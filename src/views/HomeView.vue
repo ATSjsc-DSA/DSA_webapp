@@ -1,9 +1,10 @@
 <script setup>
-import TheWelcome from '@/components/TheWelcome.vue';
+import mapView from '@/components/mapView.vue';
+import SSR_Module from '@/components/SSR_Module.vue';
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <div>
+    <mapView></mapView>
+  </div>
 </template>

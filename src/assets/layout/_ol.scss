@@ -1,0 +1,67 @@
+.ol-attribution {
+  display: none;
+}
+
+#popup_template {
+  display: none;
+}
+
+.ol-popup {
+  position: absolute;
+  bottom: 12px;
+  left: -50px;
+}
+
+.ol-popup:after,
+.ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: ' ';
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ol-popup:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+
+.ol-popup:before {
+  border-top-color: #cccccc;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -11px;
+}
+
+.ol-zoom,
+.ol-rotate {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px 0 0 4px;
+  gap: 4px;
+  width: fit-content;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.ol-zoom button,
+.ol-rotate button {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 1rem;
+  border-width: 0px;
+  background-color: rgb(248, 250, 252);
+  &:hover {
+    background-color: rgb(226, 230, 240);
+  }
+}
+
+.ol-rotate {
+  padding-top: 2px;
+}
