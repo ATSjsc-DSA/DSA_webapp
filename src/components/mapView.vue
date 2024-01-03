@@ -28,18 +28,7 @@ const features = ref([]);
 // set layer
 
 //method
-const getFeatures = (param) => {
-  param.forEach((modem) => {
-    features.value.push(
-      new Feature({
-        geometry: new Point(fromLonLat([modem[0], modem[1]])),
-        name: modem[3],
-        id: modem[2],
-        subData: modem,
-      }),
-    );
-  });
-};
+
 const getListSub = async () => {
   try {
     await mapStore.getListSub();
@@ -48,8 +37,17 @@ const getListSub = async () => {
   }
 };
 
+const getListLine = async () => {
+  try {
+    await mapStore.getListLine();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  }
+};
+
 onMounted(async () => {
   await getListSub();
+  await getListLine();
   // Create a map with the tile and vector layers
   mapStore.map = new Map({
     layers: [
