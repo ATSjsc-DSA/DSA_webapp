@@ -7,4 +7,7 @@ export default class DSA_api {
   static async getdataSub() {
     return get('/dsa/dataSub');
   }
+  static async getListLine() {
+    return get('/dsa/listLine');
+  }
 }

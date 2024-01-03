@@ -14,6 +14,7 @@ import Point from 'ol/geom/Point';
 import View from 'ol/View';
 import MultiLineString from 'ol/geom/MultiLineString';
 import Control from 'ol/control/Control';
+import LineString from 'ol/geom/LineString';
 
 export const useMapStore = defineStore('map_Store', () => {
   // setup data map
@@ -24,8 +25,7 @@ export const useMapStore = defineStore('map_Store', () => {
   const panel = ref(null);
 
   const map = ref(null);
-  const featuresSub500 = ref([]);
-
+  const features500 = ref([]);
   const viewMap_config = new View({
     zoom: 4.3,
     maxZoom: 16,
@@ -40,53 +40,92 @@ export const useMapStore = defineStore('map_Store', () => {
     }),
   });
   //subData
-  const layerSub500kV = ref(null);
-
+  const layer500kV = ref(null);
   async function getListSub() {
     try {
       const res = await DSA_api.getListSub();
       if (!res.data.success) {
         throw res.data.error;
       } else {
-        getFeatures500kV(res.data.payload.sub500kV);
+        getFeaturesSub500kV(res.data.payload.sub500kV);
       }
     } catch (error) {
       throw error;
     }
   }
-  function getFeatures500kV(param) {
+  async function getListLine() {
+    try {
+      const res = await DSA_api.getListLine();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        getFeaturesLine500kV(res.data.payload.line500kV);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  function getFeaturesSub500kV(param) {
     param.forEach((sub) => {
-      featuresSub500.value.push(
+      features500.value.push(
         new Feature({
-          geometry: new Point(fromLonLat([sub[0], sub[1]])),
-          name: sub[3],
-          id: sub[2],
+          geometry: new Point(fromLonLat(sub.geo)),
+          name: sub.name,
+          id: 'point',
           subData: {
-            name: sub[3],
-            id: sub[2],
+            name: sub.name,
+            id: sub.id,
+          },
+        }),
+      );
+    });
+  }
+  function getFeaturesLine500kV(param) {
+    param.forEach((line) => {
+      const lineStringCoords = line.geo.map((coord) => fromLonLat(coord));
+      features500.value.push(
+        new Feature({
+          geometry: new LineString(lineStringCoords),
+          name: line.name,
+          id: 'line',
+          subData: {
+            name: line.name,
+            id: 'line',
           },
         }),
       );
     });
   }
   function addLayer500kV() {
-    const sourceSub500kV = new VectorSource({
-      features: featuresSub500.value,
+    const source500kV = new VectorSource({
+      features: features500.value,
     });
-    layerSub500kV.value = new VectorLayer({
-      source: sourceSub500kV,
-      style: iconStyle,
+    layer500kV.value = new VectorLayer({
+      source: source500kV,
+      style: function (feature) {
+        console.log(feature, 'feature');
+        if (feature.values_.id === 'point') {
+          return iconStyle;
+        } else if (feature.values_.id === 'line') {
+          return new Style({
+            stroke: new Stroke({
+              color: 'red',
+              width: 2,
+            }),
+          });
+        }
+      },
     });
-    map.value.addLayer(layerSub500kV.value);
+    map.value.addLayer(layer500kV.value);
   }
 
   function removeLayer500kV() {
-    if (layerSub500kV.value) {
+    if (layer500kV.value) {
       // Xóa layer khỏi danh sách layers của bản đồ
-      map.value.getLayers().remove(layerSub500kV.value);
+      map.value.getLayers().remove(layer500kV.value);
       // Dispose of the layer to release resources
-      layerSub500kV.value.dispose();
-      layerSub500kV.value = null;
+      layer500kV.value.dispose();
+      layer500kV.value = null;
     }
   }
 
@@ -97,8 +136,9 @@ export const useMapStore = defineStore('map_Store', () => {
     panel,
     map,
     iconStyle,
-    layerSub500kV,
+    layer500kV,
     getListSub,
+    getListLine,
     addLayer500kV,
     removeLayer500kV,
   };
