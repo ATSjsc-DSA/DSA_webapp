@@ -1,10 +1,15 @@
 <script setup>
 import mapView from '@/components/mapView.vue';
-import SSR_Module from '@/components/SSR_Module.vue';
+import mainLayout from '@/components/layout/mainLayout.vue';
 </script>
 
 <template>
-  <div>
-    <mapView></mapView>
+  <div class="grid">
+    <div class="col-4">
+      <mapView></mapView>
+    </div>
+    <div class="col-8">
+      <mainLayout></mainLayout>
+    </div>
   </div>
 </template>
