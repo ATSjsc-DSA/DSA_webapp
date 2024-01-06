@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import DSA_api from '@/api/dsa_api';
 
 // Openlayer
+import BingMaps from 'ol/source/BingMaps.js';
 import { fromLonLat } from 'ol/proj';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text, Icon } from 'ol/style';
 import { Cluster, OSM, Vector as VectorSource } from 'ol/source';
@@ -25,6 +26,10 @@ export const useMapStore = defineStore('map_Store', () => {
   const panel = ref(null);
 
   const map = ref(null);
+
+  //
+  const color1 = ref('#f56c6c');
+  const color2 = '#a4cd3c';
   const features500 = ref([]);
   const viewMap_config = new View({
     zoom: 4.3,
@@ -71,10 +76,10 @@ export const useMapStore = defineStore('map_Store', () => {
         new Feature({
           geometry: new Point(fromLonLat(sub.geo)),
           name: sub.name,
-          id: 'point',
+          id: 'sub',
           subData: {
             name: sub.name,
-            id: sub.id,
+            id: 'sub',
           },
         }),
       );
@@ -103,14 +108,20 @@ export const useMapStore = defineStore('map_Store', () => {
     layer500kV.value = new VectorLayer({
       source: source500kV,
       style: function (feature) {
-        console.log(feature, 'feature');
-        if (feature.values_.id === 'point') {
-          return iconStyle;
+        if (feature.values_.id === 'sub') {
+          return new Style({
+            image: new CircleStyle({
+              radius: 6,
+              fill: new Fill({ color: 'white' }),
+              stroke: new Stroke({ color: color1.value, width: 5 }),
+            }),
+          });
         } else if (feature.values_.id === 'line') {
           return new Style({
             stroke: new Stroke({
-              color: 'red',
-              width: 2,
+              color: '#007bff',
+              width: 3,
+              // lineDash: [5, 5],
             }),
           });
         }
@@ -128,6 +139,10 @@ export const useMapStore = defineStore('map_Store', () => {
       layer500kV.value = null;
     }
   }
+  function changeColor() {
+    console.log('abc');
+    color1.value = '#a4cd3c';
+  }
 
   return {
     subData,
@@ -141,5 +156,6 @@ export const useMapStore = defineStore('map_Store', () => {
     getListLine,
     addLayer500kV,
     removeLayer500kV,
+    changeColor,
   };
 });

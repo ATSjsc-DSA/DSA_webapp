@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue';
 import mapMultiselect from './mapMultiselect.vue';
 import { useMapStore } from '@/store';
 // Openlayer
+import BingMaps from 'ol/source/BingMaps.js';
+
 import { fromLonLat } from 'ol/proj';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text, Icon } from 'ol/style';
 import { Cluster, OSM, Vector as VectorSource } from 'ol/source';
@@ -17,6 +19,8 @@ import Control from 'ol/control/Control';
 // primeVue
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
+import Card from 'primevue/card';
+import Tag from 'primevue/tag';
 
 const mapStore = useMapStore();
 const toast = useToast();
@@ -52,7 +56,12 @@ onMounted(async () => {
   mapStore.map = new Map({
     layers: [
       new TileLayer({
-        source: new OSM(),
+        visible: true,
+        preload: Infinity,
+        source: new BingMaps({
+          key: 'AjXb8jlJMD-Q4iyDA1defb1sCi4ZDUJEaoqgwLNi4CnucFBmWea61Q2bJrLi_Zba',
+          imagerySet: 'RoadOnDemand',
+        }),
       }),
     ],
     target: olMap.value,
@@ -83,11 +92,8 @@ onMounted(async () => {
   mapStore.map.on('click', (e) => {
     close_popup();
     mapStore.map.forEachFeatureAtPixel(e.pixel, (feature) => {
-      const geometry = feature.getGeometry();
-      console.log(feature.values_.subData);
       subDataClick.value = feature.values_.subData;
-      const coordinate = geometry.getCoordinates();
-      mapStore.popup.setPosition(coordinate);
+      mapStore.popup.setPosition(e.coordinate);
     });
   });
 });
@@ -119,6 +125,9 @@ const changeSelecet = (dataFocus, dataArray) => {
       case 115:
         break;
       case 20:
+        break;
+      case 'LL':
+        mapStore.changeColor();
         break;
     }
   } else {
@@ -152,10 +161,10 @@ const changeSelecet = (dataFocus, dataArray) => {
   </div>
   <div id="popup" class="ol-popup">
     <div v-if="subDataClick" class="ol-popup_card">
-      <div>
-        <span> {{ subDataClick.name }}</span>
+      <div class="ol-popup_card_maintitle">
+        <span>{{ subDataClick.name }}</span>
       </div>
-      <span>{{ subDataClick.id }}</span>
+      <Tag :severity="subDataClick.id === 'line' ? 'info' : 'success'" :value="subDataClick.id"></Tag>
     </div>
   </div>
   <Toast></Toast>
@@ -182,11 +191,15 @@ const changeSelecet = (dataFocus, dataArray) => {
 .ol-popup {
   background-color: white;
   padding: 10px;
-  min-width: 180px;
+  width: fit-content;
   border-radius: 10px;
   .ol-popup_card {
     font-size: small;
     padding: 0px;
+    .ol-popup_card_maintitle {
+      white-space: nowrap;
+      margin-bottom: 0.5rem;
+    }
   }
 }
 .map {
@@ -194,10 +207,3 @@ const changeSelecet = (dataFocus, dataArray) => {
   width: 100%;
 }
 </style>
-// const multiLineStringCoordinates = [ // [ // [0, 0], // [2000000, 0], // ], // [ // [0, 1000000], // [2000000,
-1000000], // ], // [fromLonLat([-111.0937311, 34.0489281]), fromLonLat([-121.4260018, 37.7395818])], //
-[fromLonLat([-111.2223624, 36.1111043]), fromLonLat([-122.622279097506, 47.12446079697])], // ]; // const
-multiLineString = new MultiLineString(multiLineStringCoordinates); // create a line // const vectorSourceLine = new
-VectorSource({ // features: [new Feature(multiLineString)], // }); // const vectorLayerLine = new VectorLayer({ //
-source: vectorSourceLine, // style: new Style({ // stroke: new Stroke({ // color: 'red', // width: 3, // }), // }), //
-});
