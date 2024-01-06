@@ -48,9 +48,18 @@ const groupedItem = ref([
     ],
   },
   {
-    label: 'Line',
+    label: 'Criteria',
     code: 'Li',
-    items: [],
+    items: [
+      { label: 'Line Loading', value: 'LL' },
+      { label: 'Tranformer Loading', value: 'TL' },
+      { label: 'Generator Loading', value: 'GL' },
+      { label: 'Excitation Limiter', value: 'EL' },
+      { label: 'Low/High Voltage', value: 'LHV' },
+      { label: 'VSA Module', value: 'VSA' },
+      { label: 'TSA Module', value: 'TSA' },
+      { label: 'SSR Module', value: 'SSR' },
+    ],
   },
 ]);
 

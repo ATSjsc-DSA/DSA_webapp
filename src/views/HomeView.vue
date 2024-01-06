@@ -4,12 +4,13 @@ import mainLayout from '@/components/layout/mainLayout.vue';
 </script>
 
 <template>
-  <div class="grid">
-    <div class="col-4">
+  <div>
+    <mapView></mapView>
+    <!-- <div class="col-4">
       <mapView></mapView>
     </div>
     <div class="col-8">
       <mainLayout></mainLayout>
-    </div>
+    </div> -->
   </div>
 </template>
