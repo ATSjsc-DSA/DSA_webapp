@@ -18,6 +18,22 @@ let maxAxisValue = 0.3;
 let titleStatus = 'Secure'; // Secure , Warning , Critical
 let colorStatus = 'rgba(0,128,0,1)';
 let colorTitle = 'blue'; // blue, darkOrange, red
+let defaultChartData = {
+  Key: [
+    'Line Loading',
+    'Tranformer Loading',
+    'Generator Loading',
+    'Excitation Limiter',
+    'Low/High Voltage',
+    'VSA Module',
+    'TSA Module',
+    'SSR Module',
+  ],
+  Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
+  Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
+  Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
+  CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
+};
 
 const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) => ({
   data: pdata,
@@ -30,7 +46,7 @@ const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) =>
   label: plabel,
 });
 
-const getCurrentStateColor = (rate1, rate2) => {
+const getCurrentStateColorAndTitle = (rate1, rate2) => {
   if (rate2 <= 0) {
     colorTitle = 'red';
     colorStatus = 'rgba(255,0,0,1)';
@@ -50,22 +66,11 @@ const getCurrentStateColor = (rate1, rate2) => {
   };
 };
 
-const setChartData = (radarData) => {
+const setChartData = (pRadarData) => {
+  let radarData = pRadarData;
+  if (radarData == null || radarData == 'undefined' || radarData.Key == null) radarData = defaultChartData;
   const chartValue = [];
-
-  const axislabel =
-    radarData.Key == null
-      ? [
-          'Line Loading',
-          'Tranformer Loading',
-          'Generator Loading',
-          'Excitation Limiter',
-          'Low Voltage',
-          'VSA Module',
-          'TSA Module',
-          'SSR Module',
-        ]
-      : radarData.Key;
+  const axislabel = radarData.Key;
   const numAxis = axislabel.length;
 
   const rate1 = radarData.Rate1;
@@ -91,7 +96,7 @@ const setChartData = (radarData) => {
 
   let minRate1 = Math.min(...reserve1Data);
   let minRate2 = Math.min(...reserve2Data);
-  getCurrentStateColor(minRate1, minRate2);
+  getCurrentStateColorAndTitle(minRate1, minRate2);
 
   const currentData = new Array(numAxis).fill(0);
   const boundData = new Array(numAxis).fill(maxAxisValue);
@@ -131,7 +136,7 @@ const chartOptions = computed(() => {
           display: true,
           stepSize: 0.05,
           callback: function (value, index, values) {
-            return value * 100 + '%';
+            return (value * 100).toFixed(0) + '%';
           },
           color: 'rgba(169,169,169,1)',
         },
@@ -170,44 +175,26 @@ const chartOptions = computed(() => {
       },
     },
     interaction: {
-      intersect: true,
+      intersect: false,
     },
   };
 });
 </script>
 
 <template>
-  <div class="card">
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="chart" />
+  <div class="card flex justify-content-center" style="height: 100%">
+    <Chart type="radar" :data="chartData" :options="chartOptions" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .card {
-  border-radius: 0;
-  padding: 10px;
+  position: relative;
+  padding: 5px 5px 5px 5px;
 }
-.chart {
-  height: 100%;
+.p-chart {
+  max-width: calc(100vh - 16rem) !important;
+  width: 95%;
+  height: 100% !important;
 }
 </style>
-
-<!-- template api data return
-
-const data = {
-  Key: [
-    'Line Loading',
-    'Tranformer Loading',
-    'Generator Loading',
-    'Excitation Limiter',
-    'Low/High Voltage',
-    'VSA Module',
-    'TSA Module',
-    'SSR Module',
-  ],
-  Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
-  Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
-  Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
-  CurentState: [81, 81, 87, 81, 81, 81, 81, 88],
-};
--->

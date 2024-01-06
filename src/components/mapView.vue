@@ -191,7 +191,6 @@ const changeSelecet = (dataFocus, dataArray) => {
 }
 .map {
   height: calc(100vh - 154px);
-  // height: auto;
   width: 100%;
 }
 </style>
