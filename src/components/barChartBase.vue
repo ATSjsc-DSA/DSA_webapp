@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue';
 import Chart from 'primevue/chart';
-import chartOverLayPanel from './chartOverLayPanel.vue';
+import chartComposable from '@/combosables/chartData';
+
+const { zoomOptions } = chartComposable();
 const props = defineProps({
   chartData: {
     type: Object,
@@ -52,6 +53,7 @@ const chartOptions = computed(() => {
     maintainAspectRatio: false,
     aspectRatio: 0.6,
     plugins: {
+      zoom: zoomOptions(),
       title: {
         display: true,
         text: titleChart.value,

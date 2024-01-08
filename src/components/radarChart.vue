@@ -156,10 +156,10 @@ const chartOptions = computed(() => {
         position: 'top', // Đặt vị trí tiêu đề là top
         align: 'center', // Căn giữa
         font: {
-          size: 20, // Kích thước font
+          size: 18, // Kích thước font
           weight: 'bold', // Độ đậm của font
         },
-        padding: 0,
+        padding: 12,
       },
       legend: {
         display: false,
@@ -183,18 +183,22 @@ const chartOptions = computed(() => {
 
 <template>
   <div class="card flex justify-content-center" style="height: 100%">
-    <Chart type="radar" :data="chartData" :options="chartOptions" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="chart md:w-27rem" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .card {
+  border-radius: 0;
   position: relative;
   padding: 5px 5px 5px 5px;
 }
-.p-chart {
-  max-width: calc(100vh - 16rem) !important;
-  width: 95%;
-  height: 100% !important;
+// .p-chart {
+//   max-width: calc(100vh - 16rem) !important;
+//   width: 95%;
+//   height: 100%;
+// }
+.chart {
+  height: 100%;
 }
 </style>

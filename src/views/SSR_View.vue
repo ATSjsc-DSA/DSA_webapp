@@ -4,7 +4,7 @@ import SSR_Module from '@/components/SSR_Module.vue';
 </script>
 
 <template>
-  <div class="grid">
+  <div class="grid h-full">
     <div class="col-5">
       <mapView></mapView>
     </div>

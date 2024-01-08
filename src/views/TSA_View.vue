@@ -4,7 +4,7 @@ import TSA_Module from '@/components/TSA_Module.vue';
 </script>
 
 <template>
-  <div class="grid">
+  <div class="grid h-full">
     <div class="col-4">
       <mapView></mapView>
     </div>

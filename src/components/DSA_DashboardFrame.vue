@@ -64,7 +64,7 @@ onMounted(async () => {
 
 <template>
   <Toast></Toast>
-  <div class="">
+  <div class="h-full">
     <DSA_DashboardBlock
       :class="'dashboard dashboard--editing dashboard--' + state"
       v-bind="props.data"

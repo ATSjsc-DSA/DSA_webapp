@@ -10,7 +10,6 @@ import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
 
-
 const baseValueChart = {
   name: '',
   dm: {
@@ -129,8 +128,9 @@ const changeSubActive4 = async (param) => {
 <style lang="scss" scoped>
 .ssr {
   margin-top: 0px;
+  height: 100%;
   .ssr-block {
-    height: calc((100vh - 154px) / 2); /* 50% chiều cao của viewport, bạn có thể điều chỉnh theo nhu cầu */
+    height: 50%;
     position: relative;
   }
   .block-top {

@@ -127,7 +127,7 @@ const changeSelecet = (dataFocus, dataArray) => {
       case 20:
         break;
       case 'LL':
-        mapStore.changeColor();
+        mapStore.changeStandardsLineLoading();
         break;
     }
   } else {
@@ -146,6 +146,9 @@ const changeSelecet = (dataFocus, dataArray) => {
       case 115:
         break;
       case 20:
+        break;
+      case 'LL':
+        mapStore.resetLineColor();
         break;
     }
   }
@@ -203,7 +206,8 @@ const changeSelecet = (dataFocus, dataArray) => {
   }
 }
 .map {
-  height: calc(100vh - 154px);
+  // height: calc(100vh - 154px);
+  height: 100%;
   width: 100%;
 }
 </style>

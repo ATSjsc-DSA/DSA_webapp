@@ -1,8 +1,10 @@
 import DSA_DashboardsEmpty from './DSA_DashboardsEmpty.vue';
 import mapView from '@/components/mapView.vue';
 import DSA_RadarChar from './DSA_RadarChar.vue';
+import SSR_lineChart from './SSR_lineChart.vue';
+import TSA_F81Chart from './TSA_F81Chart.vue';
+import TSA_GTTTChart from './TSA_GTTTChart.vue';
 import SSR_Module from './SSR_Module.vue';
-
 const defaultSetting = {
   type: 'horizontal',
   size: 1,
@@ -103,11 +105,11 @@ const getComponent = (name) => {
   } else if (name === 'VSA') {
     return DSA_RadarChar;
   } else if (name === 'SSR') {
-    return DSA_RadarChar;
+    return SSR_lineChart;
   } else if (name === 'SPS-81') {
-    return DSA_RadarChar;
+    return TSA_F81Chart;
   } else if (name === 'TSA') {
-    return DSA_RadarChar;
+    return TSA_GTTTChart;
   } else if (name === 'LINE') {
     return DSA_RadarChar;
   } else {
