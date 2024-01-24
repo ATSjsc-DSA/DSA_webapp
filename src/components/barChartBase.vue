@@ -48,6 +48,7 @@ const chartOptions = computed(() => {
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
   return {
+    barThickness: 20,
     stacked: true,
     maintainAspectRatio: false,
     aspectRatio: 0.6,

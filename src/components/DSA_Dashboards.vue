@@ -95,7 +95,7 @@ const props = defineProps({
   },
 });
 const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA'];
-const canEdit = ref(true);
+const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
 let activeDashboardData = ref(DSA_DashboardHelper.defaultSetting);
@@ -135,7 +135,7 @@ const saveConfigReport = () => {
   isChanged.value = false;
 };
 onMounted(() => {
-  let saveLayoutDashboard = null; // DSA_DashboardHelper.loadSettingLocalStorage();
+  let saveLayoutDashboard = DSA_DashboardHelper.loadSettingLocalStorage();
   console.log('saveLayoutDashboard');
   console.log(saveLayoutDashboard);
   if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')

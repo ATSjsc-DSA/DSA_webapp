@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import Chart from 'primevue/chart';
 import chartOverLayPanel from './chartOverLayPanel.vue';
+import 'chartjs-plugin-zoom';
+
 const props = defineProps({
   chartData: {
     type: Object,
@@ -134,6 +136,21 @@ const chartOptions = computed(() => {
           padding: 12,
         },
         position: 'top',
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'xy',
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: 'xy',
+        },
       },
     },
     scales: {

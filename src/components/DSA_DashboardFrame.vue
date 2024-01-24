@@ -30,7 +30,7 @@ const state = ref('none');
 
 const handleReadyPrintDashboard = (_Component, _readyPrint) => {
   console.log('handleReadyPrintDashboard : ' + _Component + ' - ' + _readyPrint);
-  emit('handleReadyPrintReport', _Component, _readyPrint);
+  //emit('handleReadyPrintReport', _Component, _readyPrint);
 };
 
 onMounted(async () => {

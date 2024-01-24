@@ -378,13 +378,13 @@ export default {
     handleReadyPrintRealComponent(_Id, _readyPrint) {
       console.log('handle ready : ' + _Id + '  - ' + _readyPrint);
       this.readyPrint = _readyPrint;
-      this.$emit('handleReadyPrintDashboardBlock', this.idUuid, _readyPrint);
+      //this.$emit('handleReadyPrintDashboardBlock', this.idUuid, _readyPrint);
     },
     handleReadyPrintDashboardBlock(_Id, _readyPrint) {
       //	console.log('handle ready 2 : ' + _Id + '  - ' + _readyPrint);
       this.readyPrint = this.checkChildrenArrayReadyPrint(_Id, _readyPrint);
       if (this.readyPrint && this.readyPrintArray.length == this.children.length) {
-        this.$emit('handleReadyPrintDashboardBlock', this.idUuid, true);
+        // this.$emit('handleReadyPrintDashboardBlock', this.idUuid, true);
       }
     },
 
