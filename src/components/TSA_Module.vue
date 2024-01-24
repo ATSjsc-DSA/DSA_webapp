@@ -5,7 +5,7 @@ import TSA_ChartView from './TSA_ChartView.vue';
 </script>
 
 <template>
-  <div class="grid mt-0">
+  <div class="grid h-full">
     <div class="col-4 tsa-block py-0">
       <TSA_SPSCheck></TSA_SPSCheck>
     </div>
@@ -21,7 +21,7 @@ import TSA_ChartView from './TSA_ChartView.vue';
 </template>
 <style lang="scss" scoped>
 .tsa-block {
-  height: calc((100vh - 154px));
+  height: 100%;
   display: flex;
   flex-direction: column;
   row-gap: 0.5rem;

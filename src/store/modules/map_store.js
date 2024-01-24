@@ -27,10 +27,17 @@ export const useMapStore = defineStore('map_Store', () => {
 
   const map = ref(null);
 
-  //
-  const color1 = ref('#f56c6c');
-  const color2 = '#a4cd3c';
+  //layer500
   const features500 = ref([]);
+  const layer500kV = ref(null);
+
+  //config
+  const greenColor = '#28a745';
+  const yellowColor = '#ffb40a';
+  const redColor = '#d01e39';
+
+  const Point500Color = '#f5385a';
+
   const viewMap_config = new View({
     zoom: 4.3,
     maxZoom: 16,
@@ -44,35 +51,11 @@ export const useMapStore = defineStore('map_Store', () => {
       height: 25,
     }),
   });
-  //subData
-  const layer500kV = ref(null);
-  async function getListSub() {
-    try {
-      const res = await DSA_api.getListSub();
-      if (!res.data.success) {
-        throw res.data.error;
-      } else {
-        getFeaturesSub500kV(res.data.payload.sub500kV);
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-  async function getListLine() {
-    try {
-      const res = await DSA_api.getListLine();
-      if (!res.data.success) {
-        throw res.data.error;
-      } else {
-        getFeaturesLine500kV(res.data.payload.line500kV);
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-  function getFeaturesSub500kV(param) {
+  //common function
+  function getFeaturesPoint(param) {
+    const featuresPoin = [];
     param.forEach((sub) => {
-      features500.value.push(
+      featuresPoin.push(
         new Feature({
           geometry: new Point(fromLonLat(sub.geo)),
           name: sub.name,
@@ -84,11 +67,13 @@ export const useMapStore = defineStore('map_Store', () => {
         }),
       );
     });
+    return featuresPoin;
   }
-  function getFeaturesLine500kV(param) {
+  function getFeaturesLine(param) {
+    const featuresline = [];
     param.forEach((line) => {
       const lineStringCoords = line.geo.map((coord) => fromLonLat(coord));
-      features500.value.push(
+      featuresline.push(
         new Feature({
           geometry: new LineString(lineStringCoords),
           name: line.name,
@@ -97,51 +82,106 @@ export const useMapStore = defineStore('map_Store', () => {
             name: line.name,
             id: 'line',
           },
+          lineColor: greenColor,
         }),
       );
     });
+    return featuresline;
   }
+
+  function getFeatureStyle(pointColor, feature) {
+    const id = feature.get('id');
+    if (id === 'sub') {
+      // Style for Point
+      return new Style({
+        image: new CircleStyle({
+          radius: 6,
+          fill: new Fill({ color: 'white' }),
+          stroke: new Stroke({ color: pointColor, width: 5 }),
+        }),
+      });
+    } else if (id === 'line') {
+      // Style for line
+      const lineColor = feature.get('lineColor') !== null ? feature.get('lineColor') : greenColor;
+      return new Style({
+        stroke: new Stroke({
+          color: lineColor,
+          width: 3,
+        }),
+      });
+    }
+  }
+  //subData
+  async function getListSub() {
+    try {
+      const res = await DSA_api.getListSub();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        features500.value = [...features500.value, ...getFeaturesPoint(res.data.payload.sub500kV)];
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async function getListLine() {
+    try {
+      const res = await DSA_api.getListLine();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        features500.value = [...features500.value, ...getFeaturesLine(res.data.payload.line500kV)];
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   function addLayer500kV() {
     const source500kV = new VectorSource({
       features: features500.value,
     });
     layer500kV.value = new VectorLayer({
       source: source500kV,
-      style: function (feature) {
-        if (feature.values_.id === 'sub') {
-          return new Style({
-            image: new CircleStyle({
-              radius: 6,
-              fill: new Fill({ color: 'white' }),
-              stroke: new Stroke({ color: color1.value, width: 5 }),
-            }),
-          });
-        } else if (feature.values_.id === 'line') {
-          return new Style({
-            stroke: new Stroke({
-              color: '#007bff',
-              width: 3,
-              // lineDash: [5, 5],
-            }),
-          });
-        }
-      },
+      style: getFeatureStyle.bind(null, Point500Color),
     });
     map.value.addLayer(layer500kV.value);
   }
 
   function removeLayer500kV() {
     if (layer500kV.value) {
-      // Xóa layer khỏi danh sách layers của bản đồ
       map.value.getLayers().remove(layer500kV.value);
-      // Dispose of the layer to release resources
       layer500kV.value.dispose();
       layer500kV.value = null;
     }
   }
-  function changeColor() {
-    console.log('abc');
-    color1.value = '#a4cd3c';
+  function changeStandardsLineLoading() {
+    layer500kV.value
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        const id = feature.get('id');
+        if (id === 'line') {
+          feature.set('lineColor', redColor);
+        }
+      });
+  }
+  function resetLineColor() {
+    console.log('resetLineColor');
+    if (layer500kV.value) {
+      layer500kV.value
+        .getSource()
+        .getFeatures()
+        .forEach((feature) => {
+          const id = feature.get('id');
+          if (id === 'line') {
+            feature.set('lineColor', null);
+          }
+        });
+
+      // call ol.layer.Layer#changed update layer
+      // layer500kV.value.changed();
+    }
   }
 
   return {
@@ -156,6 +196,7 @@ export const useMapStore = defineStore('map_Store', () => {
     getListLine,
     addLayer500kV,
     removeLayer500kV,
-    changeColor,
+    changeStandardsLineLoading,
+    resetLineColor,
   };
 });

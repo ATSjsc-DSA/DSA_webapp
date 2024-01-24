@@ -1,14 +1,13 @@
 <script setup>
 import mainLayout from '@/components/layout/mainLayout.vue';
+import anhtdq from '@/components/a.vue';
+import anhyd from '@/components/b.vue';
 </script>
 
 <template>
-  <div>
-    <div class="circle-container">
-      <div class="circleR"></div>
-      <div class="circleY"></div>
-      <div class="circleG"></div>
-    </div>
+  <div class="h-full">
+    <!-- <anhtdq></anhtdq>
+    <anhyd></anhyd> -->
     <main-layout></main-layout>
   </div>
 </template>

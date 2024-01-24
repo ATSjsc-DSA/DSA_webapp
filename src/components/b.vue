@@ -94,42 +94,6 @@
           consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
           aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio
         </span>
-        <p>
-          r accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum, dolor sit
-          amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam qui id
-          ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque lib
-        </p>
-        <p>
-          r accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum, dolor sit
-          amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam qui id
-          ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque lib
-        </p>
       </template>
     </Card>
   </div>

@@ -14,8 +14,26 @@ const chartComposable = () => {
       throw error;
     }
   };
+  const zoomOptions = () => {
+    return {
+      zoom: {
+        wheel: {
+          enabled: true,
+        },
+        pinch: {
+          enabled: true,
+        },
+        mode: 'x',
+      },
+      pan: {
+        enabled: true,
+        mode: 'x',
+      },
+    };
+  };
   return {
     getDataSub,
+    zoomOptions,
   };
 };
 export default chartComposable;

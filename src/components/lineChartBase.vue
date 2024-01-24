@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue';
 import Chart from 'primevue/chart';
-import chartOverLayPanel from './chartOverLayPanel.vue';
-import 'chartjs-plugin-zoom';
+import chartComposable from '@/combosables/chartData';
+
+const { zoomOptions } = chartComposable();
 
 const props = defineProps({
   chartData: {
@@ -11,7 +11,6 @@ const props = defineProps({
     default: {},
   },
 });
-
 const chartData = computed(() => {
   return setChartData(props.chartData);
 });
@@ -32,7 +31,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y', // Choose the appropriate axis
         tension: 0, // Use tension 0 to draw straight lines
         data: dataSub.dm,
-        pointRadius: 1.5,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'Base',
@@ -41,7 +41,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.base,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_4001_8001_1',
@@ -50,7 +51,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_4001_8001_1,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_4001_4204_1',
@@ -59,7 +61,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_4001_4204_1,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_4001_4097_1',
@@ -68,7 +71,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_4001_4097_1,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_4001_4094_1',
@@ -77,7 +81,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_4001_4094_1,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_4001_4090_1',
@@ -86,7 +91,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_4001_4090_1,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_3906_4001_2',
@@ -95,7 +101,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_3906_4001_2,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
       {
         label: 'lne_3906_4001_1',
@@ -104,7 +111,8 @@ const setChartData = (dataSub) => {
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_3906_4001_1,
-        pointRadius: 1.2,
+        pointRadius: 0,
+        borderWidth: 2,
       },
     ],
   };
@@ -121,6 +129,7 @@ const chartOptions = computed(() => {
     maintainAspectRatio: false,
     aspectRatio: 0.6,
     plugins: {
+      zoom: zoomOptions(),
       title: {
         display: true,
         text: titleChart.value,

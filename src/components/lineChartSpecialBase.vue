@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Chart from 'primevue/chart';
-import chartOverLayPanel from './chartOverLayPanel.vue';
 const props = defineProps({
   chartData: {
     type: Object,
@@ -22,6 +21,7 @@ const titleChart = computed(() => {
     return 'Angle chart';
   } else return 'Power Tranfer';
 });
+const chartPlugins = ref();
 
 const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
   label,
