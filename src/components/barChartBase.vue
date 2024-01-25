@@ -50,6 +50,7 @@ const chartOptions = computed(() => {
 
   return {
     animation: false,
+    barThickness: 20,
     stacked: true,
     barThickness: 20,
     maintainAspectRatio: false,

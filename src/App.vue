@@ -1,9 +1,8 @@
-<script setup></script>
+<script setup>
+import { Chart } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
+Chart.register(zoomPlugin);
+</script>
 <template>
   <RouterView></RouterView>
 </template>
-<style>
-.grid {
-  margin-top: 0px !important;
-}
-</style>
