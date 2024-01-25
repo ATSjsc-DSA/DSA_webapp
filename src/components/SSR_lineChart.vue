@@ -1,14 +1,22 @@
 <script setup>
 import lineChartBase from './lineChartBase.vue';
 import SSR_api from '@/api/ssr_api';
+import chartOverLayPanel from './chartOverLayPanel.vue';
 
 // primeVue
-
-import chartOverLayPanel from './chartOverLayPanel.vue';
 
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
+
+const props = defineProps({
+  subActive: {
+    Type: String,
+    default: 'sym_4031_1',
+  },
+});
+
+const subActive = ref(props.subActive);
 
 const baseValueChart = {
   name: '',
@@ -29,9 +37,8 @@ const baseValueChart = {
 };
 
 const listSub = ref([]);
-
+const interval = ref(null);
 const chartBlock = ref(baseValueChart);
-const chartBlock2 = ref(baseValueChart);
 
 const getListSub = async () => {
   try {
@@ -40,7 +47,6 @@ const getListSub = async () => {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       listSub.value = res.data.payload;
-      console.log(listSub.value, 'listSub.value');
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -50,12 +56,10 @@ getListSub();
 const getchartData = async (subName) => {
   try {
     const res = await SSR_api.getSubInfo(subName);
-    // chartData.value = await getDataSub('sym_4035_1');
     if (!res.data.success) {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
-      console.log(res.data.payload, 'res.data.payload');
-      return res.data.payload;
+      chartBlock.value = res.data.payload;
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -63,11 +67,19 @@ const getchartData = async (subName) => {
 };
 
 onMounted(async () => {
-  chartBlock.value = await getchartData('sym_4031_1');
+  await getchartData(subActive.value);
+  interval.value = setInterval(() => {
+    getchartData(subActive.value);
+  }, 5000);
+});
+
+onUnmounted(() => {
+  clearInterval(interval.value);
 });
 
 const changeSubActive = async (param) => {
-  chartBlock.value = await getchartData(param);
+  subActive.value = param;
+  await getchartData(param);
 };
 </script>
 
@@ -76,7 +88,7 @@ const changeSubActive = async (param) => {
   <div class="ssr-block">
     <chartOverLayPanel
       :listSub="listSub"
-      :subActive="chartBlock.name"
+      :subActive="subActive"
       @changeSubActive="changeSubActive"
       class="ssr-block-overlay"
     ></chartOverLayPanel>
@@ -85,14 +97,14 @@ const changeSubActive = async (param) => {
 </template>
 <style lang="scss" scoped>
 .ssr-block {
-  // height: 100%;
   width: 100%;
-  height: calc((100vh - 154px) / 2); /* 50% chiều cao của viewport, bạn có thể điều chỉnh theo nhu cầu */
+  // height: calc((100vh - 154px) / 2);
+  height: 100%;
   position: relative;
   .ssr-block-overlay {
     position: absolute;
-    top: 0px;
-    left: 0.5rem;
+    top: 0.2rem;
+    left: 0.2rem;
     z-index: 100;
   }
 }

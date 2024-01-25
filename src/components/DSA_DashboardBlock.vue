@@ -165,8 +165,6 @@ export default {
       const newComponent = JSON.parse(data);
 
       if (parentType === directionMatch[direction]) {
-        console.log('out1');
-
         const isHorizontal = this.$parent.type === 'horizontal';
         const parentRect = this.$parent.$refs.block.getBoundingClientRect();
         const parentSize = isHorizontal ? parentRect.width : parentRect.height;
@@ -203,10 +201,7 @@ export default {
             size: newChildSize,
           }),
         );
-
-        console.log(this.$parent.children);
       } else {
-        console.log('out2');
         const newSelf = {
           type: 'panel',
           size: 0.5,
@@ -256,11 +251,9 @@ export default {
       const newComponent = JSON.parse(data);
 
       if (this.type === 'panel') {
-        console.log('out4');
         Object.assign(this.$parent.children[this.i], newComponent);
       } else {
         // This is a specific case just for empty dashboards
-        console.log('out5');
         this.children.push(
           Object.assign(newComponent, {
             type: 'panel',
@@ -278,25 +271,18 @@ export default {
       e.target.classList.remove('controls__control--active');
     },
     handleDelete() {
-      console.log('delete begin');
-      console.log(this.children);
-      console.log(this.$parent.children);
-
       if (this.$parent.children.length === 1) {
         this.$parent.children.splice(0, 1);
         const parentParent = this.$parent.$parent;
         if (parentParent.children) {
           parentParent.children.splice(this.$parent.i, 1);
         }
-        console.log('delete size =1');
       } else if (this.$parent.children.length === 2) {
         const parentParent = this.$parent.$parent;
 
         if (!parentParent) return;
 
         if (parentParent.children) {
-          console.log('delete size =2 parentParent have children');
-
           const parentSiblingsPanels = parentParent.children.every(
             (block, i) => i === this.$parent.i || block.type === 'panel',
           );
@@ -348,7 +334,6 @@ export default {
           // }
         }
       } else {
-        console.log('delete size = n');
         this.$parent.children.splice(this.i, 1);
 
         this.$parent.children.forEach((child) => {

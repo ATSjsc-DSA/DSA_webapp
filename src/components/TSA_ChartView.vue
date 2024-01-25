@@ -65,7 +65,6 @@ const getListLine = async () => {
     if (!res.data.success) {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
-      console.log(res.data.payload, 'res.data.payload');
       listLine.value = res.data.payload;
     }
   } catch (error) {
@@ -84,8 +83,8 @@ const getActive = (value) => {
 const changeLineActive1 = async (param) => {
   chartBlock1.value = await getchartData('DaNang-Pleiku_' + param);
 };
-const changeLineActive2 = async (event) => {
-  chartBlock1.value = await getchartData('NhoQuan-HaTinh_' + param);
+const changeLineActive2 = async (param) => {
+  chartBlock2.value = await getchartData('NhoQuan-HaTinh_' + param);
 };
 </script>
 
@@ -97,18 +96,11 @@ const changeLineActive2 = async (event) => {
         <chartOverLayPanel :listSub="listLine.DNPK" :subActive="lineActiveBlock1" @changeSubActive="changeLineActive1">
           <span>{{ chartBlock1.name }}</span></chartOverLayPanel
         >
-        <!-- <Avatar
-          icon="pi pi-building"
-          class="mr-2"
-          style="background-color: #078f62; color: #ffffff"
-          shape="circle"
-        /> -->
       </div>
       <div v-show="active === 1">
         <chartOverLayPanel :listSub="listLine.NQHT" :subActive="lineActiveBlock2" @changeSubActive="changeLineActive2">
           <span>{{ chartBlock2.name }}</span></chartOverLayPanel
         >
-        <!-- <Avatar icon="pi pi-building" class="mr-2" style="background-color: #078f62; color: #ffffff" shape="circle" /> -->
       </div>
     </div>
 
@@ -120,19 +112,18 @@ const changeLineActive2 = async (event) => {
 
       <div class="flex-1">
         <div v-show="active === 0" class="h-full">
-          <div></div>
           <div class="flex flex-column h-full">
             <div class="flex-1">
               <lineChartSpecialBase
                 ChartStabe
-                :chartData="chartBlock2"
+                :chartData="chartBlock1"
                 labelChart="value"
                 class="chart"
               ></lineChartSpecialBase>
             </div>
             <div class="flex-1">
               <lineChartSpecialBase
-                :chartData="chartBlock2"
+                :chartData="chartBlock1"
                 labelChart="PowerTranfer"
                 class="chart"
               ></lineChartSpecialBase>
@@ -145,14 +136,14 @@ const changeLineActive2 = async (event) => {
             <div class="flex-1">
               <lineChartSpecialBase
                 ChartStabe
-                :chartData="chartBlock1"
+                :chartData="chartBlock2"
                 labelChart="value"
                 class="chart"
               ></lineChartSpecialBase>
             </div>
             <div class="flex-1">
               <lineChartSpecialBase
-                :chartData="chartBlock1"
+                :chartData="chartBlock2"
                 labelChart="PowerTranfer"
                 class="chart"
               ></lineChartSpecialBase>

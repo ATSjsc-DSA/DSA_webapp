@@ -10,4 +10,13 @@ export default class DSA_api {
   static async getListLine() {
     return get('/dsa/listLine');
   }
+  static async voltageStandards() {
+    return get('/dsa/voltageStandards');
+  }
+  static async ssrStandards() {
+    return get('/dsa/SSRStandards');
+  }
+  static async lineLoadingStandards() {
+    return get('/dsa/lineLoadingStandards');
+  }
 }

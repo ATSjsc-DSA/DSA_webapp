@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import Button from 'primevue/button';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
@@ -66,7 +67,8 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-  <div class="layout-topbar">
+  <Button icon="pi pi-bars" class="absolute top-50 border-noround-left z-5" @click="onMenuToggle()" />
+  <!-- <div class="layout-topbar">
     <router-link to="/" class="layout-topbar-logo">
       <img :src="logoUrl" alt="logo" />
       <span> DSA Solution</span>
@@ -94,7 +96,7 @@ const isOutsideClicked = (event) => {
         <span>Settings</span>
       </button>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style lang="scss" scoped></style>

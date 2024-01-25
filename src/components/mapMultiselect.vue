@@ -1,83 +1,41 @@
 <template>
   <div class="">
-    <MultiSelect
-      v-model="selectedItem"
-      :options="groupedItem"
-      optionLabel="label"
-      optionGroupLabel="label"
-      optionGroupChildren="items"
-      display="chip"
-      placeholder="Select "
-      class="w-full md:w-12rem"
-      @change="changeSelecet($event)"
-    >
-      <template #optiongroup="slotProps">
-        <div class="flex align-items-center">
-          <div>{{ slotProps.option.label }}</div>
-        </div>
-      </template>
-    </MultiSelect>
+    <Dropdown
+      v-model="selectedCriteria"
+      :options="criterias"
+      optionLabel="name"
+      placeholder="Select a Criteria"
+      class="w-full md:w-14rem border-noround"
+      @update:modelValue="changeSelecet($event)"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import MultiSelect from 'primevue/multiselect';
+import Dropdown from 'primevue/dropdown';
 
 const props = defineProps({
-  selectedSubs: {
-    type: Array,
+  selectedCriteria: {
+    type: String,
     required: true,
   },
 });
 
 const emits = defineEmits(['changeSelecet']);
-const selectedItem = ref();
-const groupedItem = ref([
-  {
-    label: 'Substation',
-    code: 'Sub',
-    items: [
-      { label: '500KV', value: 500 },
-      { label: '345KV', value: 345 },
-      { label: '287KV', value: 287 },
-      { label: '220kV', value: 220 },
-      { label: '138KV', value: 138 },
-      { label: '115kV', value: 115 },
-      { label: '20KV', value: 20 },
-    ],
-  },
-  {
-    label: 'Criteria',
-    code: 'Li',
-    items: [
-      { label: 'Line Loading', value: 'LL' },
-      { label: 'Tranformer Loading', value: 'TL' },
-      { label: 'Generator Loading', value: 'GL' },
-      { label: 'Excitation Limiter', value: 'EL' },
-      { label: 'Low/High Voltage', value: 'LHV' },
-      { label: 'VSA Module', value: 'VSA' },
-      { label: 'TSA Module', value: 'TSA' },
-      { label: 'SSR Module', value: 'SSR' },
-    ],
-  },
+const selectedCriteria = ref();
+const criterias = ref([
+  { name: 'Line Loading', value: 'LL' },
+  { name: 'Tranformer Loading', value: 'TL' },
+  { name: 'Generator Loading', value: 'GL' },
+  { name: 'Excitation Limiter', value: 'EL' },
+  { name: 'Low/High Voltage', value: 'LHV' },
+  { name: 'VSA Module', value: 'VSA' },
+  { name: 'TSA Module', value: 'TSA' },
+  { name: 'SSR Module', value: 'SSR' },
 ]);
 
-const findDifferentValues = (array1, array2) => {
-  let differentValues = array1.filter((value) => !array2.includes(value));
-  return differentValues[0];
-};
-
 const changeSelecet = (event) => {
-
-  let data = {
-    valueFocus: findDifferentValues(event.value, props.selectedSubs),
-    added: true,
-  };
-  if (props.selectedSubs.length > event.value.length) {
-    data.added = false;
-    data.valueFocus = findDifferentValues(props.selectedSubs, event.value);
-  }
-  emits('changeSelecet', data, event.value);
+  emits('changeSelecet', event.value);
 };
 </script>

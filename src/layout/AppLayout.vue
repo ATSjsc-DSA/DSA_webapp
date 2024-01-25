@@ -22,7 +22,7 @@ const containerClass = computed(() => {
   return {
     'layout-theme-light': layoutConfig.darkTheme.value === 'light',
     'layout-theme-dark': layoutConfig.darkTheme.value === 'dark',
-    'layout-overlay': layoutConfig.menuMode.value === 'overlay',
+    'layout-overlay': layoutConfig.menuMode.value === 'overlay' || layoutConfig.menuMode.value === 'hide',
     'layout-static': layoutConfig.menuMode.value === 'static',
     'layout-static-inactive': layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static',
     'layout-overlay-active': layoutState.overlayMenuActive.value,
@@ -30,6 +30,11 @@ const containerClass = computed(() => {
     'p-input-filled': layoutConfig.inputStyle.value === 'filled',
     'p-ripple-disabled': !layoutConfig.ripple.value,
   };
+});
+const hideOverlayMenu = computed(() => {
+  if (layoutConfig.menuMode.value === 'hide') {
+    return true;
+  } else return false;
 });
 const bindOutsideClickListener = () => {
   if (!outsideClickListener.value) {
@@ -63,8 +68,8 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-  <div class="layout-wrapper" :class="containerClass">
-    <app-topbar></app-topbar>
+  <div class="layout-wrapper relative" :class="containerClass">
+    <app-topbar v-show="!hideOverlayMenu"></app-topbar>
     <div class="layout-sidebar">
       <app-sidebar></app-sidebar>
     </div>

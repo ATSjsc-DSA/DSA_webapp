@@ -5,6 +5,7 @@ import SSR_lineChart from './SSR_lineChart.vue';
 import TSA_F81Chart from './TSA_F81Chart.vue';
 import TSA_GTTTChart from './TSA_GTTTChart.vue';
 import SSR_Module from './SSR_Module.vue';
+import DSA_logTable from './DSA_logTable.vue';
 const defaultSetting = {
   type: 'horizontal',
   size: 1,
@@ -17,6 +18,7 @@ const defaultSetting = {
       type: 'panel',
       size: 1,
     },
+
     {
       type: 'vertical',
       size: 1,
@@ -32,7 +34,7 @@ const defaultSetting = {
         {
           type: 'panel',
           size: 0.5,
-          component: 'RADAR',
+          component: 'logTable',
           meta: {
             color: 'rgb(241, 131, 186)',
           },
@@ -44,7 +46,7 @@ const defaultSetting = {
       size: 1,
       children: [
         {
-          component: 'RADAR',
+          component: 'SSR',
           meta: {
             color: 'rgb(241, 131, 186)',
           },
@@ -54,29 +56,7 @@ const defaultSetting = {
         {
           type: 'panel',
           size: 0.5,
-          component: 'RADAR',
-          meta: {
-            color: 'rgb(241, 131, 186)',
-          },
-        },
-      ],
-    },
-    {
-      type: 'vertical',
-      size: 1,
-      children: [
-        {
-          component: 'RADAR',
-          meta: {
-            color: 'rgb(241, 131, 186)',
-          },
-          type: 'panel',
-          size: 0.5,
-        },
-        {
-          type: 'panel',
-          size: 0.5,
-          component: 'RADAR',
+          component: 'SPS-81',
           meta: {
             color: 'rgb(241, 131, 186)',
           },
@@ -112,6 +92,8 @@ const getComponent = (name) => {
     return TSA_GTTTChart;
   } else if (name === 'LINE') {
     return DSA_RadarChar;
+  } else if (name === 'logTable') {
+    return DSA_logTable;
   } else {
     return DSA_DashboardsEmpty; //{ render: (h) => h('p', '404 component not found') };
   }

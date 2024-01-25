@@ -1,7 +1,10 @@
 <script setup>
 import { ref } from 'vue';
+import { useLayout } from '@/layout/composables/layout';
 
 import AppMenuItem from './AppMenuItem.vue';
+import Button from 'primevue/button';
+const { onMenuToggle } = useLayout();
 
 const model = ref([
   {
@@ -19,12 +22,18 @@ const model = ref([
 </script>
 
 <template>
-  <ul class="layout-menu">
+  <ul class="layout-menu relative">
     <template v-for="(item, i) in model" :key="item">
       <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
       <li v-if="item.separator" class="menu-separator"></li>
     </template>
   </ul>
+  <Button
+    icon="pi pi-chevron-left"
+    size="small"
+    class="absolute bottom-0 border-noround left-0 w-full"
+    @click="onMenuToggle()"
+  />
 </template>
 
 <style lang="scss" scoped></style>

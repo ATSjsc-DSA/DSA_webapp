@@ -33,7 +33,6 @@ instance.interceptors.response.use(
       return Promise.reject(error);
     }
     const { message } = error;
-    console.error(message);
     return Promise.reject(error);
   },
 );

@@ -1,9 +1,8 @@
 <script setup>
 import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
-
+import TSA_GTTTChart from './TSA_GTTTChart.vue';
 // primeVue
-import Tag from 'primevue/tag';
 
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
@@ -34,9 +33,7 @@ onMounted(async () => {
 <template>
   <Toast></Toast>
   <customFieldset legendText="TTTG Check">
-    <div class="tttg-block">
-      <barChartBase :chartData="chartBlock1" class="chart"></barChartBase>
-    </div>
+    <TSA_GTTTChart enabledFieldset></TSA_GTTTChart>
   </customFieldset>
 </template>
 <style lang="scss" scoped>

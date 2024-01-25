@@ -3,8 +3,9 @@
   flex-direction: column;
   height: calc(100vh - 3.5rem);
   // height: 100%;
+  // height: 100vh;
   justify-content: space-between;
-  padding: 6rem 1rem 0rem 4rem;
+  padding: 1rem 1rem 0rem 4rem; // padding 7 rem to top menu
   transition: margin-left $transitionDuration;
   overflow: hidden;
 }

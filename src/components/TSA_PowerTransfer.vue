@@ -3,20 +3,24 @@ import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
 
 // primeVue
-
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
+const toast = useToast();
 const props = defineProps({
   enabledFieldset: Boolean,
 });
-const toast = useToast();
-const interval = ref(null);
 
-const chartBlock1 = ref();
+const baseValueChart = {
+  Key: [],
+  Require: [],
+  Estimated: [],
+};
+const interval = ref(null);
+const chartBlock1 = ref(baseValueChart);
 
 const getchartData = async () => {
   try {
-    const res = await TSA_api.getTransCap();
+    const res = await TSA_api.getSpsCodeInfo('PowerTransfer');
     if (!res.data.success) {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
@@ -26,11 +30,9 @@ const getchartData = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-
 const displayFieldset = computed(() => {
   return props.enabledFieldset ? 'flex-1 p-2' : '';
 });
-
 onMounted(async () => {
   await getchartData();
   interval.value = setInterval(() => {
@@ -45,14 +47,17 @@ onUnmounted(() => {
 
 <template>
   <Toast></Toast>
-  <div class="tttg-block" :class="displayFieldset">
+  <div class="sps-block-trans" :class="displayFieldset">
     <barChartBase :chartData="chartBlock1" class="chart"></barChartBase>
   </div>
 </template>
 <style lang="scss" scoped>
-.tttg-block {
+.sps-block-trans {
   position: relative;
-  height: 100%;
+  // padding: 0.5rem;
   width: 100%;
+}
+.chart {
+  height: 100%;
 }
 </style>

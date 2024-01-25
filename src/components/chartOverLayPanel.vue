@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import RadioButton from 'primevue/radiobutton';
-import VirtualScroller from 'primevue/virtualscroller';
 
 const props = defineProps({
   listSub: Object,
@@ -12,7 +11,6 @@ const props = defineProps({
 
 const emits = defineEmits(['changeSubActive']);
 const op = ref();
-console.log(props, 'props');
 const selectedCategory = computed(() => {
   return props.subActive;
 });

@@ -2,37 +2,24 @@
 import { onMounted, ref } from 'vue';
 import mapMultiselect from './mapMultiselect.vue';
 import { useMapStore } from '@/store';
+import mapCheckBoxLayer from './mapCheckBoxLayer.vue';
 // Openlayer
 import BingMaps from 'ol/source/BingMaps.js';
-
-import { fromLonLat } from 'ol/proj';
-import { Circle as CircleStyle, Fill, Stroke, Style, Text, Icon } from 'ol/style';
-import { Cluster, OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import Overlay from 'ol/Overlay';
-import Feature from 'ol/Feature';
 import Map from 'ol/Map';
-import Point from 'ol/geom/Point';
-import View from 'ol/View';
-import MultiLineString from 'ol/geom/MultiLineString';
 import Control from 'ol/control/Control';
 // primeVue
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
-import Card from 'primevue/card';
 import Tag from 'primevue/tag';
-
+// define
 const mapStore = useMapStore();
 const toast = useToast();
 // setup data map
 const subDataClick = ref();
 const olMap = ref(null);
-
-const features = ref([]);
-// set layer
-
 //method
-
 const getListSub = async () => {
   try {
     await mapStore.getListSub();
@@ -40,7 +27,6 @@ const getListSub = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-
 const getListLine = async () => {
   try {
     await mapStore.getListLine();
@@ -48,7 +34,12 @@ const getListLine = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-
+const close_popup = () => {
+  if (mapStore.popup) {
+    mapStore.popup.setPosition(undefined);
+  }
+};
+//mouted
 onMounted(async () => {
   await getListSub();
   await getListLine();
@@ -67,12 +58,17 @@ onMounted(async () => {
     target: olMap.value,
     view: mapStore.viewMap_config,
   });
-
+  mapStore.addLayerInit();
   //Add Control panel
   mapStore.panel = new Control({
     element: document.getElementById('panel'),
   });
   mapStore.map.addControl(mapStore.panel);
+  //Add Control panel
+  const panelLayer = new Control({
+    element: document.getElementById('panelLayer'),
+  });
+  mapStore.map.addControl(panelLayer);
 
   // Create an overlay for the popup element
   mapStore.popup = new Overlay({
@@ -98,59 +94,87 @@ onMounted(async () => {
   });
 });
 
-function close_popup() {
-  if (mapStore.popup) {
-    mapStore.popup.setPosition(undefined);
-  }
-}
-
-const selectedSubs = ref([]);
-
-const changeSelecet = (dataFocus, dataArray) => {
-  selectedSubs.value = dataArray;
+const selectedLayer = ref([500]);
+const changeSelecetLayer = (dataFocus, dataArray) => {
+  selectedLayer.value = dataArray;
   if (dataFocus.added) {
-    switch (dataFocus.valueFocus.value) {
+    switch (dataFocus.valueFocus) {
       case 500:
-        mapStore.addLayer500kV();
+        mapStore.addLayerBase(500);
         break;
       case 345:
-        // addLayer500kV();
+        mapStore.addLayerBase(345);
         break;
       case 287:
+        mapStore.addLayerBase(287);
         break;
-      case 220:
+      case 230:
+        mapStore.addLayerBase(230);
         break;
       case 138:
+        mapStore.addLayerBase(138);
         break;
       case 115:
+        mapStore.addLayerBase(115);
         break;
       case 20:
-        break;
-      case 'LL':
-        mapStore.changeStandardsLineLoading();
+        mapStore.removeLayerBase(20);
         break;
     }
   } else {
-    switch (dataFocus.valueFocus.value) {
+    switch (dataFocus.valueFocus) {
       case 500:
-        mapStore.removeLayer500kV();
+        mapStore.removeLayerBase(500);
         break;
       case 345:
+        mapStore.removeLayerBase(345);
         break;
       case 287:
+        mapStore.removeLayerBase(287);
         break;
-      case 220:
+      case 230:
+        mapStore.removeLayerBase(230);
         break;
       case 138:
+        mapStore.removeLayerBase(138);
         break;
       case 115:
+        mapStore.removeLayerBase(115);
         break;
       case 20:
-        break;
-      case 'LL':
-        mapStore.resetLineColor();
+        mapStore.removeLayerBase(20);
         break;
     }
+  }
+};
+const selectedCriteria = ref('');
+const changeSelecetCriteria = (value) => {
+  selectedCriteria.value = value;
+  switch (value) {
+    case 'LL':
+      mapStore.lineLoadingStandards();
+      break;
+    case 'TL':
+      mapStore.changeStandardsLineLoading();
+      break;
+    case 'GL':
+      mapStore.changeStandardsLineLoading();
+      break;
+    case 'EL':
+      mapStore.changeStandardsLineLoading();
+      break;
+    case 'LHV':
+      mapStore.voltageStandards();
+      break;
+    case 'VSA':
+      mapStore.changeStandardsLineLoading();
+      break;
+    case 'TSA':
+      mapStore.changeStandardsLineLoading();
+      break;
+    case 'SSR':
+      mapStore.ssrStandards();
+      break;
   }
 };
 </script>
@@ -159,15 +183,20 @@ const changeSelecet = (dataFocus, dataArray) => {
   <div class="map" ref="olMap"></div>
   <div id="panel" class="ol-panel">
     <div class="ol-panel_checkbox">
-      <mapMultiselect :selectedSubs="selectedSubs" @changeSelecet="changeSelecet"></mapMultiselect>
+      <mapMultiselect :selectedCriteria="selectedCriteria" @changeSelecet="changeSelecetCriteria"></mapMultiselect>
     </div>
+  </div>
+  <div id="panelLayer" class="ol-panel-layer">
+    <mapCheckBoxLayer :selectedSubs="selectedLayer" @changeSelecetLayer="changeSelecetLayer"></mapCheckBoxLayer>
   </div>
   <div id="popup" class="ol-popup">
     <div v-if="subDataClick" class="ol-popup_card">
       <div class="ol-popup_card_maintitle">
         <span>{{ subDataClick.name }}</span>
+        <br />
+        <span>{{ subDataClick.desc }}</span>
       </div>
-      <Tag :severity="subDataClick.id === 'line' ? 'info' : 'success'" :value="subDataClick.id"></Tag>
+      <Tag :severity="subDataClick.id === 'line' ? 'info' : 'success'" :value="subDataClick.id" class="w-full"></Tag>
     </div>
   </div>
   <Toast></Toast>
@@ -180,16 +209,21 @@ const changeSelecet = (dataFocus, dataArray) => {
   top: 0px;
 }
 .ol-panel {
-  /* Các thiết lập khác... */
   .ol-panel_button {
     @include panel;
   }
   .ol-panel_checkbox {
     @include panel;
-    // display: none;
     opacity: 0.6;
     border-radius: 0px;
   }
+}
+.ol-panel-layer {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 0;
+  opacity: 0.92;
 }
 .ol-popup {
   background-color: white;

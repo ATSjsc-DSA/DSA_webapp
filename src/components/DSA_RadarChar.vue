@@ -20,7 +20,6 @@ const getDataSub = async () => {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       listSub.value = res.data.payload;
-      console.log(listSub.value, 'listSub.value');
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });

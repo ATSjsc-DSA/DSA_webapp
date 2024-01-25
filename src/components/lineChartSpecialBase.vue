@@ -32,12 +32,13 @@ const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash)
   data,
   pointRadius,
   borderDash: [borderDash, borderDash],
+  borderWidth: 1,
 });
 
 const setChartData = (dataSub) => {
   const documentStyle = getComputedStyle(document.documentElement);
   const chartValue = [
-    getChartConfig(props.labelChart, documentStyle.getPropertyValue('--red-600'), dataSub[props.labelChart]),
+    getChartConfig(props.labelChart, documentStyle.getPropertyValue('--red-600'), dataSub[props.labelChart], 0),
   ];
   if (props.ChartStabe) {
     const peakChartData = [
@@ -49,8 +50,8 @@ const setChartData = (dataSub) => {
       { x: dataSub.time[0], y: dataSub.mean[0] },
       { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean[0] },
     ];
-    const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0.5, 5);
-    const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0.5, 5);
+    const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0, 5);
+    const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0, 5);
 
     chartValue.push(chartPeakValue, chartMeanValue);
   }
@@ -68,6 +69,7 @@ const chartOptions = computed(() => {
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
   return {
+    animation: false,
     stacked: true,
     maintainAspectRatio: false,
     aspectRatio: 0.6,

@@ -6,10 +6,10 @@ import TSA_ChartView from './TSA_ChartView.vue';
 
 <template>
   <div class="grid h-full">
-    <div class="col-4 tsa-block py-0">
+    <div class="col-5 tsa-block py-0">
       <TSA_SPSCheck></TSA_SPSCheck>
     </div>
-    <div class="col-8 tsa-block py-0">
+    <div class="col-7 tsa-block py-0 row-gap-2">
       <div class="tsa-block-gtth">
         <TSA_GTTTCheck></TSA_GTTTCheck>
       </div>
@@ -24,7 +24,7 @@ import TSA_ChartView from './TSA_ChartView.vue';
   height: 100%;
   display: flex;
   flex-direction: column;
-  row-gap: 0.5rem;
+  // row-gap: 0.5rem;
   .tsa-block-gtth {
     flex: 1;
   }
