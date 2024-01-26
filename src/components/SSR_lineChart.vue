@@ -9,14 +9,14 @@ import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
 
-const props = defineProps({
-  subActive: {
-    Type: String,
-    default: 'sym_4031_1',
-  },
-});
+// const props = defineProps({
+//   subActive: {
+//     Type: String,
+//     default: 'sym_4031_1',
+//   },
+// });
 
-const subActive = ref(props.subActive);
+const subActive = ref('');
 
 const baseValueChart = {
   name: '',
@@ -47,12 +47,14 @@ const getListSub = async () => {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       listSub.value = res.data.payload;
+      subActive.value = listSub.value[0].name;
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 getListSub();
+
 const getchartData = async (subName) => {
   try {
     const res = await SSR_api.getSubInfo(subName);
