@@ -18,7 +18,7 @@
       :pdfMode="pdfMode"
     ></component>
     <DSA_DashboardBlock
-      v-else-if="children.length"
+      v-else-if="children != 'undefined' && children != null && children.length"
       v-for="(child, i) in children"
       v-bind="child"
       :component-getter="componentGetter"
@@ -366,7 +366,7 @@ export default {
       //this.$emit('handleReadyPrintDashboardBlock', this.idUuid, _readyPrint);
     },
     handleReadyPrintDashboardBlock(_Id, _readyPrint) {
-      //	console.log('handle ready 2 : ' + _Id + '  - ' + _readyPrint);
+      console.log('handle ready 2 : ' + _Id + '  - ' + _readyPrint);
       this.readyPrint = this.checkChildrenArrayReadyPrint(_Id, _readyPrint);
       if (this.readyPrint && this.readyPrintArray.length == this.children.length) {
         // this.$emit('handleReadyPrintDashboardBlock', this.idUuid, true);
