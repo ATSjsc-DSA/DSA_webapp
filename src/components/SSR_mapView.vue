@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import mapMultiselect from './mapMultiselect.vue';
 import { useMapStore } from '@/store';
 import mapCheckBoxLayer from './mapCheckBoxLayer.vue';
@@ -20,7 +20,6 @@ const toast = useToast();
 const subDataClick = ref();
 const olMap = ref(null);
 const popup = ref(null);
-const panel = ref(null);
 //method
 const getListSub = async () => {
   try {
@@ -62,11 +61,6 @@ onMounted(async () => {
   });
   mapStore.addLayerInit();
   //Add Control panel
-  panel.value = new Control({
-    element: document.getElementById('panel'),
-  });
-  mapStore.map.addControl(panel.value);
-  //Add Control panel
   const panelLayer = new Control({
     element: document.getElementById('panelLayer'),
   });
@@ -94,6 +88,7 @@ onMounted(async () => {
       popup.value.setPosition(e.coordinate);
     });
   });
+  mapStore.ssrStandards();
 });
 
 const selectedLayer = ref([500]);
@@ -120,7 +115,7 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
         mapStore.addLayerBase(115);
         break;
       case 20:
-        mapStore.removeLayerBase(20);
+        mapStore.addLayerBase(20);
         break;
     }
   } else {
@@ -149,45 +144,14 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
     }
   }
 };
-const selectedCriteria = ref('');
-const changeSelecetCriteria = (value) => {
-  selectedCriteria.value = value;
-  switch (value) {
-    case 'LL':
-      mapStore.lineLoadingStandards();
-      break;
-    case 'TL':
-      mapStore.transStandards();
-      break;
-    case 'GL':
-      mapStore.generatorStandards();
-      break;
-    case 'EL':
-      mapStore.excitationLimiterStandards();
-      break;
-    case 'LHV':
-      mapStore.voltageStandards();
-      break;
-    case 'VSA':
-      mapStore.vsaStandards();
-      break;
-    case 'TSA':
-      mapStore.tsaStandards();
-      break;
-    case 'SSR':
-      mapStore.ssrStandards();
-      break;
-  }
-};
+// onUnmounted(() => {
+//   // reset component when unmounted
+//   // mapStore.removeMap();
+// });
 </script>
 
 <template>
   <div class="map" ref="olMap"></div>
-  <div id="panel" class="ol-panel">
-    <div class="ol-panel_checkbox">
-      <mapMultiselect :selectedCriteria="selectedCriteria" @changeSelecet="changeSelecetCriteria"></mapMultiselect>
-    </div>
-  </div>
   <div id="panelLayer" class="ol-panel-layer">
     <mapCheckBoxLayer :selectedSubs="selectedLayer" @changeSelecetLayer="changeSelecetLayer"></mapCheckBoxLayer>
   </div>

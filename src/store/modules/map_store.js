@@ -18,9 +18,6 @@ export const useMapStore = defineStore('map_Store', () => {
 
   const subData = ref();
 
-  const popup = ref(null);
-  const panel = ref(null);
-
   const map = ref(null);
 
   //layer500
@@ -32,11 +29,11 @@ export const useMapStore = defineStore('map_Store', () => {
   const aquaLayer = 'rgba(0, 255, 255, 0.2)';
   const greenLayer = 'rgba(11, 185, 11, 0.2)';
   const yellowLayer = 'rgba(255, 255, 102, 0.2)';
-  const redLayer = 'rgba(255, 0, 0, 0.5)';
+  const redLayer = 'rgba(255, 0, 0, 0.2)';
 
-  const greenLineColor = '#28a745';
-  const orangeLineColor = '#fb5630';
-  const redLineColor = '#d01e39';
+  const greenLineColor = 'rgba(11, 185, 11, 0.2)';
+  const orangeLineColor = 'rgba(245, 91, 58, 0.2)';
+  const redLineColor = 'rgba(255, 0, 0, 0.5)';
 
   const greenColor = '#28a745';
   const yellowColor = '#ffb40a';
@@ -88,7 +85,7 @@ export const useMapStore = defineStore('map_Store', () => {
             name: sub.name,
             id: 'sub',
           },
-          status: 0,
+          status: greenLayer,
           zIndex: 1,
           type: type,
           visible: visible,
@@ -136,20 +133,6 @@ export const useMapStore = defineStore('map_Store', () => {
 
   function getFeatureStyle(pointColor, feature) {
     const id = feature.get('id');
-    const subStrokeColor = () => {
-      switch (feature.get('status')) {
-        case 1:
-          return blueLayer;
-        case 2:
-          return aquaLayer;
-        case 4:
-          return yellowLayer;
-        case 5:
-          return redLayer;
-        default:
-          return greenLayer;
-      }
-    };
     const subFillColor = () => {
       switch (feature.get('type')) {
         case 500:
@@ -178,7 +161,7 @@ export const useMapStore = defineStore('map_Store', () => {
                   color: subFillColor(),
                 }),
                 stroke: new Stroke({
-                  color: subStrokeColor(),
+                  color: feature.get('status') !== null ? feature.get('status') : greenLayer,
                   width: 36,
                 }),
               }),
@@ -227,24 +210,27 @@ export const useMapStore = defineStore('map_Store', () => {
   }
   function getStep(x) {
     if (x < voltageLimits.value.step1) {
-      return 1;
+      return blueLayer;
     } else if (x < voltageLimits.value.step2) {
-      return 2;
+      return aquaLayer;
     } else if (x < voltageLimits.value.step3) {
-      return 3;
+      return yellowLayer;
     } else if (x < voltageLimits.value.step4) {
-      return 4;
+      return redLayer;
     } else {
-      return 5;
+      return greenLayer;
     }
   }
   function setLineColor(x) {
     if (x < loadingLimits.value.step1) {
       return greenLineColor;
-    } else if (x < voltageLimits.value.step2) {
+      // ;
+    } else if (x < loadingLimits.value.step2) {
       return orangeLineColor;
+      // ;
     } else {
       return redLineColor;
+      // ;
     }
   }
   //subData get API
@@ -254,8 +240,7 @@ export const useMapStore = defineStore('map_Store', () => {
       if (!res.data.success) {
         throw res.data.error;
       } else {
-        featuresSubLine.value = [
-          ...featuresSubLine.value,
+        const newFeaturesArray = [
           ...getFeaturesPoint(res.data.payload.sub500kV, 500, true),
           ...getFeaturesPoint(res.data.payload.sub345kV, 345),
           ...getFeaturesPoint(res.data.payload.sub287kV, 287),
@@ -264,6 +249,7 @@ export const useMapStore = defineStore('map_Store', () => {
           ...getFeaturesPoint(res.data.payload.sub115kV, 115),
           ...getFeaturesPoint(res.data.payload.sub20kV, 20),
         ];
+        featuresSubLine.value = newFeaturesArray;
         // features230.value = [...features230.value, ...getFeaturesPoint(res.data.payload.sub230kV)];
       }
     } catch (error) {
@@ -290,6 +276,18 @@ export const useMapStore = defineStore('map_Store', () => {
     } catch (error) {
       throw error;
     }
+  }
+  //method layer Init
+  function addLayerInit() {
+    const sourceSubline = new VectorSource({
+      features: featuresSubLine.value,
+    });
+    layerSubLine.value = new VectorLayer({
+      source: sourceSubline,
+      style: getFeatureStyle.bind(null, Point230Color),
+    });
+
+    map.value.addLayer(layerSubLine.value);
   }
   // *****standard*****
   async function voltageStandards() {
@@ -319,6 +317,34 @@ export const useMapStore = defineStore('map_Store', () => {
       throw error;
     }
   }
+  async function vsaStandards() {
+    try {
+      resetLineSubColor();
+      const res = await DSA_api.vsaStandards();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        loadingLimits.value = res.data.payload.evaluation;
+        changeStandardsVSA(res.data.payload.value);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async function tsaStandards() {
+    try {
+      resetLineSubColor();
+      const res = await DSA_api.tsaStandards();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        loadingLimits.value = res.data.payload.evaluation;
+        changeStandardsTSA(res.data.payload.value);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
   async function lineLoadingStandards() {
     try {
       resetLineSubColor();
@@ -333,17 +359,47 @@ export const useMapStore = defineStore('map_Store', () => {
       throw error;
     }
   }
-  //method layer Init
-  function addLayerInit() {
-    const sourceSubline = new VectorSource({
-      features: featuresSubLine.value,
-    });
-    layerSubLine.value = new VectorLayer({
-      source: sourceSubline,
-      style: getFeatureStyle.bind(null, Point230Color),
-    });
-
-    map.value.addLayer(layerSubLine.value);
+  async function transStandards() {
+    try {
+      resetLineSubColor();
+      const res = await DSA_api.transStandards();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        loadingLimits.value = res.data.payload.evaluation;
+        changeStandardsTrans(res.data.payload.value);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async function generatorStandards() {
+    try {
+      resetLineSubColor();
+      const res = await DSA_api.generatorStandards();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        loadingLimits.value = res.data.payload.evaluation;
+        changeStandardsGenerator(res.data.payload.value);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async function excitationLimiterStandards() {
+    try {
+      resetLineSubColor();
+      const res = await DSA_api.generatorStandards();
+      if (!res.data.success) {
+        throw res.data.error;
+      } else {
+        loadingLimits.value = res.data.payload.evaluation;
+        changeStandardsExcitationLimiter(res.data.payload.value);
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   // voltageStandards
@@ -371,7 +427,39 @@ export const useMapStore = defineStore('map_Store', () => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
             if (sub.name === feature.get('name')) {
-              feature.set('status', 5);
+              feature.set('status', redLayer);
+              feature.set('zIndex', 10);
+            }
+          });
+        }
+      });
+  }
+  // TSA
+  function changeStandardsTSA(param) {
+    layerSubLine.value
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        if (feature.get('id') === 'line') {
+          param.forEach((sub) => {
+            if (sub.name === feature.get('name')) {
+              feature.set('lineColor', setLineColor(sub.value));
+              feature.set('zIndex', 10);
+            }
+          });
+        }
+      });
+  }
+  // VSA
+  function changeStandardsVSA(param) {
+    layerSubLine.value
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        if (feature.get('id') === 'line') {
+          param.forEach((sub) => {
+            if (sub.name === feature.get('name')) {
+              feature.set('lineColor', setLineColor(sub.value));
               feature.set('zIndex', 10);
             }
           });
@@ -380,25 +468,69 @@ export const useMapStore = defineStore('map_Store', () => {
   }
   // lineloading
   function changeStandardsLineLoading(param) {
-    console.log(param);
     layerSubLine.value
       .getSource()
       .getFeatures()
       .forEach((feature) => {
         if (feature.get('id') === 'line') {
-          console.log(feature.get('name'), 'feature');
           param.forEach((sub) => {
-            console.log(sub, 'sub');
             if (sub.name === feature.get('name')) {
-              console.log('avc');
-              feature.set('lineColor', 'red');
+              feature.set('lineColor', setLineColor(sub.value));
               feature.set('zIndex', 10);
             }
           });
         }
       });
   }
-
+  // transStandards
+  function changeStandardsTrans(param) {
+    layerSubLine.value
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        if (feature.get('id') === 'sub') {
+          param.forEach((sub) => {
+            if (sub.name === feature.get('name')) {
+              feature.set('status', setLineColor(sub.value));
+              feature.set('zIndex', 10);
+            }
+          });
+        }
+      });
+  }
+  //generatorStandards
+  function changeStandardsGenerator(param) {
+    layerSubLine.value
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        if (feature.get('id') === 'sub') {
+          param.forEach((sub) => {
+            if (sub.name === feature.get('name')) {
+              feature.set('status', setLineColor(sub.value));
+              feature.set('zIndex', 10);
+            }
+          });
+        }
+      });
+  }
+  //excitationLimiterStandards
+  function changeStandardsExcitationLimiter(param) {
+    layerSubLine.value
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        if (feature.get('id') === 'sub') {
+          param.forEach((sub) => {
+            if (sub.name === feature.get('name')) {
+              feature.set('status', setLineColor(sub.value));
+              feature.set('zIndex', 10);
+            }
+          });
+        }
+      });
+  }
+  //reset standars
   function resetLineSubColor() {
     if (layerSubLine.value) {
       layerSubLine.value
@@ -421,12 +553,17 @@ export const useMapStore = defineStore('map_Store', () => {
         });
     }
   }
+  function removeMap() {
+    if (layerSubLine.value) {
+      map.value.getLayers().remove(layerSubLine.value);
+      layerSubLine.value = null;
+      map.value = null;
+    }
+  }
 
   return {
     subData,
     viewMap_config,
-    popup,
-    panel,
     map,
     iconStyle,
     getListSub,
@@ -437,6 +574,12 @@ export const useMapStore = defineStore('map_Store', () => {
     changeStandardsLineLoading,
     voltageStandards,
     ssrStandards,
+    tsaStandards,
+    vsaStandards,
     lineLoadingStandards,
+    transStandards,
+    generatorStandards,
+    excitationLimiterStandards,
+    removeMap,
   };
 });

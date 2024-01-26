@@ -7,7 +7,6 @@ import TSA_PowerTransfer from './TSA_PowerTransfer.vue';
 </script>
 
 <template>
-  <Toast></Toast>
   <customFieldset legendText="SPS Check">
     <div class="sps-fieldset-main">
       <TSA_F81Chart enabledFieldset></TSA_F81Chart>

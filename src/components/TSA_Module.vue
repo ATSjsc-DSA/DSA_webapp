@@ -5,11 +5,11 @@ import TSA_ChartView from './TSA_ChartView.vue';
 </script>
 
 <template>
-  <div class="grid h-full">
-    <div class="col-5 tsa-block py-0">
+  <div class="grid h-full mt-0 pb-0">
+    <div class="col-5 tsa-block">
       <TSA_SPSCheck></TSA_SPSCheck>
     </div>
-    <div class="col-7 tsa-block py-0 row-gap-2">
+    <div class="col-7 tsa-block row-gap-2">
       <div class="tsa-block-gtth">
         <TSA_GTTTCheck></TSA_GTTTCheck>
       </div>
@@ -24,6 +24,7 @@ import TSA_ChartView from './TSA_ChartView.vue';
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding-bottom: 0;
   // row-gap: 0.5rem;
   .tsa-block-gtth {
     flex: 1;
@@ -33,7 +34,7 @@ import TSA_ChartView from './TSA_ChartView.vue';
   }
 }
 fieldset {
-  padding: 0;
+  // padding: 0;
   width: 100%;
 }
 </style>

@@ -16,7 +16,22 @@ export default class DSA_api {
   static async ssrStandards() {
     return get('/dsa/SSRStandards');
   }
+  static async tsaStandards() {
+    return get('/dsa/TSAStandards');
+  }
+  static async vsaStandards() {
+    return get('/dsa/VSAStandards');
+  }
   static async lineLoadingStandards() {
     return get('/dsa/lineLoadingStandards');
+  }
+  static async transStandards() {
+    return get('/dsa/transStandards');
+  }
+  static async generatorStandards() {
+    return get('/dsa/generatorStandards');
+  }
+  static async excitationLimiterStandards() {
+    return get('/dsa/excitationLimiterStandards');
   }
 }

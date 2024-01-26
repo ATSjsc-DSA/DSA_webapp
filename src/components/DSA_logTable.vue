@@ -14,37 +14,34 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup'; // optional
 import Row from 'primevue/row'; // optional
-onMounted(() => {
-  data.value = [
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-    { time: '14:25:15 20/1/2024', content: 'set source is on' },
-    { time: '14:18:22 20/1/2024', content: 'time log set true' },
-    { time: '18:05:50 20/1/2024', content: 'time log set false' },
-  ];
-});
-
 const data = ref();
+data.value = [
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+  { time: '14:25:15 20/1/2024', content: 'set source is on' },
+  { time: '14:18:22 20/1/2024', content: 'time log set true' },
+  { time: '18:05:50 20/1/2024', content: 'time log set false' },
+];
 </script>

@@ -1,5 +1,7 @@
 <script setup>
 import mainLayout from '@/components/layout/mainLayout.vue';
+import mapView from '@/components/mapView.vue';
+
 import anhtdq from '@/components/a.vue';
 import anhyd from '@/components/b.vue';
 import TSA_F81Chart from '@/components/TSA_F81Chart.vue';
