@@ -66,16 +66,17 @@ const getListLine = async () => {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       listLine.value = res.data.payload;
+      console.log(listLine.value, 'listLine.value');
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-getListLine();
 
 onMounted(async () => {
-  chartBlock1.value = await getchartData('DaNang-Pleiku_100.0MW');
-  chartBlock2.value = await getchartData('NhoQuan-HaTinh_1000.0MW');
+  await getListLine();
+  chartBlock1.value = await getchartData('DaNang-Pleiku_' + listLine.value.NQHT[0].name);
+  chartBlock2.value = await getchartData('NhoQuan-HaTinh_' + listLine.value.DNPK[0].name);
 });
 const getActive = (value) => {
   active.value = value;
