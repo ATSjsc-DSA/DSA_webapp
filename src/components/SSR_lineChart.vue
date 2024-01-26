@@ -34,6 +34,7 @@ const baseValueChart = {
   lne_4001_4090_1: [],
   lne_3906_4001_2: [],
   lne_3906_4001_1: [],
+  modificationTime: 0,
 };
 
 const listSub = ref([]);
@@ -53,7 +54,6 @@ const getListSub = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-getListSub();
 
 const getchartData = async (subName) => {
   try {
@@ -69,6 +69,7 @@ const getchartData = async (subName) => {
 };
 
 onMounted(async () => {
+  await getListSub();
   await getchartData(subActive.value);
   interval.value = setInterval(() => {
     getchartData(subActive.value);

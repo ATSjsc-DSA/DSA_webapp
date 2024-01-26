@@ -31,9 +31,21 @@ const chartComposable = () => {
       },
     };
   };
+  const convertDateTimeToString = (t) => {
+    if (t !== null) {
+      let dateTimeConvert = new Date(t);
+      let date = dateTimeConvert.toLocaleDateString();
+      let time = dateTimeConvert.toLocaleTimeString('es-AR');
+      let result = date + ' ' + time;
+      return result;
+    } else {
+      return 'None';
+    }
+  };
   return {
     getDataSub,
     zoomOptions,
+    convertDateTimeToString,
   };
 };
 export default chartComposable;
