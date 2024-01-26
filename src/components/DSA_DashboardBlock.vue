@@ -11,12 +11,12 @@
       :is="realComponent"
       ref="refRealComponent"
       v-bind="meta"
-      @handleReadyPrintRealComponent="handleReadyPrintRealComponent"
-      @handleUpdateDataRealComponent="handleUpdateDataRealComponent"
       class="dashboard__block__component"
       :editing="editing"
       :pdfMode="pdfMode"
     ></component>
+    <!-- @handleReadyPrintRealComponent="handleReadyPrintRealComponent"
+      @handleUpdateDataRealComponent="handleUpdateDataRealComponent" -->
     <DSA_DashboardBlock
       v-else-if="children != 'undefined' && children != null && children.length"
       v-for="(child, i) in children"
@@ -28,8 +28,8 @@
       :pdfMode="pdfMode"
       @change="$emit('change')"
       @changing="$emit('changing')"
-      @handleReadyPrintDashboardBlock="handleReadyPrintDashboardBlock"
     ></DSA_DashboardBlock>
+    <!-- @handleReadyPrintDashboardBlock="handleReadyPrintDashboardBlock" -->
     <component
       v-else
       :is="emptyDashboard"
@@ -366,8 +366,8 @@ export default {
       //this.$emit('handleReadyPrintDashboardBlock', this.idUuid, _readyPrint);
     },
     handleReadyPrintDashboardBlock(_Id, _readyPrint) {
-      console.log('handle ready 2 : ' + _Id + '  - ' + _readyPrint);
-      this.readyPrint = this.checkChildrenArrayReadyPrint(_Id, _readyPrint);
+      //console.log('handle ready 2 : ' + _Id + '  - ' + _readyPrint);
+      // this.readyPrint = this.checkChildrenArrayReadyPrint(_Id, _readyPrint);
       if (this.readyPrint && this.readyPrintArray.length == this.children.length) {
         // this.$emit('handleReadyPrintDashboardBlock', this.idUuid, true);
       }

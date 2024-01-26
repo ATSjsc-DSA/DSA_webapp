@@ -6,25 +6,25 @@
 <script>
 export default {
   props: {
-    editing: {
-      type: Boolean,
-      required: true,
-    },
-    pdfMode: {
-      type: Boolean,
-      required: true,
-    },
-    externalData: {
-      type: String,
-      default: '',
-    },
+    // editing: {
+    //   type: Boolean,
+    //   required: true,
+    // },
+    // pdfMode: {
+    //   type: Boolean,
+    //   required: true,
+    // },
+    // externalData: {
+    //   type: String,
+    //   default: '',
+    // },
   },
   mounted() {
-    this.$emit('handleReadyPrintRealComponent', 'rline', true);
+    //this.$emit('handleReadyPrintRealComponent', 'rline', true);
   },
   methods: {
     updateData(newValue) {
-      this.$emit('handleUpdateDataRealComponent', newValue);
+      //this.$emit('handleUpdateDataRealComponent', newValue);
     },
     ShowSetting() {
       console.log('showMM Line');

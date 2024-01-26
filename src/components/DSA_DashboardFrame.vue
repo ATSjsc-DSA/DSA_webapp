@@ -5,7 +5,7 @@ import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 
 const toast = useToast();
-const emit = defineEmits(['inFocus', 'submit']);
+const emit = defineEmits(['change', 'changing']);
 const props = defineProps({
   data: {
     type: Object,
@@ -29,9 +29,9 @@ const props = defineProps({
 const state = ref('none');
 
 const handleReadyPrintDashboard = (_Component, _readyPrint) => {
-  emit('handleReadyPrintReport', _Component, _readyPrint);
+  // emit('handleReadyPrintReport', _Component, _readyPrint);
   // console.log('handleReadyPrintDashboard : ' + _Component + ' - ' + _readyPrint);
-  //emit('handleReadyPrintReport', _Component, _readyPrint);
+  // emit('handleReadyPrintReport', _Component, _readyPrint);
 };
 
 onMounted(async () => {
@@ -74,8 +74,8 @@ onMounted(async () => {
       :pdfMode="props.pdfMode"
       @change="$emit('change')"
       @changing="$emit('changing')"
-      @handleReadyPrintDashboardBlock="handleReadyPrintDashboard"
     ></DSA_DashboardBlock>
+    <!-- @handleReadyPrintDashboardBlock="handleReadyPrintDashboard" -->
   </div>
 </template>
 
