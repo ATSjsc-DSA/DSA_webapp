@@ -18,7 +18,7 @@
     <!-- @handleReadyPrintRealComponent="handleReadyPrintRealComponent"
       @handleUpdateDataRealComponent="handleUpdateDataRealComponent" -->
     <DSA_DashboardBlock
-      v-else-if="children != 'undefined' && children != null && children.length"
+      v-else-if="children.length"
       v-for="(child, i) in children"
       v-bind="child"
       :component-getter="componentGetter"

@@ -2,7 +2,7 @@
 import Chart from 'primevue/chart';
 import chartComposable from '@/combosables/chartData';
 
-const { zoomOptions } = chartComposable();
+const { zoomOptions, convertDateTimeToString } = chartComposable();
 const props = defineProps({
   chartData: {
     type: Object,
@@ -17,7 +17,11 @@ const chartData = computed(() => {
 const titleChart = computed(() => {
   return props.chartData.name;
 });
-
+const modificationTime = computed(() => {
+  if (props.chartData.modificationTime) {
+    return convertDateTimeToString(props.chartData.modificationTime);
+  }
+});
 const keysChartData = computed(() => {
   return Object.keys(props.chartData);
 });
@@ -102,7 +106,7 @@ const chartOptions = computed(() => {
   <div class="card relative">
     <div class="icon-chart">
       <i class="pi pi-sync pi-spin"></i>
-      <span>Auto update</span>
+      <span> {{ modificationTime }}</span>
     </div>
     <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
