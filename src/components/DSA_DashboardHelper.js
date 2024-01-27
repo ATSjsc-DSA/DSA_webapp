@@ -4,7 +4,6 @@ import DSA_RadarChar from './DSA_RadarChar.vue';
 import SSR_lineChart from './SSR_lineChart.vue';
 import TSA_F81Chart from './TSA_F81Chart.vue';
 import TSA_GTTTChart from './TSA_GTTTChart.vue';
-import SSR_Module from './SSR_Module.vue';
 import DSA_logTable from './DSA_logTable.vue';
 const defaultSetting = {
   type: 'horizontal',
@@ -32,12 +31,12 @@ const defaultSetting = {
           size: 0.5,
         },
         {
-          type: 'panel',
-          size: 0.5,
           component: 'logTable',
           meta: {
             color: 'rgb(241, 131, 186)',
           },
+          type: 'panel',
+          size: 0.5,
         },
       ],
     },
