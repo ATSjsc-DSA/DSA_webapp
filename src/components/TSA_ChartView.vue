@@ -12,6 +12,9 @@ import Button from 'primevue/button';
 import lineChartSpecialBase from './lineChartSpecialBase.vue';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
+import chartComposable from '@/combosables/chartData';
+const { convertDateTimeToString } = chartComposable();
+
 const toast = useToast();
 const active = ref(0);
 
@@ -24,6 +27,7 @@ const baseValueChart = {
   mean: [],
   t_stablility: [],
   stability: [],
+  modificationTime: null,
 };
 
 const chartBlock1 = ref(baseValueChart);
@@ -44,6 +48,14 @@ const lineActiveBlock2 = computed(() => {
     const result = chartBlock2.value.name.match(/([\d.]+MW)/);
     return result[1];
   } else return '';
+});
+
+const modificationTimeBlock1 = computed(() => {
+  return convertDateTimeToString(chartBlock1.value.modificationTime);
+});
+
+const modificationTimeBlock2 = computed(() => {
+  return convertDateTimeToString(chartBlock2.value.modificationTime);
 });
 
 const getchartData = async (code_name) => {
@@ -104,7 +116,13 @@ const changeLineActive2 = async (param) => {
         >
       </div>
     </div>
-
+    <div class="chartView-lastUpdate">
+      <div class="icon-chart">
+        <i class="pi pi-sync pi-spin"></i>
+        <span v-show="active === 0"> {{ modificationTimeBlock1 }}</span>
+        <span v-show="active === 1"> {{ modificationTimeBlock2 }}</span>
+      </div>
+    </div>
     <div class="h-full flex flex-column p-2">
       <div class="flex mb-2 gap-2 justify-content-end mr-2">
         <Button @click="getActive(0)" rounded label="1" class="w-2rem h-2rem p-0" :outlined="active !== 0" />
@@ -164,5 +182,32 @@ const changeLineActive2 = async (param) => {
 .chartView-options {
   position: absolute;
   top: 0;
+}
+
+.chartView-lastUpdate {
+  position: absolute;
+  top: 1%;
+  right: 87%;
+  width: 100%;
+}
+.icon-chart {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1rem;
+  color: var(--primary-color);
+  display: block;
+  text-align: center;
+  i {
+    display: block;
+    margin: 0 auto; /* Để căn giữa theo chiều ngang */
+  }
+  span {
+    display: block;
+    margin: 4px auto;
+    font-size: 0.6rem;
+    color: #808080;
+    width: 100%;
+  }
 }
 </style>
