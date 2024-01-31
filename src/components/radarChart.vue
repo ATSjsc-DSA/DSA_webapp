@@ -1,39 +1,30 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import chartComposable from '@/combosables/chartData';
 import Chart from 'primevue/chart';
+const { convertDateTimeToString } = chartComposable();
 
 const props = defineProps({
   chartData: {
     type: Object,
     require: true,
-    default: {},
   },
 });
 
 const chartData = computed(() => {
-  return setChartData(props.chartData);
+  return setChartData(props.chartData.data);
 });
-
+const modificationTime = computed(() => {
+  if (props.chartData.modificationTime) {
+    return convertDateTimeToString(props.chartData.modificationTime);
+  }
+});
+const label = computed(() => {
+  return props.chartData.Key;
+});
 let maxAxisValue = 0.3;
 let titleStatus = 'Secure'; // Secure , Warning , Critical
 let colorStatus = 'rgba(0,128,0,1)';
 let colorTitle = 'blue'; // blue, darkOrange, red
-let defaultChartData = {
-  Key: [
-    'Line Loading',
-    'Tranformer Loading',
-    'Generator Loading',
-    'Excitation Limiter',
-    'Low/High Voltage',
-    'VSA Module',
-    'TSA Module',
-    'SSR Module',
-  ],
-  Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
-  Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
-  Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
-  CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
-};
 
 const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) => ({
   data: pdata,
@@ -66,12 +57,9 @@ const getCurrentStateColorAndTitle = (rate1, rate2) => {
   };
 };
 
-const setChartData = (pRadarData) => {
-  let radarData = pRadarData;
-  if (radarData == null || radarData == 'undefined' || radarData.Key == null) radarData = defaultChartData;
+const setChartData = (radarData) => {
   const chartValue = [];
-  const axislabel = radarData.Key;
-  const numAxis = axislabel.length;
+  const numAxis = label.value.length;
 
   const rate1 = radarData.Rate1;
   const rate2 = radarData.Rate2;
@@ -110,13 +98,15 @@ const setChartData = (pRadarData) => {
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
 
   return {
-    labels: axislabel,
+    labels: label.value,
     datasets: chartValue,
   };
 };
 
 const chartOptions = computed(() => {
   return {
+    animation: false,
+
     scales: {
       r: {
         beginAtZero: true,
@@ -183,6 +173,10 @@ const chartOptions = computed(() => {
 
 <template>
   <div class="card flex justify-content-center" style="height: 100%">
+    <div class="icon-chart">
+      <i class="pi pi-sync pi-spin"></i>
+      <span> {{ modificationTime }}</span>
+    </div>
     <Chart type="radar" :data="chartData" :options="chartOptions" class="chart md:w-27rem" />
   </div>
 </template>
@@ -192,6 +186,25 @@ const chartOptions = computed(() => {
   border-radius: 0;
   position: relative;
   padding: 5px 5px 5px 5px;
+  .icon-chart {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1rem;
+    color: var(--primary-color);
+    display: block;
+    text-align: center;
+    i {
+      display: block;
+      margin: 0 auto; /* Để căn giữa theo chiều ngang */
+    }
+    span {
+      display: block;
+      margin: 4px auto;
+      font-size: 0.6rem;
+      color: #808080;
+    }
+  }
 }
 // .p-chart {
 //   max-width: calc(100vh - 16rem) !important;

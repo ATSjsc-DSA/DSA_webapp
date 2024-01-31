@@ -44,19 +44,15 @@
           <i class="pi pi-fw pi-play"></i>
         </button>
       </div>
-      <div
-        class="color-swatch d-flex justify-content-center align-items-center"
-        :style="{ overflowX: 'auto', scrollSnapType: 'x' }"
-      >
+      <div class="color-swatch d-flex justify-content-center align-items-center" :style="{ scrollSnapType: 'x' }">
         <div
           v-for="(item, index) in componentList"
           :key="index"
           :id="item"
-          class="color-swatch__color m-50"
+          class="color-swatch__color"
           :style="{
             textAlign: 'center',
             height: 'auto',
-            width: '50px',
             backgroundColor: 'hsl(' + (index - 1) * 30 + ', 80%, 73%)',
           }"
           @dragstart="handleDragstart"
@@ -133,7 +129,8 @@ const saveConfigReport = () => {
   isChanged.value = false;
 };
 onMounted(() => {
-  let saveLayoutDashboard = DSA_DashboardHelper.loadSettingLocalStorage();
+  // let saveLayoutDashboard = DSA_DashboardHelper.loadSettingLocalStorage();
+  let saveLayoutDashboard = null;
   console.log('saveLayoutDashboard');
   console.log(saveLayoutDashboard);
   if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')

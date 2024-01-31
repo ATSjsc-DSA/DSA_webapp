@@ -20,13 +20,15 @@ const active = ref(0);
 
 const baseValueChart = {
   name: '',
-  time: [],
-  value: [],
-  PowerTranfer: [],
-  peak: [],
-  mean: [],
-  t_stablility: [],
-  stability: [],
+  data: {
+    time: [],
+    value: [],
+    PowerTranfer: [],
+    peak: [],
+    mean: [],
+    t_stablility: [],
+    stability: [],
+  },
   modificationTime: null,
 };
 

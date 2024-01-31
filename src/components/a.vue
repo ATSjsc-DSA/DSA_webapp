@@ -1,110 +1,223 @@
-<script setup>
-import barChartBase from './barChartBase.vue';
-import TSA_api from '@/api/tsa_api';
-import _ from 'lodash';
-
-// primeVue
-import { useToast } from 'primevue/usetoast';
-import Toast from 'primevue/toast';
-const toast = useToast();
-
-const baseValueChart = {
-  Key: [],
-  Require: [],
-  Estimated: [],
-};
-const interval = ref(null);
-const chartBlock1 = ref(baseValueChart);
-
-const getchartData = async () => {
-  try {
-    const res = await TSA_api.getSpsCodeInfo('F81');
-    if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      chartBlock1.value = res.data.payload;
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
-};
-const debouncedGetChartData = _.debounce(getchartData, 500);
-
-onMounted(async () => {
-  await getchartData();
-  interval.value = setInterval(() => {
-    debouncedGetChartData();
-  }, 5000);
-});
-
-onUnmounted(() => {
-  clearInterval(interval.value);
-});
-</script>
-
 <template>
-  <Toast></Toast>
-  <div class="sps-block">
-    <barChartBase :chartData="chartBlock1" class="chart"></barChartBase>
+  <div>
+    <div class="grid1">
+      <div class="col-115 application-left-side-main">
+        <div :class="internalPdfMode ? 'containerView' : 'containerEdit'">
+          <DSA_DashboardFrame
+            :data="activeDashboardData"
+            :component-getter="getComponent"
+            :editing="canEdit"
+            :pdfMode="internalPdfMode"
+            ref="dashboard"
+            @change="dirkChange"
+          ></DSA_DashboardFrame>
+        </div>
+      </div>
+      <div class="application-right-side-custom">
+        <div
+          class="control_dashboard m-50 d-flex justify-content-center align-items-center"
+          :style="{ flexDirection: 'column', display: 'flex' }"
+        >
+          <button :variant="isChanged ? 'success' : 'secondary'" size="sm" @click="callSave" class="mr-1 mt-1">
+            <i class="pi pi-fw pi-save"></i>
+          </button>
+          <button variant="warning" size="sm" @click="callLoad" class="mr-1 mt-1">
+            <i class="pi pi-fw pi-refresh"></i>
+          </button>
+          <button
+            type="button"
+            v-if="canEdit"
+            size="sm"
+            :style="{ backgroundColor: '#008CBA' }"
+            @click="callEdit"
+            class="mr-1 mt-1 mb-2"
+          >
+            <i class="pi pi-fw pi-pencil btn-info"></i>
+          </button>
+          <button
+            type="button"
+            v-else
+            size="sm"
+            :style="{ backgroundColor: '#04AA6D' }"
+            @click="callEdit"
+            class="mr-1 mt-1 mb-2"
+          >
+            <i class="pi pi-fw pi-play"></i>
+          </button>
+        </div>
+        <div
+          class="color-swatch d-flex justify-content-center align-items-center"
+          :style="{ overflowX: 'auto', scrollSnapType: 'x' }"
+        >
+          <div
+            v-for="(item, index) in componentList"
+            :key="index"
+            :id="item"
+            class="color-swatch__color m-50"
+            :style="{
+              textAlign: 'center',
+              height: 'auto',
+              width: '50px',
+              backgroundColor: 'hsl(' + (index - 1) * 30 + ', 80%, 73%)',
+            }"
+            @dragstart="handleDragstart"
+            draggable="true"
+          >
+            <div class="mt-50">
+              <i v-if="item == 'MAP'" class="pi pi-fw pi-map-marker"></i>
+              <div
+                v-if="item == 'LINE'"
+                :style="{ height: '19.5px', borderBottom: 'solid 3px Gray', marginLeft: '8px', marginRight: '8px' }"
+              ></div>
+              <i v-if="item == 'VSA'" class="pi pi-fw pi-chart-line"></i>
+              <i v-if="item == 'SSR'" class="pi pi-fw pi-chart-line"></i>
+              <i v-if="item == 'SPS-81'" class="pi pi-fw pi-chart-bar"></i>
+              <i v-if="item == 'TSA'" class="pi pi-fw pi-chart-bar"></i>
+              <i v-if="item == 'RADAR'" class="pi pi-fw pi-chart-line"></i>
+            </div>
+            <div class="mb-50" :style="{ fontSize: '10px' }">{{ item }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-<style lang="scss" scoped>
-.sps-block {
-  position: relative;
-  // padding: 0.5rem;
-  width: 100%;
+
+<script setup>
+import { ref, onBeforeUnmount, onMounted } from 'vue';
+import DSA_DashboardFrame from './DSA_DashboardFrame.vue';
+import DSA_DashboardHelper from './DSA_DashboardHelper';
+
+const props = defineProps({
+  pdfMode: {
+    type: Boolean,
+    default: false,
+  },
+});
+const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA'];
+const canEdit = ref(true);
+const internalPdfMode = ref(props.pdfMode);
+const tempDashboardData = ref({});
+let activeDashboardData = ref(DSA_DashboardHelper.defaultSetting);
+const isChanged = ref(false);
+
+const getComponent = (name) => {
+  return DSA_DashboardHelper.getComponent(name);
+};
+
+const handleDragstart = (e) => {
+  DSA_DashboardHelper.handleDragstart(e);
+};
+
+const dirkChange = () => {
+  DSA_DashboardHelper.dirkChange(activeDashboardData.value);
+  isChanged.value = true;
+};
+
+const callSave = () => {
+  console.log(activeDashboardData);
+  saveConfigReport();
+};
+
+const callLoad = () => {
+  setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
+  activeDashboardData.value = tempDashboardData.value.data;
+  // activeDashboardData.value = DSA_DashboardHelper.defaultSetting; // Object.assign({}, tempDashboardData.value.data);
+};
+
+const callEdit = () => {
+  canEdit.value = !canEdit.value;
+};
+
+const saveConfigReport = () => {
+  setTempDashboardData({ data: activeDashboardData.value });
+  DSA_DashboardHelper.saveSettingLocalStorage(tempDashboardData);
+  isChanged.value = false;
+};
+onMounted(() => {
+  let saveLayoutDashboard = null; // DSA_DashboardHelper.loadSettingLocalStorage();
+  console.log('saveLayoutDashboard');
+  console.log(saveLayoutDashboard);
+  if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')
+    setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
+  else setTempDashboardData(saveLayoutDashboard);
+
+  activeDashboardData.value = tempDashboardData.value.data;
+});
+onBeforeUnmount(() => {
+  if (isChanged.value) {
+    saveConfigReport();
+  }
+});
+
+const setTempDashboardData = (pData) => {
+  console.log('setTempDashboardData');
+  tempDashboardData.value = pData;
+};
+</script>
+
+<style lang="scss">
+.application-left-side-main {
+  float: left;
+  width: calc((100vw - 60px - 4rem));
 }
-.chart {
-  height: 100%;
+.application-right-side-custom {
+  float: right;
+  width: 60px !important;
+  position: relative;
+  border: 1px solid rgb(240, 241, 242);
+  height: auto;
+}
+
+.containerEdit {
+  margin: 0px auto;
+  border: 1px solid rgb(240, 241, 242);
+  height: auto;
+  background-color: rgb(240, 241, 242);
+
+  .dashboard__block {
+    &--panel {
+      margin: 5px;
+    }
+  }
+}
+
+.containerView {
+  margin: 20px auto;
+  border: 1px solid rgb(240, 241, 242);
+  height: auto;
+  background-color: rgb(255, 255, 255);
+
+  .dashboard__block {
+    &--panel {
+      margin: 1px;
+    }
+  }
+}
+
+.container {
+  margin: 20px auto;
+  border: 1px solid rgb(240, 241, 242);
+  height: auto;
+}
+
+.color-swatch__color {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  cursor: move;
+}
+
+.dashboard__block__component {
+  background-color: rgb(255, 255, 255);
+}
+
+.ql-container {
+  border-bottom: none !important;
+}
+
+.ql-toolbar {
+  border-bottom: none !important;
 }
 </style>
-// function getFeaturesLine(param) { // const featuresline = []; // param.forEach((line) => { // console.log(line.geo,
-'geo'); // // const lineStringnpCoords = line.geo.map((coord) => fromLonLat(coord)); // // const lineString = new
-LineString(lineStringnpCoords); // // const midPoint = fromLonLat([((line.geo[0][0] + line.geo[1][0]) / 2,
-(line.geo[1][0] + line.geo[1][1]) / 2)]); // // const lineStringCoords = [fromLonLat(line.geo[0]), midPoint,
-fromLonLat(line.geo[1])]; // var line = turf.lineString([line.geo[0], line.geo[1]]); // var d =
-turf.distance(line.geo[0], line.geo[1]); // var pMid = turf.along(line, d / 2); // var lineBearing =
-turf.bearing(line.geo[0], line.geo[1]); // var centerPoint = turf.destination(pMid, 2 * d, lineBearing - 90); // var r =
-turf.distance(centerPoint, turf.point(line.geo[0])); // var bear1 = turf.bearing(centerPoint, turf.point(line.geo[0]));
-// var bear2 = turf.bearing(centerPoint, turf.point(line.geo[1])); // var arc2 = turf.lineArc(centerPoint, r, bear2,
-bear1, { steps: 256 }); // var arcFeature2 = new GeoJSON().readFeatures(arc2, { // featureProjection: 'EPSG:3857', //
-dataProjection: 'EPSG:4326', // }); // arcFeature2[0].setStyle( // new Style({ // stroke: new Stroke({ // color:
-'#FF0000', // width: 1, // lineDash: [5, 2], // lineCap: 'butt', // }), // }), // ); //
-featuresline.push(arcFeature2[0]); // }); // return featuresline; // } // // var p1LonLat = [104.784, -3.03]; // var
-p2LonLat = [103.591, -1.625]; // var line = turf.lineString([p1LonLat, p2LonLat]); // var d = turf.distance(p1LonLat,
-p2LonLat); // var pMid = turf.along(line, d / 2); // var lineBearing = turf.bearing(p1LonLat, p2LonLat); // var
-centerPoint = turf.destination(pMid, 2 * d, lineBearing - 90); // var r = turf.distance(centerPoint,
-turf.point(p1LonLat)); // var bear1 = turf.bearing(centerPoint, turf.point(p1LonLat)); // var bear2 =
-turf.bearing(centerPoint, turf.point(p2LonLat)); // var arc2 = turf.lineArc(centerPoint, r, bear2, bear1, { steps: 256
-}); // var arcFeature2 = new ol.format.GeoJSON().readFeatures(arc2, { // featureProjection: 'EPSG:3857', //
-dataProjection: 'EPSG:4326', // }); // arcFeature2[0].setStyle( // new ol.style.Style({ // stroke: new ol.style.Stroke({
-// color: '#FF0000', // width: 1, // lineDash: [5, 2], // lineCap: 'butt', // }), // }), // ); //
-vectorSource.addFeature(arcFeature2[0]); // // function getFeaturesLine(param) { // const featuresline = []; //
-param.forEach((line) => { // // console.log(line.geo[0]); // // console.log(line.geo[1]); // // var p1LonLat = [104.784,
--3.03]; // // var p2LonLat = [103.591, -1.625]; // // console.log(p1LonLat); // // console.log(p2LonLat); // // var line
-= turf.lineString([p1LonLat, p2LonLat]); // // console.log(line, 'line'); // // // var d =
-turf.distance(turf.point(line.geo[0]), turf.point(line.geo[1])); // // var d = turf.distance(p1LonLat, p2LonLat); // //
-console.log(d, 'd'); // // var pMid = turf.along(line, d / 2); // // console.log(pMid, 'pMid'); // // var lineBearing =
-turf.bearing(line.geo[0], line.geo[1]); // // var centerPoint = turf.destination(pMid, 2 * d, lineBearing - 90); // //
-var r = turf.distance(centerPoint, turf.point(line.geo[0])); // // var bear1 = turf.bearing(centerPoint,
-turf.point(line.geo[0])); // // var bear2 = turf.bearing(centerPoint, turf.point(line.geo[1])); // // var arc2 =
-turf.lineArc(centerPoint, r, bear2, bear1, { steps: 256 }); // // console.log(arc2, 'arc2'); // // const // const
-geoJsonFeature = { // type: 'Feature', // geometry: { // type: 'LineString', // coordinates: line.geo.map((coord) =>
-fromLonLat(coord)), // }, // properties: { // name: line.name, // id: 'line', // subData: { // name: line.name, // id:
-'line', // }, // lineColor: greenColor, // }, // }; // featuresline.push(new GeoJSON().readFeature(geoJsonFeature)); //
-}); // console.log(featuresline, 'featuresline'); // return featuresline; // } // heatmapLayer.value = new Heatmap({ //
-source: source500kV, // blur: 10, // radius: 10, // gradient: ['red', 'yellow', 'green'], // // weight: function
-(feature) { // // // Có thể tùy chỉnh giá trị trọng số của từng điểm // // return 1; // // }, // });
-
-    // pointsLayer.value = new WebGLPointsLayer({
-    //   source: source500kV2,
-    //   style: {
-    //     'circle-radius': 16,
-    //     'circle-fill-color': ['match', ['get', 'status'], 1, 'red', 'green'],
-    //     'circle-blur': 1,
-    //     'circle-rotate-with-view': false,
-    //     'circle-displacement': [0, 0],
-    //     'circle-opacity': ['interpolate', ['linear'], ['get', 'population'], 40000, 0.6, 2000000, 0.92],
-    //   },
-    // });
-    // // map.value.addLayer(pointsLayer.value);

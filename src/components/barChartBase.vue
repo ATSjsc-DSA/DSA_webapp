@@ -12,7 +12,7 @@ const props = defineProps({
 });
 
 const chartData = computed(() => {
-  return setChartData(props.chartData);
+  return setChartData(props.chartData.data);
 });
 const titleChart = computed(() => {
   return props.chartData.name;
@@ -23,26 +23,24 @@ const modificationTime = computed(() => {
   }
 });
 const keysChartData = computed(() => {
-  return Object.keys(props.chartData);
+  return Object.keys(props.chartData.data);
+});
+const label = computed(() => {
+  return props.chartData.Key;
 });
 const setChartData = (dataSub) => {
   const documentStyle = getComputedStyle(document.documentElement);
+  const colorVariables = ['--blue-500', '--pink-500', '--green-500'];
   return {
-    labels: dataSub.Key,
-    datasets: [
-      {
-        label: keysChartData.value[2],
-        backgroundColor: documentStyle.getPropertyValue('--blue-500'),
-        borderColor: documentStyle.getPropertyValue('--blue-500'),
-        data: dataSub[keysChartData.value[2]],
-      },
-      {
-        label: keysChartData.value[3],
-        backgroundColor: documentStyle.getPropertyValue('--pink-500'),
-        borderColor: documentStyle.getPropertyValue('--pink-500'),
-        data: dataSub[keysChartData.value[3]],
-      },
-    ],
+    labels: label.value,
+    datasets: keysChartData.value.map((dataset, index) => {
+      return {
+        label: dataset,
+        backgroundColor: documentStyle.getPropertyValue(colorVariables[index]),
+        borderColor: documentStyle.getPropertyValue(colorVariables[index]),
+        data: dataSub[dataset],
+      };
+    }),
   };
 };
 

@@ -11,9 +11,13 @@ const props = defineProps({
 });
 
 const baseValueChart = {
+  name: 'Power Tranfer',
   Key: [],
-  Require: [],
-  Estimated: [],
+  data: {
+    Require: [],
+    Estimated: [],
+  },
+  modificationTime: 0,
 };
 const interval = ref(null);
 const chartBlock1 = ref(baseValueChart);

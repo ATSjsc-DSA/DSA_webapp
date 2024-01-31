@@ -34,4 +34,7 @@ export default class DSA_api {
   static async excitationLimiterStandards() {
     return get('/dsa/excitationLimiterStandards');
   }
+  static async getLogs() {
+    return get('/dsa/logs');
+  }
 }

@@ -14,14 +14,13 @@ const props = defineProps({
   },
 });
 const chartData = computed(() => {
-  return setChartData(props.chartData);
+  return setChartData(props.chartData.data);
 });
 const titleChart = computed(() => {
   if (props.labelChart === 'value') {
     return 'Angle chart';
   } else return 'Power Tranfer';
 });
-const chartPlugins = ref();
 
 const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
   label,
@@ -50,10 +49,20 @@ const setChartData = (dataSub) => {
       { x: dataSub.time[0], y: dataSub.mean[0] },
       { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean[0] },
     ];
+    const stablilityChartData = [
+      { x: dataSub.t_stablility[0], y: Math.min(...dataSub.value) },
+      { x: dataSub.t_stablility[0], y: Math.max(...dataSub.value) },
+    ];
     const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0, 5);
     const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0, 5);
-
-    chartValue.push(chartPeakValue, chartMeanValue);
+    const chartStablilityValue = getChartConfig(
+      'stablility',
+      documentStyle.getPropertyValue('--yellow-300'),
+      stablilityChartData,
+      0,
+      5,
+    );
+    chartValue.push(chartPeakValue, chartMeanValue, chartStablilityValue);
   }
 
   return {
