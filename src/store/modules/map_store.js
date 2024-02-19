@@ -4,6 +4,7 @@ import DSA_api from '@/api/dsa_api';
 // Openlayer
 import BingMaps from 'ol/source/BingMaps.js';
 import { fromLonLat } from 'ol/proj';
+import { RegularShape } from 'ol/style';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text, Icon } from 'ol/style';
 import { Cluster, OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -156,13 +157,25 @@ export const useMapStore = defineStore('map_Store', () => {
         id === 'sub'
           ? {
               image: new CircleStyle({
-                radius: 4,
+                // radius: 4,
+                // fill: new Fill({
+                //   color: subFillColor(),
+                // }),
+                // stroke: new Stroke({
+                //   color: feature.get('status') !== null ? feature.get('status') : greenLayer,
+                //   width: 36,
+                // }),
+                radiusX: 20,
+                radiusY: 10, // Bán kính theo trục y của hình ellipse
+                points: 50, // Số điểm để xấp xỉ hình ellipse
+                angle: Math.PI / 4, // Góc quay của hình ellipse
+                // radius: 50, // Bán kính của hình
                 fill: new Fill({
-                  color: subFillColor(),
+                  color: 'rgba(255, 46, 78, 0.5)', // Màu và độ trong suốt của hình
                 }),
                 stroke: new Stroke({
-                  color: feature.get('status') !== null ? feature.get('status') : greenLayer,
-                  width: 36,
+                  color: 'rgba(255, 0, 0, 0.8)', // Màu của viền hình
+                  width: 2, // Độ rộng của viền hình
                 }),
               }),
               zIndex: feature.get('zIndex'),

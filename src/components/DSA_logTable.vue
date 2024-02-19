@@ -8,16 +8,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import Toast from 'primevue/toast';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup'; // optional
 import Row from 'primevue/row'; // optional
 import chartComposable from '@/combosables/chartData';
 import dsa_api from '@/api/dsa_api';
-
+import { intervalTime } from '@/Constants/';
 const { convertDateTimeToString } = chartComposable();
 const toast = useToast();
 
@@ -45,6 +44,9 @@ onMounted(async () => {
   await getLogs();
   interval.value = setInterval(() => {
     getLogs();
-  }, 5000);
+  }, intervalTime);
+});
+onUnmounted(() => {
+  clearInterval(interval.value);
 });
 </script>

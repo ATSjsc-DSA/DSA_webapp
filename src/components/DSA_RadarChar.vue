@@ -1,11 +1,9 @@
 <script setup>
 import radarChart from './radarChart.vue';
 import dsa_api from '@/api/dsa_api';
+import { intervalTime } from '@/Constants/';
 
 // primeVue
-
-import chartOverLayPanel from './chartOverLayPanel.vue';
-
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
@@ -47,7 +45,10 @@ onMounted(async () => {
   await getDataSub();
   interval.value = setInterval(() => {
     getDataSub();
-  }, 5000);
+  }, intervalTime);
+});
+onUnmounted(() => {
+  clearInterval(interval.value);
 });
 </script>
 

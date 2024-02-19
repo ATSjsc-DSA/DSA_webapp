@@ -2,6 +2,7 @@
 import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
 import chartOverLayPanel from './chartOverLayPanel.vue';
+import { intervalTime } from '@/Constants/';
 
 // primeVue
 
@@ -36,16 +37,18 @@ const getchartData = async (param) => {
         data: {
           Online: [],
           Offline: [],
-          Current: [1890, 1890, 1890],
+          Current: [],
         },
         modificationTime: res.data.payload.modificationTime,
       };
       for (let i = 0; i < a['Key'].length; i++) {
         let key = a['Key'][i];
-        if (key.includes('Limitation')) {
-          if (key.includes('Offline')) {
-            output.data['Offline'].push(a.data.value[i]);
-          } else {
+        if (key.includes('Offline') && key.includes('Limitation')) {
+          output.data['Offline'].push(a.data.value[i]);
+        } else if (key.includes('_Current')) {
+          output.data['Current'].push(a.data.value[i]);
+        } else {
+          if (key.includes('Limitation')) {
             output.data['Online'].push(a.data.value[i]);
           }
         }
@@ -89,7 +92,7 @@ onMounted(async () => {
   await getchartData(typelineActive.value);
   interval.value = setInterval(() => {
     getchartData(typelineActive.value);
-  }, 5000);
+  }, intervalTime);
 });
 
 onUnmounted(() => {

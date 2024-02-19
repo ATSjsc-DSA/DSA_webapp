@@ -2,19 +2,13 @@
 import lineChartBase from './lineChartBase.vue';
 import SSR_api from '@/api/ssr_api';
 import chartOverLayPanel from './chartOverLayPanel.vue';
+import { intervalTime } from '@/Constants/';
 
 // primeVue
 
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
-
-// const props = defineProps({
-//   subActive: {
-//     Type: String,
-//     default: 'sym_4031_1',
-//   },
-// });
 
 const subActive = ref('');
 
@@ -73,7 +67,7 @@ onMounted(async () => {
   await getchartData(subActive.value);
   interval.value = setInterval(() => {
     getchartData(subActive.value);
-  }, 5000);
+  }, intervalTime);
 });
 
 onUnmounted(() => {

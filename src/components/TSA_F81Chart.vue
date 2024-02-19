@@ -1,6 +1,7 @@
 <script setup>
 import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
+import { intervalTime } from '@/Constants/';
 
 // primeVue
 import { useToast } from 'primevue/usetoast';
@@ -44,7 +45,7 @@ onMounted(async () => {
   await getchartData();
   interval.value = setInterval(() => {
     getchartData();
-  }, 5000);
+  }, intervalTime);
 });
 
 onUnmounted(() => {
