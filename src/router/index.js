@@ -14,17 +14,17 @@ const router = createRouter({
         },
         {
           path: '/DSA/SSR',
-          name: 'formlayout',
+          name: 'SSR',
           component: () => import('@/views/SSR_View.vue'),
         },
         {
           path: '/DSA/TSA',
-          name: 'input',
+          name: 'TSA',
           component: () => import('@/views/TSA_View.vue'),
         },
         {
           path: '/DSA/VSA',
-          name: 'input',
+          name: 'VSA',
           component: () => import('@/views/VSA_View.vue'),
         },
       ],
