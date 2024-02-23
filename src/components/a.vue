@@ -1,223 +1,143 @@
-<template>
-  <div>
-    <div class="grid1">
-      <div class="col-115 application-left-side-main">
-        <div :class="internalPdfMode ? 'containerView' : 'containerEdit'">
-          <DSA_DashboardFrame
-            :data="activeDashboardData"
-            :component-getter="getComponent"
-            :editing="canEdit"
-            :pdfMode="internalPdfMode"
-            ref="dashboard"
-            @change="dirkChange"
-          ></DSA_DashboardFrame>
-        </div>
-      </div>
-      <div class="application-right-side-custom">
-        <div
-          class="control_dashboard m-50 d-flex justify-content-center align-items-center"
-          :style="{ flexDirection: 'column', display: 'flex' }"
-        >
-          <button :variant="isChanged ? 'success' : 'secondary'" size="sm" @click="callSave" class="mr-1 mt-1">
-            <i class="pi pi-fw pi-save"></i>
-          </button>
-          <button variant="warning" size="sm" @click="callLoad" class="mr-1 mt-1">
-            <i class="pi pi-fw pi-refresh"></i>
-          </button>
-          <button
-            type="button"
-            v-if="canEdit"
-            size="sm"
-            :style="{ backgroundColor: '#008CBA' }"
-            @click="callEdit"
-            class="mr-1 mt-1 mb-2"
-          >
-            <i class="pi pi-fw pi-pencil btn-info"></i>
-          </button>
-          <button
-            type="button"
-            v-else
-            size="sm"
-            :style="{ backgroundColor: '#04AA6D' }"
-            @click="callEdit"
-            class="mr-1 mt-1 mb-2"
-          >
-            <i class="pi pi-fw pi-play"></i>
-          </button>
-        </div>
-        <div
-          class="color-swatch d-flex justify-content-center align-items-center"
-          :style="{ overflowX: 'auto', scrollSnapType: 'x' }"
-        >
-          <div
-            v-for="(item, index) in componentList"
-            :key="index"
-            :id="item"
-            class="color-swatch__color m-50"
-            :style="{
-              textAlign: 'center',
-              height: 'auto',
-              width: '50px',
-              backgroundColor: 'hsl(' + (index - 1) * 30 + ', 80%, 73%)',
-            }"
-            @dragstart="handleDragstart"
-            draggable="true"
-          >
-            <div class="mt-50">
-              <i v-if="item == 'MAP'" class="pi pi-fw pi-map-marker"></i>
-              <div
-                v-if="item == 'LINE'"
-                :style="{ height: '19.5px', borderBottom: 'solid 3px Gray', marginLeft: '8px', marginRight: '8px' }"
-              ></div>
-              <i v-if="item == 'VSA'" class="pi pi-fw pi-chart-line"></i>
-              <i v-if="item == 'SSR'" class="pi pi-fw pi-chart-line"></i>
-              <i v-if="item == 'SPS-81'" class="pi pi-fw pi-chart-bar"></i>
-              <i v-if="item == 'TSA'" class="pi pi-fw pi-chart-bar"></i>
-              <i v-if="item == 'RADAR'" class="pi pi-fw pi-chart-line"></i>
-            </div>
-            <div class="mb-50" :style="{ fontSize: '10px' }">{{ item }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { ref, onBeforeUnmount, onMounted } from 'vue';
-import DSA_DashboardFrame from './DSA_DashboardFrame.vue';
-import DSA_DashboardHelper from './DSA_DashboardHelper';
+import Chart from 'primevue/chart';
+import chartComposable from '@/combosables/chartData';
 
+const { zoomOptions } = chartComposable();
 const props = defineProps({
-  pdfMode: {
+  chartData: {
+    type: Object,
+    require: true,
+    default: {},
+  },
+  labelChart: String,
+  ChartStabe: {
     type: Boolean,
     default: false,
   },
 });
-const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA'];
-const canEdit = ref(true);
-const internalPdfMode = ref(props.pdfMode);
-const tempDashboardData = ref({});
-let activeDashboardData = ref(DSA_DashboardHelper.defaultSetting);
-const isChanged = ref(false);
-
-const getComponent = (name) => {
-  return DSA_DashboardHelper.getComponent(name);
-};
-
-const handleDragstart = (e) => {
-  DSA_DashboardHelper.handleDragstart(e);
-};
-
-const dirkChange = () => {
-  DSA_DashboardHelper.dirkChange(activeDashboardData.value);
-  isChanged.value = true;
-};
-
-const callSave = () => {
-  console.log(activeDashboardData);
-  saveConfigReport();
-};
-
-const callLoad = () => {
-  setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
-  activeDashboardData.value = tempDashboardData.value.data;
-  // activeDashboardData.value = DSA_DashboardHelper.defaultSetting; // Object.assign({}, tempDashboardData.value.data);
-};
-
-const callEdit = () => {
-  canEdit.value = !canEdit.value;
-};
-
-const saveConfigReport = () => {
-  setTempDashboardData({ data: activeDashboardData.value });
-  DSA_DashboardHelper.saveSettingLocalStorage(tempDashboardData);
-  isChanged.value = false;
-};
-onMounted(() => {
-  let saveLayoutDashboard = null; // DSA_DashboardHelper.loadSettingLocalStorage();
-  console.log('saveLayoutDashboard');
-  console.log(saveLayoutDashboard);
-  if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')
-    setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
-  else setTempDashboardData(saveLayoutDashboard);
-
-  activeDashboardData.value = tempDashboardData.value.data;
+const chartData = computed(() => {
+  return setChartData(props.chartData.data);
 });
-onBeforeUnmount(() => {
-  if (isChanged.value) {
-    saveConfigReport();
+const titleChart = computed(() => {
+  if (props.labelChart === 'value') {
+    return 'Angle chart';
+  } else return 'Power Tranfer';
+});
+
+const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
+  label,
+  fill: false,
+  borderColor,
+  yAxisID: 'y',
+  tension: 0,
+  data,
+  pointRadius,
+  borderDash: [borderDash, borderDash],
+  borderWidth: 1,
+});
+
+const setChartData = (dataSub) => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const chartValue = [
+    getChartConfig(props.labelChart, documentStyle.getPropertyValue('--red-600'), dataSub[props.labelChart], 0),
+  ];
+  if (props.ChartStabe) {
+    const peakChartData = [
+      { x: dataSub.time[0], y: dataSub.peak[0] },
+      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.peak[0] },
+    ];
+
+    const meanChartData = [
+      { x: dataSub.time[0], y: dataSub.mean[0] },
+      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean[0] },
+    ];
+    const stablilityChartData = [
+      { x: dataSub.t_stablility[0], y: Math.min(...dataSub.value) },
+      { x: dataSub.t_stablility[0], y: Math.max(...dataSub.value) },
+    ];
+    const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0, 5);
+    const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0, 5);
+    const chartStablilityValue = getChartConfig(
+      'stablility',
+      documentStyle.getPropertyValue('--yellow-300'),
+      stablilityChartData,
+      0,
+      5,
+    );
+    chartValue.push(chartPeakValue, chartMeanValue, chartStablilityValue);
   }
-});
 
-const setTempDashboardData = (pData) => {
-  console.log('setTempDashboardData');
-  tempDashboardData.value = pData;
+  return {
+    labels: dataSub.time,
+    datasets: chartValue,
+  };
 };
+
+const chartOptions = computed(() => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColor = documentStyle.getPropertyValue('--text-color');
+  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+  const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+  return {
+    animation: false,
+    stacked: true,
+    maintainAspectRatio: false,
+    aspectRatio: 0.6,
+    plugins: {
+      title: {
+        display: true,
+        text: titleChart.value,
+        padding: 4,
+      },
+      legend: {
+        labels: {
+          usePointStyle: true,
+          color: textColor,
+          font: {
+            size: 8,
+          },
+          padding: 12,
+        },
+        position: 'top',
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: textColorSecondary,
+        },
+        grid: {
+          color: surfaceBorder,
+        },
+      },
+      y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+        ticks: {
+          color: textColorSecondary,
+        },
+        grid: {
+          color: surfaceBorder,
+        },
+      },
+    },
+  };
+});
 </script>
 
-<style lang="scss">
-.application-left-side-main {
-  float: left;
-  width: calc((100vw - 60px - 4rem));
+<template>
+  <div class="card">
+    <Chart type="line" :data="chartData" :options="chartOptions" class="chart" />
+  </div>
+</template>
+<style lang="scss" scoped>
+.card {
+  border-radius: 0;
+  padding: 10px;
 }
-.application-right-side-custom {
-  float: right;
-  width: 60px !important;
-  position: relative;
-  border: 1px solid rgb(240, 241, 242);
-  height: auto;
-}
-
-.containerEdit {
-  margin: 0px auto;
-  border: 1px solid rgb(240, 241, 242);
-  height: auto;
-  background-color: rgb(240, 241, 242);
-
-  .dashboard__block {
-    &--panel {
-      margin: 5px;
-    }
-  }
-}
-
-.containerView {
-  margin: 20px auto;
-  border: 1px solid rgb(240, 241, 242);
-  height: auto;
-  background-color: rgb(255, 255, 255);
-
-  .dashboard__block {
-    &--panel {
-      margin: 1px;
-    }
-  }
-}
-
-.container {
-  margin: 20px auto;
-  border: 1px solid rgb(240, 241, 242);
-  height: auto;
-}
-
-.color-swatch__color {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  margin: 5px;
-  cursor: move;
-}
-
-.dashboard__block__component {
-  background-color: rgb(255, 255, 255);
-}
-
-.ql-container {
-  border-bottom: none !important;
-}
-
-.ql-toolbar {
-  border-bottom: none !important;
+.chart {
+  height: 100%;
 }
 </style>

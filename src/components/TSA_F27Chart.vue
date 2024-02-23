@@ -2,11 +2,14 @@
 import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
 import { intervalTime } from '@/Constants/';
-
+import { useLayout } from '@/layout/composables/layout';
+import { ref, watch } from 'vue';
 // primeVue
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
+const { isDarkTheme } = useLayout();
+
 const props = defineProps({
   enabledFieldset: Boolean,
 });
@@ -46,6 +49,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
   clearInterval(interval.value);
+});
+watch(isDarkTheme, () => {
+  getchartData();
 });
 </script>
 

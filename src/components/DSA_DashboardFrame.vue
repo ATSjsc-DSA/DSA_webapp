@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps, defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 import DSA_DashboardBlock from './DSA_DashboardBlock.vue';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';

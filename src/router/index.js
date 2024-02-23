@@ -22,6 +22,11 @@ const router = createRouter({
           name: 'input',
           component: () => import('@/views/TSA_View.vue'),
         },
+        {
+          path: '/DSA/VSA',
+          name: 'input',
+          component: () => import('@/views/VSA_View.vue'),
+        },
       ],
     },
   ],

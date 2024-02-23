@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full h-full border-noround">
+  <div class="w-full h-full card border-noround p-0">
     <DataTable :value="data" scrollable scrollHeight="430px" tableStyle="min-width: 50rem">
-      <Column field="Timestamp" header="Timestamp" style="width: 25%"></Column>
-      <Column field="Event" header="Event" style="width: 75%"></Column>
+      <Column field="Timestamp" header="Timestamp" style="width: 30%"></Column>
+      <Column field="Event" header="Event" style="width: 70%"></Column>
     </DataTable>
   </div>
 </template>
@@ -50,3 +50,8 @@ onUnmounted(() => {
   clearInterval(interval.value);
 });
 </script>
+<style scoped>
+.p-datatable-wrapper {
+  /* height: 430px !important; */
+}
+</style>

@@ -34,6 +34,7 @@ const onChangeTheme = (theme, mode) => {
     changeThemeSettings(theme, mode === 'dark');
   });
   linkElement.parentNode.insertBefore(cloneLinkElement, linkElement.nextSibling);
+  localStorage.setItem('theme', theme);
 };
 const decrementScale = () => {
   setScale(layoutConfig.scale.value - 1);
@@ -46,6 +47,23 @@ const incrementScale = () => {
 const applyScale = () => {
   document.documentElement.style.fontSize = layoutConfig.scale.value + 'px';
 };
+onMounted(() => {
+  // Lấy giá trị theme từ localStorage
+  const theme = localStorage.getItem('theme');
+
+  // Kiểm tra xem theme có giá trị hay không trước khi thực hiện thay đổi
+  if (theme !== null) {
+    layoutConfig.theme.value = theme;
+    const linkElement = document.getElementById('theme-css');
+
+    // Thay đổi giá trị href bằng cách sử dụng replace
+    if (linkElement) {
+      linkElement.href = linkElement
+        .getAttribute('href')
+        .replace(/\/themes\/.*\/theme\.css/, `/themes/${theme}/theme.css`);
+    }
+  }
+});
 </script>
 
 <template>
@@ -143,7 +161,7 @@ const applyScale = () => {
       <h5>Ripple Effect</h5>
       <InputSwitch v-model="layoutConfig.ripple.value"></InputSwitch>
     </template>
-
+    <!-- /*
     <h5>Bootstrap</h5>
     <div class="grid">
       <div class="col-3">
@@ -257,7 +275,7 @@ const applyScale = () => {
         </button>
       </div>
     </div>
-
+*/ -->
     <h5>PrimeOne Design - 2022</h5>
     <div class="grid">
       <div class="col-3">
@@ -265,7 +283,7 @@ const applyScale = () => {
           <img src="/layout/images/themes/lara-light-indigo.png" class="w-2rem h-2rem" alt="Lara Light Indigo" />
         </button>
       </div>
-      <div class="col-3">
+      <!-- <div class="col-3">
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('lara-light-blue', 'light')">
           <img src="/layout/images/themes/lara-light-blue.png" class="w-2rem h-2rem" alt="Lara Light Blue" />
         </button>
@@ -279,13 +297,13 @@ const applyScale = () => {
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('lara-light-teal', 'light')">
           <img src="/layout/images/themes/lara-light-teal.png" class="w-2rem h-2rem" alt="Lara Light Teal" />
         </button>
-      </div>
+      </div> -->
       <div class="col-3">
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('lara-dark-indigo', 'dark')">
           <img src="/layout/images/themes/lara-dark-indigo.png" class="w-2rem h-2rem" alt="Lara Dark Indigo" />
         </button>
       </div>
-      <div class="col-3">
+      <!-- <div class="col-3">
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('lara-dark-blue', 'dark')">
           <img src="/layout/images/themes/lara-dark-blue.png" class="w-2rem h-2rem" alt="Lara Dark Blue" />
         </button>
@@ -299,10 +317,10 @@ const applyScale = () => {
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('lara-dark-teal', 'dark')">
           <img src="/layout/images/themes/lara-dark-teal.png" class="w-2rem h-2rem" alt="Lara Dark Teal" />
         </button>
-      </div>
+      </div> -->
     </div>
 
-    <h5>PrimeOne Design - 2021</h5>
+    <!-- <h5>PrimeOne Design - 2021</h5>
     <div class="grid">
       <div class="col-3">
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('saga-blue', 'light')">
@@ -364,7 +382,7 @@ const applyScale = () => {
           <img src="/layout/images/themes/arya-purple.png" class="w-2rem h-2rem" alt="Arya Purple" />
         </button>
       </div>
-    </div>
+    </div> -->
   </Sidebar>
 </template>
 

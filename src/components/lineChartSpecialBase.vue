@@ -1,13 +1,19 @@
 <script setup>
-import { ref, onMounted } from 'vue';
 import Chart from 'primevue/chart';
+import chartComposable from '@/combosables/chartData';
+
+const { zoomOptions } = chartComposable();
 const props = defineProps({
   chartData: {
     type: Object,
     require: true,
     default: {},
   },
-  labelChart: String,
+  labelChart: {
+    type: Object,
+    require: true,
+    default: 'Angle chart',
+  },
   ChartStabe: {
     type: Boolean,
     default: false,
@@ -16,11 +22,7 @@ const props = defineProps({
 const chartData = computed(() => {
   return setChartData(props.chartData.data);
 });
-const titleChart = computed(() => {
-  if (props.labelChart === 'value') {
-    return 'Angle chart';
-  } else return 'Power Tranfer';
-});
+const titleChart = computed(() => (props.labelChart === 'value' ? 'Angle chart' : 'Power Transfer'));
 
 const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
   label,
@@ -87,6 +89,10 @@ const chartOptions = computed(() => {
         display: true,
         text: titleChart.value,
         padding: 4,
+      },
+      subtitle: {
+        display: true,
+        text: props.chartData.name,
       },
       legend: {
         labels: {

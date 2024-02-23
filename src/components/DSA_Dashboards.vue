@@ -168,7 +168,7 @@ const setTempDashboardData = (pData) => {
   margin: 0px auto;
   border: 1px solid rgb(240, 241, 242);
   height: 100%;
-  background-color: rgb(240, 241, 242);
+  // background-color: rgb(240, 241, 242);
 
   .dashboard__block {
     &--panel {
@@ -181,7 +181,7 @@ const setTempDashboardData = (pData) => {
   margin: 20px auto;
   border: 1px solid rgb(240, 241, 242);
   height: auto;
-  background-color: rgb(255, 255, 255);
+  // background-color: rgb(255, 255, 255);
 
   .dashboard__block {
     &--panel {
@@ -205,7 +205,7 @@ const setTempDashboardData = (pData) => {
 }
 
 .dashboard__block__component {
-  background-color: rgb(255, 255, 255);
+  // background-color: rgb(255, 255, 255);
 }
 
 .ql-container {

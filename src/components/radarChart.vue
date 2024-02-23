@@ -104,6 +104,9 @@ const setChartData = (radarData) => {
 };
 
 const chartOptions = computed(() => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+
   return {
     animation: false,
 
@@ -117,6 +120,7 @@ const chartOptions = computed(() => {
           display: true,
           lineWidth: 1,
           circular: false,
+          color: textColorSecondary,
         },
         angleLines: {
           display: true,
@@ -128,7 +132,7 @@ const chartOptions = computed(() => {
           callback: function (value, index, values) {
             return (value * 100).toFixed(0) + '%';
           },
-          color: 'rgba(169,169,169,1)',
+          // color: 'rgba(169,169,169,1)',
         },
       },
     },
