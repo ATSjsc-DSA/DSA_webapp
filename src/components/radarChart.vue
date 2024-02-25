@@ -32,7 +32,7 @@ let defaultChartData = {
   Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
   Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
   Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
-  CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
+  CurentState: [91, 81, 88, 70, 81, 81, 81, 81],
 };
 
 const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) => ({
@@ -119,6 +119,7 @@ const chartOptions = computed(() => {
   return {
     scales: {
       r: {
+        startAngle: 0,
         beginAtZero: true,
         stacked: true,
         min: -0.05,
@@ -130,7 +131,17 @@ const chartOptions = computed(() => {
         },
         angleLines: {
           display: true,
-          lineWidth: 1,
+          lineWidth: 2,
+          color: [
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(255,165,0,1)',
+            'rgba(255,165,0,1)',
+            'rgba(255,165,0,1)',
+          ],
         },
         ticks: {
           display: true,
@@ -139,6 +150,26 @@ const chartOptions = computed(() => {
             return (value * 100).toFixed(0) + '%';
           },
           color: 'rgba(169,169,169,1)',
+        },
+
+        pointLabels: {
+          fontColor: 'blue', // Change the color of the labels here
+          backdropColor: [
+            'rgba(255,169,169,0)',
+            'rgba(255,169,169,0)',
+            'rgba(255,169,169,0)',
+            'rgba(255,169,169,0)',
+            'rgba(255,169,169,0)',
+            'rgba(255,169,169,0.2)',
+            'rgba(255,169,169,0.2)',
+            'rgba(255,169,169,0.2)',
+          ],
+          color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
+          font: {
+            size: 14,
+            style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
+            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
+          },
         },
       },
     },
@@ -183,7 +214,7 @@ const chartOptions = computed(() => {
 
 <template>
   <div class="card flex justify-content-center" style="height: 100%">
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="chart md:w-27rem" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="chart md:w-50rem" />
   </div>
 </template>
 
@@ -193,11 +224,11 @@ const chartOptions = computed(() => {
   position: relative;
   padding: 5px 5px 5px 5px;
 }
-// .p-chart {
-//   max-width: calc(100vh - 16rem) !important;
-//   width: 95%;
-//   height: 100%;
-// }
+.p-chart {
+  max-width: calc(100vh - 16rem) !important;
+  width: 95%;
+  height: 100%;
+}
 .chart {
   height: 100%;
 }
