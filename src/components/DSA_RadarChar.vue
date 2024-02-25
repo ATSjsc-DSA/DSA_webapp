@@ -1,25 +1,42 @@
 <script setup>
 import radarChart from './radarChart.vue';
 import dsa_api from '@/api/dsa_api';
+import { intervalTime } from '@/Constants/';
+import { useLayout } from '@/layout/composables/layout';
 
 // primeVue
-
-import chartOverLayPanel from './chartOverLayPanel.vue';
-
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
+const { isDarkTheme } = useLayout();
 
-const chartData = ref({});
-const listSub = ref({});
-
+const chartData = ref({
+  Key: [
+    'Line Loading',
+    'Tranformer Loading',
+    'Generator Loading',
+    'Excitation Limiter',
+    'Low/High Voltage',
+    'VSA Module',
+    'TSA Module',
+    'SSR Module',
+  ],
+  data: {
+    Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
+    Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
+    Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
+    CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
+  },
+  modificationTime: 0,
+});
+const interval = ref(null);
 const getDataSub = async () => {
   try {
     const res = await dsa_api.getdataSub();
     if (!res.data.success) {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
-      listSub.value = res.data.payload;
+      chartData.value = res.data.payload;
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -27,8 +44,15 @@ const getDataSub = async () => {
 };
 
 onMounted(async () => {
-  chartData.value = await getDataSub();
+  await getDataSub();
+  interval.value = setInterval(() => {
+    getDataSub();
+  }, intervalTime);
 });
+onUnmounted(() => {
+  clearInterval(interval.value);
+});
+watch(isDarkTheme, getDataSub());
 </script>
 
 <template>

@@ -78,7 +78,7 @@ const isOutsideClicked = (event) => {
         <router-view></router-view>
       </div>
     </div>
-    <app-footer></app-footer>
+    <!-- <app-footer></app-footer> -->
     <app-config></app-config>
     <div class="layout-mask"></div>
   </div>

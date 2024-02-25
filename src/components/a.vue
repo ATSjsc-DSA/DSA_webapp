@@ -1,110 +1,143 @@
 <script setup>
-import barChartBase from './barChartBase.vue';
-import TSA_api from '@/api/tsa_api';
-import _ from 'lodash';
+import Chart from 'primevue/chart';
+import chartComposable from '@/combosables/chartData';
 
-// primeVue
-import { useToast } from 'primevue/usetoast';
-import Toast from 'primevue/toast';
-const toast = useToast();
-
-const baseValueChart = {
-  Key: [],
-  Require: [],
-  Estimated: [],
-};
-const interval = ref(null);
-const chartBlock1 = ref(baseValueChart);
-
-const getchartData = async () => {
-  try {
-    const res = await TSA_api.getSpsCodeInfo('F81');
-    if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      chartBlock1.value = res.data.payload;
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
-};
-const debouncedGetChartData = _.debounce(getchartData, 500);
-
-onMounted(async () => {
-  await getchartData();
-  interval.value = setInterval(() => {
-    debouncedGetChartData();
-  }, 5000);
+const { zoomOptions } = chartComposable();
+const props = defineProps({
+  chartData: {
+    type: Object,
+    require: true,
+    default: {},
+  },
+  labelChart: String,
+  ChartStabe: {
+    type: Boolean,
+    default: false,
+  },
+});
+const chartData = computed(() => {
+  return setChartData(props.chartData.data);
+});
+const titleChart = computed(() => {
+  if (props.labelChart === 'value') {
+    return 'Angle chart';
+  } else return 'Power Tranfer';
 });
 
-onUnmounted(() => {
-  clearInterval(interval.value);
+const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
+  label,
+  fill: false,
+  borderColor,
+  yAxisID: 'y',
+  tension: 0,
+  data,
+  pointRadius,
+  borderDash: [borderDash, borderDash],
+  borderWidth: 1,
+});
+
+const setChartData = (dataSub) => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const chartValue = [
+    getChartConfig(props.labelChart, documentStyle.getPropertyValue('--red-600'), dataSub[props.labelChart], 0),
+  ];
+  if (props.ChartStabe) {
+    const peakChartData = [
+      { x: dataSub.time[0], y: dataSub.peak[0] },
+      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.peak[0] },
+    ];
+
+    const meanChartData = [
+      { x: dataSub.time[0], y: dataSub.mean[0] },
+      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean[0] },
+    ];
+    const stablilityChartData = [
+      { x: dataSub.t_stablility[0], y: Math.min(...dataSub.value) },
+      { x: dataSub.t_stablility[0], y: Math.max(...dataSub.value) },
+    ];
+    const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0, 5);
+    const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0, 5);
+    const chartStablilityValue = getChartConfig(
+      'stablility',
+      documentStyle.getPropertyValue('--yellow-300'),
+      stablilityChartData,
+      0,
+      5,
+    );
+    chartValue.push(chartPeakValue, chartMeanValue, chartStablilityValue);
+  }
+
+  return {
+    labels: dataSub.time,
+    datasets: chartValue,
+  };
+};
+
+const chartOptions = computed(() => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColor = documentStyle.getPropertyValue('--text-color');
+  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+  const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+  return {
+    animation: false,
+    stacked: true,
+    maintainAspectRatio: false,
+    aspectRatio: 0.6,
+    plugins: {
+      title: {
+        display: true,
+        text: titleChart.value,
+        padding: 4,
+      },
+      legend: {
+        labels: {
+          usePointStyle: true,
+          color: textColor,
+          font: {
+            size: 8,
+          },
+          padding: 12,
+        },
+        position: 'top',
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: textColorSecondary,
+        },
+        grid: {
+          color: surfaceBorder,
+        },
+      },
+      y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+        ticks: {
+          color: textColorSecondary,
+        },
+        grid: {
+          color: surfaceBorder,
+        },
+      },
+    },
+  };
 });
 </script>
 
 <template>
-  <Toast></Toast>
-  <div class="sps-block">
-    <barChartBase :chartData="chartBlock1" class="chart"></barChartBase>
+  <div class="card">
+    <Chart type="line" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
 <style lang="scss" scoped>
-.sps-block {
-  position: relative;
-  // padding: 0.5rem;
-  width: 100%;
+.card {
+  border-radius: 0;
+  padding: 10px;
 }
 .chart {
   height: 100%;
 }
 </style>
-// function getFeaturesLine(param) { // const featuresline = []; // param.forEach((line) => { // console.log(line.geo,
-'geo'); // // const lineStringnpCoords = line.geo.map((coord) => fromLonLat(coord)); // // const lineString = new
-LineString(lineStringnpCoords); // // const midPoint = fromLonLat([((line.geo[0][0] + line.geo[1][0]) / 2,
-(line.geo[1][0] + line.geo[1][1]) / 2)]); // // const lineStringCoords = [fromLonLat(line.geo[0]), midPoint,
-fromLonLat(line.geo[1])]; // var line = turf.lineString([line.geo[0], line.geo[1]]); // var d =
-turf.distance(line.geo[0], line.geo[1]); // var pMid = turf.along(line, d / 2); // var lineBearing =
-turf.bearing(line.geo[0], line.geo[1]); // var centerPoint = turf.destination(pMid, 2 * d, lineBearing - 90); // var r =
-turf.distance(centerPoint, turf.point(line.geo[0])); // var bear1 = turf.bearing(centerPoint, turf.point(line.geo[0]));
-// var bear2 = turf.bearing(centerPoint, turf.point(line.geo[1])); // var arc2 = turf.lineArc(centerPoint, r, bear2,
-bear1, { steps: 256 }); // var arcFeature2 = new GeoJSON().readFeatures(arc2, { // featureProjection: 'EPSG:3857', //
-dataProjection: 'EPSG:4326', // }); // arcFeature2[0].setStyle( // new Style({ // stroke: new Stroke({ // color:
-'#FF0000', // width: 1, // lineDash: [5, 2], // lineCap: 'butt', // }), // }), // ); //
-featuresline.push(arcFeature2[0]); // }); // return featuresline; // } // // var p1LonLat = [104.784, -3.03]; // var
-p2LonLat = [103.591, -1.625]; // var line = turf.lineString([p1LonLat, p2LonLat]); // var d = turf.distance(p1LonLat,
-p2LonLat); // var pMid = turf.along(line, d / 2); // var lineBearing = turf.bearing(p1LonLat, p2LonLat); // var
-centerPoint = turf.destination(pMid, 2 * d, lineBearing - 90); // var r = turf.distance(centerPoint,
-turf.point(p1LonLat)); // var bear1 = turf.bearing(centerPoint, turf.point(p1LonLat)); // var bear2 =
-turf.bearing(centerPoint, turf.point(p2LonLat)); // var arc2 = turf.lineArc(centerPoint, r, bear2, bear1, { steps: 256
-}); // var arcFeature2 = new ol.format.GeoJSON().readFeatures(arc2, { // featureProjection: 'EPSG:3857', //
-dataProjection: 'EPSG:4326', // }); // arcFeature2[0].setStyle( // new ol.style.Style({ // stroke: new ol.style.Stroke({
-// color: '#FF0000', // width: 1, // lineDash: [5, 2], // lineCap: 'butt', // }), // }), // ); //
-vectorSource.addFeature(arcFeature2[0]); // // function getFeaturesLine(param) { // const featuresline = []; //
-param.forEach((line) => { // // console.log(line.geo[0]); // // console.log(line.geo[1]); // // var p1LonLat = [104.784,
--3.03]; // // var p2LonLat = [103.591, -1.625]; // // console.log(p1LonLat); // // console.log(p2LonLat); // // var line
-= turf.lineString([p1LonLat, p2LonLat]); // // console.log(line, 'line'); // // // var d =
-turf.distance(turf.point(line.geo[0]), turf.point(line.geo[1])); // // var d = turf.distance(p1LonLat, p2LonLat); // //
-console.log(d, 'd'); // // var pMid = turf.along(line, d / 2); // // console.log(pMid, 'pMid'); // // var lineBearing =
-turf.bearing(line.geo[0], line.geo[1]); // // var centerPoint = turf.destination(pMid, 2 * d, lineBearing - 90); // //
-var r = turf.distance(centerPoint, turf.point(line.geo[0])); // // var bear1 = turf.bearing(centerPoint,
-turf.point(line.geo[0])); // // var bear2 = turf.bearing(centerPoint, turf.point(line.geo[1])); // // var arc2 =
-turf.lineArc(centerPoint, r, bear2, bear1, { steps: 256 }); // // console.log(arc2, 'arc2'); // // const // const
-geoJsonFeature = { // type: 'Feature', // geometry: { // type: 'LineString', // coordinates: line.geo.map((coord) =>
-fromLonLat(coord)), // }, // properties: { // name: line.name, // id: 'line', // subData: { // name: line.name, // id:
-'line', // }, // lineColor: greenColor, // }, // }; // featuresline.push(new GeoJSON().readFeature(geoJsonFeature)); //
-}); // console.log(featuresline, 'featuresline'); // return featuresline; // } // heatmapLayer.value = new Heatmap({ //
-source: source500kV, // blur: 10, // radius: 10, // gradient: ['red', 'yellow', 'green'], // // weight: function
-(feature) { // // // Có thể tùy chỉnh giá trị trọng số của từng điểm // // return 1; // // }, // });
-
-    // pointsLayer.value = new WebGLPointsLayer({
-    //   source: source500kV2,
-    //   style: {
-    //     'circle-radius': 16,
-    //     'circle-fill-color': ['match', ['get', 'status'], 1, 'red', 'green'],
-    //     'circle-blur': 1,
-    //     'circle-rotate-with-view': false,
-    //     'circle-displacement': [0, 0],
-    //     'circle-opacity': ['interpolate', ['linear'], ['get', 'population'], 40000, 0.6, 2000000, 0.92],
-    //   },
-    // });
-    // // map.value.addLayer(pointsLayer.value);

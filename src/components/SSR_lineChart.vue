@@ -2,19 +2,16 @@
 import lineChartBase from './lineChartBase.vue';
 import SSR_api from '@/api/ssr_api';
 import chartOverLayPanel from './chartOverLayPanel.vue';
+import { intervalTime } from '@/Constants/';
+import { useLayout } from '@/layout/composables/layout';
+import { ref, watch } from 'vue';
 
 // primeVue
 
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
-
-// const props = defineProps({
-//   subActive: {
-//     Type: String,
-//     default: 'sym_4031_1',
-//   },
-// });
+const { isDarkTheme } = useLayout();
 
 const subActive = ref('');
 
@@ -73,7 +70,7 @@ onMounted(async () => {
   await getchartData(subActive.value);
   interval.value = setInterval(() => {
     getchartData(subActive.value);
-  }, 5000);
+  }, intervalTime);
 });
 
 onUnmounted(() => {
@@ -84,6 +81,10 @@ const changeSubActive = async (param) => {
   subActive.value = param;
   await getchartData(param);
 };
+console.log(isDarkTheme.value, 'isDarkTheme');
+watch(isDarkTheme, () => {
+  getchartData(subActive.value);
+});
 </script>
 
 <template>

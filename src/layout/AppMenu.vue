@@ -16,7 +16,12 @@ const model = ref([
     items: [
       { label: 'SSR', icon: 'pi pi-fw pi-server', to: '/DSA/SSR' },
       { label: 'TSA', icon: 'pi pi-fw pi-slack', to: '/DSA/TSA' },
+      { label: 'VSA', icon: 'pi pi-fw pi-sitemap', to: '/DSA/VSA' },
     ],
+  },
+  {
+    label: 'UTILITIES',
+    items: [{ label: 'Help', icon: 'pi pi-fw pi-info-circle', to: '/DSA/Info' }],
   },
 ]);
 </script>

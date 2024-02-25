@@ -1,6 +1,4 @@
 <script setup>
-import barChartBase from './barChartBase.vue';
-import TSA_api from '@/api/tsa_api';
 import TSA_GTTTChart from './TSA_GTTTChart.vue';
 // primeVue
 
@@ -9,25 +7,6 @@ import Toast from 'primevue/toast';
 import customFieldset from './customFieldset.vue';
 
 const toast = useToast();
-
-const chartBlock1 = ref();
-
-const getchartData = async () => {
-  try {
-    const res = await TSA_api.getTransCap();
-    if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      return res.data.payload;
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
-};
-
-onMounted(async () => {
-  chartBlock1.value = await getchartData();
-});
 </script>
 
 <template>

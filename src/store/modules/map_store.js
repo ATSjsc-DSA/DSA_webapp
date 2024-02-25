@@ -4,6 +4,7 @@ import DSA_api from '@/api/dsa_api';
 // Openlayer
 import BingMaps from 'ol/source/BingMaps.js';
 import { fromLonLat } from 'ol/proj';
+import { RegularShape } from 'ol/style';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text, Icon } from 'ol/style';
 import { Cluster, OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -32,7 +33,7 @@ export const useMapStore = defineStore('map_Store', () => {
   const redLayer = 'rgba(255, 0, 0, 0.2)';
 
   const greenLineColor = 'rgba(11, 185, 11, 0.2)';
-  const orangeLineColor = 'rgba(245, 91, 58, 0.2)';
+  const orangeLineColor = 'rgba(255, 210, 127, 0.2)';
   const redLineColor = 'rgba(255, 0, 0, 0.5)';
 
   const greenColor = '#28a745';
@@ -164,6 +165,18 @@ export const useMapStore = defineStore('map_Store', () => {
                   color: feature.get('status') !== null ? feature.get('status') : greenLayer,
                   width: 36,
                 }),
+                // radiusX: 20,
+                // radiusY: 10, // Bán kính theo trục y của hình ellipse
+                // points: 50, // Số điểm để xấp xỉ hình ellipse
+                // angle: Math.PI / 4, // Góc quay của hình ellipse
+                // // radius: 50, // Bán kính của hình
+                // fill: new Fill({
+                //   color: 'rgba(255, 46, 78, 0.5)', // Màu và độ trong suốt của hình
+                // }),
+                // stroke: new Stroke({
+                //   color: 'rgba(255, 0, 0, 0.8)', // Màu của viền hình
+                //   width: 2, // Độ rộng của viền hình
+                // }),
               }),
               zIndex: feature.get('zIndex'),
             }
@@ -221,15 +234,21 @@ export const useMapStore = defineStore('map_Store', () => {
       return greenLayer;
     }
   }
-  function setLineColor(x) {
+  function setLineColor(x, param = 'sub') {
     if (x < loadingLimits.value.step1) {
-      return greenLineColor;
+      if (param === 'line') {
+        return greenColor;
+      } else return greenLayer;
       // ;
     } else if (x < loadingLimits.value.step2) {
-      return orangeLineColor;
+      if (param === 'line') {
+        return yellowColor;
+      } else return yellowLayer;
       // ;
     } else {
-      return redLineColor;
+      if (param === 'line') {
+        return redColor;
+      } else return redLayer;
       // ;
     }
   }
@@ -410,8 +429,8 @@ export const useMapStore = defineStore('map_Store', () => {
       .forEach((feature) => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
-            if (sub.name === feature.get('name')) {
-              feature.set('status', getStep(sub.value));
+            if (sub.Substation === feature.get('name')) {
+              feature.set('status', getStep(sub.Voltage));
               feature.set('zIndex', 10);
             }
           });
@@ -426,8 +445,8 @@ export const useMapStore = defineStore('map_Store', () => {
       .forEach((feature) => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
-            if (sub.name === feature.get('name')) {
-              feature.set('status', redLayer);
+            if (sub.Substation === feature.get('name')) {
+              feature.set('status', setLineColor(sub.value, 'sub'));
               feature.set('zIndex', 10);
             }
           });
@@ -443,7 +462,7 @@ export const useMapStore = defineStore('map_Store', () => {
         if (feature.get('id') === 'line') {
           param.forEach((sub) => {
             if (sub.name === feature.get('name')) {
-              feature.set('lineColor', setLineColor(sub.value));
+              feature.set('lineColor', setLineColor(sub.value, 'line'));
               feature.set('zIndex', 10);
             }
           });
@@ -459,7 +478,7 @@ export const useMapStore = defineStore('map_Store', () => {
         if (feature.get('id') === 'line') {
           param.forEach((sub) => {
             if (sub.name === feature.get('name')) {
-              feature.set('lineColor', setLineColor(sub.value));
+              feature.set('lineColor', setLineColor(sub.value, 'line'));
               feature.set('zIndex', 10);
             }
           });
@@ -474,8 +493,8 @@ export const useMapStore = defineStore('map_Store', () => {
       .forEach((feature) => {
         if (feature.get('id') === 'line') {
           param.forEach((sub) => {
-            if (sub.name === feature.get('name')) {
-              feature.set('lineColor', setLineColor(sub.value));
+            if (sub.Line === feature.get('name')) {
+              feature.set('lineColor', setLineColor(sub.Loading, 'line'));
               feature.set('zIndex', 10);
             }
           });
@@ -490,8 +509,8 @@ export const useMapStore = defineStore('map_Store', () => {
       .forEach((feature) => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
-            if (sub.name === feature.get('name')) {
-              feature.set('status', setLineColor(sub.value));
+            if (sub.Substation === feature.get('name')) {
+              feature.set('status', setLineColor(sub.Loading));
               feature.set('zIndex', 10);
             }
           });
@@ -506,8 +525,8 @@ export const useMapStore = defineStore('map_Store', () => {
       .forEach((feature) => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
-            if (sub.name === feature.get('name')) {
-              feature.set('status', setLineColor(sub.value));
+            if (sub.Substation === feature.get('name')) {
+              feature.set('status', setLineColor(sub.Loading));
               feature.set('zIndex', 10);
             }
           });
@@ -522,8 +541,8 @@ export const useMapStore = defineStore('map_Store', () => {
       .forEach((feature) => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
-            if (sub.name === feature.get('name')) {
-              feature.set('status', setLineColor(sub.value));
+            if (sub.Substation === feature.get('name')) {
+              feature.set('status', setLineColor(sub.Loading));
               feature.set('zIndex', 10);
             }
           });

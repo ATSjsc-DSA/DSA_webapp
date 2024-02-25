@@ -6,16 +6,16 @@ import SSR_lineChart from './SSR_lineChart.vue';
 <template>
   <div class="grid ssr">
     <div class="ssr-block col-6 block-top">
-      <SSR_lineChart subActive="sym_4031_1"></SSR_lineChart>
+      <SSR_lineChart></SSR_lineChart>
     </div>
     <div class="ssr-block col-6 block-top">
-      <SSR_lineChart subActive="sym_4035_1"></SSR_lineChart>
+      <SSR_lineChart></SSR_lineChart>
     </div>
     <div class="ssr-block col-6 block-bot">
-      <SSR_lineChart subActive="sym_4035_1"></SSR_lineChart>
+      <SSR_lineChart></SSR_lineChart>
     </div>
     <div class="ssr-block col-6 block-bot">
-      <SSR_lineChart subActive="sym_4031_1"></SSR_lineChart>
+      <SSR_lineChart></SSR_lineChart>
     </div>
   </div>
 </template>

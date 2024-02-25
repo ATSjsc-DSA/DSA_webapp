@@ -1,27 +1,28 @@
 <script setup>
-import { ref, onMounted } from 'vue';
 import Chart from 'primevue/chart';
+import chartComposable from '@/combosables/chartData';
+
+const { zoomOptions } = chartComposable();
 const props = defineProps({
   chartData: {
     type: Object,
     require: true,
     default: {},
   },
-  labelChart: String,
+  labelChart: {
+    type: Object,
+    require: true,
+    default: 'Angle chart',
+  },
   ChartStabe: {
     type: Boolean,
     default: false,
   },
 });
 const chartData = computed(() => {
-  return setChartData(props.chartData);
+  return setChartData(props.chartData.data);
 });
-const titleChart = computed(() => {
-  if (props.labelChart === 'value') {
-    return 'Angle chart';
-  } else return 'Power Tranfer';
-});
-const chartPlugins = ref();
+const titleChart = computed(() => (props.labelChart === 'value' ? 'Angle chart' : 'Power Transfer'));
 
 const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
   label,
@@ -50,10 +51,20 @@ const setChartData = (dataSub) => {
       { x: dataSub.time[0], y: dataSub.mean[0] },
       { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean[0] },
     ];
+    const stablilityChartData = [
+      { x: dataSub.t_stablility[0], y: Math.min(...dataSub.value) },
+      { x: dataSub.t_stablility[0], y: Math.max(...dataSub.value) },
+    ];
     const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0, 5);
     const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0, 5);
-
-    chartValue.push(chartPeakValue, chartMeanValue);
+    const chartStablilityValue = getChartConfig(
+      'stablility',
+      documentStyle.getPropertyValue('--yellow-300'),
+      stablilityChartData,
+      0,
+      5,
+    );
+    chartValue.push(chartPeakValue, chartMeanValue, chartStablilityValue);
   }
 
   return {
@@ -78,6 +89,10 @@ const chartOptions = computed(() => {
         display: true,
         text: titleChart.value,
         padding: 4,
+      },
+      subtitle: {
+        display: true,
+        text: props.chartData.name,
       },
       legend: {
         labels: {

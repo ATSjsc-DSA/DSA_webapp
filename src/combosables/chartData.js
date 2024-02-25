@@ -36,7 +36,11 @@ const chartComposable = () => {
       let dateTimeConvert = new Date(t);
       let date = dateTimeConvert.toLocaleDateString();
       let time = dateTimeConvert.toLocaleTimeString('es-AR');
-      let result = date + ' ' + time;
+      let ms = dateTimeConvert.getMilliseconds();
+      let result = date + ' ' + time + '.' + ms;
+      if (ms === 0) {
+        result = date + ' ' + time;
+      }
       return result;
     } else {
       return 'None';

@@ -1,0 +1,65 @@
+pipeline {
+    agent {
+        label 'windows-agent'
+    }
+    environment {
+        GIT_BRANCH = 'main'
+        GIT_REPO_URL = 'git@github.com:ATSjsc-DSA/DSA_webapp.git'
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: env.GIT_BRANCH]],
+                            userRemoteConfigs: [[credentialsId: 'windows-agent', url: env.GIT_REPO_URL]]])
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    //deploy 
+                    echo "Deploying..."
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    
+                    // install dependencies using npm
+                    bat "npm install"
+                }
+            }
+        }
+        stage('Restart or Start DSA_webapp') {
+            steps {
+                script {
+                    // check 'DSA_service' running ?
+                    def pm2List = bat(script: 'pm2 list', returnStdout: true).trim()
+                    if (pm2List.contains('DSA_webapp')) {
+                        echo 'restart DSA_webapp ...'
+                        bat 'pm2 restart DSA_webapp'
+                    } else {
+                        // start 'DSA_service'
+                        echo 'start DSA_webapp ...'
+                        bat 'pm2 start pm2.config.cjs'
+                    }
+                }
+            }
+}
+
+        
+    }
+
+    post {
+        success {
+            echo 'Pipeline ran successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
+
+

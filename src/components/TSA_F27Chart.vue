@@ -1,18 +1,26 @@
 <script setup>
 import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
-
+import { intervalTime } from '@/Constants/';
+import { useLayout } from '@/layout/composables/layout';
+import { ref, watch } from 'vue';
 // primeVue
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
+const { isDarkTheme } = useLayout();
+
 const props = defineProps({
   enabledFieldset: Boolean,
 });
 const baseValueChart = {
+  name: 'F27',
   Key: [],
-  Require: [],
-  Estimated: [],
+  data: {
+    Require: [],
+    Estimated: [],
+  },
+  modificationTime: 0,
 };
 const interval = ref(null);
 const chartBlock1 = ref(baseValueChart);
@@ -36,11 +44,14 @@ onMounted(async () => {
   await getchartData();
   interval.value = setInterval(() => {
     getchartData();
-  }, 5000);
+  }, intervalTime);
 });
 
 onUnmounted(() => {
   clearInterval(interval.value);
+});
+watch(isDarkTheme, () => {
+  getchartData();
 });
 </script>
 
