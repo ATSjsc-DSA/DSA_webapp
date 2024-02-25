@@ -176,7 +176,7 @@ const chartOptions = computed(() => {
           ],
           color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
           font: {
-            size: 14,
+            // size: 14,
             style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
             weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
           },
@@ -196,7 +196,7 @@ const chartOptions = computed(() => {
           ],
           color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
           font: {
-            size: 14,
+            // size: 14,
             style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
             weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
           },
