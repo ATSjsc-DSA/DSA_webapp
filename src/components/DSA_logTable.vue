@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-full card border-noround p-0">
-    <DataTable :value="data" scrollable scrollHeight="430px" tableStyle="min-width: 50rem">
+    <DataTable :value="data" scrollable scrollHeight="430px" tableStyle="min-width: 30rem">
       <Column field="Timestamp" header="Timestamp" style="width: 30%"></Column>
       <Column field="Event" header="Event" style="width: 70%"></Column>
     </DataTable>

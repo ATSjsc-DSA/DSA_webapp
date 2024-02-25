@@ -19,6 +19,10 @@ const model = ref([
       { label: 'VSA', icon: 'pi pi-fw pi-sitemap', to: '/DSA/VSA' },
     ],
   },
+  {
+    label: 'UTILITIES',
+    items: [{ label: 'Help', icon: 'pi pi-fw pi-info-circle', to: '/DSA/Info' }],
+  },
 ]);
 </script>
 

@@ -27,6 +27,11 @@ const router = createRouter({
           name: 'VSA',
           component: () => import('@/views/VSA_View.vue'),
         },
+        {
+          path: '/DSA/Info',
+          name: 'Info',
+          component: () => import('@/views/Info_View.vue'),
+        },
       ],
     },
   ],

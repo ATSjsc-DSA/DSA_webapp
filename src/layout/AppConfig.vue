@@ -276,7 +276,7 @@ onMounted(() => {
       </div>
     </div>
 */ -->
-    <h5>PrimeOne Design - 2022</h5>
+    <h5>Theme</h5>
     <div class="grid">
       <div class="col-3">
         <button class="p-link w-2rem h-2rem" @click="onChangeTheme('lara-light-indigo', 'light')">
