@@ -127,6 +127,9 @@ export default {
     i: {
       type: Number,
     },
+    scroll: {
+      type: String,
+    },
     componentGetter: {
       type: Function,
       required: true,

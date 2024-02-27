@@ -190,15 +190,17 @@ const chartOptions = computed(() => {
     },
   };
 });
+const lineChart = ref();
 const refeshData = () => {
-  emits('refeshData');
+  lineChart.value.chart.resetZoom();
+  // emits('refeshData');
 };
 </script>
 
 <template>
   <div class="card">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
-    <Chart type="line" :data="chartData" :options="chartOptions" class="chart" />
+    <Chart ref="lineChart" type="line" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
 <style lang="scss" scoped>
