@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full h-full card border-noround p-0">
-    <DataTable :value="data" scrollable scrollHeight="430px" tableStyle="min-width: 30rem">
+  <div class="w-full card border-noround p-1 dialogTable">
+    <DataTable :value="data" size="small" tableStyle="min-width: 30rem">
       <Column field="Timestamp" header="Timestamp" style="width: 30%"></Column>
       <Column field="Event" header="Event" style="width: 70%"></Column>
     </DataTable>
@@ -51,7 +51,9 @@ onUnmounted(() => {
 });
 </script>
 <style scoped>
-.p-datatable-wrapper {
-  /* height: 430px !important; */
+.dialogTable {
+  height: 100%;
+  /* height: inherit; */
+  /* overflow: scroll; */
 }
 </style>

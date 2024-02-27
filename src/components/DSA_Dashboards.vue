@@ -1,6 +1,6 @@
 <template>
   <div class="h-full">
-    <div class="col-115 application-left-side-main h-full">
+    <div class="application-left-side-main h-full">
       <div :class="internalPdfMode ? 'containerView' : 'containerEdit'">
         <DSA_DashboardFrame
           :data="activeDashboardData"
@@ -69,6 +69,7 @@
             <i v-if="item == 'SPS-81'" class="pi pi-fw pi-chart-bar"></i>
             <i v-if="item == 'TSA'" class="pi pi-fw pi-chart-bar"></i>
             <i v-if="item == 'RADAR'" class="pi pi-fw pi-chart-line"></i>
+            <i v-if="item == 'LOG'" class="pi pi-fw pi-history py-1"></i>
           </div>
           <div class="mb-50" :style="{ fontSize: '10px' }">{{ item }}</div>
         </div>
@@ -88,7 +89,7 @@ const props = defineProps({
     default: false,
   },
 });
-const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA'];
+const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA', 'LOG'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
@@ -129,10 +130,10 @@ const saveConfigReport = () => {
   isChanged.value = false;
 };
 onMounted(() => {
-  // let saveLayoutDashboard = DSA_DashboardHelper.loadSettingLocalStorage();
-  let saveLayoutDashboard = null;
-  console.log('saveLayoutDashboard');
-  console.log(saveLayoutDashboard);
+  let saveLayoutDashboard = DSA_DashboardHelper.loadSettingLocalStorage();
+  // let saveLayoutDashboard = null;
+  // console.log(saveLayoutDashboard, 'saveLayoutDashboard');
+  // console.log(saveLayoutDashboard);
   if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')
     setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
   else setTempDashboardData(saveLayoutDashboard);
@@ -146,7 +147,6 @@ onBeforeUnmount(() => {
 });
 
 const setTempDashboardData = (pData) => {
-  console.log('setTempDashboardData');
   tempDashboardData.value = pData;
 };
 </script>
@@ -180,7 +180,7 @@ const setTempDashboardData = (pData) => {
 .containerView {
   margin: 20px auto;
   border: 1px solid rgb(240, 241, 242);
-  height: auto;
+  height: 100%;
   // background-color: rgb(255, 255, 255);
 
   .dashboard__block {

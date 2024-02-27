@@ -3,6 +3,7 @@ import TSA_api from '@/api/tsa_api';
 
 import { computed, ref } from 'vue';
 import Tag from 'primevue/tag';
+import { intervalTime } from '@/Constants/';
 
 import Avatar from 'primevue/avatar';
 import chartOverLayPanel from './chartOverLayPanel.vue';
@@ -108,11 +109,25 @@ const getListLine = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
+const interval1 = ref(null);
+const interval2 = ref(null);
 
 onMounted(async () => {
   await getListLine();
+
   await getchartDataBlock1('DaNang-Pleiku_' + lineActiveBlock1.value);
   await getchartDataBlock2('NhoQuan-HaTinh_' + lineActiveBlock2.value);
+  interval1.value = setInterval(() => {
+    getchartDataBlock1('DaNang-Pleiku_' + lineActiveBlock1.value);
+  }, intervalTime);
+  interval2.value = setInterval(() => {
+    getchartDataBlock2('NhoQuan-HaTinh_' + lineActiveBlock2.value);
+  }, intervalTime);
+});
+
+onUnmounted(() => {
+  clearInterval(interval1.value);
+  clearInterval(interval2.value);
 });
 const getActive = (value) => {
   active.value = value;
@@ -149,7 +164,7 @@ watch(isDarkTheme, () => {
     </div>
     <div class="chartView-lastUpdate">
       <div class="icon-chart">
-        <i class="pi pi-sync pi-spin"></i>
+        <i class="pi pi-sync"></i>
         <span v-show="active === 0"> {{ modificationTimeBlock1 }}</span>
         <span v-show="active === 1"> {{ modificationTimeBlock2 }}</span>
       </div>

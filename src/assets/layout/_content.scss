@@ -11,7 +11,8 @@
 }
 
 .layout-main {
-  flex: 1 1 auto;
+  // flex: 1 1 auto;
+  height: 100%;
   //set full screen fix no scroll;
   // height: calc(100vh - 154px);
 }

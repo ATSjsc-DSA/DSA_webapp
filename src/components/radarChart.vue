@@ -243,12 +243,12 @@ const chartOptions = computed(() => {
 </script>
 
 <template>
-  <div class="card flex justify-content-center" style="height: 100%">
+  <div class="card flex justify-content-center h-full">
     <div class="icon-chart">
       <i class="pi pi-sync pi-spin"></i>
       <span> {{ modificationTime }}</span>
     </div>
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="chart md:w-27rem" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="md:w-26rem w-full" />
   </div>
 </template>
 
@@ -256,7 +256,8 @@ const chartOptions = computed(() => {
 .card {
   border-radius: 0;
   position: relative;
-  padding: 5px 5px 5px 5px;
+  // padding: 5px 5px 5px 5px;
+  padding: 10px;
   .icon-chart {
     position: absolute;
     top: 0.5rem;
@@ -277,12 +278,13 @@ const chartOptions = computed(() => {
     }
   }
 }
-.p-chart {
-  max-width: calc(100vh - 16rem) !important;
-  width: 95%;
-  height: 100%;
-}
+// .p-chart {
+//   max-width: calc(100vh - 16rem) !important;
+//   width: 95%;
+//   height: 100%;
+// }
 .chart {
-  height: 100%;
+  // height: 100%;
+  // width: 70%;
 }
 </style>

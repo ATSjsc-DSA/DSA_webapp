@@ -108,6 +108,9 @@ watch(
   },
   { immediate: false },
 );
+const refeshData = () => {
+  getchartData();
+};
 </script>
 
 <template>
@@ -119,7 +122,7 @@ watch(
       @changeSubActive="changeSubActive"
       class="ssr-block-overlay"
     ></chartOverLayPanel>
-    <barChartBase :chartData="chartBlock1" class="chart"></barChartBase>
+    <barChartBase :chartData="chartBlock1" class="chart" @refeshData="refeshData"></barChartBase>
   </div>
 </template>
 <style lang="scss" scoped>

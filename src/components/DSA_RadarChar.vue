@@ -56,7 +56,7 @@ watch(isDarkTheme, getDataSub());
 </script>
 
 <template>
-  <Toast></Toast>
+  <!-- <Toast></Toast> -->
   <div class="radarChartContainer">
     <radar-chart :chartData="chartData"></radar-chart>
   </div>

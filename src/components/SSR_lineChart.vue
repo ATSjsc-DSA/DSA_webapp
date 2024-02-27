@@ -81,10 +81,12 @@ const changeSubActive = async (param) => {
   subActive.value = param;
   await getchartData(param);
 };
-console.log(isDarkTheme.value, 'isDarkTheme');
 watch(isDarkTheme, () => {
   getchartData(subActive.value);
 });
+const refeshData = () => {
+  getchartData(subActive.value);
+};
 </script>
 
 <template>
@@ -96,7 +98,7 @@ watch(isDarkTheme, () => {
       @changeSubActive="changeSubActive"
       class="ssr-block-overlay"
     ></chartOverLayPanel>
-    <lineChartBase :chartData="chartBlock" class="chart"></lineChartBase>
+    <lineChartBase :chartData="chartBlock" class="chart" @refeshData="refeshData"></lineChartBase>
   </div>
 </template>
 <style lang="scss" scoped>
