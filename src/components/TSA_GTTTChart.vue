@@ -109,7 +109,7 @@ watch(
   { immediate: false },
 );
 const refeshData = () => {
-  getchartData();
+  getchartData(typelineActive.value);
 };
 </script>
 

@@ -101,15 +101,18 @@ const chartOptions = computed(() => {
     },
   };
 });
+const barChart = ref();
+
 const refeshData = () => {
-  emits('refeshData');
+  barChart.value.chart.resetZoom();
+  // emits('refeshData');
 };
 </script>
 <template>
   <div class="card relative">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
 
-    <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
+    <Chart ref="barChart" type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
 <style lang="scss" scoped>
