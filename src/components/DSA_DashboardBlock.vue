@@ -1,7 +1,9 @@
 <template>
   <div
     :id="idUuid"
-    :class="'dashboard__block dashboard__block--' + type + ' dashboard__block--' + state"
+    :class="
+      'dashboard__block dashboard__block--' + type + ' dashboard__block--' + state + ' dashboard__block--' + scroll
+    "
     :style="{ flexBasis: flexBasis }"
     ref="block"
     @drop="handleReplaceDrop"
@@ -507,6 +509,9 @@ $twentyFivePercent: 100%;
   position: relative;
 
   display: flex;
+  &--scroll {
+    overflow-y: scroll;
+  }
 
   &--panel {
     //margin: 5px;

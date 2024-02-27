@@ -54,12 +54,15 @@ onUnmounted(() => {
 watch(isDarkTheme, () => {
   getchartData();
 });
+const refeshData = () => {
+  getchartData();
+};
 </script>
 
 <template>
   <Toast></Toast>
   <div class="sps-block-trans" :class="displayFieldset">
-    <barChartBase :chartData="chartBlock1" class="chart"></barChartBase>
+    <barChartBase :chartData="chartBlock1" class="chart" @refeshData="refeshData"></barChartBase>
   </div>
 </template>
 <style lang="scss" scoped>

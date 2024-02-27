@@ -1,7 +1,7 @@
 <script setup>
 import Chart from 'primevue/chart';
 import chartComposable from '@/combosables/chartData';
-
+import modificationTimeFile from './modificationTimeFile.vue';
 const { zoomOptions, convertDateTimeToString } = chartComposable();
 
 const props = defineProps({
@@ -11,6 +11,7 @@ const props = defineProps({
     default: {},
   },
 });
+const emits = defineEmits(['refeshData']);
 const chartData = computed(() => {
   return setChartData(props.chartData);
 });
@@ -189,14 +190,14 @@ const chartOptions = computed(() => {
     },
   };
 });
+const refeshData = () => {
+  emits('refeshData');
+};
 </script>
 
 <template>
   <div class="card">
-    <div class="icon-chart">
-      <i class="pi pi-sync pi-spin"></i>
-      <span> {{ modificationTime }}</span>
-    </div>
+    <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
     <Chart type="line" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
@@ -205,25 +206,6 @@ const chartOptions = computed(() => {
   border-radius: 0;
   padding: 10px;
   position: relative;
-  .icon-chart {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 1rem;
-    color: var(--primary-color);
-    display: block;
-    text-align: center;
-    i {
-      display: block;
-      margin: 0 auto; /* Để căn giữa theo chiều ngang */
-    }
-    span {
-      display: block;
-      margin: 4px auto;
-      font-size: 0.6rem;
-      color: #808080;
-    }
-  }
 }
 .chart {
   height: 100%;

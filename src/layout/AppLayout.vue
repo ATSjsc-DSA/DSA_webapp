@@ -69,10 +69,10 @@ const isOutsideClicked = (event) => {
 
 <template>
   <div class="layout-wrapper relative" :class="containerClass">
-    <app-topbar v-show="!hideOverlayMenu"></app-topbar>
+    <!-- <app-topbar v-show="!hideOverlayMenu"></app-topbar>
     <div class="layout-sidebar">
       <app-sidebar></app-sidebar>
-    </div>
+    </div> -->
     <div class="layout-main-container">
       <div class="layout-main">
         <router-view></router-view>

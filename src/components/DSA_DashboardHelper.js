@@ -31,7 +31,7 @@ const defaultSetting = {
           size: 0.5,
         },
         {
-          component: 'logTable',
+          component: 'LOG',
           meta: {
             color: 'rgb(241, 131, 186)',
           },
@@ -59,6 +59,7 @@ const defaultSetting = {
           meta: {
             color: 'rgb(241, 131, 186)',
           },
+          scroll: 'scroll',
         },
       ],
     },
@@ -71,6 +72,7 @@ const loadSettingLocalStorage = () => {
   let data = ref(defaultSetting);
   try {
     let savedLayoutData = JSON.parse(localStorage.getItem('dashboard-layout-storage'));
+    console.log(savedLayoutData, 'savedLayoutData');
     data = savedLayoutData._value;
   } catch (error) {}
 
@@ -91,14 +93,13 @@ const getComponent = (name) => {
     return TSA_GTTTChart;
   } else if (name === 'LINE') {
     return DSA_RadarChar;
-  } else if (name === 'logTable') {
+  } else if (name === 'LOG') {
     return DSA_logTable;
   } else {
     return DSA_DashboardsEmpty; //{ render: (h) => h('p', '404 component not found') };
   }
 };
 const handleDragstart = (e) => {
-  console.log(e);
   let srcData = e.srcElement.id;
   const data = {
     component: srcData,

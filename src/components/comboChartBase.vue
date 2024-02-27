@@ -39,12 +39,6 @@ const setChartData = () => {
         borderColor: 'white',
         borderWidth: 2,
       },
-      {
-        type: 'bar',
-        label: 'Dataset 3',
-        backgroundColor: documentStyle.getPropertyValue('--cyan-500'),
-        data: [41, 52, 24, 74, 23, 21, 32],
-      },
     ],
   };
 };
