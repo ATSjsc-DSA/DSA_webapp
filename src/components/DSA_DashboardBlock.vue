@@ -2,7 +2,7 @@
   <div
     :id="idUuid"
     :class="
-      'dashboard__block dashboard__block--' + type + ' dashboard__block--' + state + ' dashboard__block--' + scroll
+      'dashboard__block dashboard__block--' + type + ' dashboard__block--' + state + ' dashboard__block--' + component
     "
     :style="{ flexBasis: flexBasis }"
     ref="block"
@@ -512,7 +512,7 @@ $twentyFivePercent: 100%;
   position: relative;
 
   display: flex;
-  &--scroll {
+  &--LOG {
     overflow-y: scroll;
   }
 

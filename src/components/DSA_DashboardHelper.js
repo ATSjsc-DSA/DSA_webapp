@@ -59,7 +59,6 @@ const defaultSetting = {
           meta: {
             color: 'rgb(241, 131, 186)',
           },
-          scroll: 'scroll',
         },
       ],
     },
