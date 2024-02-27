@@ -104,6 +104,8 @@ const setChartData = (radarData) => {
   let maxDataValue = Math.max(...reserve1Data, ...reserve2Data, ...reserve3Data);
   if (maxDataValue > maxAxisValue) maxAxisValue = maxDataValue;
 
+  maxAxisValue = maxDataValue + 0.05;
+
   let minRate1 = Math.min(...reserve1Data);
   let minRate2 = Math.min(...reserve2Data);
   getCurrentStateColorAndTitle(minRate1, minRate2);
