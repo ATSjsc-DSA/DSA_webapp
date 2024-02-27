@@ -10,6 +10,10 @@ const props = defineProps({
   },
 });
 
+onMounted(() => {
+  //chartData.value = setChartData(props.chartData.data);
+});
+
 const chartData = computed(() => {
   return setChartData(props.chartData.data);
 });
@@ -67,10 +71,12 @@ const getCurrentStateColorAndTitle = (rate1, rate2) => {
     colorStatus = 'rgba(0,128,0,1)';
     titleStatus = 'Secure';
   }
-  return {
-    title: titleStatus,
-    color: colorStatus,
-  };
+  updateTitleChart(titleStatus, colorTitle);
+};
+
+const updateTitleChart = (titleStatus, colorTitle) => {
+  chartOptions.value.plugins.title.text = 'System status : ' + titleStatus;
+  chartOptions.value.plugins.title.color = colorTitle;
 };
 
 const setChartData = (radarData) => {
@@ -112,7 +118,6 @@ const setChartData = (radarData) => {
   const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.5)', '-1', 'bound');
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
-
   return {
     labels: label.value,
     datasets: chartValue,
@@ -120,12 +125,9 @@ const setChartData = (radarData) => {
 };
 
 const chartOptions = computed(() => {
-  const documentStyle = getComputedStyle(document.documentElement);
-  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-
-  return {
+  let abc = props.chartData.data;
+  let chartOpt = {
     animation: false,
-
     scales: {
       r: {
         startAngle: 0,
@@ -137,11 +139,10 @@ const chartOptions = computed(() => {
           display: true,
           lineWidth: 1,
           circular: false,
-          color: textColorSecondary,
         },
         angleLines: {
           display: true,
-          lineWidth: 2,
+          lineWidth: 1,
           color: [
             'rgba(169,169,169,0.3)',
             'rgba(169,169,169,0.3)',
@@ -159,7 +160,6 @@ const chartOptions = computed(() => {
           callback: function (value, index, values) {
             return (value * 100).toFixed(0) + '%';
           },
-          // color: 'rgba(169,169,169,1)',
         },
 
         pointLabels: {
@@ -176,7 +176,6 @@ const chartOptions = computed(() => {
           ],
           color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
           font: {
-            // size: 14,
             style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
             weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
           },
@@ -236,9 +235,11 @@ const chartOptions = computed(() => {
       },
     },
     interaction: {
-      intersect: false,
+      //intersect: false,
     },
   };
+  console.log(chartOpt);
+  return chartOpt;
 });
 </script>
 
