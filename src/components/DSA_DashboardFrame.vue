@@ -68,6 +68,7 @@ onMounted(async () => {
   <div class="h-full">
     <DSA_DashboardBlock
       :class="'dashboard dashboard--editing dashboard--' + state"
+      v-if="props.data.children"
       v-bind="props.data"
       :component-getter="props.componentGetter"
       :editing="props.editing"

@@ -93,7 +93,7 @@ const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA', 'LOG'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
-let activeDashboardData = ref(DSA_DashboardHelper.defaultSetting);
+let activeDashboardData = ref({}); //DSA_DashboardHelper.defaultSetting
 const isChanged = ref(false);
 
 const getComponent = (name) => {
@@ -117,7 +117,6 @@ const callSave = () => {
 const callLoad = () => {
   setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
   activeDashboardData.value = tempDashboardData.value.data;
-  // activeDashboardData.value = DSA_DashboardHelper.defaultSetting; // Object.assign({}, tempDashboardData.value.data);
 };
 
 const callEdit = () => {
