@@ -5,6 +5,7 @@ import SSR_lineChart from './SSR_lineChart.vue';
 import TSA_F81Chart from './TSA_F81Chart.vue';
 import TSA_GTTTChart from './TSA_GTTTChart.vue';
 import DSA_logTable from './DSA_logTable.vue';
+
 const defaultSetting = {
   type: 'horizontal',
   size: 1,
@@ -17,7 +18,6 @@ const defaultSetting = {
       type: 'panel',
       size: 1,
     },
-
     {
       type: 'vertical',
       size: 1,
@@ -64,42 +64,47 @@ const defaultSetting = {
     },
   ],
 };
+
 const saveSettingLocalStorage = (data) => {
   localStorage.setItem('dashboard-layout-storage', JSON.stringify(data));
 };
+
 const loadSettingLocalStorage = () => {
   let data = ref(defaultSetting);
+
   try {
     let savedLayoutData = JSON.parse(localStorage.getItem('dashboard-layout-storage'));
-    console.log(savedLayoutData, 'savedLayoutData');
     data = savedLayoutData._value;
   } catch (error) {}
 
   return data;
 };
+
 const getComponent = (name) => {
-  if (name === 'RADAR') {
-    return DSA_RadarChar;
-  } else if (name === 'MAP') {
-    return mapView;
-  } else if (name === 'VSA') {
-    return DSA_RadarChar;
-  } else if (name === 'SSR') {
-    return SSR_lineChart;
-  } else if (name === 'SPS-81') {
-    return TSA_F81Chart;
-  } else if (name === 'TSA') {
-    return TSA_GTTTChart;
-  } else if (name === 'LINE') {
-    return DSA_RadarChar;
-  } else if (name === 'LOG') {
-    return DSA_logTable;
-  } else {
-    return DSA_DashboardsEmpty; //{ render: (h) => h('p', '404 component not found') };
+  switch (name) {
+    case 'RADAR':
+      return DSA_RadarChar;
+    case 'MAP':
+      return mapView;
+    case 'VSA':
+      return DSA_RadarChar;
+    case 'SSR':
+      return SSR_lineChart;
+    case 'SPS-81':
+      return TSA_F81Chart;
+    case 'TSA':
+      return TSA_GTTTChart;
+    case 'LINE':
+      return DSA_RadarChar;
+    case 'LOG':
+      return DSA_logTable;
+    default:
+      return DSA_DashboardsEmpty;
   }
 };
+
 const handleDragstart = (e) => {
-  let srcData = e.srcElement.id;
+  const srcData = e.srcElement.id;
   const data = {
     component: srcData,
     meta: {
@@ -108,12 +113,15 @@ const handleDragstart = (e) => {
   };
   e.dataTransfer.setData('text', JSON.stringify(data));
 };
+
 const dirkChange = (data) => {
   localStorage.setItem('dirk-data', JSON.stringify(data));
 };
+
 const toPDF = () => {
   window.print();
 };
+
 export default {
   defaultSetting,
   saveSettingLocalStorage,

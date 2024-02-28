@@ -8,7 +8,7 @@
           :editing="canEdit"
           :pdfMode="internalPdfMode"
           ref="dashboard"
-          @change="dirkChange"
+          @change="dirkChangeFarm"
         ></DSA_DashboardFrame>
       </div>
     </div>
@@ -81,8 +81,18 @@
 <script setup>
 import { ref, onBeforeUnmount, onMounted } from 'vue';
 import DSA_DashboardFrame from './DSA_DashboardFrame.vue';
-import DSA_DashboardHelper from './DSA_DashboardHelper';
+// import DSA_DashboardHelper from '../combosables/DSA_DashboardHelper';
+import useDashboardHelper from '../combosables/DSA_DashboardHelper';
 
+const {
+  defaultSetting,
+  saveSettingLocalStorage,
+  loadSettingLocalStorage,
+  getComponent,
+  handleDragstart,
+  dirkChange,
+  toPDF,
+} = useDashboardHelper();
 const props = defineProps({
   pdfMode: {
     type: Boolean,
@@ -93,19 +103,11 @@ const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA', 'LOG'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
-let activeDashboardData = ref(DSA_DashboardHelper.defaultSetting);
+let activeDashboardData = ref(defaultSetting);
 const isChanged = ref(false);
 
-const getComponent = (name) => {
-  return DSA_DashboardHelper.getComponent(name);
-};
-
-const handleDragstart = (e) => {
-  DSA_DashboardHelper.handleDragstart(e);
-};
-
-const dirkChange = () => {
-  DSA_DashboardHelper.dirkChange(activeDashboardData.value);
+const dirkChangeFarm = () => {
+  dirkChange(activeDashboardData.value);
   isChanged.value = true;
 };
 
@@ -115,9 +117,9 @@ const callSave = () => {
 };
 
 const callLoad = () => {
-  setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
+  setTempDashboardData({ data: defaultSetting });
   activeDashboardData.value = tempDashboardData.value.data;
-  // activeDashboardData.value = DSA_DashboardHelper.defaultSetting; // Object.assign({}, tempDashboardData.value.data);
+  // activeDashboardData.value = defaultSetting; // Object.assign({}, tempDashboardData.value.data);
 };
 
 const callEdit = () => {
@@ -126,19 +128,18 @@ const callEdit = () => {
 
 const saveConfigReport = () => {
   setTempDashboardData({ data: activeDashboardData.value });
-  DSA_DashboardHelper.saveSettingLocalStorage(tempDashboardData);
+  saveSettingLocalStorage(tempDashboardData);
   isChanged.value = false;
 };
 onMounted(() => {
-  let saveLayoutDashboard = DSA_DashboardHelper.loadSettingLocalStorage();
+  let saveLayoutDashboard = loadSettingLocalStorage();
   // let saveLayoutDashboard = null;
-  // console.log(saveLayoutDashboard, 'saveLayoutDashboard');
-  // console.log(saveLayoutDashboard);
+  console.log(saveLayoutDashboard, 'saveLayoutDashboard');
   if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')
-    setTempDashboardData({ data: DSA_DashboardHelper.defaultSetting });
+    setTempDashboardData({ data: defaultSetting });
   else setTempDashboardData(saveLayoutDashboard);
-
-  activeDashboardData.value = tempDashboardData.value.data;
+  console.log(tempDashboardData.value, 'tempDashboardData');
+  activeDashboardData.value = saveLayoutDashboard;
 });
 onBeforeUnmount(() => {
   if (isChanged.value) {

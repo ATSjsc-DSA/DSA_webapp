@@ -34,7 +34,6 @@ const getLogs = async () => {
         element.Timestamp = convertDateTimeToString(element.Timestamp);
       });
       data.value = dataload;
-      console.log(dataload, 'dataload');
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });

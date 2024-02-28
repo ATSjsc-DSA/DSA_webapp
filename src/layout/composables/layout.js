@@ -21,10 +21,8 @@ const layoutState = reactive({
 
 export function useLayout() {
   const changeThemeSettings = (theme, darkTheme) => {
-    console.log(theme, 'theme');
     layoutConfig.darkTheme = darkTheme;
     layoutConfig.theme = theme;
-    console.log();
   };
 
   const setScale = (scale) => {

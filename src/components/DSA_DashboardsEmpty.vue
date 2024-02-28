@@ -27,7 +27,6 @@ export default {
       //this.$emit('handleUpdateDataRealComponent', newValue);
     },
     ShowSetting() {
-      console.log('showMM Line');
     },
   },
   data() {

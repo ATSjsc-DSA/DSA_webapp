@@ -2,6 +2,8 @@
 import Chart from 'primevue/chart';
 import chartComposable from '@/combosables/chartData';
 import modificationTimeFile from './modificationTimeFile.vue';
+import { useLayout } from '@/layout/composables/layout';
+const { isDarkTheme } = useLayout();
 
 const { zoomOptions, convertDateTimeToString } = chartComposable();
 const props = defineProps({
@@ -46,7 +48,7 @@ const setChartData = (dataSub) => {
   };
 };
 
-const chartOptions = computed(() => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
@@ -65,6 +67,7 @@ const chartOptions = computed(() => {
         display: true,
         text: titleChart.value,
         padding: 4,
+        color: textColor,
       },
       legend: {
         labels: {
@@ -82,6 +85,8 @@ const chartOptions = computed(() => {
       x: {
         ticks: {
           color: textColorSecondary,
+          autoSkip: true, // Cho phép Chart.js tự động bỏ qua nhãn để giảm độ phân giải
+          maxTicksLimit: 5, // Số lượng tối đa các nhãn trục x được hiển thị
         },
         grid: {
           color: surfaceBorder,
@@ -100,18 +105,31 @@ const chartOptions = computed(() => {
       },
     },
   };
+};
+const chartOptions = ref();
+onMounted(() => {
+  chartOptions.value = setChartOptions();
 });
 const barChart = ref();
-
 const refeshData = () => {
   barChart.value.chart.resetZoom();
-  // emits('refeshData');
+  chartOptions.value = setChartOptions();
+  emits('refeshData');
 };
+watch(
+  isDarkTheme,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+  { immediate: false },
+);
+watch(titleChart, () => {
+  chartOptions.value = setChartOptions();
+});
 </script>
 <template>
   <div class="card relative">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
-
     <Chart ref="barChart" type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>

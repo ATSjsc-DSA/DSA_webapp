@@ -2,10 +2,8 @@
 import TSA_api from '@/api/tsa_api';
 
 import { computed, ref } from 'vue';
-import Tag from 'primevue/tag';
 import { intervalTime } from '@/Constants/';
 
-import Avatar from 'primevue/avatar';
 import chartOverLayPanel from './chartOverLayPanel.vue';
 import customFieldset from './customFieldset.vue';
 
@@ -14,9 +12,7 @@ import lineChartSpecialBase from './lineChartSpecialBase.vue';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 import chartComposable from '@/combosables/chartData';
-import { useLayout } from '@/layout/composables/layout';
 const { convertDateTimeToString } = chartComposable();
-const { isDarkTheme } = useLayout();
 
 const toast = useToast();
 const active = ref(0);
@@ -70,11 +66,9 @@ const modificationTimeBlock2 = computed(() => {
 const getchartDataBlock1 = async (code_name) => {
   try {
     const res = await TSA_api.getLineData(code_name);
-    console.log(res, 'res.data.payload');
     if (!res.data.success) {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
-      console.log(res.data.payload, 'res.data.payload');
       chartBlock1.value = res.data.payload;
     }
   } catch (error) {
@@ -103,7 +97,6 @@ const getListLine = async () => {
       listLine.value = res.data.payload;
       lineActiveBlock1.value = listLine.value.DNPK[0].name;
       lineActiveBlock2.value = listLine.value.NQHT[0].name;
-      console.log(listLine.value, 'listLine.value');
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -140,11 +133,6 @@ const changeLineActive2 = (param) => {
   getchartDataBlock2('NhoQuan-HaTinh_' + param);
   lineActiveBlock2.value = param;
 };
-watch(isDarkTheme, () => {
-  console.log(lineActiveBlock1.value, 'lineActiveBlock1');
-  changeLineActive1(lineActiveBlock1.value);
-  changeLineActive2(lineActiveBlock2.value);
-});
 </script>
 
 <template>

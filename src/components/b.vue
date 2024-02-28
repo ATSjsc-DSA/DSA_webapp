@@ -1,104 +1,70 @@
+<script setup>
+import radarChart from './radarChart.vue';
+import dsa_api from '@/api/dsa_api';
+import { intervalTime } from '@/Constants/';
+import { useLayout } from '@/layout/composables/layout';
+
+// primeVue
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
+const toast = useToast();
+const { isDarkTheme } = useLayout();
+
+const chartData = ref({
+  Key: [
+    'Line Loading',
+    'Tranformer Loading',
+    'Generator Loading',
+    'Excitation Limiter',
+    'Low/High Voltage',
+    'VSA Module',
+    'TSA Module',
+    'SSR Module',
+  ],
+  data: {
+    Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
+    Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
+    Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
+    CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
+  },
+  modificationTime: 0,
+});
+const interval = ref(null);
+const getDataSub = async () => {
+  try {
+    const res = await dsa_api.getdataSub();
+    if (!res.data.success) {
+      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    } else {
+      chartData.value = res.data.payload;
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  }
+};
+
+onMounted(async () => {
+  await getDataSub();
+  interval.value = setInterval(() => {
+    getDataSub();
+  }, intervalTime);
+});
+onUnmounted(() => {
+  clearInterval(interval.value);
+});
+watch(isDarkTheme, getDataSub());
+</script>
+
 <template>
-  <div class="h-full">
-    <Card>
-      <template #title> Simple Card </template>
-      <template #content>
-        <p class="m-0">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam
-          deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate
-          neque quas!
-        </p>
-        <span>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus
-          tenetur quis quam qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum
-          dolor sit amet, consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque
-          mollitia! Ab aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio
-          assumenda. orem ipsum, dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit
-          minus tenetur quis quam qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem
-          ipsum dolor sit amet, consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi
-          eaque mollitia! Ab aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam
-          optio orem ipsum, dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus
-          tenetur quis quam qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum
-          dolor sit amet, consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque
-          mollitia! Ab aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio
-          orem ipsum, dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur
-          quis quam qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit
-          amet, consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia!
-          Ab aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio v orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio v orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio orem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optiovorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optioorem ipsum,
-          dolor sit amet consectetur adipisicing elit. Dolores odio nobis, vero itaque impedit minus tenetur quis quam
-          qui id ullam, assumenda architecto rem iusto nemo dolorem nam, laboriosam eos. Lorem ipsum dolor sit amet,
-          consectetur adipisicing elit. Doloremque libero veritatis placeat provident culpa sequi eaque mollitia! Ab
-          aspernatur accusamus quis quibusdam soluta laudantium, enim explicabo dignissimos veniam optio
-        </span>
-      </template>
-    </Card>
+  <!-- <Toast></Toast> -->
+  <div class="radarChartContainer">
+    <radar-chart :chartData="chartData"></radar-chart>
   </div>
 </template>
-
-<script setup>
-import Card from 'primevue/card';
-</script>
+<style lang="scss" scoped>
+.radarChartContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+</style>

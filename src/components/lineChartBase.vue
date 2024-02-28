@@ -2,7 +2,9 @@
 import Chart from 'primevue/chart';
 import chartComposable from '@/combosables/chartData';
 import modificationTimeFile from './modificationTimeFile.vue';
+import { onMounted, watch } from 'vue';
 const { zoomOptions, convertDateTimeToString } = chartComposable();
+import { useLayout } from '@/layout/composables/layout';
 
 const props = defineProps({
   chartData: {
@@ -11,10 +13,13 @@ const props = defineProps({
     default: {},
   },
 });
+const { isDarkTheme } = useLayout();
+
 const emits = defineEmits(['refeshData']);
 const chartData = computed(() => {
   return setChartData(props.chartData);
 });
+
 const titleChart = computed(() => {
   return props.chartData.name;
 });
@@ -33,9 +38,9 @@ const setChartData = (dataSub) => {
         fill: false,
         borderColor: documentStyle.getPropertyValue('--red-600'), // Set your desired color
         yAxisID: 'y', // Choose the appropriate axis
-        tension: 0, // Use tension 0 to draw straight lines
+        tension: 0.4, // Use tension 0 to draw straight lines
         data: dataSub.dm,
-        pointRadius: 0,
+        pointRadius: 0.2,
         borderWidth: 2,
       },
       {
@@ -122,12 +127,11 @@ const setChartData = (dataSub) => {
   };
 };
 
-const chartOptions = computed(() => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
   return {
     animation: false,
     stacked: true,
@@ -137,8 +141,9 @@ const chartOptions = computed(() => {
       zoom: zoomOptions(),
       title: {
         display: true,
-        text: titleChart.value,
+        text: props.chartData.name,
         padding: 4,
+        color: textColor,
       },
       legend: {
         labels: {
@@ -169,8 +174,16 @@ const chartOptions = computed(() => {
     },
     scales: {
       x: {
+        type: 'linear',
+        display: true,
         ticks: {
           color: textColorSecondary,
+          x: {
+            ticks: {
+              autoSkip: true,
+              maxTicksLimit: 5,
+            },
+          },
         },
         grid: {
           color: surfaceBorder,
@@ -189,12 +202,24 @@ const chartOptions = computed(() => {
       },
     },
   };
+};
+const chartOptions = ref();
+onMounted(() => {
+  chartOptions.value = setChartOptions();
 });
 const lineChart = ref();
 const refeshData = () => {
   lineChart.value.chart.resetZoom();
-  // emits('refeshData');
+  chartOptions.value = setChartOptions();
+  emits('refeshData');
 };
+watch(isDarkTheme, () => {
+  chartOptions.value = setChartOptions();
+});
+
+watch(titleChart, () => {
+  chartOptions.value = setChartOptions();
+});
 </script>
 
 <template>

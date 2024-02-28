@@ -3,7 +3,6 @@ import lineChartBase from './lineChartBase.vue';
 import SSR_api from '@/api/ssr_api';
 import chartOverLayPanel from './chartOverLayPanel.vue';
 import { intervalTime } from '@/Constants/';
-import { useLayout } from '@/layout/composables/layout';
 import { ref, watch } from 'vue';
 
 // primeVue
@@ -11,7 +10,6 @@ import { ref, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
-const { isDarkTheme } = useLayout();
 
 const subActive = ref('');
 
@@ -81,9 +79,7 @@ const changeSubActive = async (param) => {
   subActive.value = param;
   await getchartData(param);
 };
-watch(isDarkTheme, () => {
-  getchartData(subActive.value);
-});
+
 const refeshData = () => {
   getchartData(subActive.value);
 };

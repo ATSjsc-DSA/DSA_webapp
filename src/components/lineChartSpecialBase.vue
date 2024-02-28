@@ -1,7 +1,8 @@
 <script setup>
 import Chart from 'primevue/chart';
 import chartComposable from '@/combosables/chartData';
-
+import { useLayout } from '@/layout/composables/layout';
+const { isDarkTheme } = useLayout();
 const { zoomOptions } = chartComposable();
 const props = defineProps({
   chartData: {
@@ -10,7 +11,7 @@ const props = defineProps({
     default: {},
   },
   labelChart: {
-    type: Object,
+    type: String,
     require: true,
     default: 'Angle chart',
   },
@@ -23,7 +24,7 @@ const chartData = computed(() => {
   return setChartData(props.chartData.data);
 });
 const titleChart = computed(() => (props.labelChart === 'value' ? 'Angle chart' : 'Power Transfer'));
-
+const lineName = computed(() => props.chartData.name);
 const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
   label,
   fill: false,
@@ -73,7 +74,7 @@ const setChartData = (dataSub) => {
   };
 };
 
-const chartOptions = computed(() => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
@@ -90,10 +91,6 @@ const chartOptions = computed(() => {
         text: titleChart.value,
         padding: 4,
       },
-      subtitle: {
-        display: true,
-        text: props.chartData.name,
-      },
       legend: {
         labels: {
           usePointStyle: true,
@@ -108,8 +105,13 @@ const chartOptions = computed(() => {
     },
     scales: {
       x: {
+        type: 'linear',
+        display: true,
         ticks: {
           color: textColorSecondary,
+          autoSkip: true, // Cho phép Chart.js tự động bỏ qua nhãn để giảm độ phân giải
+          maxTicksLimit: 20, // Số lượng tối đa các nhãn trục x được hiển thị
+          stepSize: 1,
         },
         grid: {
           color: surfaceBorder,
@@ -128,6 +130,16 @@ const chartOptions = computed(() => {
       },
     },
   };
+};
+const chartOptions = ref();
+onMounted(() => {
+  chartOptions.value = setChartOptions();
+});
+watch(isDarkTheme, () => {
+  chartOptions.value = setChartOptions();
+});
+watch(lineName, () => {
+  chartOptions.value = setChartOptions();
 });
 </script>
 

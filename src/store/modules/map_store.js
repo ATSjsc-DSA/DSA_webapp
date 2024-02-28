@@ -198,7 +198,6 @@ export const useMapStore = defineStore('map_Store', () => {
   }
 
   function addLayerBase(layer) {
-    console.log(layer, 'layer');
     layerSubLine.value
       .getSource()
       .getFeatures()

@@ -127,8 +127,13 @@ const setChartData = (radarData) => {
 };
 
 const chartOptions = computed(() => {
-  let abc = props.chartData.data;
-  let chartOpt = {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColor = documentStyle.getPropertyValue('--text-color');
+  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+  const primaryColor = documentStyle.getPropertyValue('--primary-color');
+  const highlightBg = documentStyle.getPropertyValue('--highlight-bg');
+
+  return {
     animation: false,
     scales: {
       r: {
@@ -141,6 +146,7 @@ const chartOptions = computed(() => {
           display: true,
           lineWidth: 1,
           circular: false,
+          color: textColor,
         },
         angleLines: {
           display: true,
@@ -165,40 +171,28 @@ const chartOptions = computed(() => {
         },
 
         pointLabels: {
-          fontColor: 'blue', // Change the color of the labels here
           backdropColor: [
             'rgba(255,169,169,0)',
             'rgba(255,169,169,0)',
             'rgba(255,169,169,0)',
             'rgba(255,169,169,0)',
             'rgba(255,169,169,0)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
+            highlightBg,
+            highlightBg,
+            highlightBg,
           ],
-          color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
-          font: {
-            style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
-            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
-          },
-        },
-
-        pointLabels: {
-          fontColor: 'blue', // Change the color of the labels here
-          backdropColor: [
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
+          color: [
+            textColorSecondary,
+            textColorSecondary,
+            textColorSecondary,
+            textColorSecondary,
+            textColorSecondary,
+            primaryColor,
+            primaryColor,
+            primaryColor,
           ],
-          color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
           font: {
-            // size: 14,
-            style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
+            size: 12,
             weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
           },
         },
@@ -227,7 +221,7 @@ const chartOptions = computed(() => {
         display: false,
         labels: {
           usePointStyle: true,
-          color: 'red',
+          color: textColor,
           font: {
             size: 8,
           },
@@ -240,8 +234,6 @@ const chartOptions = computed(() => {
       //intersect: false,
     },
   };
-  console.log(chartOpt);
-  return chartOpt;
 });
 </script>
 
@@ -251,7 +243,7 @@ const chartOptions = computed(() => {
       <i class="pi pi-sync pi-spin"></i>
       <span> {{ modificationTime }}</span>
     </div>
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="md:w-26rem w-full" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full" />
   </div>
 </template>
 
@@ -288,6 +280,6 @@ const chartOptions = computed(() => {
 // }
 .chart {
   // height: 100%;
-  // width: 70%;
+  width: 100%;
 }
 </style>

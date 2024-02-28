@@ -70,8 +70,6 @@ const itemClick = (event, item) => {
 };
 
 const changeSelecet = () => {
-  console.log(props, 'separator');
-  console.log('abc');
   emit('changeMenuToggle');
 };
 const checkActiveRoute = (item) => {

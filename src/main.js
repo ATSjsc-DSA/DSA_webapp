@@ -9,6 +9,7 @@ import ToastService from 'primevue/toastservice';
 import '@/assets/styles.scss';
 import { Chart } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
+import 'chart.js/auto';
 
 Chart.register(zoomPlugin);
 const app = createApp(App);
