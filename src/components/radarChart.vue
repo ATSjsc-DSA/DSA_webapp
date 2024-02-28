@@ -10,10 +10,6 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {
-  //chartData.value = setChartData(props.chartData.data);
-});
-
 const chartData = computed(() => {
   return setChartData(props.chartData.data);
 });
@@ -25,7 +21,7 @@ const modificationTime = computed(() => {
 const label = computed(() => {
   return props.chartData.Key;
 });
-let maxAxisValue = 0.3;
+let maxAxisValue = 0.2;
 let titleStatus = 'Secure'; // Secure , Warning , Critical
 let colorStatus = 'rgba(0,128,0,1)';
 let colorTitle = 'blue'; // blue, darkOrange, red
@@ -88,9 +84,9 @@ const setChartData = (radarData) => {
   const rate3 = radarData.Rate3;
   const current = radarData.CurentState;
 
-  const reserve1Data = [];
-  const reserve2Data = [];
-  const reserve3Data = [];
+  let reserve1Data = [];
+  let reserve2Data = [];
+  let reserve3Data = [];
 
   for (let index = 0; index < numAxis; index++) {
     const re1 = (-current[index] + rate1[index]) / rate3[index];
@@ -103,12 +99,19 @@ const setChartData = (radarData) => {
 
   let maxDataValue = Math.max(...reserve1Data, ...reserve2Data, ...reserve3Data);
   if (maxDataValue > maxAxisValue) maxAxisValue = maxDataValue;
-
   maxAxisValue = maxDataValue + 0.05;
+  maxAxisValue = maxAxisValue > 0.2 ? 0.2 : maxAxisValue;
 
   let minRate1 = Math.min(...reserve1Data);
   let minRate2 = Math.min(...reserve2Data);
   getCurrentStateColorAndTitle(minRate1, minRate2);
+
+  reserve1Data = removeValueBellowZero(reserve1Data);
+  reserve2Data = removeValueBellowZero(reserve2Data);
+  reserve3Data = removeValueBellowZero(reserve3Data);
+  reserve1Data = removeValueExceed20(reserve1Data);
+  reserve2Data = removeValueExceed20(reserve2Data);
+  reserve3Data = removeValueExceed20(reserve3Data);
 
   const currentData = new Array(numAxis).fill(0);
   const boundData = new Array(numAxis).fill(maxAxisValue);
@@ -124,6 +127,16 @@ const setChartData = (radarData) => {
     labels: label.value,
     datasets: chartValue,
   };
+};
+
+const removeValueBellowZero = (reserveData) => {
+  var reserveDataZero = reserveData.map((item) => (item < 0 ? 0 : item));
+  return reserveDataZero;
+};
+
+const removeValueExceed20 = (reserveData) => {
+  var reserveDataExceed20 = reserveData.map((item) => (item > 0.2 ? 0.2 : item));
+  return reserveDataExceed20;
 };
 
 const chartOptions = computed(() => {
@@ -144,17 +157,17 @@ const chartOptions = computed(() => {
         },
         angleLines: {
           display: true,
-          lineWidth: 1,
-          color: [
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(255,165,0,1)',
-            'rgba(255,165,0,1)',
-            'rgba(255,165,0,1)',
-          ],
+          lineWidth: 2,
+          // color: [
+          //   'rgba(169,169,169,0.3)',
+          //   'rgba(169,169,169,0.3)',
+          //   'rgba(169,169,169,0.3)',
+          //   'rgba(169,169,169,0.3)',
+          //   'rgba(169,169,169,0.3)',
+          //   'rgba(255,165,0,1)',
+          //   'rgba(255,165,0,1)',
+          //   'rgba(255,165,0,1)',
+          // ],
         },
         ticks: {
           display: true,
@@ -163,53 +176,19 @@ const chartOptions = computed(() => {
             return (value * 100).toFixed(0) + '%';
           },
         },
-
         pointLabels: {
-          fontColor: 'blue', // Change the color of the labels here
-          backdropColor: [
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
-          ],
-          color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
+          padding: 1,
           font: {
-            style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
+            style: ['normal', 'normal', 'normal', 'normal', 'normal', 'italic', 'italic', 'italic'],
             weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
           },
-        },
-
-        pointLabels: {
-          fontColor: 'blue', // Change the color of the labels here
-          backdropColor: [
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
-            'rgba(255,169,169,0.2)',
-          ],
-          color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
-          font: {
-            // size: 14,
-            style: ['normal', 'normal', 'normal', 'normal', 'normal', 'oblique', 'oblique', 'oblique'],
-            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
-          },
+          //color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
         },
       },
     },
     plugins: {
-      filler: {
-        propagate: false,
-      },
-      'samples-filler-analyser': {
-        target: 'chart-analyser',
+      datalabels: {
+        display: false,
       },
       title: {
         display: true,
@@ -218,10 +197,10 @@ const chartOptions = computed(() => {
         position: 'top', // Đặt vị trí tiêu đề là top
         align: 'center', // Căn giữa
         font: {
-          size: 18, // Kích thước font
+          size: 20, // Kích thước font
           weight: 'bold', // Độ đậm của font
         },
-        padding: 12,
+        padding: 3,
       },
       legend: {
         display: false,
@@ -231,16 +210,31 @@ const chartOptions = computed(() => {
           font: {
             size: 8,
           },
-          padding: 12,
+          padding: 1,
         },
         position: 'top',
       },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || '';
+
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.r !== null) {
+              let viewValue = context.parsed.r * 100;
+              label += viewValue;
+            }
+            return label;
+          },
+        },
+      },
     },
     interaction: {
-      //intersect: false,
+      intersect: false,
     },
   };
-  console.log(chartOpt);
   return chartOpt;
 });
 </script>
@@ -251,7 +245,7 @@ const chartOptions = computed(() => {
       <i class="pi pi-sync pi-spin"></i>
       <span> {{ modificationTime }}</span>
     </div>
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="md:w-26rem w-full" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="md:w-30rem w-full" />
   </div>
 </template>
 
@@ -281,13 +275,15 @@ const chartOptions = computed(() => {
     }
   }
 }
-// .p-chart {
-//   max-width: calc(100vh - 16rem) !important;
-//   width: 95%;
-//   height: 100%;
-// }
-.chart {
-  // height: 100%;
-  // width: 70%;
+/*
+.p-chart {
+  max-width: calc(100vh - 16rem) !important;
+  width: 95%;
+  height: 100%;
 }
+.chart {
+  height: 100%;
+  width: 70%;
+}
+*/
 </style>
