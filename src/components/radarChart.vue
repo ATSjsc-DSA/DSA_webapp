@@ -1,7 +1,11 @@
 <script setup>
 import chartComposable from '@/combosables/chartData';
 import Chart from 'primevue/chart';
+import { useLayout } from '@/layout/composables/layout';
+import modificationTimeFile from './modificationTimeFile.vue';
+
 const { convertDateTimeToString } = chartComposable();
+const { isDarkTheme } = useLayout();
 
 const props = defineProps({
   chartData: {
@@ -9,6 +13,7 @@ const props = defineProps({
     require: true,
   },
 });
+const emits = defineEmits(['refeshData']);
 
 const chartData = computed(() => {
   return setChartData(props.chartData.data);
@@ -67,13 +72,19 @@ const getCurrentStateColorAndTitle = (rate1, rate2) => {
     colorStatus = 'rgba(0,128,0,1)';
     titleStatus = 'Secure';
   }
-  updateTitleChart(titleStatus, colorTitle);
+  console.log(titleStatus, 'titleStatus');
+  TitleChart(titleStatus);
+  colorTitleChart(colorTitle);
+  chartOptions.value = setChartOptions();
+  // updateTitleChart(titleStatus, colorTitle);
 };
 
-const updateTitleChart = (titleStatus, colorTitle) => {
-  chartOptions.value.plugins.title.text = 'System status : ' + titleStatus;
-  chartOptions.value.plugins.title.color = colorTitle;
-};
+const TitleChart = () => 'System status : ' + titleStatus;
+const colorTitleChart = () => colorTitle;
+// const updateTitleChart = (titleStatus, colorTitle) => {
+//   chartOptions.value.plugins.title.text = 'System status : ' + titleStatus;
+//   chartOptions.value.plugins.title.color = colorTitle;
+// };
 
 const setChartData = (radarData) => {
   const chartValue = [];
@@ -119,8 +130,8 @@ const setChartData = (radarData) => {
   const currentValue = getChartConfig(currentData, 'rgba(0,0,0,1)', colorStatus, 'start', 'current');
   const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(0,128,0,0.5)', '-1', 'rate1');
   const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
-  const reserve3Value = getChartConfig(reserve3Data, 'rgba(128,0,128,1)', 'rgba(255,0,0,0.5)', '-1', 'rate3');
-  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.5)', '-1', 'bound');
+  const reserve3Value = getChartConfig(reserve3Data, 'rgba(255,0,128,1)', 'rgba(255,0,0,0.3)', '-1', 'rate3');
+  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.3)', '-1', 'bound');
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
   return {
@@ -139,13 +150,13 @@ const removeValueExceed20 = (reserveData) => {
   return reserveDataExceed20;
 };
 
-const chartOptions = computed(() => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const primaryColor = documentStyle.getPropertyValue('--primary-color');
+  console.log(primaryColor, 'primaryColor');
   const highlightBg = documentStyle.getPropertyValue('--highlight-bg');
-
   return {
     animation: false,
     scales: {
@@ -159,21 +170,31 @@ const chartOptions = computed(() => {
           display: true,
           lineWidth: 1,
           circular: false,
-          color: textColor,
+          color: textColorSecondary,
         },
         angleLines: {
           display: true,
-          lineWidth: 2,
-          // color: [
-          //   'rgba(169,169,169,0.3)',
-          //   'rgba(169,169,169,0.3)',
-          //   'rgba(169,169,169,0.3)',
-          //   'rgba(169,169,169,0.3)',
-          //   'rgba(169,169,169,0.3)',
-          //   'rgba(255,165,0,1)',
-          //   'rgba(255,165,0,1)',
-          //   'rgba(255,165,0,1)',
-          // ],
+          lineWidth: 1,
+          color: [
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            'rgba(169,169,169,0.3)',
+            primaryColor,
+            primaryColor,
+            primaryColor,
+          ],
+        },
+        pointLabels: {
+          padding: 1,
+          color: textColorSecondary,
+          // backdropColor: [, , , , , highlightBg, highlightBg, highlightBg],
+          font: {
+            size: 11,
+            style: 'normal',
+            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
+          },
         },
         ticks: {
           display: true,
@@ -182,43 +203,13 @@ const chartOptions = computed(() => {
             return (value * 100).toFixed(0) + '%';
           },
         },
-        pointLabels: {
-          backdropColor: [
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            highlightBg,
-            highlightBg,
-            highlightBg,
-          ],
-          color: [
-            textColorSecondary,
-            textColorSecondary,
-            textColorSecondary,
-            textColorSecondary,
-            textColorSecondary,
-            primaryColor,
-            primaryColor,
-            primaryColor,
-          ],
-          font: {
-            size: 12,
-            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
-          },
-          //color: ['gray', 'gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue'],
-        },
       },
     },
     plugins: {
-      datalabels: {
-        display: false,
-      },
       title: {
         display: true,
-        text: 'System status : ' + titleStatus,
-        color: colorTitle,
+        text: TitleChart,
+        color: colorTitleChart,
         position: 'top', // Đặt vị trí tiêu đề là top
         align: 'center', // Căn giữa
         font: {
@@ -231,7 +222,7 @@ const chartOptions = computed(() => {
         display: false,
         labels: {
           usePointStyle: true,
-          color: textColor,
+          color: 'red',
           font: {
             size: 8,
           },
@@ -260,15 +251,24 @@ const chartOptions = computed(() => {
       intersect: false,
     },
   };
+};
+const chartOptions = ref();
+onMounted(() => {
+  chartOptions.value = setChartOptions();
 });
+watch(isDarkTheme, () => {
+  chartOptions.value = setChartOptions();
+});
+const refeshData = () => {
+  chartOptions.value = setChartOptions();
+  emits('refeshData');
+};
 </script>
 
 <template>
   <div class="card flex justify-content-center h-full">
-    <div class="icon-chart">
-      <i class="pi pi-sync pi-spin"></i>
-      <span> {{ modificationTime }}</span>
-    </div>
+    <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
+
     <Chart type="radar" :data="chartData" :options="chartOptions" class="md:w-30rem w-full" />
   </div>
 </template>
@@ -299,8 +299,15 @@ const chartOptions = computed(() => {
     }
   }
 }
-.chart {
-  // height: 100%;
-  width: 100%;
+/*
+.p-chart {
+  max-width: calc(100vh - 16rem) !important;
+  width: 95%;
+  height: 100%;
 }
+.chart {
+  height: 100%;
+  width: 70%;
+}
+*/
 </style>

@@ -192,13 +192,16 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
   opacity: 0.92;
 }
 .ol-popup {
-  background-color: white;
+  background-color: var(--surface-ground);
   padding: 10px;
   width: fit-content;
   border-radius: 10px;
   .ol-popup_card {
     font-size: small;
     padding: 0px;
+    &::after {
+      border-top-color: var(--surface-ground);
+    }
     .ol-popup_card_maintitle {
       white-space: nowrap;
       margin-bottom: 0.5rem;

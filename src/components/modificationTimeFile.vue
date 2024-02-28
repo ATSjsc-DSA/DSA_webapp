@@ -38,7 +38,7 @@ const refeshData = () => {
     display: block;
     margin: 4px auto;
     font-size: 0.6rem;
-    color: #808080;
+    color: var(--text-color);
   }
 }
 </style>

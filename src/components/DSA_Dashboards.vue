@@ -8,7 +8,7 @@
           :editing="canEdit"
           :pdfMode="internalPdfMode"
           ref="dashboard"
-          @change="dirkChangeFarm"
+          @change="dirkChangeFile"
         ></DSA_DashboardFrame>
       </div>
     </div>
@@ -81,9 +81,7 @@
 <script setup>
 import { ref, onBeforeUnmount, onMounted } from 'vue';
 import DSA_DashboardFrame from './DSA_DashboardFrame.vue';
-// import DSA_DashboardHelper from '../combosables/DSA_DashboardHelper';
 import useDashboardHelper from '../combosables/DSA_DashboardHelper';
-
 const {
   defaultSetting,
   saveSettingLocalStorage,
@@ -93,6 +91,7 @@ const {
   dirkChange,
   toPDF,
 } = useDashboardHelper();
+
 const props = defineProps({
   pdfMode: {
     type: Boolean,
@@ -103,10 +102,10 @@ const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA', 'LOG'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
-let activeDashboardData = ref(defaultSetting);
+let activeDashboardData = ref({}); //DSA_DashboardHelper.defaultSetting
 const isChanged = ref(false);
 
-const dirkChangeFarm = () => {
+const dirkChangeFile = () => {
   dirkChange(activeDashboardData.value);
   isChanged.value = true;
 };
@@ -119,7 +118,6 @@ const callSave = () => {
 const callLoad = () => {
   setTempDashboardData({ data: defaultSetting });
   activeDashboardData.value = tempDashboardData.value.data;
-  // activeDashboardData.value = defaultSetting; // Object.assign({}, tempDashboardData.value.data);
 };
 
 const callEdit = () => {
@@ -133,13 +131,13 @@ const saveConfigReport = () => {
 };
 onMounted(() => {
   let saveLayoutDashboard = loadSettingLocalStorage();
-  // let saveLayoutDashboard = null;
-  console.log(saveLayoutDashboard, 'saveLayoutDashboard');
-  if (saveLayoutDashboard == null || saveLayoutDashboard == 'undefined' || saveLayoutDashboard.data == 'undefined')
+  if (!saveLayoutDashboard || !saveLayoutDashboard.data) {
     setTempDashboardData({ data: defaultSetting });
-  else setTempDashboardData(saveLayoutDashboard);
-  console.log(tempDashboardData.value, 'tempDashboardData');
-  activeDashboardData.value = saveLayoutDashboard;
+  } else {
+    setTempDashboardData(saveLayoutDashboard);
+  }
+
+  activeDashboardData.value = tempDashboardData.value.data;
 });
 onBeforeUnmount(() => {
   if (isChanged.value) {
@@ -203,6 +201,7 @@ const setTempDashboardData = (pData) => {
   height: 40px;
   margin: 5px;
   cursor: move;
+  color: black;
 }
 
 .dashboard__block__component {

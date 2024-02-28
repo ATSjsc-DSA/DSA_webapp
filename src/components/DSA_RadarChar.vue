@@ -2,13 +2,11 @@
 import radarChart from './radarChart.vue';
 import dsa_api from '@/api/dsa_api';
 import { intervalTime } from '@/Constants/';
-import { useLayout } from '@/layout/composables/layout';
 
 // primeVue
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
-const { isDarkTheme } = useLayout();
 
 const chartData = ref({
   Key: [
@@ -52,13 +50,15 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(interval.value);
 });
-watch(isDarkTheme, getDataSub());
+const refeshData = () => {
+  getDataSub();
+};
 </script>
 
 <template>
   <!-- <Toast></Toast> -->
   <div class="radarChartContainer">
-    <radar-chart :chartData="chartData"></radar-chart>
+    <radar-chart :chartData="chartData" @refeshData="refeshData"></radar-chart>
   </div>
 </template>
 <style lang="scss" scoped>

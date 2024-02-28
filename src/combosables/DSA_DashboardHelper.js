@@ -6,7 +6,7 @@ import SSR_lineChart from '@/components/SSR_lineChart.vue';
 import TSA_F81Chart from '@/components/TSA_F81Chart.vue';
 import TSA_GTTTChart from '@/components/TSA_GTTTChart.vue';
 import DSA_logTable from '@/components/DSA_logTable.vue';
-export default function useDashboardHelper() {
+const useDashboardHelper = () => {
   const defaultSetting = {
     type: 'horizontal',
     size: 1,
@@ -132,4 +132,5 @@ export default function useDashboardHelper() {
     dirkChange,
     toPDF,
   };
-}
+};
+export default useDashboardHelper;

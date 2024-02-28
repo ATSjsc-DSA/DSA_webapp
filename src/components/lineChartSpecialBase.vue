@@ -90,6 +90,7 @@ const setChartOptions = () => {
         display: true,
         text: titleChart.value,
         padding: 4,
+        color: textColor,
       },
       legend: {
         labels: {
