@@ -131,7 +131,7 @@ const setChartData = (radarData) => {
   const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(0,128,0,0.5)', '-1', 'rate1');
   const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
   const reserve3Value = getChartConfig(reserve3Data, 'rgba(255,0,128,1)', 'rgba(255,0,0,0.3)', '-1', 'rate3');
-  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.3)', '-1', 'bound');
+  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.5)', '-1', 'bound');
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
   return {
@@ -156,7 +156,7 @@ const setChartOptions = () => {
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const primaryColor = documentStyle.getPropertyValue('--primary-color');
   console.log(primaryColor, 'primaryColor');
-  const highlightBg = documentStyle.getPropertyValue('--highlight-bg');
+  const surface = documentStyle.getPropertyValue('--surface-ground');
   return {
     animation: false,
     scales: {
@@ -188,7 +188,7 @@ const setChartOptions = () => {
         },
         pointLabels: {
           padding: 1,
-          color: textColorSecondary,
+          color: textColor,
           // backdropColor: [, , , , , highlightBg, highlightBg, highlightBg],
           font: {
             size: 11,
@@ -202,6 +202,9 @@ const setChartOptions = () => {
           callback: function (value, index, values) {
             return (value * 100).toFixed(0) + '%';
           },
+          color: textColor,
+          backdropColor: 'transparent',
+          z: 10,
         },
       },
     },
@@ -216,7 +219,7 @@ const setChartOptions = () => {
           size: 20, // Kích thước font
           weight: 'bold', // Độ đậm của font
         },
-        padding: 3,
+        padding: 1,
       },
       legend: {
         display: false,
@@ -226,7 +229,7 @@ const setChartOptions = () => {
           font: {
             size: 8,
           },
-          padding: 1,
+          padding: 0,
         },
         position: 'top',
       },
