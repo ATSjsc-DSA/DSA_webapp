@@ -57,7 +57,7 @@ onMounted(async () => {
       }),
     ],
     target: olMap.value,
-    view: mapStore.viewMap_config,
+    view: mapStore.viewMap_config(),
   });
   mapStore.addLayerInit();
   //Add Control panel

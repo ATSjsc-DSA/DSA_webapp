@@ -48,12 +48,11 @@ export const useMapStore = defineStore('map_Store', () => {
   const Point115Color = '#1166bb';
   const Point20Color = '#1166bb';
 
-  const viewMap_config = (center = [-102.198, 37.055], zoom = 4.3) =>
-    new View({
-      zoom: zoom,
-      maxZoom: 16,
-      center: fromLonLat(center),
-    });
+  const viewMap_config = new View({
+    zoom: 4.3,
+    maxZoom: 16,
+    center: fromLonLat([-102.198, 37.055]),
+  });
 
   const iconStyle = new Style({
     image: new Icon({

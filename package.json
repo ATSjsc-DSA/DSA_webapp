@@ -30,6 +30,8 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-zoom": "^2.0.1",
     "dayjs": "^1.11.10",
+    "highcharts": "^11.3.0",
+    "highcharts-vue": "^1.4.3",
     "lodash": "^4.17.21",
     "mitt": "^3.0.1",
     "ol": "^8.2.0",

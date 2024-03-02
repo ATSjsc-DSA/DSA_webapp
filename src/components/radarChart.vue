@@ -165,6 +165,10 @@ const setChartOptions = () => {
   const surface = documentStyle.getPropertyValue('--surface-ground');
   return {
     animation: false,
+    maintainAspectRatio: true,
+    layout: {
+      padding: 0,
+    },
     scales: {
       r: {
         startAngle: 0,
@@ -222,10 +226,13 @@ const setChartOptions = () => {
         position: 'top', // Đặt vị trí tiêu đề là top
         align: 'center', // Căn giữa
         font: {
-          size: 20, // Kích thước font
+          size: 18, // Kích thước font
           weight: 'bold', // Độ đậm của font
         },
-        padding: 1,
+        padding: {
+          top: 0,
+          bottom: 0,
+        },
       },
       legend: {
         display: false,

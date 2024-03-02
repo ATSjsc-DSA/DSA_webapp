@@ -3,7 +3,7 @@ import barChartBase from './barChartBase.vue';
 import TSA_api from '@/api/tsa_api';
 import chartOverLayPanel from './chartOverLayPanel.vue';
 import { intervalTime } from '@/Constants/';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 // primeVue
 
 import { useToast } from 'primevue/usetoast';
@@ -11,6 +11,10 @@ import Toast from 'primevue/toast';
 
 const props = defineProps({
   enabledFieldset: Boolean,
+  listTypeLine: {
+    type: Array,
+    default: [],
+  },
 });
 const toast = useToast();
 const interval = ref(null);
@@ -26,6 +30,10 @@ const baseValueChart = {
 const chartBlock1 = ref(baseValueChart);
 
 const getchartData = async (param) => {
+  if (param === '') {
+    // Tránh gọi getchartData khi param rỗng
+    return;
+  }
   try {
     const res = await TSA_api.getTransCap(param);
     if (!res.data.success) {
@@ -66,21 +74,16 @@ const displayFieldset = computed(() => {
 });
 
 const typelineActive = ref('');
-const listTypeLine = ref([]);
-
-const getListTypeLine = async () => {
-  try {
-    const res = await TSA_api.getListTypeLine();
-    if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      listTypeLine.value = res.data.payload;
-      typelineActive.value = res.data.payload[0].name;
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
-};
+watch(
+  () => props.listTypeLine,
+  () => {
+    typelineActive.value = props.listTypeLine[0].name;
+    nextTick(async () => {
+      await getchartData(typelineActive.value);
+    });
+  },
+);
+const listTypeLine = computed(() => props.listTypeLine);
 
 const changeSubActive = async (param) => {
   typelineActive.value = param;
@@ -88,8 +91,6 @@ const changeSubActive = async (param) => {
 };
 
 onMounted(async () => {
-  await getListTypeLine();
-  await getchartData(typelineActive.value);
   interval.value = setInterval(() => {
     getchartData(typelineActive.value);
   }, intervalTime);

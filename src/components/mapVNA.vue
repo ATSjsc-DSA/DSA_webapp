@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import mapMultiselect from './mapMultiselect.vue';
 import { useMapStore } from '@/store';
 import mapCheckBoxLayer from './mapCheckBoxLayer.vue';
@@ -9,6 +9,7 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import Overlay from 'ol/Overlay';
 import Map from 'ol/Map';
 import Control from 'ol/control/Control';
+
 // primeVue
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
@@ -20,7 +21,6 @@ const toast = useToast();
 const subDataClick = ref();
 const olMap = ref(null);
 const popup = ref(null);
-const panel = ref(null);
 //method
 const getListSub = async () => {
   try {
@@ -58,14 +58,9 @@ onMounted(async () => {
       }),
     ],
     target: olMap.value,
-    view: mapStore.viewMap_config(),
+    view: mapStore.viewMap_config([105.8342, 16.5278], 6.2),
   });
   mapStore.addLayerInit();
-  //Add Control panel
-  panel.value = new Control({
-    element: document.getElementById('panel'),
-  });
-  mapStore.map.addControl(panel.value);
   //Add Control panel
   const panelLayer = new Control({
     element: document.getElementById('panelLayer'),
@@ -94,6 +89,7 @@ onMounted(async () => {
       popup.value.setPosition(e.coordinate);
     });
   });
+  mapStore.ssrStandards();
 });
 
 const selectedLayer = ref([500]);
@@ -120,7 +116,7 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
         mapStore.addLayerBase(115);
         break;
       case 20:
-        mapStore.removeLayerBase(20);
+        mapStore.addLayerBase(20);
         break;
     }
   } else {
@@ -149,45 +145,14 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
     }
   }
 };
-const selectedCriteria = ref('');
-const changeSelecetCriteria = (value) => {
-  selectedCriteria.value = value;
-  switch (value) {
-    case 'LL':
-      mapStore.lineLoadingStandards();
-      break;
-    case 'TL':
-      mapStore.transStandards();
-      break;
-    case 'GL':
-      mapStore.generatorStandards();
-      break;
-    case 'EL':
-      mapStore.excitationLimiterStandards();
-      break;
-    case 'LHV':
-      mapStore.voltageStandards();
-      break;
-    case 'VSA':
-      mapStore.vsaStandards();
-      break;
-    case 'TSA':
-      mapStore.tsaStandards();
-      break;
-    case 'SSR':
-      mapStore.ssrStandards();
-      break;
-  }
-};
+// onUnmounted(() => {
+//   // reset component when unmounted
+//   // mapStore.removeMap();
+// });
 </script>
 
 <template>
   <div class="map" ref="olMap"></div>
-  <div id="panel" class="ol-panel">
-    <div class="ol-panel_checkbox">
-      <mapMultiselect :selectedCriteria="selectedCriteria" @changeSelecet="changeSelecetCriteria"></mapMultiselect>
-    </div>
-  </div>
   <div id="panelLayer" class="ol-panel-layer">
     <mapCheckBoxLayer :selectedSubs="selectedLayer" @changeSelecetLayer="changeSelecetLayer"></mapCheckBoxLayer>
   </div>
@@ -232,12 +197,12 @@ const changeSelecetCriteria = (value) => {
   padding: 10px;
   width: fit-content;
   border-radius: 10px;
-  &::after {
-    border-top-color: var(--surface-ground);
-  }
   .ol-popup_card {
     font-size: small;
     padding: 0px;
+    &::after {
+      border-top-color: var(--surface-ground);
+    }
     .ol-popup_card_maintitle {
       white-space: nowrap;
       margin-bottom: 0.5rem;
@@ -248,6 +213,5 @@ const changeSelecetCriteria = (value) => {
   // height: calc(100vh - 154px);
   height: 100%;
   width: 100%;
-  // border-radius: 1 !important;
 }
 </style>
