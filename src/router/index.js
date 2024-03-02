@@ -32,6 +32,11 @@ const router = createRouter({
           name: 'Info',
           component: () => import('@/views/Info_View.vue'),
         },
+        {
+          path: '/DSA/Map',
+          name: 'Map',
+          component: () => import('@/views/MapVNA_View.vue'),
+        },
       ],
     },
   ],

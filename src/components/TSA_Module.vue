@@ -2,6 +2,25 @@
 import TSA_SPSCheck from './TSA_SPSCheck.vue';
 import TSA_GTTTCheck from './TSA_GTTTCheck.vue';
 import TSA_ChartView from './TSA_ChartView.vue';
+import TSA_api from '@/api/tsa_api';
+
+const listTypeLine = ref([]);
+
+const getListTypeLine = async () => {
+  try {
+    const res = await TSA_api.getListTypeLine();
+    if (!res.data.success) {
+      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    } else {
+      listTypeLine.value = res.data.payload;
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  }
+};
+onMounted(async () => {
+  await getListTypeLine();
+});
 </script>
 
 <template>
@@ -11,10 +30,10 @@ import TSA_ChartView from './TSA_ChartView.vue';
     </div>
     <div class="col-7 tsa-block row-gap-2">
       <div class="tsa-block-gtth">
-        <TSA_GTTTCheck></TSA_GTTTCheck>
+        <TSA_GTTTCheck :listTypeLine="listTypeLine"></TSA_GTTTCheck>
       </div>
       <div class="tsa-block-chart">
-        <TSA_ChartView></TSA_ChartView>
+        <TSA_ChartView :listTypeLine="listTypeLine"></TSA_ChartView>
       </div>
     </div>
   </div>

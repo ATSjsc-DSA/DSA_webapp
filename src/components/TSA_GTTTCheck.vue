@@ -7,12 +7,18 @@ import Toast from 'primevue/toast';
 import customFieldset from './customFieldset.vue';
 
 const toast = useToast();
+const props = defineProps({
+  listTypeLine: {
+    type: Array,
+    default: [],
+  },
+});
 </script>
 
 <template>
   <Toast></Toast>
   <customFieldset legendText="TTTG Check">
-    <TSA_GTTTChart enabledFieldset></TSA_GTTTChart>
+    <TSA_GTTTChart :listTypeLine="props.listTypeLine" enabledFieldset></TSA_GTTTChart>
   </customFieldset>
 </template>
 <style lang="scss" scoped>

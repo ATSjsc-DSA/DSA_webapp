@@ -1,30 +1,44 @@
 <template>
   <div class="">
-    <div class="flex align-items-center mb-3">
-      <Checkbox v-model="checked" :binary="true" />
-      <label for="ingredient1" class="ml-2"> Only critical busbar</label>
-    </div>
-    <Dropdown
-      v-model="selectedCity"
-      :options="cities"
+    <MultiSelect
+      v-model="selectedBusbar"
+      variant="filled"
+      :options="listBusBar"
       optionLabel="name"
-      placeholder="Select a City"
-      class="w-full md:w-14rem"
+      placeholder="Select Cities"
+      :maxSelectedLabels="3"
+      class="w-full md:w-16rem"
+      @update:modelValue="changeListBusbar($event)"
     />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import Checkbox from 'primevue/checkbox';
-import Dropdown from 'primevue/dropdown';
-const checked = ref(true);
-const selectedCity = ref();
-const cities = ref([
-  { name: 'New York', code: 'NY' },
-  { name: 'Rome', code: 'RM' },
-  { name: 'London', code: 'LDN' },
-  { name: 'Istanbul', code: 'IST' },
-  { name: 'Paris', code: 'PRS' },
-]);
+
+import MultiSelect from 'primevue/multiselect';
+
+const selectedBusbar = ref();
+const changeListBusbar = (lisBusbar) => {
+  emits('changeListBusbar', lisBusbar);
+};
+const props = defineProps({
+  listBusbar: {
+    type: Array,
+    default: [],
+  },
+});
+const emits = defineEmits(['changeListBusbar']);
+const listBusBar = computed(() => props.listBusbar);
 </script>
+<style scoped>
+/* .listboxSubbar {
+  height: 45rem;
+  overflow-y: scroll;
+}
+@media screen and (max-width: 1536px) {
+  .listboxSubbar {
+    height: 30rem;
+  }
+} */
+</style>

@@ -19,6 +19,10 @@ const model = ref([
     ],
   },
   {
+    label: 'VNA',
+    items: [{ label: 'Map', icon: 'pi pi-fw pi-map-marker', to: '/DSA/Map' }],
+  },
+  {
     label: 'UTILITIES',
     items: [{ label: 'Help', icon: 'pi pi-fw pi-info-circle', to: '/DSA/Info' }],
   },

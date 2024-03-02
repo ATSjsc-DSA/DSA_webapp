@@ -16,7 +16,12 @@ const { convertDateTimeToString } = chartComposable();
 
 const toast = useToast();
 const active = ref(0);
-
+const props = defineProps({
+  listTypeLine: {
+    type: Array,
+    default: [],
+  },
+});
 const baseValueChart = {
   name: '',
   data: {
@@ -33,28 +38,12 @@ const baseValueChart = {
 
 const chartBlock1 = ref(baseValueChart);
 const chartBlock2 = ref(baseValueChart);
-const listLine = ref({
-  NQHT: [],
-  DNPK: [],
-});
-
-// const lineActiveBlock1 = computed(() => {
-//   console.log(chartBlock1.value, 'chartBlock1');
-//   if (chartBlock1.value.name !== '') {
-//     const result = chartBlock1.value.name.match(/([\d.]+MW)/);
-//     return result[1];
-//   } else return '';
-// });
-// const lineActiveBlock2 = computed(() => {
-//   if (chartBlock2.value.name !== '') {
-//     const result = chartBlock2.value.name.match(/([\d.]+MW)/);
-//     return result[1];
-//   } else return '';
-// });
+const listLine = ref({});
 
 const lineActiveBlock1 = ref('');
 const lineActiveBlock2 = ref('');
-
+const listLineBlock1 = ref([]);
+const listLineBlock2 = ref([]);
 const modificationTimeBlock1 = computed(() => {
   return convertDateTimeToString(chartBlock1.value.modificationTime);
 });
@@ -95,42 +84,58 @@ const getListLine = async () => {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       listLine.value = res.data.payload;
-      lineActiveBlock1.value = listLine.value.DNPK[0].name;
-      lineActiveBlock2.value = listLine.value.NQHT[0].name;
+      listLineBlock1.value = listLine.value[typeLine1.value.name];
+      listLineBlock2.value = listLine.value[typeLine2.value.name];
+
+      lineActiveBlock1.value = listLine.value[typeLine1.value.name][0].name;
+      lineActiveBlock2.value = listLine.value[typeLine2.value.name][0].name;
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
+
+const listTypeLine = ref(props.listTypeLine);
+const typeLine1 = ref('');
+const typeLine2 = ref('');
+watch(
+  () => props.listTypeLine,
+  (newValue) => {
+    listTypeLine.value = newValue;
+    typeLine1.value = newValue[0];
+    typeLine2.value = newValue[1];
+    nextTick(async () => {
+      await getListLine();
+      console.log(typeLine1.value, ' typeLine1.value');
+      await getchartDataBlock1(typeLine1.value.name + '_' + lineActiveBlock1.value);
+      await getchartDataBlock2(typeLine2.value.name + '_' + lineActiveBlock2.value);
+    });
+  },
+);
+
 const interval1 = ref(null);
-const interval2 = ref(null);
 
 onMounted(async () => {
-  await getListLine();
+  interval1.value = setInterval(async () => {
+    await getListLine();
 
-  await getchartDataBlock1('DaNang-Pleiku_' + lineActiveBlock1.value);
-  await getchartDataBlock2('NhoQuan-HaTinh_' + lineActiveBlock2.value);
-  interval1.value = setInterval(() => {
-    getchartDataBlock1('DaNang-Pleiku_' + lineActiveBlock1.value);
-  }, intervalTime);
-  interval2.value = setInterval(() => {
-    getchartDataBlock2('NhoQuan-HaTinh_' + lineActiveBlock2.value);
+    getchartDataBlock1(typeLine1.value.name + '_' + lineActiveBlock1.value);
+    getchartDataBlock2(typeLine2.value.name + '_' + lineActiveBlock2.value);
   }, intervalTime);
 });
 
 onUnmounted(() => {
   clearInterval(interval1.value);
-  clearInterval(interval2.value);
 });
 const getActive = (value) => {
   active.value = value;
 };
 const changeLineActive1 = (param) => {
-  getchartDataBlock1('DaNang-Pleiku_' + param);
+  getchartDataBlock1(typeLine1.value.name + param);
   lineActiveBlock1.value = param;
 };
 const changeLineActive2 = (param) => {
-  getchartDataBlock2('NhoQuan-HaTinh_' + param);
+  getchartDataBlock2(typeLine2.value.name + '_' + param);
   lineActiveBlock2.value = param;
 };
 </script>
@@ -140,12 +145,12 @@ const changeLineActive2 = (param) => {
   <customFieldset legendText="Chart View">
     <div class="chartView-title">
       <div v-show="active === 0">
-        <chartOverLayPanel :listSub="listLine.DNPK" :subActive="lineActiveBlock1" @changeSubActive="changeLineActive1">
+        <chartOverLayPanel :listSub="listLineBlock1" :subActive="lineActiveBlock1" @changeSubActive="changeLineActive1">
           <span>{{ chartBlock1.name }}</span></chartOverLayPanel
         >
       </div>
       <div v-show="active === 1">
-        <chartOverLayPanel :listSub="listLine.NQHT" :subActive="lineActiveBlock2" @changeSubActive="changeLineActive2">
+        <chartOverLayPanel :listSub="listLineBlock2" :subActive="lineActiveBlock2" @changeSubActive="changeLineActive2">
           <span>{{ chartBlock2.name }}</span></chartOverLayPanel
         >
       </div>

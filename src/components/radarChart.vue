@@ -155,10 +155,12 @@ const setChartOptions = () => {
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const primaryColor = documentStyle.getPropertyValue('--primary-color');
-  console.log(primaryColor, 'primaryColor');
-  const surface = documentStyle.getPropertyValue('--surface-ground');
   return {
     animation: false,
+    maintainAspectRatio: true,
+    layout: {
+      padding: 0,
+    },
     scales: {
       r: {
         startAngle: 0,
@@ -170,7 +172,7 @@ const setChartOptions = () => {
           display: true,
           lineWidth: 1,
           circular: false,
-          color: textColorSecondary,
+          color: textColor,
         },
         angleLines: {
           display: true,
@@ -216,10 +218,13 @@ const setChartOptions = () => {
         position: 'top', // Đặt vị trí tiêu đề là top
         align: 'center', // Căn giữa
         font: {
-          size: 20, // Kích thước font
+          size: 18, // Kích thước font
           weight: 'bold', // Độ đậm của font
         },
-        padding: 1,
+        padding: {
+          top: 0,
+          bottom: 0,
+        },
       },
       legend: {
         display: false,
@@ -272,7 +277,7 @@ const refeshData = () => {
   <div class="card flex justify-content-center h-full">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
 
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="md:w-30rem w-full" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="chartRadar" />
   </div>
 </template>
 
@@ -313,4 +318,12 @@ const refeshData = () => {
   width: 70%;
 }
 */
+.chartRadar {
+  width: 30rem;
+}
+@media screen and (max-width: 769px) {
+  .chartRadar {
+    width: 100%;
+  }
+}
 </style>

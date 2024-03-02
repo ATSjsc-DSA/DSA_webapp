@@ -6,11 +6,12 @@
     </div>
     <div>
       <Dropdown
-        v-model="selectedCity"
-        :options="cities"
-        optionLabel="name"
-        placeholder="Select a City"
+        v-model="selectedArea"
+        :options="listDataArea"
+        optionLabel="Name"
+        placeholder="Select a Area"
         class="w-full md:w-14rem"
+        @update:modelValue="changeArea($event)"
       />
     </div>
   </div>
@@ -21,12 +22,16 @@ import { ref } from 'vue';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 const checked = ref(true);
-const selectedCity = ref();
-const cities = ref([
-  { name: 'New York', code: 'NY' },
-  { name: 'Rome', code: 'RM' },
-  { name: 'London', code: 'LDN' },
-  { name: 'Istanbul', code: 'IST' },
-  { name: 'Paris', code: 'PRS' },
-]);
+const selectedArea = ref();
+const changeArea = (area) => {
+  emits('changeArea', area);
+};
+const props = defineProps({
+  listDataArea: {
+    type: Array,
+    default: [],
+  },
+});
+const emits = defineEmits(['changeArea']);
+const listDataArea = computed(() => props.listDataArea);
 </script>
