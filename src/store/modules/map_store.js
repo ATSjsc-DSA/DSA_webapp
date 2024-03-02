@@ -235,18 +235,23 @@ export const useMapStore = defineStore('map_Store', () => {
     }
   }
   function setLineColor(x, param = 'sub') {
+    console.log(loadingLimits.value, ' loadingLimits.value');
+    console.log(x, ' x');
     if (x < loadingLimits.value.step1) {
       if (param === 'line') {
+        console.log('greenLayer');
         return greenColor;
       } else return greenLayer;
       // ;
     } else if (x < loadingLimits.value.step2) {
+      console.log('greenLayer');
       if (param === 'line') {
         return yellowColor;
       } else return yellowLayer;
       // ;
     } else {
       if (param === 'line') {
+        console.log('greenLayer');
         return redColor;
       } else return redLayer;
       // ;
@@ -330,6 +335,7 @@ export const useMapStore = defineStore('map_Store', () => {
       if (!res.data.success) {
         throw res.data.error;
       } else {
+        loadingLimits.value = res.data.payload.evaluation;
         changeStandardsSSR(res.data.payload.value);
       }
     } catch (error) {
@@ -446,7 +452,7 @@ export const useMapStore = defineStore('map_Store', () => {
         if (feature.get('id') === 'sub') {
           param.forEach((sub) => {
             if (sub.Substation === feature.get('name')) {
-              feature.set('status', setLineColor(sub.value, 'sub'));
+              feature.set('status', setLineColor(sub.Value, 'sub'));
               feature.set('zIndex', 10);
             }
           });
