@@ -1,4 +1,5 @@
 <script setup>
+import { ref, onMounted, onUpdated, onUnmounted, triggerRef } from 'vue';
 import radarChart from './radarChart.vue';
 import dsa_api from '@/api/dsa_api';
 import { intervalTime } from '@/Constants/';
@@ -7,7 +8,9 @@ import { intervalTime } from '@/Constants/';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 const toast = useToast();
-
+const refRadarChartContainer = ref(null);
+const signalUpdate = ref(true);
+const interval = ref(null);
 const chartData = ref({
   Key: [
     'Line Loading',
@@ -27,7 +30,23 @@ const chartData = ref({
   },
   modificationTime: 0,
 });
-const interval = ref(null);
+
+const radarChartContainerWidth = computed(() => {
+  let a = signalUpdate.value;
+  let width = 300;
+
+  if (refRadarChartContainer.value) {
+    let clWidth = refRadarChartContainer.value.clientWidth;
+    let clientHeight = refRadarChartContainer.value.clientHeight;
+    let finalSize = Math.min(clientHeight, clWidth);
+    console.log(finalSize);
+    width = finalSize;
+  }
+  width = width < 300 ? 300 : width;
+  console.log('update');
+  console.log(width);
+  return width;
+});
 const getDataSub = async () => {
   try {
     const res = await dsa_api.getdataSub();
@@ -53,12 +72,16 @@ onUnmounted(() => {
 const refeshData = () => {
   getDataSub();
 };
+
+onUpdated(() => {
+  signalUpdate.value = !signalUpdate.value;
+});
 </script>
 
 <template>
   <!-- <Toast></Toast> -->
-  <div class="radarChartContainer">
-    <radar-chart :chartData="chartData" @refeshData="refeshData"></radar-chart>
+  <div ref="refRadarChartContainer" class="radarChartContainer">
+    <radar-chart :chartData="chartData" :parentWidth="radarChartContainerWidth" @refeshData="refeshData"></radar-chart>
   </div>
 </template>
 <style lang="scss" scoped>

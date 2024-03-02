@@ -12,7 +12,12 @@ const props = defineProps({
     type: Object,
     require: true,
   },
+  parentWidth: {
+    type: Number,
+    default: 200,
+  },
 });
+
 const emits = defineEmits(['refeshData']);
 
 const chartData = computed(() => {
@@ -59,16 +64,16 @@ const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) =>
 });
 
 const getCurrentStateColorAndTitle = (rate1, rate2) => {
-  if (rate2 <= 0) {
+  if (rate2 < 0) {
     colorTitle = 'red';
     colorStatus = 'rgba(255,0,0,1)';
     titleStatus = 'Critical';
-  } else if (rate1 <= 0) {
+  } else if (rate1 < 0) {
     colorTitle = 'darkOrange';
     colorStatus = 'rgba(255,255,0,1)';
     titleStatus = 'Warning';
   } else {
-    colorTitle = 'blue';
+    colorTitle = 'rgb(34,139,34)';
     colorStatus = 'rgba(0,128,0,1)';
     titleStatus = 'Secure';
   }
@@ -130,8 +135,8 @@ const setChartData = (radarData) => {
   const currentValue = getChartConfig(currentData, 'rgba(0,0,0,1)', colorStatus, 'start', 'current');
   const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(0,128,0,0.5)', '-1', 'rate1');
   const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
-  const reserve3Value = getChartConfig(reserve3Data, 'rgba(255,0,128,1)', 'rgba(255,0,0,0.3)', '-1', 'rate3');
-  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.5)', '-1', 'bound');
+  const reserve3Value = getChartConfig(reserve3Data, 'navy', 'rgba(255,0,0,0.6)', '-1', 'rate3');
+  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.6)', '-1', 'bound');
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
   return {
@@ -155,6 +160,9 @@ const setChartOptions = () => {
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const primaryColor = documentStyle.getPropertyValue('--primary-color');
+  const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+  console.log(primaryColor, 'primaryColor');
+  const surface = documentStyle.getPropertyValue('--surface-ground');
   return {
     animation: false,
     maintainAspectRatio: true,
@@ -172,7 +180,7 @@ const setChartOptions = () => {
           display: true,
           lineWidth: 1,
           circular: false,
-          color: textColor,
+          color: surfaceBorder,
         },
         angleLines: {
           display: true,
@@ -276,8 +284,7 @@ const refeshData = () => {
 <template>
   <div class="card flex justify-content-center h-full">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
-
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="chartRadar" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" :width="props.parentWidth + 'px'" />
   </div>
 </template>
 
@@ -313,17 +320,5 @@ const refeshData = () => {
   width: 95%;
   height: 100%;
 }
-.chart {
-  height: 100%;
-  width: 70%;
-}
 */
-.chartRadar {
-  width: 30rem;
-}
-@media screen and (max-width: 769px) {
-  .chartRadar {
-    width: 100%;
-  }
-}
 </style>
