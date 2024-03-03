@@ -4,6 +4,8 @@ import mapView from '@/components/mapView.vue';
 import DSA_RadarChar from '@/components/DSA_RadarChar.vue';
 import SSR_lineChart from '@/components/SSR_lineChart.vue';
 import TSA_F81Chart from '@/components/TSA_F81Chart.vue';
+import TSA_F27Chart from '@/components/TSA_F27Chart.vue';
+import TSA_PowerTransfer from '@/components/TSA_PowerTransfer.vue';
 import TSA_GTTTChart from '@/components/TSA_layoutTTTGCheck.vue';
 import DSA_logTable from '@/components/DSA_logTable.vue';
 const useDashboardHelper = () => {
@@ -87,8 +89,10 @@ const useDashboardHelper = () => {
         return DSA_RadarChar;
       case 'MAP':
         return mapView;
-      case 'VSA':
-        return DSA_RadarChar;
+      case 'SPS-27':
+        return TSA_F27Chart;
+      case 'SPS-PT':
+        return TSA_PowerTransfer;
       case 'SSR':
         return SSR_lineChart;
       case 'SPS-81':

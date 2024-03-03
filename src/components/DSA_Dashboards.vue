@@ -64,10 +64,11 @@
               v-if="item == 'LINE'"
               :style="{ height: '19.5px', borderBottom: 'solid 3px Gray', marginLeft: '8px', marginRight: '8px' }"
             ></div>
-            <i v-if="item == 'VSA'" class="pi pi-fw pi-chart-line"></i>
             <i v-if="item == 'SSR'" class="pi pi-fw pi-chart-line"></i>
+            <i v-if="item == 'SPS-27'" class="pi pi-fw pi-chart-bar"></i>
             <i v-if="item == 'SPS-81'" class="pi pi-fw pi-chart-bar"></i>
-            <i v-if="item == 'TSA'" class="pi pi-fw pi-chart-bar"></i>
+            <i v-if="item == 'SPS-PT'" class="pi pi-fw pi-chart-bar"></i>
+            <i v-if="item == 'TSA'" class="pi pi-fw pi-th-large"></i>
             <i v-if="item == 'RADAR'" class="pi pi-fw pi-chart-line"></i>
             <i v-if="item == 'LOG'" class="pi pi-fw pi-history py-1"></i>
           </div>
@@ -98,7 +99,7 @@ const props = defineProps({
     default: false,
   },
 });
-const componentList = ['RADAR', 'MAP', 'VSA', 'SSR', 'SPS-81', 'TSA', 'LOG'];
+const componentList = ['RADAR', 'MAP', 'SSR', 'SPS-27', 'SPS-81', 'SPS-PT', 'TSA', 'LOG'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
