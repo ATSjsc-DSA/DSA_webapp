@@ -1,8 +1,7 @@
 <script setup>
 import TSA_SPSCheck from './TSA_SPSCheck.vue';
-import TSA_GTTTCheck from './TSA_GTTTCheck.vue';
-import TSA_ChartView from './TSA_ChartView.vue';
 import TSA_api from '@/api/tsa_api';
+import TSA_TTTGView from './TSA_TTTGView.vue';
 
 const listTypeLine = ref([]);
 
@@ -24,17 +23,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="grid h-full mt-0 pb-0">
-    <div class="col-5 tsa-block">
-      <TSA_SPSCheck></TSA_SPSCheck>
-    </div>
-    <div class="col-7 tsa-block row-gap-2">
-      <div class="tsa-block-gtth">
-        <TSA_GTTTCheck :listTypeLine="listTypeLine"></TSA_GTTTCheck>
-      </div>
-      <div class="tsa-block-chart">
-        <TSA_ChartView :listTypeLine="listTypeLine"></TSA_ChartView>
-      </div>
+  <div class="grid h-full mt-0">
+    <TSA_SPSCheck class="col-5 pt-0"></TSA_SPSCheck>
+    <div class="col-7 py-0">
+      <TSA_TTTGView></TSA_TTTGView>
     </div>
   </div>
 </template>

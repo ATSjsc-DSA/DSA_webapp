@@ -64,7 +64,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Toast></Toast>
+  <!-- <Toast></Toast> --> 
   <div class="h-full">
     <DSA_DashboardBlock
       :class="'dashboard dashboard--editing dashboard--' + state"

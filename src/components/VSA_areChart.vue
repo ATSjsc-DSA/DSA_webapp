@@ -25,13 +25,12 @@ const getListBusbar = async () => {
   try {
     const res = await VSA_api.getBusbarList(areaActive.value);
     if (!res.data.success) {
-      console.log(error, 'getListArea');
     } else {
       listBusbar.value = res.data.payload;
       busbarsActive.value = [listBusbar.value[0]];
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 const getDetailBusbars = async (lisBusbar) => {
@@ -43,12 +42,11 @@ const getDetailBusbars = async (lisBusbar) => {
   try {
     const res = await VSA_api.detailBusBar(areaActive.value, { payload: payload });
     if (!res.data.success) {
-      console.log(error, 'getListArea');
     } else {
       detailBusbars.value = res.data.payload;
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 const busbarsActive = ref([]);

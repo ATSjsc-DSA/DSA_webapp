@@ -235,23 +235,18 @@ export const useMapStore = defineStore('map_Store', () => {
     }
   }
   function setLineColor(x, param = 'sub') {
-    console.log(loadingLimits.value, ' loadingLimits.value');
-    console.log(x, ' x');
     if (x < loadingLimits.value.step1) {
       if (param === 'line') {
-        console.log('greenLayer');
         return greenColor;
       } else return greenLayer;
       // ;
     } else if (x < loadingLimits.value.step2) {
-      console.log('greenLayer');
       if (param === 'line') {
         return yellowColor;
       } else return yellowLayer;
       // ;
     } else {
       if (param === 'line') {
-        console.log('greenLayer');
         return redColor;
       } else return redLayer;
       // ;

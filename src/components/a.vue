@@ -1,285 +1,237 @@
 <script setup>
+import TSA_api from '@/api/tsa_api';
+
+import { computed, ref } from 'vue';
+import { intervalTime } from '@/Constants/';
+
+import chartOverLayPanel from './chartOverLayPanel.vue';
+
+import Button from 'primevue/button';
+import lineChartSpecialBase from './lineChartSpecialBase.vue';
+
 import chartComposable from '@/combosables/chartData';
-import Chart from 'primevue/chart';
 const { convertDateTimeToString } = chartComposable();
 
+const active = ref(0);
 const props = defineProps({
-  chartData: {
-    type: Object,
-    require: true,
+  listTypeLine: {
+    type: Array,
+    default: [],
   },
 });
-
-onMounted(() => {
-  //chartData.value = setChartData(props.chartData.data);
-});
-
-const chartData = computed(() => {
-  return setChartData(props.chartData.data);
-});
-const modificationTime = computed(() => {
-  if (props.chartData.modificationTime) {
-    return convertDateTimeToString(props.chartData.modificationTime);
-  }
-});
-const label = computed(() => {
-  return props.chartData.Key;
-});
-let maxAxisValue = 0.3;
-let titleStatus = 'Secure'; // Secure , Warning , Critical
-let colorStatus = 'rgba(0,128,0,1)';
-let colorTitle = 'blue'; // blue, darkOrange, red
-let defaultChartData = {
-  Key: [
-    'Line Loading',
-    'Tranformer Loading',
-    'Generator Loading',
-    'Excitation Limiter',
-    'Low/High Voltage',
-    'VSA Module',
-    'TSA Module',
-    'SSR Module',
-  ],
-  Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
-  Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
-  Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
-  CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
+const baseValueChart = {
+  name: '',
+  data: {
+    time: [],
+    value: [],
+    PowerTranfer: [],
+    peak: [],
+    mean: [],
+    t_stablility: [],
+    stability: [],
+  },
+  modificationTime: null,
 };
 
-const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) => ({
-  data: pdata,
-  showLine: true,
-  pointRadius: 0,
-  borderWidth: 1,
-  borderColor: pborderColor,
-  backgroundColor: pbackgroundColor,
-  fill: pfill,
-  label: plabel,
+const chartBlock1 = ref(baseValueChart);
+const chartBlock2 = ref(baseValueChart);
+const listLine = ref({});
+
+const lineActiveBlock1 = ref('');
+const lineActiveBlock2 = ref('');
+const listLineBlock1 = ref([]);
+const listLineBlock2 = ref([]);
+const modificationTimeBlock1 = computed(() => {
+  return convertDateTimeToString(chartBlock1.value.modificationTime);
 });
 
-const getCurrentStateColorAndTitle = (rate1, rate2) => {
-  if (rate2 <= 0) {
-    colorTitle = 'red';
-    colorStatus = 'rgba(255,0,0,1)';
-    titleStatus = 'Critical';
-  } else if (rate1 <= 0) {
-    colorTitle = 'darkOrange';
-    colorStatus = 'rgba(255,255,0,1)';
-    titleStatus = 'Warning';
-  } else {
-    colorTitle = 'blue';
-    colorStatus = 'rgba(0,128,0,1)';
-    titleStatus = 'Secure';
-  }
-  updateTitleChart(titleStatus, colorTitle);
-};
-
-const updateTitleChart = (titleStatus, colorTitle) => {
-  chartOptions.value.plugins.title.text = 'System status : ' + titleStatus;
-  chartOptions.value.plugins.title.color = colorTitle;
-};
-
-const setChartData = (radarData) => {
-  const chartValue = [];
-  const numAxis = label.value.length;
-
-  const rate1 = radarData.Rate1;
-  const rate2 = radarData.Rate2;
-  const rate3 = radarData.Rate3;
-  const current = radarData.CurentState;
-
-  const reserve1Data = [];
-  const reserve2Data = [];
-  const reserve3Data = [];
-
-  for (let index = 0; index < numAxis; index++) {
-    const re1 = (-current[index] + rate1[index]) / rate3[index];
-    const re2 = (-current[index] + rate2[index]) / rate3[index];
-    const re3 = (-current[index] + rate3[index]) / rate3[index];
-    reserve1Data.push(re1);
-    reserve2Data.push(re2);
-    reserve3Data.push(re3);
-  }
-
-  let maxDataValue = Math.max(...reserve1Data, ...reserve2Data, ...reserve3Data);
-  if (maxDataValue > maxAxisValue) maxAxisValue = maxDataValue;
-
-  maxAxisValue = maxDataValue + 0.05;
-
-  let minRate1 = Math.min(...reserve1Data);
-  let minRate2 = Math.min(...reserve2Data);
-  getCurrentStateColorAndTitle(minRate1, minRate2);
-
-  const currentData = new Array(numAxis).fill(0);
-  const boundData = new Array(numAxis).fill(maxAxisValue);
-
-  const currentValue = getChartConfig(currentData, 'rgba(0,0,0,1)', colorStatus, 'start', 'current');
-  const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(0,128,0,0.5)', '-1', 'rate1');
-  const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
-  const reserve3Value = getChartConfig(reserve3Data, 'rgba(128,0,128,1)', 'rgba(255,0,0,0.5)', '-1', 'rate3');
-  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.5)', '-1', 'bound');
-
-  chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
-  return {
-    labels: label.value,
-    datasets: chartValue,
-  };
-};
-
-const chartOptions = computed(() => {
-  const documentStyle = getComputedStyle(document.documentElement);
-  const textColor = documentStyle.getPropertyValue('--text-color');
-  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-  const primaryColor = documentStyle.getPropertyValue('--primary-color');
-  const highlightBg = documentStyle.getPropertyValue('--highlight-bg');
-
-  return {
-    animation: false,
-    scales: {
-      r: {
-        startAngle: 0,
-        beginAtZero: true,
-        stacked: true,
-        min: -0.05,
-        max: maxAxisValue,
-        grid: {
-          display: true,
-          lineWidth: 1,
-          circular: false,
-          color: textColor,
-        },
-        angleLines: {
-          display: true,
-          lineWidth: 1,
-          color: [
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(255,165,0,1)',
-            'rgba(255,165,0,1)',
-            'rgba(255,165,0,1)',
-          ],
-        },
-        ticks: {
-          display: true,
-          stepSize: 0.05,
-          callback: function (value, index, values) {
-            return (value * 100).toFixed(0) + '%';
-          },
-        },
-
-        pointLabels: {
-          backdropColor: [
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            'rgba(255,169,169,0)',
-            highlightBg,
-            highlightBg,
-            highlightBg,
-          ],
-          color: [
-            textColorSecondary,
-            textColorSecondary,
-            textColorSecondary,
-            textColorSecondary,
-            textColorSecondary,
-            primaryColor,
-            primaryColor,
-            primaryColor,
-          ],
-          font: {
-            size: 12,
-            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
-          },
-        },
-      },
-    },
-    plugins: {
-      filler: {
-        propagate: false,
-      },
-      'samples-filler-analyser': {
-        target: 'chart-analyser',
-      },
-      title: {
-        display: true,
-        text: 'System status : ' + titleStatus,
-        color: colorTitle,
-        position: 'top', // Đặt vị trí tiêu đề là top
-        align: 'center', // Căn giữa
-        font: {
-          size: 18, // Kích thước font
-          weight: 'bold', // Độ đậm của font
-        },
-        padding: 12,
-      },
-      legend: {
-        display: false,
-        labels: {
-          usePointStyle: true,
-          color: textColor,
-          font: {
-            size: 8,
-          },
-          padding: 12,
-        },
-        position: 'top',
-      },
-    },
-    interaction: {
-      //intersect: false,
-    },
-  };
+const modificationTimeBlock2 = computed(() => {
+  return convertDateTimeToString(chartBlock2.value.modificationTime);
 });
+
+const getchartDataBlock1 = async (code_name) => {
+  try {
+    const res = await TSA_api.getLineData(code_name);
+    if (!res.data.success) {
+    } else {
+      chartBlock1.value = res.data.payload;
+    }
+  } catch (error) {}
+};
+const getchartDataBlock2 = async (code_name) => {
+  try {
+    const res = await TSA_api.getLineData(code_name);
+    if (!res.data.success) {
+    } else {
+      chartBlock2.value = res.data.payload;
+    }
+  } catch (error) {}
+};
+
+const getListLine = async () => {
+  try {
+    const res = await TSA_api.getListLine();
+    if (!res.data.success) {
+    } else {
+      listLine.value = res.data.payload;
+      listLineBlock1.value = listLine.value[typeLine1.value.name];
+      listLineBlock2.value = listLine.value[typeLine2.value.name];
+
+      lineActiveBlock1.value = listLine.value[typeLine1.value.name][0].name;
+      lineActiveBlock2.value = listLine.value[typeLine2.value.name][0].name;
+    }
+  } catch (error) {}
+};
+
+const listTypeLine = ref(props.listTypeLine);
+const typeLine1 = ref('');
+const typeLine2 = ref('');
+watch(
+  () => props.listTypeLine,
+  (newValue) => {
+    listTypeLine.value = newValue;
+    typeLine1.value = newValue[0];
+    typeLine2.value = newValue[1];
+    nextTick(async () => {
+      await getListLine();
+      console.log(typeLine1.value, ' typeLine1.value');
+      await getchartDataBlock1(typeLine1.value.name + '_' + lineActiveBlock1.value);
+      await getchartDataBlock2(typeLine2.value.name + '_' + lineActiveBlock2.value);
+    });
+  },
+);
+
+const interval1 = ref(null);
+
+onMounted(async () => {
+  interval1.value = setInterval(async () => {
+    await getListLine();
+
+    getchartDataBlock1(typeLine1.value.name + '_' + lineActiveBlock1.value);
+    getchartDataBlock2(typeLine2.value.name + '_' + lineActiveBlock2.value);
+  }, intervalTime);
+});
+
+onUnmounted(() => {
+  clearInterval(interval1.value);
+});
+const getActive = (value) => {
+  active.value = value;
+};
+const changeLineActive1 = (param) => {
+  getchartDataBlock1(typeLine1.value.name + param);
+  lineActiveBlock1.value = param;
+};
+const changeLineActive2 = (param) => {
+  getchartDataBlock2(typeLine2.value.name + '_' + param);
+  lineActiveBlock2.value = param;
+};
 </script>
 
 <template>
-  <div class="card flex justify-content-center h-full">
-    <div class="icon-chart">
-      <i class="pi pi-sync pi-spin"></i>
-      <span> {{ modificationTime }}</span>
+  <div class="chartView-title">
+    <div v-show="active === 0">
+      <chartOverLayPanel :listSub="listLineBlock1" :subActive="lineActiveBlock1" @changeSubActive="changeLineActive1">
+        <span>{{ chartBlock1.name }}</span></chartOverLayPanel
+      >
     </div>
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full" />
+    <div v-show="active === 1">
+      <chartOverLayPanel :listSub="listLineBlock2" :subActive="lineActiveBlock2" @changeSubActive="changeLineActive2">
+        <span>{{ chartBlock2.name }}</span></chartOverLayPanel
+      >
+    </div>
+  </div>
+  <div class="chartView-lastUpdate">
+    <div class="icon-chart">
+      <i class="pi pi-sync"></i>
+      <span v-show="active === 0"> {{ modificationTimeBlock1 }}</span>
+      <span v-show="active === 1"> {{ modificationTimeBlock2 }}</span>
+    </div>
+  </div>
+  <div class="h-full flex flex-column p-2">
+    <div class="flex mb-2 gap-2 justify-content-end mr-2">
+      <Button @click="getActive(0)" rounded label="1" class="w-2rem h-2rem p-0" :outlined="active !== 0" />
+      <Button @click="getActive(1)" rounded label="2" class="w-2rem h-2rem p-0" :outlined="active !== 1" />
+    </div>
+
+    <div class="flex-1">
+      <div v-show="active === 0" class="h-full">
+        <div class="flex flex-column h-full">
+          <div class="flex-1">
+            <lineChartSpecialBase
+              ChartStabe
+              :chartData="chartBlock1"
+              labelChart="value"
+              class="chart"
+            ></lineChartSpecialBase>
+          </div>
+          <div class="flex-1">
+            <lineChartSpecialBase
+              :chartData="chartBlock1"
+              labelChart="PowerTranfer"
+              class="chart"
+            ></lineChartSpecialBase>
+          </div>
+        </div>
+      </div>
+
+      <div v-show="active === 1" class="h-full">
+        <div class="flex flex-column h-full">
+          <div class="flex-1">
+            <lineChartSpecialBase
+              ChartStabe
+              :chartData="chartBlock2"
+              labelChart="value"
+              class="chart"
+            ></lineChartSpecialBase>
+          </div>
+          <div class="flex-1">
+            <lineChartSpecialBase
+              :chartData="chartBlock2"
+              labelChart="PowerTranfer"
+              class="chart"
+            ></lineChartSpecialBase>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <style lang="scss" scoped>
-.card {
-  border-radius: 0;
-  position: relative;
-  // padding: 5px 5px 5px 5px;
-  padding: 10px;
-  .icon-chart {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 1rem;
-    color: var(--primary-color);
-    display: block;
-    text-align: center;
-    i {
-      display: block;
-      margin: 0 auto; /* Để căn giữa theo chiều ngang */
-    }
-    span {
-      display: block;
-      margin: 4px auto;
-      font-size: 0.6rem;
-      color: #808080;
-    }
-  }
+.chartView-title {
+  position: absolute;
+  top: 0;
+  left: 37%;
 }
-// .p-chart {
-//   max-width: calc(100vh - 16rem) !important;
-//   width: 95%;
-//   height: 100%;
-// }
-.chart {
-  // height: 100%;
+.chartView-options {
+  position: absolute;
+  top: 0;
+}
+
+.chartView-lastUpdate {
+  position: absolute;
+  top: 1%;
+  right: 87%;
   width: 100%;
+}
+.icon-chart {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1rem;
+  color: var(--primary-color);
+  display: block;
+  text-align: center;
+  i {
+    display: block;
+    margin: 0 auto; /* Để căn giữa theo chiều ngang */
+  }
+  span {
+    display: block;
+    margin: 4px auto;
+    font-size: 0.6rem;
+    color: #808080;
+    width: 100%;
+  }
 }
 </style>

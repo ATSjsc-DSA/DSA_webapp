@@ -25,7 +25,7 @@ const chartData = computed(() => {
 });
 const titleChart = computed(() => (props.labelChart === 'value' ? 'Angle chart' : 'Power Transfer'));
 const lineName = computed(() => props.chartData.name);
-const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash) => ({
+const getChartConfig = (label, borderColor, data, pointRadius = 1, borderDash) => ({
   label,
   fill: false,
   borderColor,
@@ -34,7 +34,7 @@ const getChartConfig = (label, borderColor, data, pointRadius = 1.5, borderDash)
   data,
   pointRadius,
   borderDash: [borderDash, borderDash],
-  borderWidth: 1,
+  borderWidth: 2,
 });
 
 const setChartData = (dataSub) => {
@@ -89,8 +89,15 @@ const setChartOptions = () => {
       title: {
         display: true,
         text: titleChart.value,
-        padding: 4,
-        color: textColor,
+        padding: {
+          top: 10,
+          bottom: 0,
+        },
+        font: {
+          size: 12,
+        },
+        color: textColorSecondary,
+        align: 'start',
       },
       legend: {
         labels: {

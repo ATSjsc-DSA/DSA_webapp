@@ -4,7 +4,7 @@ import mapView from '@/components/mapView.vue';
 import DSA_RadarChar from '@/components/DSA_RadarChar.vue';
 import SSR_lineChart from '@/components/SSR_lineChart.vue';
 import TSA_F81Chart from '@/components/TSA_F81Chart.vue';
-import TSA_GTTTChart from '@/components/TSA_GTTTChart.vue';
+import TSA_GTTTChart from '@/components/TSA_layoutTTTGCheck.vue';
 import DSA_logTable from '@/components/DSA_logTable.vue';
 const useDashboardHelper = () => {
   const defaultSetting = {

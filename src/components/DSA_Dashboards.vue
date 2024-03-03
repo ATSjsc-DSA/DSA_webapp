@@ -111,7 +111,6 @@ const dirkChangeFile = () => {
 };
 
 const callSave = () => {
-  console.log(activeDashboardData);
   saveConfigReport();
 };
 

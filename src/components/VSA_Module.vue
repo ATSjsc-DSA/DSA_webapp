@@ -10,12 +10,11 @@ const getListArea = async () => {
   try {
     const res = await VSA_api.getAreaList();
     if (!res.data.success) {
-      console.log(error, 'getListArea');
     } else {
       return res.data.payload;
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 

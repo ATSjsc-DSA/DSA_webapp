@@ -6,13 +6,13 @@ import { intervalTime } from '@/Constants/';
 import { computed, ref, watch } from 'vue';
 // primeVue
 
+// import { useToast } from 'primevue/usetoast';
+// import Toast from 'primevue/toast';
+
 const props = defineProps({
   enabledFieldset: Boolean,
-  typelineActive: {
-    type: String,
-    default: '',
-  },
 });
+// const toast = useToast();
 const interval = ref(null);
 const baseValueChart = {
   name: '',
@@ -24,6 +24,23 @@ const baseValueChart = {
   modificationTime: 0,
 };
 const chartBlock1 = ref(baseValueChart);
+const typelineActive = ref('');
+const listTypeLine = ref([]);
+const getListTypeLine = async () => {
+  try {
+    const res = await TSA_api.getListTypeLine();
+    if (!res.data.success) {
+      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    } else {
+      if (res.data.payload[0]) {
+        listTypeLine.value = res.data.payload;
+        typelineActive.value = res.data.payload[0].name;
+      }
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  }
+};
 
 const getchartData = async (param) => {
   if (param === '') {
@@ -33,6 +50,7 @@ const getchartData = async (param) => {
   try {
     const res = await TSA_api.getTransCap(param);
     if (!res.data.success) {
+      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       let a = res.data.payload;
       let output = {
@@ -59,21 +77,23 @@ const getchartData = async (param) => {
       }
       chartBlock1.value = output;
     }
-  } catch (error) {}
+  } catch (error) {
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  }
 };
 
-const typelineActive = ref('');
-watch(
-  () => props.typelineActive,
-  (newValue) => {
-    typelineActive.value = newValue;
-    nextTick(() => {
-      getchartData(typelineActive.value);
-    });
-  },
-);
+const displayFieldset = computed(() => {
+  return props.enabledFieldset ? 'flex-1 p-2' : '';
+});
+
+const changeSubActive = async (param) => {
+  typelineActive.value = param;
+  await getchartData(param);
+};
 
 onMounted(async () => {
+  await getListTypeLine();
+  await getchartData(typelineActive.value);
   interval.value = setInterval(() => {
     getchartData(typelineActive.value);
   }, intervalTime);
@@ -89,6 +109,27 @@ const refeshData = () => {
 </script>
 
 <template>
-  <barChartBase :chartData="chartBlock1" class="chart border-none" @refeshData="refeshData"></barChartBase>
+  <!-- <Toast></Toast> -->
+  <div class="tttg-block" :class="displayFieldset">
+    <chartOverLayPanel
+      :listSub="listTypeLine"
+      :subActive="typelineActive"
+      @changeSubActive="changeSubActive"
+      class="ssr-block-overlay"
+    ></chartOverLayPanel>
+    <barChartBase :chartData="chartBlock1" class="chart" @refeshData="refeshData"></barChartBase>
+  </div>
 </template>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tttg-block {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  .ssr-block-overlay {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
+    z-index: 100;
+  }
+}
+</style>

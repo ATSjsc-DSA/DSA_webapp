@@ -9,13 +9,13 @@ import SSR_lineChart from './SSR_lineChart.vue';
       <SSR_lineChart></SSR_lineChart>
     </div>
     <div class="ssr-block col-6 block-top">
-      <SSR_lineChart></SSR_lineChart>
+      <SSR_lineChart :linechartNumber="1"></SSR_lineChart>
     </div>
     <div class="ssr-block col-6 block-bot">
-      <SSR_lineChart></SSR_lineChart>
+      <SSR_lineChart :linechartNumber="2"></SSR_lineChart>
     </div>
     <div class="ssr-block col-6 block-bot">
-      <SSR_lineChart></SSR_lineChart>
+      <SSR_lineChart :linechartNumber="2"></SSR_lineChart>
     </div>
   </div>
 </template>

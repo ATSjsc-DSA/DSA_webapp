@@ -1,24 +1,25 @@
 <script setup>
-import customFieldset from './customFieldset.vue';
-
 import TSA_F27Chart from './TSA_F27Chart.vue';
 import TSA_F81Chart from './TSA_F81Chart.vue';
 import TSA_PowerTransfer from './TSA_PowerTransfer.vue';
 </script>
 
 <template>
-  <customFieldset legendText="SPS Check">
-    <div class="sps-fieldset-main">
-      <TSA_F81Chart enabledFieldset></TSA_F81Chart>
-      <TSA_F27Chart enabledFieldset></TSA_F27Chart>
-      <TSA_PowerTransfer enabledFieldset></TSA_PowerTransfer>
-    </div>
-  </customFieldset>
+  <div class="SPS-view-block">
+    <TSA_F81Chart class="SPS-view-item"></TSA_F81Chart>
+    <TSA_F27Chart class="SPS-view-item"></TSA_F27Chart>
+    <TSA_PowerTransfer class="SPS-view-item"></TSA_PowerTransfer>
+  </div>
 </template>
 <style lang="scss">
-.sps-fieldset-main {
+.SPS-view-block {
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding-bottom: 0;
+  gap: 1rem;
+  .SPS-view-item {
+    flex: 1;
+  }
 }
 </style>

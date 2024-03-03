@@ -5,9 +5,9 @@ import dsa_api from '@/api/dsa_api';
 import { intervalTime } from '@/Constants/';
 
 // primeVue
-import { useToast } from 'primevue/usetoast';
-import Toast from 'primevue/toast';
-const toast = useToast();
+// import { useToast } from 'primevue/usetoast';
+// import Toast from 'primevue/toast';
+// const toast = useToast();
 const refRadarChartContainer = ref(null);
 const signalUpdate = ref(true);
 const interval = ref(null);
@@ -39,24 +39,21 @@ const radarChartContainerWidth = computed(() => {
     let clWidth = refRadarChartContainer.value.clientWidth;
     let clientHeight = refRadarChartContainer.value.clientHeight;
     let finalSize = Math.min(clientHeight, clWidth);
-    console.log(finalSize);
     width = finalSize;
   }
   width = width < 300 ? 300 : width;
-  console.log('update');
-  console.log(width);
   return width;
 });
 const getDataSub = async () => {
   try {
     const res = await dsa_api.getdataSub();
     if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       chartData.value = res.data.payload;
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 
@@ -79,7 +76,7 @@ onUpdated(() => {
 </script>
 
 <template>
-  <!-- <Toast></Toast> -->
+  <!--  <Toast></Toast> -->
   <div ref="refRadarChartContainer" class="radarChartContainer">
     <radar-chart :chartData="chartData" :parentWidth="radarChartContainerWidth" @refeshData="refeshData"></radar-chart>
   </div>

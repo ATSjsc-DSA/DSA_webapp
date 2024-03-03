@@ -26,14 +26,14 @@ const getListSub = async () => {
   try {
     await mapStore.getListSub();
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 const getListLine = async () => {
   try {
     await mapStore.getListLine();
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 const close_popup = () => {
@@ -201,7 +201,7 @@ const changeSelecetCriteria = (value) => {
       <Tag :severity="subDataClick.id === 'line' ? 'info' : 'success'" :value="subDataClick.id" class="w-full"></Tag>
     </div>
   </div>
-  <Toast></Toast>
+  <!-- <Toast></Toast> -->
 </template>
 
 <style lang="scss" scoped>

@@ -13,7 +13,7 @@ export default class SSR_api {
   static async getLineData(line_name) {
     return get('/tsa/line/' + line_name);
   }
-  static async getListLine() {
-    return get('/tsa/line');
+  static async getListLineWithType(type_line) {
+    return get('/tsa/listLine/' + type_line);
   }
 }

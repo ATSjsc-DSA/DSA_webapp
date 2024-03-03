@@ -77,7 +77,6 @@ const getCurrentStateColorAndTitle = (rate1, rate2) => {
     colorStatus = 'rgba(0,128,0,1)';
     titleStatus = 'Secure';
   }
-  console.log(titleStatus, 'titleStatus');
   TitleChart(titleStatus);
   colorTitleChart(colorTitle);
   chartOptions.value = setChartOptions();
@@ -161,7 +160,6 @@ const setChartOptions = () => {
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const primaryColor = documentStyle.getPropertyValue('--primary-color');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-  console.log(primaryColor, 'primaryColor');
   const surface = documentStyle.getPropertyValue('--surface-ground');
   return {
     animation: false,

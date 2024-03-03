@@ -10,7 +10,6 @@ const props = defineProps({
     requied: true,
   },
 });
-console.log(props.listDataArea[0], 'props.listDataArea[0]');
 const DataArea1 = computed(() => props.listDataArea[0]);
 const DataArea2 = computed(() => props.listDataArea[1]);
 const DataArea3 = computed(() => props.listDataArea[2]);

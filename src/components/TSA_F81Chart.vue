@@ -28,18 +28,15 @@ const getchartData = async () => {
   try {
     const res = await TSA_api.getSpsCodeInfo('F81');
     if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       chartBlock1.value = res.data.payload;
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 
-const displayFieldset = computed(() => {
-  return props.enabledFieldset ? 'flex-1 p-2' : '';
-});
 
 onMounted(async () => {
   await getchartData();
@@ -58,10 +55,10 @@ const refeshData = () => {
 </script>
 
 <template>
-  <div class="sps-block-f81" :class="displayFieldset">
+  <div class="sps-block-f81" >
+    <!-- <Toast></Toast> -->
     <barChartBase :chartData="chartBlock1" class="chart" @refeshData="refeshData"></barChartBase>
   </div>
-  <Toast></Toast>
 </template>
 <style lang="scss" scoped>
 .sps-block-f81 {

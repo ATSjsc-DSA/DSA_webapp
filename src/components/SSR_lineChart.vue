@@ -13,6 +13,13 @@ const toast = useToast();
 
 const subActive = ref('');
 
+const props = defineProps({
+  linechartNumber: {
+    default: 0,
+    type: Number,
+  },
+});
+
 const baseValueChart = {
   name: '',
   dm: {
@@ -43,7 +50,9 @@ const getListSub = async () => {
       toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       listSub.value = res.data.payload;
-      subActive.value = listSub.value[0].name;
+      if (listSub.value[props.linechartNumber]) {
+        subActive.value = listSub.value[props.linechartNumber].name;
+      } 
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -54,12 +63,12 @@ const getchartData = async (subName) => {
   try {
     const res = await SSR_api.getSubInfo(subName);
     if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       chartBlock.value = res.data.payload;
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 

@@ -106,7 +106,7 @@ const setChartData = (dataSub) => {
       {
         label: 'lne_3906_4001_2',
         fill: false,
-        borderColor: documentStyle.getPropertyValue('--black-500'),
+        borderColor: documentStyle.getPropertyValue('--indigo-500'),
         yAxisID: 'y',
         tension: 0.4,
         data: dataSub.lne_3906_4001_2,
@@ -224,6 +224,7 @@ watch(titleChart, () => {
 
 <template>
   <div class="card">
+    <div v-show="!titleChart" class="card-Skeleton"></div>
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
     <Chart ref="lineChart" type="line" :data="chartData" :options="chartOptions" class="chart" />
   </div>
@@ -233,6 +234,16 @@ watch(titleChart, () => {
   border-radius: 0;
   padding: 10px;
   position: relative;
+}
+.card-Skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--surface-card);
+  opacity: 0.9;
+  z-index: 6;
 }
 .chart {
   height: 100%;

@@ -28,17 +28,15 @@ const getchartData = async () => {
   try {
     const res = await TSA_api.getSpsCodeInfo('PowerTransfer');
     if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       chartBlock1.value = res.data.payload;
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-const displayFieldset = computed(() => {
-  return props.enabledFieldset ? 'flex-1 p-2' : '';
-});
+
 onMounted(async () => {
   await getchartData();
   interval.value = setInterval(() => {
@@ -55,8 +53,8 @@ const refeshData = () => {
 </script>
 
 <template>
-  <Toast></Toast>
-  <div class="sps-block-trans" :class="displayFieldset">
+  <div class="sps-block-trans" >
+    <!-- <Toast></Toast> -->
     <barChartBase :chartData="chartBlock1" class="chart" @refeshData="refeshData"></barChartBase>
   </div>
 </template>
