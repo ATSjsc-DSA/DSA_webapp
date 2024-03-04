@@ -58,7 +58,7 @@ const useDashboardHelper = () => {
           {
             type: 'panel',
             size: 0.5,
-            component: 'SPS-81',
+            component: 'TSA',
             meta: {
               color: 'rgb(241, 131, 186)',
             },
