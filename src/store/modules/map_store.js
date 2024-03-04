@@ -26,21 +26,17 @@ export const useMapStore = defineStore('map_Store', () => {
   const layerSubLine = ref(null);
 
   //config
-  const blueLayer = 'rgba(0, 0, 255, 0.2)';
-  const aquaLayer = 'rgba(0, 255, 255, 0.2)';
-  const greenLayer = 'rgba(11, 185, 11, 0.2)';
-  const yellowLayer = 'rgba(255, 255, 102, 0.2)';
-  const redLayer = 'rgba(255, 0, 0, 0.2)';
-
-  const greenLineColor = 'rgba(11, 185, 11, 0.2)';
-  const orangeLineColor = 'rgba(255, 210, 127, 0.2)';
-  const redLineColor = 'rgba(255, 0, 0, 0.5)';
+  const blueLayer = 'rgba(99,102,241, 0.2)';
+  const aquaLayer = 'rgba(6,182,212, 0.2)';
+  const greenLayer = 'rgba(34,197,94, 0.2)';
+  const yellowLayer = 'rgba(234,179,8, 0.2)';
+  const redLayer = 'rgba(255,61,50, 0.2)';
 
   const greenColor = '#28a745';
   const yellowColor = '#ffb40a';
   const redColor = '#d01e39';
 
-  const Point500Color = 'black';
+  const Point500Color = 'rgba(0, 0, 0, 0.8)';
   const Point345Color = '#142b8e';
   const Point287Color = '#658bca';
   const Point230Color = '#007bff';
@@ -235,7 +231,6 @@ export const useMapStore = defineStore('map_Store', () => {
     }
   }
   function setLineColor(x, param = 'sub') {
-    console.log(x, 'x');
     console.log(loadingLimits.value, 'loadingLimits.value');
     if (x < loadingLimits.value.step1) {
       if (param === 'line') {
@@ -565,6 +560,7 @@ export const useMapStore = defineStore('map_Store', () => {
           const id = feature.get('id');
           if (id === 'line') {
             feature.set('lineColor', null);
+            feature.set('zIndex', 1);
           }
         });
       layerSubLine.value
@@ -574,6 +570,7 @@ export const useMapStore = defineStore('map_Store', () => {
           const id = feature.get('id');
           if (id === 'sub') {
             feature.set('status', null);
+            feature.set('zIndex', 1);
           }
         });
     }

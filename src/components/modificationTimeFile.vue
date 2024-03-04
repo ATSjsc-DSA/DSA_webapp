@@ -29,6 +29,7 @@ const refeshData = () => {
   display: block;
   text-align: center;
   cursor: pointer;
+  z-index: 10;
   i {
     display: block;
     margin: 0 auto; /* Để căn giữa theo chiều ngang */

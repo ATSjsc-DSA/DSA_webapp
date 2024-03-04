@@ -13,6 +13,7 @@ import Control from 'ol/control/Control';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 import Tag from 'primevue/tag';
+
 // define
 const mapStore = useMapStore();
 const toast = useToast();
@@ -70,7 +71,11 @@ onMounted(async () => {
   const panelLayer = new Control({
     element: document.getElementById('panelLayer'),
   });
+  const annotationLayer = new Control({
+    element: document.getElementById('annotationLayer'),
+  });
   mapStore.map.addControl(panelLayer);
+  mapStore.map.addControl(annotationLayer);
 
   // Create an overlay for the popup element
   popup.value = new Overlay({
@@ -201,7 +206,57 @@ const changeSelecetCriteria = (value) => {
       <Tag :severity="subDataClick.id === 'line' ? 'info' : 'success'" :value="subDataClick.id" class="w-full"></Tag>
     </div>
   </div>
-  <!-- <Toast></Toast> -->
+  <div id="annotationLayer" class="ol-annotation">
+    <div v-show="selectedCriteria === ''"></div>
+    <div v-show="selectedCriteria === 'LHV'" class="p-1">
+      <div class="flex align-items-center">
+        <div class="small-circle bg-indigo-300"></div>
+        <p class="annotation-text">Loading &#8804; 0.9</p>
+      </div>
+      <div class="flex align-items-center">
+        <div class="small-circle bg-cyan-300"></div>
+        <p class="annotation-text">0.9 &lt; Loading &#8804; 0.95</p>
+      </div>
+      <div class="flex align-items-center">
+        <div class="small-circle bg-green-300"></div>
+        <p class="annotation-text">0.95 &lt; Loading &#8804; 1.05</p>
+      </div>
+      <div class="flex align-items-center">
+        <div class="small-circle bg-yellow-300"></div>
+        <p class="annotation-text">1.05 &lt; Loading &#8804; 1.1</p>
+      </div>
+      <div class="flex align-items-center">
+        <div class="small-circle bg-red-300"></div>
+        <p class="annotation-text">Loading > 1.1</p>
+      </div>
+    </div>
+    <div v-show="selectedCriteria !== '' && selectedCriteria !== 'LHV'" class="p-1">
+      <div class="flex align-items-center">
+        <div class="flex align-items-center">
+          <div class="small-circle bg-green-300"></div>
+          <span class="px-1">/</span>
+          <div class="center-line bg-green-500"></div>
+        </div>
+        <p class="annotation-text">Loading &lt; 80%</p>
+      </div>
+      <div class="flex align-items-center">
+        <div class="flex align-items-center">
+          <div class="small-circle bg-yellow-300"></div>
+          <span class="px-1">/</span>
+          <div class="center-line bg-yellow-500"></div>
+        </div>
+        <p class="annotation-text">80% &#8804; Loading &#8804; 100%</p>
+      </div>
+      <div class="flex align-items-center">
+        <div class="flex align-items-center">
+          <div class="small-circle bg-red-300"></div>
+          <span class="px-1">/</span>
+          <div class="center-line bg-red-500"></div>
+        </div>
+        <p class="annotation-text">Loading > 100%</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -226,6 +281,31 @@ const changeSelecetCriteria = (value) => {
   bottom: 0px;
   border-radius: 0;
   opacity: 0.92;
+}
+.ol-annotation {
+  background-color: var(--surface-ground);
+  opacity: 0.8;
+  // padding: 1rem;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  border-radius: 0;
+  // display: flex;
+  // flex-direction: column;
+  .annotation-text {
+    font-size: 12;
+    margin-left: 0.5rem;
+  }
+  .center-line {
+    width: 1rem;
+    height: 1px;
+    margin: 0;
+  }
+  .small-circle {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+  }
 }
 .ol-popup {
   background-color: var(--surface-ground);

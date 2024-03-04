@@ -64,7 +64,11 @@ onMounted(async () => {
   const panelLayer = new Control({
     element: document.getElementById('panelLayer'),
   });
+  const annotationLayer = new Control({
+    element: document.getElementById('annotationLayer'),
+  });
   mapStore.map.addControl(panelLayer);
+  mapStore.map.addControl(annotationLayer);
 
   // Create an overlay for the popup element
   popup.value = new Overlay({
@@ -165,6 +169,20 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
       <Tag :severity="subDataClick.id === 'line' ? 'info' : 'success'" :value="subDataClick.id" class="w-full"></Tag>
     </div>
   </div>
+  <div id="annotationLayer" class="ol-annotation">
+    <div class="flex align-items-center">
+      <div class="center-line bg-green-500"></div>
+      <p class="annotation-text">Loading &lt; 80%</p>
+    </div>
+    <div class="flex align-items-center">
+      <div class="center-line bg-yellow-500"></div>
+      <p class="annotation-text">80% &#8804; Loading &#8804; 100%</p>
+    </div>
+    <div class="flex align-items-center">
+      <div class="center-line bg-red-500"></div>
+      <p class="annotation-text">Loading > 100%</p>
+    </div>
+  </div>
   <!-- <Toast></Toast> -->
 </template>
 
@@ -190,6 +208,26 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
   bottom: 0px;
   border-radius: 0;
   opacity: 0.92;
+}
+.ol-annotation {
+  background-color: var(--surface-ground);
+  opacity: 0.8;
+  padding: 1rem;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  border-radius: 0;
+  // display: flex;
+  // flex-direction: column;
+  .annotation-text {
+    font-size: small;
+    margin-left: 0.5rem;
+  }
+  .center-line {
+    width: 2rem;
+    height: 1px;
+    margin: 0;
+  }
 }
 .ol-popup {
   background-color: var(--surface-ground);
