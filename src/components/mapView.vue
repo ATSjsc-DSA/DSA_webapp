@@ -207,8 +207,8 @@ const changeSelecetCriteria = (value) => {
     </div>
   </div>
   <div id="annotationLayer" class="ol-annotation">
-    <div v-if="selectedCriteria === ''"></div>
-    <div v-else-if="selectedCriteria === 'LHV'" class="p-1">
+    <div v-show="selectedCriteria === ''"></div>
+    <div v-show="selectedCriteria === 'LHV'" class="p-1">
       <div class="flex align-items-center">
         <div class="small-circle bg-indigo-300"></div>
         <p class="annotation-text">Loading &#8804; 0.9</p>
@@ -230,7 +230,7 @@ const changeSelecetCriteria = (value) => {
         <p class="annotation-text">Loading > 1.1</p>
       </div>
     </div>
-    <div v-else class="p-1">
+    <div v-show="selectedCriteria !== '' && selectedCriteria !== 'LHV'" class="p-1">
       <div class="flex align-items-center">
         <div class="flex align-items-center">
           <div class="small-circle bg-green-300"></div>
