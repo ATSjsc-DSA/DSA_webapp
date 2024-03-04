@@ -15,9 +15,21 @@ const props = defineProps({
 });
 const emits = defineEmits(['refeshData']);
 
-const chartData = computed(() => {
-  return setChartData(props.chartData.data);
-});
+// const chartData = computed(() => {
+//   return setChartData(props.chartData.data);
+// });
+const chartData = ref();
+watch(
+  () => props.chartData,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue.data) !== JSON.stringify(oldValue.data)) {
+      console.log('watch');
+      nextTick(() => {
+        chartData.value = setChartData(newValue.data);
+      });
+    }
+  },
+);
 const titleChart = computed(() => {
   return props.chartData.name;
 });

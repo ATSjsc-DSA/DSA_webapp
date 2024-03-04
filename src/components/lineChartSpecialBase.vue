@@ -20,9 +20,21 @@ const props = defineProps({
     default: false,
   },
 });
-const chartData = computed(() => {
-  return setChartData(props.chartData.data);
-});
+// const chartData = computed(() => {
+//   return setChartData(props.chartData.data);
+// });
+const chartData = ref();
+watch(
+  () => props.chartData,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue.data) !== JSON.stringify(oldValue.data)) {
+      console.log('watch');
+      nextTick(() => {
+        chartData.value = setChartData(newValue.data);
+      });
+    }
+  },
+);
 const titleChart = computed(() => (props.labelChart === 'value' ? 'Angle chart' : 'Power Transfer'));
 const lineName = computed(() => props.chartData.name);
 const getChartConfig = (label, borderColor, data, pointRadius = 1, borderDash) => ({
