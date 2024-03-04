@@ -48,7 +48,7 @@ export const useMapStore = defineStore('map_Store', () => {
   const Point115Color = '#1166bb';
   const Point20Color = '#1166bb';
 
-  const viewMap_config = (center = [-102.198, 37.055], zoom = 4.3) =>
+  const viewMap_config = (center = [-104.391, 40.215], zoom = 4.3) =>
     new View({
       zoom: zoom,
       maxZoom: 16,
@@ -235,18 +235,23 @@ export const useMapStore = defineStore('map_Store', () => {
     }
   }
   function setLineColor(x, param = 'sub') {
+    console.log(x, 'x');
+    console.log(loadingLimits.value, 'loadingLimits.value');
     if (x < loadingLimits.value.step1) {
       if (param === 'line') {
+        console.log('greenColor');
         return greenColor;
       } else return greenLayer;
       // ;
     } else if (x < loadingLimits.value.step2) {
       if (param === 'line') {
+        console.log('yellowColor');
         return yellowColor;
       } else return yellowLayer;
       // ;
     } else {
       if (param === 'line') {
+        console.log('redColor');
         return redColor;
       } else return redLayer;
       // ;

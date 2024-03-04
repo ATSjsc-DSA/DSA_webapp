@@ -16,10 +16,19 @@ const props = defineProps({
 const { isDarkTheme } = useLayout();
 
 const emits = defineEmits(['refeshData']);
-const chartData = computed(() => {
-  return setChartData(props.chartData);
-});
-
+const chartOptions = ref();
+const chartData = ref();
+watch(
+  () => props.chartData,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      console.log('watch');
+      nextTick(() => {
+        chartData.value = setChartData(newValue);
+      });
+    }
+  },
+);
 const titleChart = computed(() => {
   return props.chartData.name;
 });
@@ -203,7 +212,7 @@ const setChartOptions = () => {
     },
   };
 };
-const chartOptions = ref();
+
 onMounted(() => {
   chartOptions.value = setChartOptions();
 });
