@@ -18,21 +18,24 @@ const DataArea3 = computed(() => props.listDataArea[2]);
 <template>
   <div class="grid ssr">
     <div class="ssr-block col-12 grid">
-      <div class="col-7 grid card-block">
-        <VSA_areaClockChart :DataArea="DataArea1" class="col-7 flex align-items-center"></VSA_areaClockChart>
-        <VSA_areaView :DataArea="DataArea1" class="col-5"></VSA_areaView>
+      <div class="flex justify-content-start h-full relative col-5">
+        <VSA_areaClockChart
+          :DataArea="DataArea1"
+          class="flex align-items-center justify-content-center"
+        ></VSA_areaClockChart>
+        <VSA_areaView :DataArea="DataArea1" class="block-areaView"></VSA_areaView>
       </div>
     </div>
     <div class="ssr-block col-12 grid">
-      <div class="col-offset-5 col-7 grid card-block">
-        <VSA_areaClockChart :DataArea="DataArea2" class="col-7 flex align-items-center"></VSA_areaClockChart>
-        <VSA_areaView :DataArea="DataArea2" class="col-5"></VSA_areaView>
+      <div class="flex justify-content-end h-full relative">
+        <VSA_areaClockChart :DataArea="DataArea2" class="flex align-items-center"></VSA_areaClockChart>
+        <!-- <VSA_areaView :DataArea="DataArea2" class="block-areaView"></VSA_areaView> -->
       </div>
     </div>
     <div class="ssr-block col-12 grid">
-      <div class="col-7 grid card-block">
-        <VSA_areaClockChart :DataArea="DataArea3" class="col-7 flex align-items-center"></VSA_areaClockChart>
-        <VSA_areaView :DataArea="DataArea3" class="col-5"></VSA_areaView>
+      <div class="flex justify-content-start h-full relative">
+        <VSA_areaClockChart :DataArea="DataArea3" class="flex align-items-center"></VSA_areaClockChart>
+        <VSA_areaView :DataArea="DataArea3" class="block-areaView"></VSA_areaView>
       </div>
     </div>
   </div>
@@ -46,9 +49,12 @@ const DataArea3 = computed(() => props.listDataArea[2]);
 .ssr {
   margin-top: 0px;
   height: 100%;
+  gap: 4rem;
   .ssr-block {
-    height: 33%;
-    position: relative;
+    height: calc(100% / 4);
+    .block-areaView {
+      position: absolute;
+    }
   }
 }
 .card-block {

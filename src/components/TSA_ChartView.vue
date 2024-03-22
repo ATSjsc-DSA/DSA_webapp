@@ -87,10 +87,8 @@ onUnmounted(() => {
 });
 
 const changeLineActive = (param) => {
-  console.log(param, 'parram');
   getchartDataBlock(typelineActive.value + '_' + param.name);
   lineActiveBlock.value = param;
-  console.log(lineActiveBlock.value, 'lineActiveBlock.value');
 };
 </script>
 

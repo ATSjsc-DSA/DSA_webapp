@@ -24,10 +24,6 @@ const props = defineProps({
     type: String,
     default: null,
   },
-  a: {
-    type: String,
-    default: null,
-  },
 });
 
 const isActiveMenu = ref(false);
@@ -48,7 +44,9 @@ watch(
   },
 );
 const itemClick = (event, item) => {
-  changeSelecet();
+  console.log('changeMenuToggle');
+  emit('changeMenuToggle');
+  // changeSelecet();
   if (item.disabled) {
     event.preventDefault();
     return;
@@ -70,6 +68,7 @@ const itemClick = (event, item) => {
 };
 
 const changeSelecet = () => {
+  console.log('changeMenuToggle');
   emit('changeMenuToggle');
 };
 const checkActiveRoute = (item) => {

@@ -353,7 +353,6 @@ export default {
       this.$refs.refRealComponent.ShowSetting();
     },
     handleUpdateDataRealComponent(data) {
-      console.log('update');
 
       const thisComponent = this.$parent.children[this.i];
       if (thisComponent) {
@@ -366,7 +365,6 @@ export default {
       this.$emit('change');
     },
     handleReadyPrintRealComponent(_Id, _readyPrint) {
-      console.log('handle ready : ' + _Id + '  - ' + _readyPrint);
       this.readyPrint = _readyPrint;
       //this.$emit('handleReadyPrintDashboardBlock', this.idUuid, _readyPrint);
     },
@@ -405,8 +403,6 @@ export default {
 
       const previous = this.$parent.children[this.i - 1];
       const previousStartSize = previous.size;
-      console.log('-------------------------xxxxxx--------------------');
-      console.log(previous);
       const currentStartSize = this.size;
       const mousemoveHandler = (e2) => {
         e2.preventDefault();
@@ -416,17 +412,13 @@ export default {
 
         const minPerc = minimumSizes[isHorizontal ? 'width' : 'height'] / parentSize;
 
-        console.log(
-          'o: ' + offsetAsPercentage + ' p: ' + previousStartSize + ' s:' + currentStartSize + ' m: ' + minPerc,
-        );
+      
 
         if (offsetAsPercentage > 0) {
           if (currentStartSize - offsetAsPercentage <= minPerc) {
-            console.log('handleMouseDown 1');
             return;
           }
         } else if (previousStartSize + offsetAsPercentage <= minPerc) {
-          console.log('handleMouseDown 2');
           return;
         }
         previous.size = previousStartSize + offsetAsPercentage;
@@ -464,7 +456,6 @@ export default {
         document.removeEventListener('drop', dropHandler);
 
         if (ei.target !== this.$refs.draggable) {
-          console.log('out6');
           if (ei.target.classList.contains('controls__control--drop')) {
             this.handleDelete();
           } else {
@@ -472,7 +463,6 @@ export default {
           }
         } else {
           this.state = 'default';
-          console.log('out7');
         }
       };
 
