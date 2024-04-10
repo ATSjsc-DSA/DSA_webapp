@@ -7,7 +7,7 @@
       <div class="leaderboard__profile__left">
         <span class="leaderboard__value__left">{{ rouderInit(item.value) }}</span>
         <div></div>
-        <span class="leaderboard__name__left">MW</span>
+        <span class="leaderboard__Dimensional">MW</span>
       </div>
     </li>
   </ul>
@@ -17,7 +17,7 @@
       <div class="leaderboard__profile__right">
         <span class="leaderboard__value__right">{{ rouderInit(item.value) }}</span>
         <div></div>
-        <span class="leaderboard__name__left">MVAR</span>
+        <span class="leaderboard__Dimensional">MVAR</span>
       </div>
     </li>
   </ul>
@@ -164,7 +164,7 @@ const rouderName = (data) => {
   &__name {
     &__left,
     &__right {
-      color: #979cb0;
+      color: var(--text-color);
       font-weight: 600;
       font-size: 0.7rem;
       letter-spacing: 0.64px;
@@ -196,6 +196,13 @@ const rouderName = (data) => {
       font-size: 0.8rem;
       margin-left: 0.2rem;
     }
+  }
+  &__Dimensional {
+    color: var(--text-color-secondary);
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.64px;
+    margin-left: 0.2rem;
   }
 }
 
