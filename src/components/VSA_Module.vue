@@ -25,10 +25,10 @@ onMounted(async () => {
 
 <template>
   <div class="h-full grid gap-3">
-    <div class="col-8">
+    <div class="col-4">
       <VSA_dashboard :listDataArea="listDataArea"></VSA_dashboard>
     </div>
-    <VSA_Chart :listDataArea="listDataArea" class="col-4 p-0"></VSA_Chart>
+    <VSA_Chart :listDataArea="listDataArea" class="col-8 p-0"></VSA_Chart>
   </div>
 </template>
 <style lang="scss" scoped></style>

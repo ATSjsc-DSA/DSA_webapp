@@ -1,5 +1,5 @@
 <template>
-  <highcharts :options="chartOptionsBase" ref="chart" class="border-circle w-full"></highcharts>
+  <highcharts :options="chartOptionsBase" ref="chart" class="w-full"></highcharts>
 </template>
 
 <script>
@@ -11,7 +11,7 @@ import { useLayout } from '@/layout/composables/layout';
 
 // import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 // HighchartsSolidGauge(Highcharts);
-ChartModuleMore(Highcharts); 
+ChartModuleMore(Highcharts);
 solidGauge(Highcharts);
 
 // const chart = ref(null);
@@ -78,7 +78,7 @@ export default {
         endAngle: 150,
         background: [
           {
-            backgroundColor: documentStyle.getPropertyValue('--surface-card'),
+            backgroundColor: documentStyle.getPropertyValue('--surface-ground'),
             borderWidth: 0,
             outerRadius: '105%',
           },
@@ -98,9 +98,8 @@ export default {
         labels: {
           distance: 15,
           style: {
-            fontSize: '14px',
             color: documentStyle.getPropertyValue('--text-color-secondary'),
-            fontSize: '14px',
+            fontSize: '1rem',
           },
         },
         lineWidth: 0,
@@ -133,7 +132,7 @@ export default {
             borderWidth: 0,
             color: '#333333',
             style: {
-              fontSize: '14px',
+              fontSize: '1rem',
             },
           },
           dial: {

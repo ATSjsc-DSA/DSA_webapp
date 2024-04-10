@@ -1,18 +1,23 @@
 <template>
   <ul class="semicircle-container-left z-5">
-    <li class="semicircle-item__left" v-for="(item, index) in dataArea.slice(0, 4)" :key="index">
-      <div class="leaderboard__profile__left">
-        <div></div>
-        <span class="leaderboard__value__left">{{ rouderInit(item.value) }}</span>
+    <li class="semicircle-item__left" v-for="(item, index) in P_array" :key="index">
+      <div class="flex justify-content-end">
         <span class="leaderboard__name__left">{{ rouderName(item.name) }}</span>
+      </div>
+      <div class="leaderboard__profile__left">
+        <span class="leaderboard__value__left">{{ rouderInit(item.value) }}</span>
+        <div></div>
+        <span class="leaderboard__name__left">MW</span>
       </div>
     </li>
   </ul>
   <ul class="semicircle-container-right z-5">
-    <li class="semicircle-item__right" v-for="(item, index) in dataArea.slice(4)" :key="index">
+    <li class="semicircle-item__right" v-for="(item, index) in Q_array" :key="index">
+      <span class="leaderboard__name__right mb-2">{{ rouderName(item.name) }}</span>
       <div class="leaderboard__profile__right">
-        <span class="leaderboard__name__right">{{ rouderName(item.name) }}</span>
         <span class="leaderboard__value__right">{{ rouderInit(item.value) }}</span>
+        <div></div>
+        <span class="leaderboard__name__left">MVAR</span>
       </div>
     </li>
   </ul>
@@ -20,6 +25,7 @@
 
 <script setup>
 import Tag from 'primevue/tag';
+import { computed } from 'vue';
 
 const props = defineProps({
   DataArea: {
@@ -36,6 +42,12 @@ const dataArea = computed(() => {
   } else {
     return [];
   }
+});
+const P_array = computed(() => {
+  return dataArea.value.filter((item) => item.name.includes('P'));
+});
+const Q_array = computed(() => {
+  return dataArea.value.filter((item) => item.name.includes('Q'));
 });
 const rouderInit = (data) => {
   return parseFloat((data * 100).toFixed(2));
@@ -75,7 +87,7 @@ const rouderName = (data) => {
     top: 0;
     bottom: 0;
     // top: 25%;
-    gap: 2rem;
+    gap: 1.2rem;
   }
 
   &-left {
@@ -87,21 +99,28 @@ const rouderName = (data) => {
   }
 }
 
-.semicircle-item:nth-child(odd) {
-  /* background-color: #fff;
-  color: #3498db; */
-}
-
 .semicircle-item__right:nth-child(1),
 .semicircle-item__right:nth-child(4) {
   left: 50%;
-  margin: 0px 0px 0px calc(50% - 8rem);
+  margin: 0px 0px 0px calc(50% - 12.5rem);
 }
 
 .semicircle-item__left:nth-child(1),
 .semicircle-item__left:nth-child(4) {
   left: 50%;
-  margin: 0px calc(50% - 8rem) 0px 0px;
+  margin: 0px calc(50% - 12.5rem) 0px 0px;
+}
+
+.semicircle-item__right:nth-child(2),
+.semicircle-item__right:nth-child(3) {
+  left: 50%;
+  margin: 0px 0px 0px calc(50% - 11rem);
+}
+
+.semicircle-item__left:nth-child(2),
+.semicircle-item__left:nth-child(3) {
+  left: 50%;
+  margin: 0px calc(50% - 11rem) 0px 0px;
 }
 
 .leaderboard {
@@ -116,9 +135,9 @@ const rouderName = (data) => {
     &__left,
     &__right {
       display: grid;
-      row-gap: 8px;
+      row-gap: 0.2rem;
       align-items: center;
-
+      margin-top: 0.2rem;
       overflow: hidden;
       border-radius: 10px;
       border: 1px solid var(--surface-border);
@@ -132,13 +151,14 @@ const rouderName = (data) => {
       &:hover {
         transform: scale(1.3);
         box-shadow: 0 9px 47px 11px rgba(51, 51, 51, 0.18);
+        z-index: 100;
       }
     }
     &__left {
-      grid-template-columns: 0.5fr 3fr 2fr;
+      grid-template-columns: 3fr 0.5fr 1fr 0.2fr;
     }
     &__right {
-      grid-template-columns: 2fr 3fr 0.5fr;
+      grid-template-columns: 3fr 0.5fr 1fr 0.2fr;
     }
   }
   &__name {
@@ -146,9 +166,9 @@ const rouderName = (data) => {
     &__right {
       color: #979cb0;
       font-weight: 600;
-      font-size: 10px;
+      font-size: 0.7rem;
       letter-spacing: 0.64px;
-      margin-left: 12px;
+      margin-left: 0.2rem;
     }
     &__left {
     }
@@ -161,20 +181,54 @@ const rouderName = (data) => {
     &__right {
       color: #35d8ac;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 0.8rem;
     }
     &__left {
+      text-align: center;
     }
     &__right {
-      text-align: right;
+      text-align: center;
     }
 
     & > span {
       opacity: 0.8;
       font-weight: 600;
-      font-size: 13px;
-      margin-left: 3px;
+      font-size: 0.8rem;
+      margin-left: 0.2rem;
     }
+  }
+}
+
+@media (max-width: 1600px) {
+  .semicircle-container {
+    &-left,
+    &-right {
+      gap: 0.5rem;
+    }
+  }
+
+  .semicircle-item__right:nth-child(1),
+  .semicircle-item__right:nth-child(4) {
+    left: 50%;
+    margin: 0px 0px 0px calc(50% - 10rem);
+  }
+
+  .semicircle-item__left:nth-child(1),
+  .semicircle-item__left:nth-child(4) {
+    left: 50%;
+    margin: 0px calc(50% - 10rem) 0px 0px;
+  }
+
+  .semicircle-item__right:nth-child(2),
+  .semicircle-item__right:nth-child(3) {
+    left: 50%;
+    margin: 0px 0px 0px calc(50% - 9rem);
+  }
+
+  .semicircle-item__left:nth-child(2),
+  .semicircle-item__left:nth-child(3) {
+    left: 50%;
+    margin: 0px calc(50% - 9rem) 0px 0px;
   }
 }
 </style>

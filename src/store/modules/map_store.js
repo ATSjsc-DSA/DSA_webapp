@@ -13,7 +13,9 @@ import Point from 'ol/geom/Point';
 import View from 'ol/View';
 
 import LineString from 'ol/geom/LineString';
+import { useLayout } from '@/layout/composables/layout';
 
+const { isDarkTheme } = useLayout();
 export const useMapStore = defineStore('map_Store', () => {
   // setup data map
 
@@ -36,14 +38,36 @@ export const useMapStore = defineStore('map_Store', () => {
   const yellowColor = '#ffb40a';
   const redColor = '#d01e39';
 
-  const Point500Color = 'rgba(0, 0, 0, 0.8)';
-  const Point345Color = '#142b8e';
-  const Point287Color = '#658bca';
-  const Point230Color = '#007bff';
-  const Point138Color = '#1f8597';
-  const Point115Color = '#1166bb';
-  const Point20Color = '#1166bb';
+  let Point500Color = 'rgba(0, 0, 0, 0.8)';
+  let Point345Color = '#142b8e';
+  let Point287Color = '#658bca';
+  let Point230Color = '#007bff';
+  let Point138Color = '#1f8597';
+  let Point115Color = '#1166bb';
+  let Point20Color = '#1166bb';
 
+  const fillColor = () => {
+    if (isDarkTheme.value.includes('dark')) {
+      Point500Color = '#e5e5e5';
+      Point345Color = '#bbbdc3';
+      Point287Color = '#d1f1ff';
+      Point230Color = '#8bd8bd';
+      Point138Color = '#17a2b8';
+      Point115Color = '#1166bb';
+      Point20Color = '#1166bb';
+    } else {
+      Point500Color = 'rgba(0, 0, 0, 0.8)';
+      Point345Color = '#142b8e';
+      Point287Color = '#658bca';
+      Point230Color = '#007bff';
+      Point138Color = '#1f8597';
+      Point115Color = '#1166bb';
+      Point20Color = '#1166bb';
+    } 
+  };
+  watch(isDarkTheme, () => {
+    fillColor();
+  });
   const viewMap_config = (center = [-104.391, 40.215], zoom = 4.3) =>
     new View({
       zoom: zoom,
@@ -132,6 +156,7 @@ export const useMapStore = defineStore('map_Store', () => {
   function getFeatureStyle(pointColor, feature) {
     const id = feature.get('id');
     const subFillColor = () => {
+      fillColor();
       switch (feature.get('type')) {
         case 500:
           return Point500Color;

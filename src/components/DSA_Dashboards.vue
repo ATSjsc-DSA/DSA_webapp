@@ -159,13 +159,13 @@ const setTempDashboardData = (pData) => {
   float: right;
   width: 4rem !important;
   position: relative;
-  border: 1px solid rgb(240, 241, 242);
+  // border: 1px solid rgb(240, 241, 242);
   height: auto;
 }
 
 .containerEdit {
   margin: 0px auto;
-  border: 1px solid rgb(240, 241, 242);
+  // border: 1px solid rgb(240, 241, 242);
   height: 100%;
   // background-color: rgb(240, 241, 242);
 

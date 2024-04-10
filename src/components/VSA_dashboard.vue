@@ -16,24 +16,24 @@ const DataArea3 = computed(() => props.listDataArea[2]);
 </script>
 
 <template>
-  <div class="grid ssr">
-    <div class="ssr-block col-12 grid">
-      <div class="flex justify-content-start h-full relative col-5">
+  <div class="flex ssr flex-column gap-3 card">
+    <div class="ssr-block flex-1">
+      <div class="flex h-full relative col-12">
         <VSA_areaClockChart
           :DataArea="DataArea1"
-          class="flex align-items-center justify-content-center"
+          class="flex h-full align-items-center justify-content-center"
         ></VSA_areaClockChart>
         <VSA_areaView :DataArea="DataArea1" class="block-areaView"></VSA_areaView>
       </div>
     </div>
-    <div class="ssr-block col-12 grid">
-      <div class="flex justify-content-end h-full relative">
+    <div class="ssr-block flex-1">
+      <div class="flex h-full relative col-12">
         <VSA_areaClockChart :DataArea="DataArea2" class="flex align-items-center"></VSA_areaClockChart>
-        <!-- <VSA_areaView :DataArea="DataArea2" class="block-areaView"></VSA_areaView> -->
+        <VSA_areaView :DataArea="DataArea2" class="block-areaView"></VSA_areaView>
       </div>
     </div>
-    <div class="ssr-block col-12 grid">
-      <div class="flex justify-content-start h-full relative">
+    <div class="ssr-block flex-1">
+      <div class="flex h-full relative col-12">
         <VSA_areaClockChart :DataArea="DataArea3" class="flex align-items-center"></VSA_areaClockChart>
         <VSA_areaView :DataArea="DataArea3" class="block-areaView"></VSA_areaView>
       </div>
@@ -49,7 +49,6 @@ const DataArea3 = computed(() => props.listDataArea[2]);
 .ssr {
   margin-top: 0px;
   height: 100%;
-  gap: 4rem;
   .ssr-block {
     height: calc(100% / 4);
     .block-areaView {

@@ -6,6 +6,8 @@ import VSA_BusbarSelect from './VSA_BusbarSelect.vue';
 import { useToast } from 'primevue/usetoast';
 import { intervalTime } from '@/Constants/';
 
+import Tag from 'primevue/tag';
+
 import Toast from 'primevue/toast';
 const toast = useToast();
 // primeVue
@@ -17,8 +19,9 @@ const props = defineProps({
   },
 });
 
-const areaActive = computed(() => props.areaActive.Name);
-
+const areaActive = ref(props.areaActive.Name);
+const p_area = ref(props.areaActive.P_area);
+const Pmax_area = ref(props.areaActive.Pmax_area);
 const listBusbar = ref([]);
 const detailBusbars = ref([]);
 const getListBusbar = async () => {
@@ -61,7 +64,9 @@ onMounted(async () => {
 
 <template>
   <div class="areaChart">
-    <comboChartBase :chartData="detailBusbars"></comboChartBase>
+    <comboChartBase :chartData="detailBusbars" :P_area="p_area" :Pmax_area="Pmax_area"></comboChartBase>
+    <!-- <Tag severity="info" :value="areaActive" class="areaNameChart"></Tag> -->
+    <span class="areaNameChart">{{ areaActive }}</span>
     <div class="selectAreaChart">
       <VSA_OverlayPannelBusbar
         :listBusbar="listBusbar"
@@ -79,8 +84,14 @@ onMounted(async () => {
   position: relative;
   .selectAreaChart {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 0rem;
+    right: 0rem;
+  }
+  .areaNameChart {
+    position: absolute;
+    top: 0.2rem;
+    left: 50%;
+    border-radius: 0%;
   }
 }
 </style>
