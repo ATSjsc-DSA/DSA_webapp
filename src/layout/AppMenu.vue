@@ -4,7 +4,7 @@ import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 // const { onMenuToggle } = useLayout();
-const emits = defineEmits(['menuToggle']);
+const emits = defineEmits(['onMenuToggle']);
 const model = ref([
   {
     label: 'Home',
@@ -28,20 +28,15 @@ const model = ref([
   },
 ]);
 const menuToggle = () => {
-  emits('menuToggle');
+  console.log('abcv');
+  emits('onMenuToggle');
 };
 </script>
 
 <template>
   <ul class="layout-menu relative">
     <template v-for="(item, i) in model" :key="item">
-      <app-menu-item
-        v-if="!item.separator"
-        @changeMenuToggle="menuToggle"
-        :item="item"
-        :index="i"
-        a=" avb"
-      ></app-menu-item>
+      <AppMenuItem v-if="!item.separator" @changeMenuToggle="menuToggle" :item="item" :index="i"></AppMenuItem>
       <li v-if="item.separator" class="menu-separator"></li>
     </template>
   </ul>

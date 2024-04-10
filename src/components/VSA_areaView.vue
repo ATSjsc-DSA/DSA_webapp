@@ -1,11 +1,19 @@
 <template>
-  <ul class="semicircle-container z-5">
-    <li class="semicircle-item" v-for="(item, index) in dataArea" :key="index">
-      <div class="leaderboard__profile">
-        <span class="leaderboard__name">{{ rouderName(item.name) }}</span>
-        <span class="leaderboard__value">{{ rouderInit(item.value) }}</span>
+  <ul class="semicircle-container-left z-5">
+    <li class="semicircle-item__left" v-for="(item, index) in dataArea.slice(0, 4)" :key="index">
+      <div class="leaderboard__profile__left">
+        <div></div>
+        <span class="leaderboard__value__left">{{ rouderInit(item.value) }}</span>
+        <span class="leaderboard__name__left">{{ rouderName(item.name) }}</span>
       </div>
-      <!-- <Tag severity="success" value="Success">{{ rouderName(item.name) }}: {{ rouderInit(item.value) }}</Tag> -->
+    </li>
+  </ul>
+  <ul class="semicircle-container-right z-5">
+    <li class="semicircle-item__right" v-for="(item, index) in dataArea.slice(4)" :key="index">
+      <div class="leaderboard__profile__right">
+        <span class="leaderboard__name__right">{{ rouderName(item.name) }}</span>
+        <span class="leaderboard__value__right">{{ rouderInit(item.value) }}</span>
+      </div>
     </li>
   </ul>
 </template>
@@ -54,16 +62,29 @@ const rouderName = (data) => {
 };
 </script>
 
-<style lang="scss">
-/* Add your styles for the semicircles here */
+<style lang="scss" scoped>
 .semicircle-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  list-style: none;
-}
+  &-left,
+  &-right {
+    position: absolute;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+    top: 0;
+    bottom: 0;
+    // top: 25%;
+    gap: 2rem;
+  }
 
-.semicircle-item {
+  &-left {
+    left: 0;
+  }
+
+  &-right {
+    right: 0;
+  }
 }
 
 .semicircle-item:nth-child(odd) {
@@ -71,32 +92,16 @@ const rouderName = (data) => {
   color: #3498db; */
 }
 
-.semicircle-item:hover {
-  transform: scale(1.2);
-}
-
-.semicircle-item:nth-child(1),
-.semicircle-item:nth-child(8) {
+.semicircle-item__right:nth-child(1),
+.semicircle-item__right:nth-child(4) {
   left: 50%;
-  margin: 0px 0px 0px calc(50% - 10rem);
-}
-.semicircle-item:nth-child(8) {
-  margin-top: 10px;
+  margin: 0px 0px 0px calc(50% - 8rem);
 }
 
-.semicircle-item:nth-child(2),
-.semicircle-item:nth-child(7) {
-  margin: 10px 0px 0px calc(50% - 9rem);
-}
-
-.semicircle-item:nth-child(3),
-.semicircle-item:nth-child(6) {
-  margin: 10px 0px 0px calc(50% - 8rem);
-}
-
-.semicircle-item:nth-child(4),
-.semicircle-item:nth-child(5) {
-  margin: 10px 0px 0px calc(50% - 7rem);
+.semicircle-item__left:nth-child(1),
+.semicircle-item__left:nth-child(4) {
+  left: 50%;
+  margin: 0px calc(50% - 8rem) 0px 0px;
 }
 
 .leaderboard {
@@ -108,38 +113,61 @@ const rouderName = (data) => {
   }
 
   &__profile {
-    display: grid;
-    grid-template-columns: 2fr 3fr 0.5fr;
-    align-items: center;
-    // padding: 10px 30px 10px 10px;
-    overflow: hidden;
-    border-radius: 10px;
-    border: 1px solid var(--surface-border);
-    box-shadow: 10px 5px 7px -1px rgba(12, 12, 12, 0.23);
-    cursor: pointer;
-    transition:
-      transform 0.25s cubic-bezier(0.7, 0.98, 0.86, 0.98),
-      box-shadow 0.25s cubic-bezier(0.7, 0.98, 0.86, 0.98);
-    background-color: var(--surface-overlay);
+    &__left,
+    &__right {
+      display: grid;
+      row-gap: 8px;
+      align-items: center;
 
-    &:hover {
-      transform: scale(1.2);
-      box-shadow: 0 9px 47px 11px rgba(51, 51, 51, 0.18);
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid var(--surface-border);
+      box-shadow: 10px 5px 7px -1px rgba(12, 12, 12, 0.23);
+      cursor: pointer;
+      transition:
+        transform 0.25s cubic-bezier(0.7, 0.98, 0.86, 0.98),
+        box-shadow 0.25s cubic-bezier(0.7, 0.98, 0.86, 0.98);
+      background-color: var(--surface-overlay);
+
+      &:hover {
+        transform: scale(1.3);
+        box-shadow: 0 9px 47px 11px rgba(51, 51, 51, 0.18);
+      }
+    }
+    &__left {
+      grid-template-columns: 0.5fr 3fr 2fr;
+    }
+    &__right {
+      grid-template-columns: 2fr 3fr 0.5fr;
     }
   }
   &__name {
-    color: #979cb0;
-    font-weight: 600;
-    font-size: 10px;
-    letter-spacing: 0.64px;
-    margin-left: 12px;
+    &__left,
+    &__right {
+      color: #979cb0;
+      font-weight: 600;
+      font-size: 10px;
+      letter-spacing: 0.64px;
+      margin-left: 12px;
+    }
+    &__left {
+    }
+    &__right {
+    }
   }
 
   &__value {
-    color: #35d8ac;
-    font-weight: 700;
-    font-size: 14px;
-    text-align: right;
+    &__left,
+    &__right {
+      color: #35d8ac;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    &__left {
+    }
+    &__right {
+      text-align: right;
+    }
 
     & > span {
       opacity: 0.8;

@@ -18,7 +18,7 @@
           multiple
           optionLabel="name"
           class="w-full md:w-20rem"
-          listStyle="max-height:200px"
+          listStyle="max-height:140px"
         />
         <!-- <MultiSelect
       v-model="selectedBusbar"

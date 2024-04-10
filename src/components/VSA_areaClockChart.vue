@@ -1,5 +1,5 @@
 <template>
-  <highcharts :options="chartOptionsBase" ref="chart"></highcharts>
+  <highcharts :options="chartOptionsBase" ref="chart" class="border-circle w-full"></highcharts>
 </template>
 
 <script>
@@ -11,7 +11,7 @@ import { useLayout } from '@/layout/composables/layout';
 
 // import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 // HighchartsSolidGauge(Highcharts);
-ChartModuleMore(Highcharts);
+ChartModuleMore(Highcharts); 
 solidGauge(Highcharts);
 
 // const chart = ref(null);
@@ -31,7 +31,7 @@ export default {
     // const renderIcons() {
     const documentStyle = getComputedStyle(document.documentElement);
     const { isDarkTheme } = useLayout();
-
+    const DataArea = computed(() => props.DataArea);
     // }
     const P_ratio = computed(() => {
       // Kiểm tra xem DataArea có tồn tại không
@@ -58,7 +58,7 @@ export default {
         plotBackgroundImage: null,
         plotBorderWidth: 0,
         plotShadow: false,
-        height: '100%',
+        // height: '100%',
       },
       dark: isDarkTheme.value,
       title: {
@@ -173,3 +173,4 @@ export default {
 // });
 //
 </script>
+<style scoped></style>

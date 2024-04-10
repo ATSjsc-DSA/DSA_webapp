@@ -22,7 +22,6 @@ watch(
   () => props.chartData,
   (newValue, oldValue) => {
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      console.log('watch');
       nextTick(() => {
         chartData.value = setChartData(newValue);
       });
