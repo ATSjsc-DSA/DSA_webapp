@@ -44,13 +44,14 @@ const dataArea = computed(() => {
   }
 });
 const P_array = computed(() => {
+  console.log(dataArea.value, 'dataArea.value.');
   return dataArea.value.filter((item) => item.name.includes('P'));
 });
 const Q_array = computed(() => {
   return dataArea.value.filter((item) => item.name.includes('Q'));
 });
 const rouderInit = (data) => {
-  return parseFloat((data * 100).toFixed(2));
+  return parseFloat(data.toFixed(2)).toLocaleString();
 };
 const rouderName = (data) => {
   switch (data) {
@@ -181,7 +182,7 @@ const rouderName = (data) => {
     &__right {
       color: #35d8ac;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
     &__left {
       text-align: center;
@@ -213,29 +214,36 @@ const rouderName = (data) => {
       gap: 0.5rem;
     }
   }
-
+  .leaderboard {
+    &__value {
+      &__left,
+      &__right {
+        font-size: 0.7rem;
+      }
+    }
+  }
   .semicircle-item__right:nth-child(1),
   .semicircle-item__right:nth-child(4) {
     left: 50%;
-    margin: 0px 0px 0px calc(50% - 10rem);
+    margin: 0px 0px 0px calc(50% - 8rem);
   }
 
   .semicircle-item__left:nth-child(1),
   .semicircle-item__left:nth-child(4) {
     left: 50%;
-    margin: 0px calc(50% - 10rem) 0px 0px;
+    margin: 0px calc(50% - 8rem) 0px 0px;
   }
 
   .semicircle-item__right:nth-child(2),
   .semicircle-item__right:nth-child(3) {
     left: 50%;
-    margin: 0px 0px 0px calc(50% - 9rem);
+    margin: 0px 0px 0px calc(50% - 6.5rem);
   }
 
   .semicircle-item__left:nth-child(2),
   .semicircle-item__left:nth-child(3) {
     left: 50%;
-    margin: 0px calc(50% - 9rem) 0px 0px;
+    margin: 0px calc(50% - 6.5rem) 0px 0px;
   }
 }
 </style>

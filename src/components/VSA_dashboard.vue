@@ -16,7 +16,7 @@ const DataArea3 = computed(() => props.listDataArea[2]);
 </script>
 
 <template>
-  <div class="flex ssr flex-column gap-3 card">
+  <div class="flex ssr flex-column gap-3 card px-4">
     <div class="ssr-block flex-1">
       <div class="flex h-full relative col-12">
         <VSA_areaClockChart
