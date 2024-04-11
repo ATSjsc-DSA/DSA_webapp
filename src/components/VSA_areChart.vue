@@ -31,8 +31,9 @@ const getListBusbar = async () => {
     const res = await VSA_api.getBusbarList(areaActive.value);
     if (!res.data.success) {
     } else {
-      listBusbar.value = res.data.payload;
-      busbarsActive.value = [listBusbar.value[0]];
+      console.log(res.data.payload, ' res.data.payload');
+      listBusbar.value = res.data.payload.list;
+      busbarsActive.value = [res.data.payload.busbarMAx];
     }
   } catch (error) {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -98,7 +99,7 @@ const progressBarWidth = computed(() => {
           <span class="progressBarGoal">{{ (Pmax_area - p_area).toFixed(2) }}</span>
         </div>
       </div>
-      <span class="areaNameChart">{{ areaActive }}</span>
+      <!-- <span class="areaNameChart">{{ areaActive }}</span> -->
       <div class="selectAreaChart">
         <VSA_OverlayPannelBusbar
           :listBusbar="listBusbar"

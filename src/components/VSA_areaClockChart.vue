@@ -35,6 +35,7 @@ export default {
     const { isDarkTheme } = useLayout();
     const DataArea = computed(() => props.DataArea);
     // }
+
     const P_ratio = computed(() => {
       // Kiểm tra xem DataArea có tồn tại không
       if (props.DataArea && props.DataArea.P_area !== undefined && props.DataArea.Pmax_area !== 0) {
@@ -131,7 +132,7 @@ export default {
             valueSuffix: ' %',
           },
           dataLabels: {
-            format: ((P_ratio.value * props.DataArea.Pmax_area) / 100).toFixed(2),
+            format: props.DataArea.P_area.toFixed(2) + ' MW',
             borderWidth: 0,
             color: '#333333',
             style: {

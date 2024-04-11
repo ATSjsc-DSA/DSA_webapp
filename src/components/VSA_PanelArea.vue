@@ -9,12 +9,12 @@ const props = defineProps({
   },
 });
 
-const dataArea = ref(props.dataArea);
-watch(props.dataArea, (newVal, oldValue) => {
-  if (newVal !== oldValue) {
-    dataArea.value = props.dataArea;
-  }
-});
+const dataArea = computed(() => props.dataArea);
+// watch(props.dataArea, (newVal, oldValue) => {
+//     dataArea.value = props.dataArea;
+//     console.log('abc');
+
+// });
 </script>
 <template>
   <div class="h-full flex flex-column gap-2 w-full">

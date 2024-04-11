@@ -20,48 +20,49 @@ const props = defineProps({
     requied: true,
   },
 });
-console.log(props.DataArea, 'DataArea');
 const loadExcludedKeys = () => {
-  switch (props.DataArea.Name) {
-    case 'North':
-      return [
-        'Name',
-        'Pmax_area',
-        'P_area',
-        'P_Central-North',
-        'Q_Central-North',
-        'P_Central-South',
-        'Q_Central-South',
-        'P_South-Central',
-        'Q_South-Central',
-      ];
+  if (props.DataArea) {
+    switch (props.DataArea.Name) {
+      case 'North':
+        return [
+          'Name',
+          'Pmax_area',
+          'P_area',
+          'P_Central-North',
+          'Q_Central-North',
+          'P_Central-South',
+          'Q_Central-South',
+          'P_South-Central',
+          'Q_South-Central',
+        ];
 
-    case 'Central':
-      return [
-        'Name',
-        'Pmax_area',
-        'P_area',
-        'P_North-Central',
-        'Q_North-Central',
-        'P_South-Central',
-        'Q_South-Central',
-      ];
+      case 'Central':
+        return [
+          'Name',
+          'Pmax_area',
+          'P_area',
+          'P_North-Central',
+          'Q_North-Central',
+          'P_South-Central',
+          'Q_South-Central',
+        ];
 
-    case 'South':
-      return [
-        'Name',
-        'Pmax_area',
-        'P_area',
-        'P_North-Central',
-        'Q_North-Central',
-        'P_Central-North',
-        'Q_Central-North',
-        'P_Central-South',
-        'Q_Central-South',
-      ];
-      break;
-    default:
-      break;
+      case 'South':
+        return [
+          'Name',
+          'Pmax_area',
+          'P_area',
+          'P_North-Central',
+          'Q_North-Central',
+          'P_Central-North',
+          'Q_Central-North',
+          'P_Central-South',
+          'Q_Central-South',
+        ];
+        break;
+      default:
+        break;
+    }
   }
 };
 const dataArea = computed(() => {

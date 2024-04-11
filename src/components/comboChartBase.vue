@@ -145,21 +145,20 @@ const setChartData = (data) => {
     const line = {
       type: 'line',
       label: '',
-      borderColor: documentStyle.getPropertyValue('--green-300'),
-      pointRadius: 0,
+      borderColor: documentStyle.getPropertyValue('--surface-card'),
+      pointRadius: 1,
       borderWidth: 1,
       yAxisID: 'y', // Choose the appropriate axis
       tension: 0, // Use tension 0 to draw straight lines
-      borderDash: [5, 5],
       data: [{ x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.1 }],
     };
     datasets.push(line);
     const lineP95 = {
       type: 'line',
       label: '',
-      borderColor: documentStyle.getPropertyValue('--cyan-500'),
+      borderColor: documentStyle.getPropertyValue('--surface-card'),
       pointRadius: 0,
-      borderWidth: 6,
+      borderWidth: 0,
       yAxisID: 'y', // Choose the appropriate axis
       tension: 0, // Use tension 0 to draw straight lines
       data: [{ x: props.P_area, y: maxValue + 0.1 }],
@@ -200,7 +199,7 @@ const setChartOptions = () => {
     aspectRatio: 0.6,
     plugins: {
       legend: {
-        display: false,
+        // display: false,
         labels: {
           usePointStyle: true,
           boxHeight: 10,
