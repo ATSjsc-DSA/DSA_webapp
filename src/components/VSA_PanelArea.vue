@@ -22,7 +22,7 @@ watch(props.dataArea, (newVal, oldValue) => {
       <div class="col">
         <VSA_areaClockChart :DataArea="dataArea"></VSA_areaClockChart>
       </div>
-      <div class="col">
+      <div class="col flex justify-content-center">
         <VSA_areaView :DataArea="dataArea"></VSA_areaView>
       </div>
     </div>

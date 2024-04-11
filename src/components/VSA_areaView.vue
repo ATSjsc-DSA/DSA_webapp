@@ -5,7 +5,7 @@
         <span class="leaderboard__name">{{ item.name }}</span>
         <span class="leaderboard__value">{{ rouderInit(item.value) }}</span>
         <div></div>
-        <span class="leaderboard__Dimensional">MW</span>
+        <span class="leaderboard__Dimensional">{{ item.name.includes('P') ? 'MV' : 'MVAR' }}</span>
       </div>
     </li>
   </ul>
@@ -20,8 +20,52 @@ const props = defineProps({
     requied: true,
   },
 });
-const excludedKeys = ['Name', 'Pmax_area', 'P_area'];
+console.log(props.DataArea, 'DataArea');
+const loadExcludedKeys = () => {
+  switch (props.DataArea.Name) {
+    case 'North':
+      return [
+        'Name',
+        'Pmax_area',
+        'P_area',
+        'P_Central-North',
+        'Q_Central-North',
+        'P_Central-South',
+        'Q_Central-South',
+        'P_South-Central',
+        'Q_South-Central',
+      ];
+
+    case 'Central':
+      return [
+        'Name',
+        'Pmax_area',
+        'P_area',
+        'P_North-Central',
+        'Q_North-Central',
+        'P_South-Central',
+        'Q_South-Central',
+      ];
+
+    case 'South':
+      return [
+        'Name',
+        'Pmax_area',
+        'P_area',
+        'P_North-Central',
+        'Q_North-Central',
+        'P_Central-North',
+        'Q_Central-North',
+        'P_Central-South',
+        'Q_Central-South',
+      ];
+      break;
+    default:
+      break;
+  }
+};
 const dataArea = computed(() => {
+  const excludedKeys = loadExcludedKeys();
   if (props.DataArea) {
     return Object.entries(props.DataArea)
       .filter(([name]) => !excludedKeys.includes(name))
@@ -33,7 +77,6 @@ const dataArea = computed(() => {
 const rouderInit = (data) => {
   return parseFloat(data.toFixed(2)).toLocaleString();
 };
-
 </script>
 
 <style lang="scss" scoped>

@@ -104,7 +104,7 @@ const useDashboardHelper = () => {
         return DSA_RadarChar;
       case 'LOG':
         return DSA_logTable;
-      case 'Check':
+      case 'PTT':
         return DSA_viewTrans;
       default:
         return DSA_DashboardsEmpty;

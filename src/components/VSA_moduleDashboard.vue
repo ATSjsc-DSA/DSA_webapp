@@ -66,26 +66,30 @@ onMounted(async () => {
       <VSA_ChartProgres :dataArea="area" class="h-full"></VSA_ChartProgres>
     </div> -->
     <div class="flex-1 flex flex-column gap-2">
-      <Tag value="North-Central" class="w-2 mb-1"></Tag>
+      <div class="flex justify-content-center">
+        <Tag value="North-Central"></Tag>
+      </div>
       <div class="flex-1 flex flex-column gap-6">
-        <div class="flex-1">
+        <div class="flex-1 flex gap-2">
           <span class="text-gen">VSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone1" :Pmax_area="VSA1_Pmax" :P_area="curent1_Pmax"></VSA_ChartProgres>
         </div>
-        <div class="flex-1">
+        <div class="flex-1 flex gap-2">
           <span class="text-gen">TSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone1" :Pmax_area="TSA1_Pmax" :P_area="curent1_Pmax"></VSA_ChartProgres>
         </div>
       </div>
     </div>
     <div class="flex-1 flex flex-column gap-2">
-      <Tag value="Central-South" class="w-2"></Tag>
+      <div class="flex justify-content-center">
+        <Tag value="Central-South"></Tag>
+      </div>
       <div class="flex-1 flex flex-column gap-6">
-        <div class="flex-1">
+        <div class="flex-1 flex gap-2">
           <span class="text-gen">VSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone2" :Pmax_area="VSA2_Pmax" :P_area="curent2_Pmax"></VSA_ChartProgres>
         </div>
-        <div class="flex-1">
+        <div class="flex-1 flex gap-2">
           <span class="text-gen">TSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone2" :Pmax_area="TSA2_Pmax" :P_area="curent2_Pmax"></VSA_ChartProgres>
         </div>
