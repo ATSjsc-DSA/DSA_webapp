@@ -50,11 +50,7 @@ const getchartData = async (param) => {
         if (key.includes('Offline') && key.includes('Limitation')) {
           output.data['Offline'].push(a.data.value[i]);
         } else if (key.includes('_Current')) {
-          let percent = (Math.random() * 5 + 1) / 100;
-          let operator = Math.random() < 0.5 ? -1 : 1;
-          const variable = a.data.value[i] * percent * operator;
-          const currentData = a.data.value[i] + variable;
-          output.data['Current'].push(currentData);
+          output.data['Current'].push(a.data.value[i]);
         } else {
           if (key.includes('Limitation')) {
             output.data['Online'].push(a.data.value[i]);
