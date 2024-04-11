@@ -55,7 +55,7 @@ const getchartData = async (param) => {
       let a = res.data.payload;
       let output = {
         name: res.data.payload.name,
-        Key: ['Thermal', 'PV', 'TSAT'],
+        Key: ['Thermal', 'VSA', 'TSAT'],
         data: {
           Online: [],
           Offline: [],
@@ -68,7 +68,11 @@ const getchartData = async (param) => {
         if (key.includes('Offline') && key.includes('Limitation')) {
           output.data['Offline'].push(a.data.value[i]);
         } else if (key.includes('_Current')) {
-          output.data['Current'].push(a.data.value[i]);
+          let percent = (Math.random() * 5 + 1) / 100;
+          let operator = Math.random() < 0.5 ? -1 : 1;
+          const variable = a.data.value[i] * percent * operator;
+          const currentData = a.data.value[i] + variable;
+          output.data['Current'].push(currentData);
         } else {
           if (key.includes('Limitation')) {
             output.data['Online'].push(a.data.value[i]);

@@ -1,5 +1,7 @@
 <template>
-  <highcharts :options="chartOptionsBase" ref="chart" class="w-full"></highcharts>
+  <div class="chartClock">
+    <highcharts :options="chartOptionsBase" ref="chart" class="w-full"></highcharts>
+  </div>
 </template>
 
 <script>
@@ -58,6 +60,7 @@ export default {
         plotBackgroundImage: null,
         plotBorderWidth: 0,
         plotShadow: false,
+        marginLeft: 0,
         // height: '100%',
       },
       dark: isDarkTheme.value,
@@ -128,7 +131,7 @@ export default {
             valueSuffix: ' %',
           },
           dataLabels: {
-            format: '{y} %',
+            format: ((P_ratio.value * props.DataArea.Pmax_area) / 100).toFixed(2),
             borderWidth: 0,
             color: '#333333',
             style: {

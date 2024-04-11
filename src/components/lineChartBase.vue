@@ -44,12 +44,12 @@ const setChartData = (dataSub) => {
       {
         label: 'T',
         fill: true,
-        borderColor: documentStyle.getPropertyValue('--green-200'), // Set your desired color
+        borderColor: documentStyle.getPropertyValue('--green-700'), // Set your desired color
         yAxisID: 'y', // Choose the appropriate axis
         tension: 0.4, // Use tension 0 to draw straight lines
         data: [{ x: dataSub.dm[0].x, y: 0.3 }],
-        pointRadius: 3,
-        borderWidth: 2,
+        pointRadius: 2,
+        borderWidth: 6,
       },
       {
         label: 'Dm',

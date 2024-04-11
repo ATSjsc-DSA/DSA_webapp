@@ -13,9 +13,6 @@ import Control from 'ol/control/Control';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 import Tag from 'primevue/tag';
-import { useLayout } from '@/layout/composables/layout';
-
-const { isDarkTheme } = useLayout();
 
 // define
 const mapStore = useMapStore();
@@ -46,37 +43,28 @@ const close_popup = () => {
   }
 };
 // AerialWithLabelsOnDemand
-const styles = ['RoadOnDemand', 'CanvasDark'];
-const layers = [];
+
 //mouted
 onMounted(async () => {
   await getListSub();
   await getListLine();
-  let i, ii;
-  for (i = 0, ii = styles.length; i < ii; ++i) {
-    layers.push(
+
+  // Create a map with the tile and vector layers
+  mapStore.map = new Map({
+    layers: [
       new TileLayer({
-        visible: false,
+        visible: true,
         preload: Infinity,
         source: new BingMaps({
           key: 'AjXb8jlJMD-Q4iyDA1defb1sCi4ZDUJEaoqgwLNi4CnucFBmWea61Q2bJrLi_Zba',
-          imagerySet: styles[i],
+          imagerySet: 'RoadOnDemand',
           // placeholderTiles: false, // Optional. Prevents showing of BingMaps placeholder tiles
         }),
       }),
-    );
-  }
-  // Create a map with the tile and vector layers
-  mapStore.map = new Map({
-    layers: layers,
+    ],
     target: olMap.value,
     view: mapStore.viewMap_config(),
   });
-  if (isDarkTheme.value.includes('dark')) {
-    layers[1].setVisible(true);
-  } else {
-    layers[0].setVisible(true);
-  }
   mapStore.addLayerInit();
   //Add Control panel
   panel.value = new Control({
@@ -115,15 +103,6 @@ onMounted(async () => {
       popup.value.setPosition(e.coordinate);
     });
   });
-});
-watch(isDarkTheme, () => {
-  if (isDarkTheme.value.includes('dark')) {
-    layers[1].setVisible(true);
-    layers[0].setVisible(false);
-  } else {
-    layers[0].setVisible(true);
-    layers[1].setVisible(false);
-  }
 });
 
 const selectedLayer = ref([500]);

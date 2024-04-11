@@ -137,51 +137,51 @@ const setChartData = (data) => {
       });
     });
 
-    const line = {
-      type: 'line',
-      label: '',
-      borderColor: documentStyle.getPropertyValue('--green-300'),
-      pointRadius: 0,
-      borderWidth: 1,
-      yAxisID: 'y', // Choose the appropriate axis
-      tension: 0, // Use tension 0 to draw straight lines
-      borderDash: [5, 5],
-      data: [
-        { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.3 },
-        { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.1 },
-      ],
-    };
-    datasets.push(line);
-    const lineP95 = {
-      type: 'line',
-      label: '',
-      borderColor: documentStyle.getPropertyValue('--cyan-500'),
-      pointRadius: 0,
-      borderWidth: 6,
-      yAxisID: 'y', // Choose the appropriate axis
-      tension: 0, // Use tension 0 to draw straight lines
-      data: [
-        { x: props.P_area, y: minValue - 0.2 },
-        { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.2 },
-      ],
-      z: 10,
-    };
-    datasets.push(lineP95);
-    const linePmax = {
-      type: 'line',
-      label: 'P',
-      borderColor: '#787878',
-      borderWidth: 12,
-      pointRadius: 0,
-      yAxisID: 'y', // Choose the appropriate axis
-      tension: 0, // Use tension 0 to draw straight lines
-      data: [
-        { x: props.P_area, y: minValue - 0.2 },
-        { x: props.Pmax_area, y: minValue - 0.2 },
-      ],
-      z: 5,
-    };
-    datasets.push(linePmax);
+    // const line = {
+    //   type: 'line',
+    //   label: '',
+    //   borderColor: documentStyle.getPropertyValue('--green-300'),
+    //   pointRadius: 0,
+    //   borderWidth: 1,
+    //   yAxisID: 'y', // Choose the appropriate axis
+    //   tension: 0, // Use tension 0 to draw straight lines
+    //   borderDash: [5, 5],
+    //   data: [
+    //     { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.03 },
+    //     { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.01 },
+    //   ],
+    // };
+    // datasets.push(line);
+    // const lineP95 = {
+    //   type: 'line',
+    //   label: '',
+    //   borderColor: documentStyle.getPropertyValue('--cyan-500'),
+    //   pointRadius: 0,
+    //   borderWidth: 6,
+    //   yAxisID: 'y', // Choose the appropriate axis
+    //   tension: 0, // Use tension 0 to draw straight lines
+    //   data: [
+    //     { x: props.P_area, y: minValue - 0.02 },
+    //     { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.02 },
+    //   ],
+    //   z: 10,
+    // };
+    // datasets.push(lineP95);
+    // const linePmax = {
+    //   type: 'line',
+    //   label: 'P',
+    //   borderColor: '#787878',
+    //   borderWidth: 12,
+    //   pointRadius: 0,
+    //   yAxisID: 'y', // Choose the appropriate axis
+    //   tension: 0, // Use tension 0 to draw straight lines
+    //   data: [
+    //     { x: props.P_area, y: minValue - 0.02 },
+    //     { x: props.Pmax_area, y: minValue - 0.02 },
+    //   ],
+    //   z: 5,
+    // };
+    // datasets.push(linePmax);
   }
 
   return {

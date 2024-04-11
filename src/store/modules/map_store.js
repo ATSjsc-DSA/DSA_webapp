@@ -46,28 +46,6 @@ export const useMapStore = defineStore('map_Store', () => {
   let Point115Color = '#1166bb';
   let Point20Color = '#1166bb';
 
-  const fillColor = () => {
-    if (isDarkTheme.value.includes('dark')) {
-      Point500Color = '#e5e5e5';
-      Point345Color = '#bbbdc3';
-      Point287Color = '#d1f1ff';
-      Point230Color = '#8bd8bd';
-      Point138Color = '#17a2b8';
-      Point115Color = '#1166bb';
-      Point20Color = '#1166bb';
-    } else {
-      Point500Color = 'rgba(0, 0, 0, 0.8)';
-      Point345Color = '#142b8e';
-      Point287Color = '#658bca';
-      Point230Color = '#007bff';
-      Point138Color = '#1f8597';
-      Point115Color = '#1166bb';
-      Point20Color = '#1166bb';
-    } 
-  };
-  watch(isDarkTheme, () => {
-    fillColor();
-  });
   const viewMap_config = (center = [-104.391, 40.215], zoom = 4.3) =>
     new View({
       zoom: zoom,
@@ -156,7 +134,6 @@ export const useMapStore = defineStore('map_Store', () => {
   function getFeatureStyle(pointColor, feature) {
     const id = feature.get('id');
     const subFillColor = () => {
-      fillColor();
       switch (feature.get('type')) {
         case 500:
           return Point500Color;

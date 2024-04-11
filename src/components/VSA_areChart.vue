@@ -5,10 +5,12 @@ import comboChartBase from './comboChartBase.vue';
 import VSA_BusbarSelect from './VSA_BusbarSelect.vue';
 import { useToast } from 'primevue/usetoast';
 import { intervalTime } from '@/Constants/';
+import ProgressBar from 'primevue/progressbar';
 
 import Tag from 'primevue/tag';
 
 import Toast from 'primevue/toast';
+import { computed } from 'vue';
 const toast = useToast();
 // primeVue
 
@@ -19,9 +21,9 @@ const props = defineProps({
   },
 });
 
-const areaActive = ref(props.areaActive.Name);
-const p_area = ref(props.areaActive.P_area);
-const Pmax_area = ref(props.areaActive.Pmax_area);
+const areaActive = computed(() => props.areaActive.Name);
+const p_area = computed(() => props.areaActive.P_area);
+const Pmax_area = computed(() => props.areaActive.Pmax_area);
 const listBusbar = ref([]);
 const detailBusbars = ref([]);
 const getListBusbar = async () => {
@@ -60,20 +62,50 @@ onMounted(async () => {
   await getListBusbar();
   await getDetailBusbars(busbarsActive.value);
 });
+watch(props.areaActive, (newVal, oldValue) => {});
+// const updateProgressBar = () => {
+//   let a = (95 / 100) * Pmax_area.value - p_area.value;
+//   let b = Pmax_area.value - p_area.value;
+//   let percentage = ((a / b) * 100).toFixed(2); // Tính phần trăm
+//   console.log(percentage, 'percentage');
+//   // Cập nhật width của progress bar
+//   let progressBarInner = document.querySelector('.progress-inner');
+//   console.log(progressBarInner);
+//   progressBarInner.style.width = percentage + '%';
+// };
+const progressBarWidth = computed(() => {
+  let a = (95 / 100) * Pmax_area.value - p_area.value;
+  let b = Pmax_area.value - p_area.value;
+  return ((a / b) * 100).toFixed(2) + '%';
+});
 </script>
 
 <template>
-  <div class="areaChart">
-    <comboChartBase :chartData="detailBusbars" :P_area="p_area" :Pmax_area="Pmax_area"></comboChartBase>
-    <!-- <Tag severity="info" :value="areaActive" class="areaNameChart"></Tag> -->
-    <span class="areaNameChart">{{ areaActive }}</span>
-    <div class="selectAreaChart">
-      <VSA_OverlayPannelBusbar
-        :listBusbar="listBusbar"
-        :busbarsActive="busbarsActive"
-        @changeListBusbar="changeListBusbar"
-      ></VSA_OverlayPannelBusbar>
-      <!-- <VSA_BusbarSelect :listBusbar="listBusbar" @changeListBusbar="changeListBusbar"></VSA_BusbarSelect> -->
+  <div class="areaChart flex flex-column">
+    <div class="flex-1">
+      <comboChartBase :chartData="detailBusbars" :P_area="p_area" :Pmax_area="Pmax_area"></comboChartBase>
+    </div>
+    <div class="card">
+      <!-- <div class="reactive mb-4">
+        <span class="dataP p_area"> {{ p_area.toFixed(2) }}</span>
+        <span class="dataP p_curent">{{ ((95 / 100) * Pmax_area).toFixed(2) }}</span>
+        <span class="dataP pmax_area"> {{ Pmax_area.toFixed(2) }}</span>
+      </div> -->
+      <!-- <ProgressBar :value="95" class="progressBar"></ProgressBar> -->
+      <div class="progress-outer">
+        <div class="progress-inner" :style="{ width: progressBarWidth }">
+          <span class="progressBarCurrent">{{ ((95 / 100) * Pmax_area - p_area).toFixed(2) }}</span>
+          <span class="progressBarGoal">{{ (Pmax_area - p_area).toFixed(2) }}</span>
+        </div>
+      </div>
+      <span class="areaNameChart">{{ areaActive }}</span>
+      <div class="selectAreaChart">
+        <VSA_OverlayPannelBusbar
+          :listBusbar="listBusbar"
+          :busbarsActive="busbarsActive"
+          @changeListBusbar="changeListBusbar"
+        ></VSA_OverlayPannelBusbar>
+      </div>
     </div>
   </div>
 </template>
@@ -93,5 +125,62 @@ onMounted(async () => {
     left: 50%;
     border-radius: 0%;
   }
+}
+.card {
+  border-radius: 0;
+  padding: 10px;
+}
+.progressBar {
+  border-radius: 0px;
+}
+.p-progressbar-value {
+  background-color: greenyellow !important;
+}
+.dataP {
+  position: absolute;
+  color: var(--text-color-secondary);
+  font-size: 0.7rem;
+}
+.p_area {
+  left: 1%;
+}
+.p_curent {
+  left: 80%;
+}
+.pmax_area {
+  right: 1%;
+}
+.progress-outer {
+  width: 96%;
+  margin: 10px 2%;
+  padding: 3px;
+  text-align: center;
+  background-color: var(--surface-ground);
+  border: 1px solid var(--surface-ground);
+  color: var(--surface-ground);
+  // border-radius: 20px;
+  position: relative;
+}
+
+.progress-inner {
+  min-width: 15%;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 5px;
+  // border-radius: 20px;
+  background-color: green;
+}
+
+.progressBarCurrent {
+  color: var(--text-color);
+  float: center;
+  font-size: 0.8rem;
+}
+
+.progressBarGoal {
+  color: var(--text-color);
+  position: absolute;
+  font-size: 0.8rem;
+  right: 5px;
 }
 </style>
