@@ -35,7 +35,7 @@ const router = createRouter({
         {
           path: '/DSA/Map',
           name: 'Map',
-          component: () => import('@/components/VSA_moduleDashboard.vue'),
+          component: () => import('@/views/MapVNA_View.vue'),
         },
       ],
     },

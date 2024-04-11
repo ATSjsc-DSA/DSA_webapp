@@ -5,51 +5,90 @@ import VSA_api from '@/api/vsa_api';
 import VSA_PanelArea from './VSA_PanelArea.vue';
 import VSA_ChartProgres from './VSA_ChartProgres.vue';
 import TSA_api from '@/api/tsa_api';
+import Tag from 'primevue/tag';
 
 // primeVue
-const listDataArea = ref([]);
+const dataListArea = ref({
+  zone1: {
+    curent: 554.6593147,
+    pv: 3807.440671,
+    tsat: 554.6593147,
+  },
+  zone2: {
+    curent: 2610,
+    pv: 5922.739794,
+    tsat: 3345.422332,
+  },
+});
 
-const getListArea = async () => {
+const getListTypeLine = async () => {
   try {
-    const res = await VSA_api.getAreaList();
+    const res = await TSA_api.getTransCapData();
     if (!res.data.success) {
+      //   toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
-      listDataArea.value = res.data.payload;
+      dataListArea.value = res.data.payload;
     }
   } catch (error) {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
-const getListTypeLine = async () => {
-  try {
-    const res = await TSA_api.getListTypeLine();
-    if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      if (res.data.payload[0]) {
-        listTypeLine.value = res.data.payload;
-        typelineActive.value = res.data.payload[0].name;
-      }
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
-};
+
+const VSA1_Pmax = computed(() => dataListArea.value.zone1.pv);
+const VSA2_Pmax = computed(() => dataListArea.value.zone2.pv);
+const TSA1_Pmax = computed(() => dataListArea.value.zone1.tsat);
+const TSA2_Pmax = computed(() => dataListArea.value.zone2.tsat);
+const curent1_Pmax = computed(() => dataListArea.value.zone1.curent);
+const curent2_Pmax = computed(() => dataListArea.value.zone2.curent);
+const PmaxZone1 = computed(() => {
+  if (VSA1_Pmax.value >= TSA1_Pmax.value) {
+    return VSA1_Pmax.value;
+  } else return TSA1_Pmax.value;
+});
+const PmaxZone2 = computed(() => {
+  if (VSA2_Pmax.value >= TSA2_Pmax.value) {
+    return VSA2_Pmax.value;
+  } else return TSA2_Pmax.value;
+});
 onMounted(async () => {
-  await getListArea();
   await getListTypeLine();
 });
 </script>
 
 <template>
-  <div class="h-full flex flex-column gap-8 p-8">
-    <div v-for="area in listDataArea" :key="area.name" class="flex-1">
+  <div class="h-full flex flex-column gap-8 card">
+    <!-- <div v-for="area in listDataArea" :key="area.name" class="flex-1">
       <VSA_ChartProgres :dataArea="area" class="h-full"></VSA_ChartProgres>
-    </div>
-    <!-- <div class="col-4">
-      <VSA_dashboard :listDataArea="listDataArea"></VSA_dashboard>
     </div> -->
-    <!-- <VSA_Chart :listDataArea="listDataArea" class="col-8 p-0"></VSA_Chart> -->
+    <div class="flex-1 flex flex-column gap-2">
+      <Tag value="Area1-Area2" class="w-2 mb-1"></Tag>
+      <div class="flex-1 flex flex-column gap-6">
+        <div class="flex-1">
+          <VSA_ChartProgres :PmaxZone="PmaxZone1" :Pmax_area="VSA1_Pmax" :P_area="curent1_Pmax"></VSA_ChartProgres>
+        </div>
+        <div class="flex-1">
+          <VSA_ChartProgres :PmaxZone="PmaxZone1" :Pmax_area="TSA1_Pmax" :P_area="curent1_Pmax"></VSA_ChartProgres>
+        </div>
+      </div>
+    </div>
+    <div class="flex-1 flex flex-column gap-2">
+      <Tag value="Area2-Area3" class="w-2"></Tag>
+      <div class="flex-1 flex flex-column gap-6">
+        <div class="flex-1">
+          <!-- <Tag value="Area2-Area3" class="w-2 mb-1"></Tag> -->
+          <VSA_ChartProgres :PmaxZone="PmaxZone2" :Pmax_area="VSA2_Pmax" :P_area="curent2_Pmax"></VSA_ChartProgres>
+        </div>
+        <div class="flex-1">
+          <VSA_ChartProgres :PmaxZone="PmaxZone2" :Pmax_area="TSA2_Pmax" :P_area="curent2_Pmax"></VSA_ChartProgres>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.card {
+  border-radius: 0;
+  margin-bottom: 0px;
+  margin: 0;
+}
+</style>
