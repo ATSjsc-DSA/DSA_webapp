@@ -5,7 +5,7 @@
         {{ (80 / 100) * Pmax_area - p_area > 0 ? ((80 / 100) * Pmax_area - p_area).toFixed(2) : zeroData }}
       </div>
     </div>
-    <div class="progress progress-2" :style="{ width: progressBarWidth95 }">
+    <div v-if="visible95Progress" class="progress progress-2" :style="{ width: progressBarWidth95 }">
       <div class="progress-label">
         {{ (95 / 100) * Pmax_area - p_area > 0 ? ((95 / 100) * Pmax_area - p_area).toFixed(2) : zeroData }}
       </div>
@@ -42,10 +42,10 @@ const props = defineProps({
 });
 const zeroData = ref(0);
 const visible80Progress = computed(() => (80 / 100) * Pmax_area.value > p_area.value);
+const visible95Progress = computed(() => (95 / 100) * Pmax_area.value > p_area.value);
 const p_area = computed(() => props.P_area);
 const Pmax_area = computed(() => props.Pmax_area);
 const PmaxZone = computed(() => props.PmaxZone);
-console.log(Pmax_area.value - p_area.value);
 const progressBarWidth80 = computed(
   () => ((((80 / 100) * Pmax_area.value - p_area.value) / (Pmax_area.value - p_area.value)) * 100).toFixed(1) + '%',
 );

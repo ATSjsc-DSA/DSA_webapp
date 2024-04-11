@@ -39,8 +39,8 @@ const getchartData = async (param) => {
         name: res.data.payload.name,
         Key: ['Thermal', 'VSA', 'TSAT'],
         data: {
-          Online: [],
           Offline: [],
+          Online: [],
           Current: [],
         },
         modificationTime: res.data.payload.modificationTime,

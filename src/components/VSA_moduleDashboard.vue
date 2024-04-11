@@ -6,6 +6,7 @@ import VSA_PanelArea from './VSA_PanelArea.vue';
 import VSA_ChartProgres from './VSA_ChartProgres.vue';
 import TSA_api from '@/api/tsa_api';
 import Tag from 'primevue/tag';
+import { intervalTime } from '@/Constants/';
 
 // primeVue
 const dataListArea = ref({
@@ -20,6 +21,7 @@ const dataListArea = ref({
     tsat: 3345.422332,
   },
 });
+const interval = ref(null);
 
 const getListTypeLine = async () => {
   try {
@@ -52,6 +54,9 @@ const PmaxZone2 = computed(() => {
 });
 onMounted(async () => {
   await getListTypeLine();
+  interval.value = setInterval(() => {
+    getListTypeLine();
+  }, intervalTime);
 });
 </script>
 
@@ -61,24 +66,27 @@ onMounted(async () => {
       <VSA_ChartProgres :dataArea="area" class="h-full"></VSA_ChartProgres>
     </div> -->
     <div class="flex-1 flex flex-column gap-2">
-      <Tag value="Area1-Area2" class="w-2 mb-1"></Tag>
+      <Tag value="North-Central" class="w-2 mb-1"></Tag>
       <div class="flex-1 flex flex-column gap-6">
         <div class="flex-1">
+          <span class="text-gen">VSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone1" :Pmax_area="VSA1_Pmax" :P_area="curent1_Pmax"></VSA_ChartProgres>
         </div>
         <div class="flex-1">
+          <span class="text-gen">TSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone1" :Pmax_area="TSA1_Pmax" :P_area="curent1_Pmax"></VSA_ChartProgres>
         </div>
       </div>
     </div>
     <div class="flex-1 flex flex-column gap-2">
-      <Tag value="Area2-Area3" class="w-2"></Tag>
+      <Tag value="Central-South" class="w-2"></Tag>
       <div class="flex-1 flex flex-column gap-6">
         <div class="flex-1">
-          <!-- <Tag value="Area2-Area3" class="w-2 mb-1"></Tag> -->
+          <span class="text-gen">VSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone2" :Pmax_area="VSA2_Pmax" :P_area="curent2_Pmax"></VSA_ChartProgres>
         </div>
         <div class="flex-1">
+          <span class="text-gen">TSA</span>
           <VSA_ChartProgres :PmaxZone="PmaxZone2" :Pmax_area="TSA2_Pmax" :P_area="curent2_Pmax"></VSA_ChartProgres>
         </div>
       </div>
@@ -90,5 +98,10 @@ onMounted(async () => {
   border-radius: 0;
   margin-bottom: 0px;
   margin: 0;
+}
+.text-gen {
+  color: var(--text-color);
+  font-size: small;
+  margin-bottom: 0.2rem;
 }
 </style>

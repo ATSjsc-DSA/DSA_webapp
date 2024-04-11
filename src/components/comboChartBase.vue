@@ -120,11 +120,13 @@ const getRandomColor = (colorsUsed) => {
 
   return colorArray[colorIndex];
 };
+
 const setChartData = (data) => {
   const documentStyle = getComputedStyle(document.documentElement);
   const datasets = [];
   const colorsUsed = [];
-  let minValue = 1000;
+  let maxValue = 0;
+  let minValue = 100;
   if (data.data) {
     Object.entries(data.data).forEach(([key, value]) => {
       const randomColor = getRandomColor(colorsUsed);
@@ -134,39 +136,36 @@ const setChartData = (data) => {
         if (element < minValue) {
           minValue = element; // Cập nhật giá trị nhỏ nhất nếu tìm thấy giá trị nhỏ hơn
         }
+        if (element > maxValue) {
+          maxValue = element; // Cập nhật giá trị nhỏ nhất nếu tìm thấy giá trị nhỏ hơn
+        }
       });
     });
 
-    // const line = {
-    //   type: 'line',
-    //   label: '',
-    //   borderColor: documentStyle.getPropertyValue('--green-300'),
-    //   pointRadius: 0,
-    //   borderWidth: 1,
-    //   yAxisID: 'y', // Choose the appropriate axis
-    //   tension: 0, // Use tension 0 to draw straight lines
-    //   borderDash: [5, 5],
-    //   data: [
-    //     { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.03 },
-    //     { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.01 },
-    //   ],
-    // };
-    // datasets.push(line);
-    // const lineP95 = {
-    //   type: 'line',
-    //   label: '',
-    //   borderColor: documentStyle.getPropertyValue('--cyan-500'),
-    //   pointRadius: 0,
-    //   borderWidth: 6,
-    //   yAxisID: 'y', // Choose the appropriate axis
-    //   tension: 0, // Use tension 0 to draw straight lines
-    //   data: [
-    //     { x: props.P_area, y: minValue - 0.02 },
-    //     { x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.02 },
-    //   ],
-    //   z: 10,
-    // };
-    // datasets.push(lineP95);
+    const line = {
+      type: 'line',
+      label: '',
+      borderColor: documentStyle.getPropertyValue('--green-300'),
+      pointRadius: 0,
+      borderWidth: 1,
+      yAxisID: 'y', // Choose the appropriate axis
+      tension: 0, // Use tension 0 to draw straight lines
+      borderDash: [5, 5],
+      data: [{ x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.1 }],
+    };
+    datasets.push(line);
+    const lineP95 = {
+      type: 'line',
+      label: '',
+      borderColor: documentStyle.getPropertyValue('--cyan-500'),
+      pointRadius: 0,
+      borderWidth: 6,
+      yAxisID: 'y', // Choose the appropriate axis
+      tension: 0, // Use tension 0 to draw straight lines
+      data: [{ x: props.P_area, y: maxValue + 0.1 }],
+      z: 10,
+    };
+    datasets.push(lineP95);
     // const linePmax = {
     //   type: 'line',
     //   label: 'P',
@@ -272,14 +271,6 @@ watch(isDarkTheme, () => {
   chartOptions.value = setChartOptions();
 });
 
-const makeHalfAsOpaque = (ctx) => {
-  return Utils.transparentize(getLineColor(ctx));
-};
-
-const adjustRadiusBasedOnData = (ctx) => {
-  const v = ctx.parsed.y;
-  return v < 10 ? 5 : v < 25 ? 7 : v < 50 ? 9 : v < 75 ? 11 : 15;
-};
 // watch(titleChart, () => {
 //   chartOptions.value = setChartOptions();
 // });
