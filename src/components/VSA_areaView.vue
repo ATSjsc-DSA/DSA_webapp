@@ -5,7 +5,7 @@
         <span class="leaderboard__name">{{ item.name }}</span>
         <span class="leaderboard__value">{{ rouderInit(item.value) }}</span>
         <div></div>
-        <span class="leaderboard__Dimensional">{{ item.name.includes('P') ? 'MV' : 'MVAR' }}</span>
+        <span class="leaderboard__Dimensional">{{ item.name.includes('P') ? 'MW' : 'MVAR' }}</span>
       </div>
     </li>
   </ul>
