@@ -52,7 +52,7 @@ const getListSub = async () => {
       listSub.value = res.data.payload;
       if (listSub.value[props.linechartNumber]) {
         subActive.value = listSub.value[props.linechartNumber].name;
-      } 
+      }
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });

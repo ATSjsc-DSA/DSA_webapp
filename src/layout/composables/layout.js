@@ -1,10 +1,12 @@
 import { toRefs, reactive, computed } from 'vue';
-const theme = localStorage.getItem('theme');
+const theme = localStorage.getItem('theme') ? localStorage.getItem('theme') : 'aura-dark-green';
+const DarkMode = theme.includes('dark') ? true : false;
+
 const layoutConfig = reactive({
-  ripple: false,
-  darkTheme: false,
+  ripple: true,
+  darkTheme: DarkMode,
   inputStyle: 'outlined',
-  menuMode: 'overlay',
+  menuMode: 'static',
   theme: theme,
   scale: 14,
   activeMenuItem: null,
@@ -20,11 +22,6 @@ const layoutState = reactive({
 });
 
 export function useLayout() {
-  const changeThemeSettings = (theme, darkTheme) => {
-    layoutConfig.darkTheme = darkTheme;
-    layoutConfig.theme = theme;
-  };
-
   const setScale = (scale) => {
     layoutConfig.scale = scale;
   };
@@ -47,14 +44,11 @@ export function useLayout() {
 
   const isSidebarActive = computed(() => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive);
 
-  const isDarkTheme = computed(() => {
-    return layoutConfig.theme;
-  });
+  const isDarkTheme = computed(() => layoutConfig.darkTheme);
 
   return {
     layoutConfig: toRefs(layoutConfig),
     layoutState: toRefs(layoutState),
-    changeThemeSettings,
     setScale,
     onMenuToggle,
     isSidebarActive,

@@ -1,8 +1,13 @@
 import axios from 'axios';
+import router from '@/router';
+
 import { BASE_URL } from '@/Constants';
 const instance = axios.create({
   baseURL: BASE_URL + '/api',
   timeout: 1000,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+  },
   withCredentials: false,
 });
 
@@ -14,6 +19,12 @@ instance.interceptors.request.use(
      *  config.headers.token = token
      * }
      */
+    const token = localStorage.getItem('token');
+    const isLoggedIn = Boolean(token !== undefined);
+    // const isApiUrl = config.url.startsWith(BASE_URL);
+    if (isLoggedIn) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -27,13 +38,48 @@ instance.interceptors.response.use(
      */
     return response;
   },
-  (error) => {
+  async (error) => {
     const { response } = error;
-    if (response && response.data) {
-      return Promise.reject(error);
+    if (response.status === 401) {
+      if (response.data.detail === 'jwt expired') {
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        if (!refreshToken) {
+          // check refreshToken, func reload login
+          localStorage.removeItem('token'); // clear token at localStorage
+          localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
+          router.push('/login');
+          return Promise.reject(error);
+        }
+        try {
+          const res = await instance.post('/auth/token', {
+            refresh_token: refreshToken,
+          });
+          console.log(res, 'res');
+          // set new token
+          localStorage.setItem('token', res.data.access_token);
+
+          // update on axios.defaults.headers.common
+          instance.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
+
+          const originalRequest = response.config;
+          originalRequest.headers['Authorization'] = `Bearer ${res.data.access_token}`;
+          return instance(originalRequest);
+        } catch (refreshError) {
+          localStorage.removeItem('refreshToken');
+          router.push('/');
+          return Promise.reject(refreshError);
+        }
+      } else {
+        localStorage.removeItem('token'); // clear token at localStorage
+        localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
+        router.push('/');
+        return Promise.reject(error);
+      }
+    } else {
+      console.log(error, 'error');
+      return Promise.reject(response);
     }
-    const { message } = error;
-    return Promise.reject(error);
   },
 );
 

@@ -1,18 +1,15 @@
 .layout-main-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 0.5rem);
-  // height: 100%;
-  // height: 100vh;
+  // min-height: 100vh;
+  height: 100vh;
   justify-content: space-between;
-  padding: 1rem 1rem 0rem 4rem; // padding 7 rem to top menu
+  padding: 7rem 2rem 0.5rem 1rem;
   transition: margin-left $transitionDuration;
-  overflow: hidden;
 }
 
 .layout-main {
   // flex: 1 1 auto;
   height: 100%;
-  //set full screen fix no scroll;
-  // height: calc(100vh - 154px);
+  // display: flex;
 }

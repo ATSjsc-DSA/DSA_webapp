@@ -1,11 +1,9 @@
 <script setup>
-import mainLayout from '@/components/layout/mainLayout.vue';
-
+import DSA_Dashboards from '@/components/DSA_Dashboards.vue';
 </script>
-
 <template>
-  <div class="h-full">
-    <main-layout></main-layout>
+  <div class="h-full w-full">
+    <DSA_Dashboards></DSA_Dashboards>
   </div>
 </template>
 <style scoped>

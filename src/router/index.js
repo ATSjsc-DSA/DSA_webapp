@@ -37,9 +37,43 @@ const router = createRouter({
           name: 'Map',
           component: () => import('@/views/MapVNA_View.vue'),
         },
+        {
+          path: '/DSA/Setting',
+          name: 'Setting',
+          component: () => import('@/views/settingView.vue'),
+        },
+        {
+          path: '/DSA/User',
+          name: 'User',
+          component: () => import('@/views/UserView.vue'),
+        },
       ],
     },
+    {
+      meta: {
+        title: 'Login',
+      },
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/LoginView.vue'),
+    },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition || { top: 0 };
+  },
+});
+
+router.beforeEach(async (to, from) => {
+  const isAuthenticated = localStorage.getItem('token');
+  if (to.name !== 'Login' && !isAuthenticated) {
+    ('abc');
+    return {
+      name: 'Login',
+      query: { redirect: to.fullPath },
+    };
+  }
+
+  // next();
 });
 
 export default router;

@@ -4,7 +4,6 @@ import VSA_Module from '@/components/VSA_Module.vue';
 
 <template>
   <div class="w-full h-full">
-    <!-- <DSA_RadarChar></DSA_RadarChar> -->
     <VSA_Module></VSA_Module>
   </div>
 </template>

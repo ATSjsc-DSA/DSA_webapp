@@ -1,6 +1,6 @@
 <template>
-  <div class="h-full">
-    <div class="application-left-side-main h-full">
+  <div class="h-full w-full flex">
+    <div class="application-left-side-main h-full flex-1">
       <div :class="internalPdfMode ? 'containerView' : 'containerEdit'">
         <DSA_DashboardFrame
           :data="activeDashboardData"
@@ -153,7 +153,7 @@ const setTempDashboardData = (pData) => {
 <style lang="scss">
 .application-left-side-main {
   float: left;
-  width: calc((100vw - 8rem));
+  // width: 100;
 }
 .application-right-side-custom {
   float: right;

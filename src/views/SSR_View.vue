@@ -8,8 +8,9 @@ import SSR_Module from '@/components/SSR_Module.vue';
     <div class="col-5">
       <mapViewSSR></mapViewSSR>
     </div>
-    <div class="col-7">
+    <div class="col-7 h-full">
       <SSR_Module></SSR_Module>
     </div>
   </div>
 </template>
+<style scoped></style>

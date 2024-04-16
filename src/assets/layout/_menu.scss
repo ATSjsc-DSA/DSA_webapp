@@ -1,11 +1,11 @@
 .layout-sidebar {
   position: fixed;
-  width: 240px;
-  height: calc(100vh - 5rem);
+  width: 260px;
+  height: calc(100vh - 9rem);
   z-index: 999;
   overflow-y: auto;
   user-select: none;
-  top: 1rem;
+  top: 7rem;
   left: 2rem;
   transition:
     transform $transitionDuration,

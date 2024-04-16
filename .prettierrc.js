@@ -17,7 +17,7 @@ export default {
   proseWrap: 'preserve',
   htmlWhitespaceSensitivity: 'css',
   vueIndentScriptAndStyle: false,
-  endOfLine: 'lf',
+  endOfLine: 'auto',
   embeddedLanguageFormatting: 'auto',
   singleAttributePerLine: false,
 };

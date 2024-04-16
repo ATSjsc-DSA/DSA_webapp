@@ -60,6 +60,7 @@ const setChartData = (dataSub) => {
 };
 
 const setChartOptions = () => {
+  console.log('abcd');
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');

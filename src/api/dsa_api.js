@@ -37,4 +37,15 @@ export default class DSA_api {
   static async getLogs() {
     return get('/dsa/logs');
   }
+
+  // ---- setting ----
+  static async getSetting() {
+    return get('/dsa');
+  }
+  static async getSettingWithTime(time) {
+    return get('/dsa/' + time);
+  }
+  static async createSetting(data) {
+    return post('/dsa', data);
+  }
 }

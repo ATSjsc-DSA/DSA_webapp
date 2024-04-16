@@ -30,7 +30,7 @@ const getListTypeLine = async () => {
   try {
     const res = await TSA_api.getListTypeLine();
     if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
     } else {
       if (res.data.payload[0]) {
         listTypeLine.value = res.data.payload;
@@ -38,7 +38,7 @@ const getListTypeLine = async () => {
       }
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 

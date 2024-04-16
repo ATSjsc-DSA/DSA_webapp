@@ -53,6 +53,8 @@ onMounted(async () => {
   background-color: var(--surface-card);
   // padding: 0;
   border: 1px solid var(--surface-border);
+  // border-radius: 12px;
+
   // row-gap: 0.5rem;
   .tsa-block-gtth {
     flex: 1;

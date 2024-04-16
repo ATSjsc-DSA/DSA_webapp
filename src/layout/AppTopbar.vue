@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
-import Button from 'primevue/button';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
@@ -18,16 +17,17 @@ onBeforeUnmount(() => {
   unbindOutsideClickListener();
 });
 
-const logoUrl = computed(() => {
-  return `layout/images/ATS-logo.png`;
-});
+// const logoUrl = computed(() => {
+//   return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+// });
 
-const onTopBarMenuButton = () => {
-  topbarMenuActive.value = !topbarMenuActive.value;
+const onTopBarUserView = () => {
+  router.push('/DSA/user');
 };
-const onSettingsClick = () => {
-  topbarMenuActive.value = false;
-  router.push('/documentation');
+const onLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  router.push('/login');
 };
 const topbarMenuClasses = computed(() => {
   return {
@@ -67,11 +67,10 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-  <Button icon="pi pi-bars" class="absolute top-50 border-noround-left z-5" @click="onMenuToggle()" />
-  <!-- <div class="layout-topbar">
+  <div class="layout-topbar">
     <router-link to="/" class="layout-topbar-logo">
-      <img :src="logoUrl" alt="logo" />
-      <span> DSA Solution</span>
+      <img src="/app/ATS_logo.png" alt="logo" />
+      <span>DSA Solution</span>
     </router-link>
 
     <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
@@ -83,20 +82,16 @@ const isOutsideClicked = (event) => {
     </button>
 
     <div class="layout-topbar-menu" :class="topbarMenuClasses">
-      <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-        <i class="pi pi-calendar"></i>
-        <span>Calendar</span>
-      </button>
-      <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+      <button @click="onTopBarUserView()" class="p-link layout-topbar-button">
         <i class="pi pi-user"></i>
         <span>Profile</span>
       </button>
-      <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-        <i class="pi pi-cog"></i>
+      <button @click="onLogout()" class="p-link layout-topbar-button">
+        <i class="pi pi-sign-out"></i>
         <span>Settings</span>
       </button>
     </div>
-  </div> -->
+  </div>
 </template>
 
 <style lang="scss" scoped></style>

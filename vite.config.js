@@ -5,7 +5,7 @@ import Icons from 'unplugin-icons/vite';
 import IconsResolver from 'unplugin-icons/resolver';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
-import { TDesignResolver } from 'unplugin-vue-components/resolvers';
+import { PrimeVueResolver } from 'unplugin-vue-components/resolvers';
 
 export default ({ mode }) => {
   const { VITE_PORT, VITE_BASE_URL } = loadEnv(mode, process.cwd());
@@ -16,28 +16,14 @@ export default ({ mode }) => {
       vue(),
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],
-        resolvers: [
-          TDesignResolver({
-            library: 'vue-next',
-          }),
-          IconsResolver({
-            prefix: 'Icon',
-          }),
-        ],
+        resolvers: [PrimeVueResolver()],
         eslintrc: {
           enabled: true,
         },
         dts: true,
       }),
       Components({
-        resolvers: [
-          TDesignResolver({
-            library: 'vue-next',
-          }),
-          IconsResolver({
-            enabledCollections: ['lets-icons'],
-          }),
-        ],
+        resolvers: [PrimeVueResolver()],
       }),
       Icons({
         autoInstall: true,

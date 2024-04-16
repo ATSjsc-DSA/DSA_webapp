@@ -24,20 +24,20 @@ const data = ref();
 const interval = ref(null);
 
 const getLogs = async () => {
-  try {
-    const res = await dsa_api.getLogs();
-    if (!res.data.success) {
-      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      let dataload = res.data.payload;
-      dataload.forEach((element) => {
-        element.Timestamp = convertDateTimeToString(element.Timestamp);
-      });
-      data.value = dataload;
-    }
-  } catch (error) {
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
+  // try {
+  //   const res = await dsa_api.getLogs();
+  //   if (!res.data.success) {
+  //     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  //   } else {
+  //     let dataload = res.data.payload;
+  //     dataload.forEach((element) => {
+  //       element.Timestamp = convertDateTimeToString(element.Timestamp);
+  //     });
+  //     data.value = dataload;
+  //   }
+  // } catch (error) {
+  //   // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+  // }
 };
 onMounted(async () => {
   await getLogs();
