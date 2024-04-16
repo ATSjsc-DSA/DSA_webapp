@@ -1,6 +1,6 @@
 <template>
   <div class="card h-full">
-    <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
+    <Chart type="line" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
 
@@ -21,6 +21,8 @@ const props = defineProps({
     require: true,
     default: {},
   },
+  P_area: Number,
+  Pmax_area: Number,
 });
 onMounted(() => {
   chartOptions.value = setChartOptions();
@@ -30,7 +32,7 @@ const chartData = computed(() => {
   return setChartData(props.chartData);
 });
 const chartOptions = ref();
-const getChartConfig = (type, label, borderColor, data, fill = false, tension = 0.4, pointRadius = 0.2) => ({
+const getChartConfig = (type, label, borderColor, data, fill = false, tension = 0.4, pointRadius = 1) => ({
   type: type,
   label,
   borderColor,
@@ -118,16 +120,66 @@ const getRandomColor = (colorsUsed) => {
 
   return colorArray[colorIndex];
 };
+
 const setChartData = (data) => {
   const documentStyle = getComputedStyle(document.documentElement);
   const datasets = [];
   const colorsUsed = [];
+  let maxValue = 0;
+  let minValue = 100;
   if (data.data) {
     Object.entries(data.data).forEach(([key, value]) => {
       const randomColor = getRandomColor(colorsUsed);
       colorsUsed.push(randomColor);
       datasets.push(getChartConfig('line', key, documentStyle.getPropertyValue(randomColor), value));
+      value.forEach((element) => {
+        if (element < minValue) {
+          minValue = element; // Cập nhật giá trị nhỏ nhất nếu tìm thấy giá trị nhỏ hơn
+        }
+        if (element > maxValue) {
+          maxValue = element; // Cập nhật giá trị nhỏ nhất nếu tìm thấy giá trị nhỏ hơn
+        }
+      });
     });
+
+    const line = {
+      type: 'line',
+      label: '',
+      borderColor: documentStyle.getPropertyValue('--surface-card'),
+      pointRadius: 1,
+      borderWidth: 1,
+      yAxisID: 'y', // Choose the appropriate axis
+      tension: 0, // Use tension 0 to draw straight lines
+      data: [{ x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.1 }],
+    };
+    datasets.push(line);
+    const lineP95 = {
+      type: 'line',
+      label: '',
+      borderColor: documentStyle.getPropertyValue('--surface-card'),
+      pointRadius: 0,
+      borderWidth: 0,
+      yAxisID: 'y', // Choose the appropriate axis
+      tension: 0, // Use tension 0 to draw straight lines
+      data: [{ x: props.P_area, y: maxValue + 0.1 }],
+      z: 10,
+    };
+    datasets.push(lineP95);
+    // const linePmax = {
+    //   type: 'line',
+    //   label: 'P',
+    //   borderColor: '#787878',
+    //   borderWidth: 12,
+    //   pointRadius: 0,
+    //   yAxisID: 'y', // Choose the appropriate axis
+    //   tension: 0, // Use tension 0 to draw straight lines
+    //   data: [
+    //     { x: props.P_area, y: minValue - 0.02 },
+    //     { x: props.Pmax_area, y: minValue - 0.02 },
+    //   ],
+    //   z: 5,
+    // };
+    // datasets.push(linePmax);
   }
 
   return {
@@ -135,6 +187,7 @@ const setChartData = (data) => {
     datasets: datasets,
   };
 };
+
 const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
@@ -146,15 +199,39 @@ const setChartOptions = () => {
     aspectRatio: 0.6,
     plugins: {
       legend: {
+        // display: false,
         labels: {
           usePointStyle: true,
+          boxHeight: 10,
+          boxWidth: 10,
           color: textColor,
-          font: {
-            size: 8,
-          },
-          padding: 12,
+          // font: {
+          //   size: 8,
+          // },
+          // padding: 12,
+          pointStyleWidth: false,
         },
         position: 'top',
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'xy',
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: 'xy',
+        },
+      },
+      tooltip: {
+        enabled: true,
+        position: 'nearest', // Chỉ hiển thị tooltip cho điểm gần nhất với con trỏ chuột
+        intersect: false,
       },
     },
     scales: {
@@ -178,6 +255,13 @@ const setChartOptions = () => {
         grid: {
           color: surfaceBorder,
         },
+        // suggestedMin: 0,
+      },
+    },
+    elements: {
+      point: {
+        radius: 10,
+        hoverRadius: 15,
       },
     },
   };

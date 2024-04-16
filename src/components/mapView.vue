@@ -42,10 +42,13 @@ const close_popup = () => {
     popup.value.setPosition(undefined);
   }
 };
+// AerialWithLabelsOnDemand
+
 //mouted
 onMounted(async () => {
   await getListSub();
   await getListLine();
+
   // Create a map with the tile and vector layers
   mapStore.map = new Map({
     layers: [
@@ -55,6 +58,7 @@ onMounted(async () => {
         source: new BingMaps({
           key: 'AjXb8jlJMD-Q4iyDA1defb1sCi4ZDUJEaoqgwLNi4CnucFBmWea61Q2bJrLi_Zba',
           imagerySet: 'RoadOnDemand',
+          // placeholderTiles: false, // Optional. Prevents showing of BingMaps placeholder tiles
         }),
       }),
     ],

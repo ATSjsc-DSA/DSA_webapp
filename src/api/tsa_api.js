@@ -16,4 +16,7 @@ export default class SSR_api {
   static async getListLineWithType(type_line) {
     return get('/tsa/listLine/' + type_line);
   }
+  static async getTransCapData() {
+    return get('/tsa/tttg/TransferCapacity');
+  }
 }

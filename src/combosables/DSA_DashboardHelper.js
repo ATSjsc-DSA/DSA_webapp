@@ -8,6 +8,7 @@ import TSA_F27Chart from '@/components/TSA_F27Chart.vue';
 import TSA_PowerTransfer from '@/components/TSA_PowerTransfer.vue';
 import TSA_GTTTChart from '@/components/TSA_layoutTTTGCheck.vue';
 import DSA_logTable from '@/components/DSA_logTable.vue';
+import DSA_viewTrans from '@/components/VSA_moduleDashboard.vue';
 const useDashboardHelper = () => {
   const defaultSetting = {
     type: 'horizontal',
@@ -48,7 +49,7 @@ const useDashboardHelper = () => {
         size: 1,
         children: [
           {
-            component: 'SSR',
+            component: 'Check',
             meta: {
               color: 'rgb(241, 131, 186)',
             },
@@ -103,6 +104,8 @@ const useDashboardHelper = () => {
         return DSA_RadarChar;
       case 'LOG':
         return DSA_logTable;
+      case 'PTT':
+        return DSA_viewTrans;
       default:
         return DSA_DashboardsEmpty;
     }
