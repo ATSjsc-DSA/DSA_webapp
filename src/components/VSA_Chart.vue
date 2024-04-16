@@ -16,7 +16,7 @@ const listDataArea = computed(() => props.listDataArea);
 
 <template>
   <div class="grid ssr">
-    <div class="ssr-block col-12" v-for="area in listDataArea" :key="area.name">
+    <div class="ssr-block col-6" v-for="area in listDataArea" :key="area.name">
       <VSA_areChart :areaActive="area"></VSA_areChart>
     </div>
   </div>
@@ -26,7 +26,7 @@ const listDataArea = computed(() => props.listDataArea);
   margin-top: 0px;
   height: 100%;
   .ssr-block {
-    height: calc(100% / 3);
+    height: calc(100% / 2);
     position: relative;
   }
   .block-top {

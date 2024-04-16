@@ -71,6 +71,7 @@
             <i v-if="item == 'TSA'" class="pi pi-fw pi-th-large"></i>
             <i v-if="item == 'RADAR'" class="pi pi-fw pi-chart-line"></i>
             <i v-if="item == 'LOG'" class="pi pi-fw pi-history py-1"></i>
+            <i v-if="item == 'PTT'" class="pi pi-fw pi-bookmark py-1"></i>
           </div>
           <div class="mb-50" :style="{ fontSize: '10px' }">{{ item }}</div>
         </div>
@@ -99,7 +100,7 @@ const props = defineProps({
     default: false,
   },
 });
-const componentList = ['RADAR', 'MAP', 'SSR', 'SPS-27', 'SPS-81', 'SPS-PT', 'TSA', 'LOG'];
+const componentList = ['RADAR', 'MAP', 'SSR', 'SPS-27', 'SPS-81', 'SPS-PT', 'TSA', 'LOG', 'PTT'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});
@@ -159,13 +160,13 @@ const setTempDashboardData = (pData) => {
   float: right;
   width: 4rem !important;
   position: relative;
-  border: 1px solid rgb(240, 241, 242);
+  // border: 1px solid rgb(240, 241, 242);
   height: auto;
 }
 
 .containerEdit {
   margin: 0px auto;
-  border: 1px solid rgb(240, 241, 242);
+  // border: 1px solid rgb(240, 241, 242);
   height: 100%;
   // background-color: rgb(240, 241, 242);
 

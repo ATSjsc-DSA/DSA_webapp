@@ -42,10 +42,13 @@ const close_popup = () => {
     popup.value.setPosition(undefined);
   }
 };
+// AerialWithLabelsOnDemand
+
 //mouted
 onMounted(async () => {
   await getListSub();
   await getListLine();
+
   // Create a map with the tile and vector layers
   mapStore.map = new Map({
     layers: [
@@ -55,6 +58,7 @@ onMounted(async () => {
         source: new BingMaps({
           key: 'AjXb8jlJMD-Q4iyDA1defb1sCi4ZDUJEaoqgwLNi4CnucFBmWea61Q2bJrLi_Zba',
           imagerySet: 'RoadOnDemand',
+          // placeholderTiles: false, // Optional. Prevents showing of BingMaps placeholder tiles
         }),
       }),
     ],
@@ -211,23 +215,23 @@ const changeSelecetCriteria = (value) => {
     <div v-show="selectedCriteria === 'LHV'" class="p-1">
       <div class="flex align-items-center">
         <div class="small-circle bg-indigo-300"></div>
-        <p class="annotation-text">Loading &#8804; 0.9</p>
+        <p class="annotation-text">value &#8804; 0.9</p>
       </div>
       <div class="flex align-items-center">
         <div class="small-circle bg-cyan-300"></div>
-        <p class="annotation-text">0.9 &lt; Loading &#8804; 0.95</p>
+        <p class="annotation-text">0.9 &lt; value &#8804; 0.95</p>
       </div>
       <div class="flex align-items-center">
         <div class="small-circle bg-green-300"></div>
-        <p class="annotation-text">0.95 &lt; Loading &#8804; 1.05</p>
+        <p class="annotation-text">0.95 &lt; value &#8804; 1.05</p>
       </div>
       <div class="flex align-items-center">
         <div class="small-circle bg-yellow-300"></div>
-        <p class="annotation-text">1.05 &lt; Loading &#8804; 1.1</p>
+        <p class="annotation-text">1.05 &lt; value &#8804; 1.1</p>
       </div>
       <div class="flex align-items-center">
         <div class="small-circle bg-red-300"></div>
-        <p class="annotation-text">Loading > 1.1</p>
+        <p class="annotation-text">value > 1.1</p>
       </div>
     </div>
     <div v-show="selectedCriteria !== '' && selectedCriteria !== 'LHV'" class="p-1">
@@ -237,7 +241,7 @@ const changeSelecetCriteria = (value) => {
           <span class="px-1">/</span>
           <div class="center-line bg-green-500"></div>
         </div>
-        <p class="annotation-text">Loading &lt; 80%</p>
+        <p class="annotation-text">value &lt; 80%</p>
       </div>
       <div class="flex align-items-center">
         <div class="flex align-items-center">
@@ -245,7 +249,7 @@ const changeSelecetCriteria = (value) => {
           <span class="px-1">/</span>
           <div class="center-line bg-yellow-500"></div>
         </div>
-        <p class="annotation-text">80% &#8804; Loading &#8804; 100%</p>
+        <p class="annotation-text">80% &#8804; value &#8804; 100%</p>
       </div>
       <div class="flex align-items-center">
         <div class="flex align-items-center">
@@ -253,7 +257,7 @@ const changeSelecetCriteria = (value) => {
           <span class="px-1">/</span>
           <div class="center-line bg-red-500"></div>
         </div>
-        <p class="annotation-text">Loading > 100%</p>
+        <p class="annotation-text">value > 100%</p>
       </div>
     </div>
   </div>

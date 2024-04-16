@@ -55,10 +55,10 @@ const getchartData = async (param) => {
       let a = res.data.payload;
       let output = {
         name: res.data.payload.name,
-        Key: ['Thermal', 'PV', 'TSAT'],
+        Key: ['Thermal', 'VSA', 'TSAT'],
         data: {
-          Online: [],
           Offline: [],
+          Online: [],
           Current: [],
         },
         modificationTime: res.data.payload.modificationTime,

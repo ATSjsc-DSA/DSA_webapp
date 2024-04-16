@@ -1,5 +1,7 @@
 <template>
-  <highcharts :options="chartOptionsBase" ref="chart" class="border-circle w-full"></highcharts>
+  <div class="chartClock">
+    <highcharts :options="chartOptionsBase" ref="chart" class="w-full"></highcharts>
+  </div>
 </template>
 
 <script>
@@ -11,7 +13,7 @@ import { useLayout } from '@/layout/composables/layout';
 
 // import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 // HighchartsSolidGauge(Highcharts);
-ChartModuleMore(Highcharts); 
+ChartModuleMore(Highcharts);
 solidGauge(Highcharts);
 
 // const chart = ref(null);
@@ -33,6 +35,7 @@ export default {
     const { isDarkTheme } = useLayout();
     const DataArea = computed(() => props.DataArea);
     // }
+
     const P_ratio = computed(() => {
       // Kiểm tra xem DataArea có tồn tại không
       if (props.DataArea && props.DataArea.P_area !== undefined && props.DataArea.Pmax_area !== 0) {
@@ -58,6 +61,7 @@ export default {
         plotBackgroundImage: null,
         plotBorderWidth: 0,
         plotShadow: false,
+        marginLeft: 0,
         // height: '100%',
       },
       dark: isDarkTheme.value,
@@ -78,7 +82,7 @@ export default {
         endAngle: 150,
         background: [
           {
-            backgroundColor: documentStyle.getPropertyValue('--surface-card'),
+            backgroundColor: documentStyle.getPropertyValue('--surface-ground'),
             borderWidth: 0,
             outerRadius: '105%',
           },
@@ -98,9 +102,8 @@ export default {
         labels: {
           distance: 15,
           style: {
-            fontSize: '14px',
             color: documentStyle.getPropertyValue('--text-color-secondary'),
-            fontSize: '14px',
+            fontSize: '1rem',
           },
         },
         lineWidth: 0,
@@ -129,11 +132,11 @@ export default {
             valueSuffix: ' %',
           },
           dataLabels: {
-            format: '{y} %',
+            format: props.DataArea.P_area.toFixed(2) + ' MW',
             borderWidth: 0,
             color: '#333333',
             style: {
-              fontSize: '14px',
+              fontSize: '1rem',
             },
           },
           dial: {

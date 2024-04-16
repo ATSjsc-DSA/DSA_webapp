@@ -13,7 +13,9 @@ import Point from 'ol/geom/Point';
 import View from 'ol/View';
 
 import LineString from 'ol/geom/LineString';
+import { useLayout } from '@/layout/composables/layout';
 
+const { isDarkTheme } = useLayout();
 export const useMapStore = defineStore('map_Store', () => {
   // setup data map
 
@@ -36,13 +38,13 @@ export const useMapStore = defineStore('map_Store', () => {
   const yellowColor = '#ffb40a';
   const redColor = '#d01e39';
 
-  const Point500Color = 'rgba(0, 0, 0, 0.8)';
-  const Point345Color = '#142b8e';
-  const Point287Color = '#658bca';
-  const Point230Color = '#007bff';
-  const Point138Color = '#1f8597';
-  const Point115Color = '#1166bb';
-  const Point20Color = '#1166bb';
+  let Point500Color = 'rgba(0, 0, 0, 0.8)';
+  let Point345Color = '#142b8e';
+  let Point287Color = '#658bca';
+  let Point230Color = '#007bff';
+  let Point138Color = '#1f8597';
+  let Point115Color = '#1166bb';
+  let Point20Color = '#1166bb';
 
   const viewMap_config = (center = [-104.391, 40.215], zoom = 4.3) =>
     new View({

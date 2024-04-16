@@ -2,9 +2,11 @@
   <Button
     v-tooltip.bottom="'Busbar Active'"
     type="button"
-    icon="pi pi-list"
+    icon="pi pi-bars"
     size="small"
-    class="p-1 border-noround"
+    class="button"
+    outlined
+    raised
     @click="toggle"
   />
 
@@ -75,3 +77,10 @@ const toggle = (event) => {
   op.value.toggle(event);
 };
 </script>
+<style lang="scss" scoped>
+.button {
+  padding: 4px;
+  border-radius: 0;
+  border-width: 0;
+}
+</style>

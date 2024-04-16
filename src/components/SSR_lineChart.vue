@@ -95,7 +95,9 @@ const refeshData = () => {
 </script>
 
 <template>
-  <Toast></Toast>
+  <!-- <Toast></Toast>
+   -->
+  <div></div>
   <div class="ssr-block">
     <chartOverLayPanel
       :listSub="listSub"

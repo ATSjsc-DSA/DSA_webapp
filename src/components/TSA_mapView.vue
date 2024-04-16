@@ -172,15 +172,15 @@ const changeSelecetLayer = (dataFocus, dataArray) => {
   <div id="annotationLayer" class="ol-annotation">
     <div class="flex align-items-center">
       <div class="center-line bg-green-500"></div>
-      <p class="annotation-text">Loading &lt; 80%</p>
+      <p class="annotation-text">value &lt; 80%</p>
     </div>
     <div class="flex align-items-center">
       <div class="center-line bg-yellow-500"></div>
-      <p class="annotation-text">80% &#8804; Loading &#8804; 100%</p>
+      <p class="annotation-text">80% &#8804; value &#8804; 100%</p>
     </div>
     <div class="flex align-items-center">
       <div class="center-line bg-red-500"></div>
-      <p class="annotation-text">Loading > 100%</p>
+      <p class="annotation-text">value > 100%</p>
     </div>
   </div>
   <!-- <Toast></Toast> -->

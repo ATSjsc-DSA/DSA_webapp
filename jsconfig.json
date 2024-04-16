@@ -15,6 +15,6 @@
     },
     "types": ["element-plus/global"]
   },
-  "include": ["mock/*.js", "src/**/*.js", "src/**/*.vue", "vite.config.js"],
+  "include": ["mock/*.js", "src/**/*.js", "src/**/*.vue", "vite.config.js", "src/components/VSA_moduleDashboard.vue"],
   "exclude": ["dist", "node_modules"]
 }
