@@ -50,11 +50,7 @@
           :key="index"
           :id="item"
           class="color-swatch__color"
-          :style="{
-            textAlign: 'center',
-            height: 'auto',
-            backgroundColor: 'hsl(' + (index - 1) * 30 + ', 80%, 73%)',
-          }"
+          :style="styleButtonComponents"
           @dragstart="handleDragstart"
           draggable="true"
         >
@@ -70,7 +66,7 @@
             <i v-if="item == 'SPS-PT'" class="pi pi-fw pi-chart-bar"></i>
             <i v-if="item == 'TSA'" class="pi pi-fw pi-th-large"></i>
             <i v-if="item == 'RADAR'" class="pi pi-fw pi-chart-line"></i>
-            <i v-if="item == 'LOG'" class="pi pi-fw pi-history py-1"></i>
+            <!-- <i v-if="item == 'LOG'" class="pi pi-fw pi-history py-1"></i> -->
             <i v-if="item == 'PTT'" class="pi pi-fw pi-bookmark py-1"></i>
           </div>
           <div class="mb-50" :style="{ fontSize: '10px' }">{{ item }}</div>
@@ -84,6 +80,7 @@
 import { ref, onBeforeUnmount, onMounted } from 'vue';
 import DSA_DashboardFrame from './DSA_DashboardFrame.vue';
 import useDashboardHelper from '../combosables/DSA_DashboardHelper';
+
 const {
   defaultSetting,
   saveSettingLocalStorage,
@@ -100,7 +97,16 @@ const props = defineProps({
     default: false,
   },
 });
-const componentList = ['RADAR', 'MAP', 'SSR', 'SPS-27', 'SPS-81', 'SPS-PT', 'TSA', 'LOG', 'PTT'];
+
+const styleButtonComponents = ref({
+  textAlign: 'center',
+  height: 'auto',
+  backgroundColor: 'var(--surface-overlay)',
+  color: 'var(--text-color)',
+  border: '1px solid gray',
+});
+
+const componentList = ['RADAR', 'MAP', 'SSR', 'SPS-27', 'SPS-81', 'SPS-PT', 'TSA', 'PTT'];
 const canEdit = ref(false);
 const internalPdfMode = ref(props.pdfMode);
 const tempDashboardData = ref({});

@@ -1,6 +1,7 @@
 <template>
+
   <DSA_F_table
-    :dataSetting="dataSetting.F81"
+    :dataSetting="F81Data"
     name="F81"
     @onRowEditSave="onRowEditSave"
     @onDeleteRow="onDeleteRow"
@@ -9,21 +10,24 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import DSA_F_table from './DSA_F_table.vue';
 import { useDSAStore } from '@/store';
-const dsaStore = useDSAStore();
-const { dataSetting } = storeToRefs(dsaStore);
 
+const dsaStore = useDSAStore();
+const { dataProfile } = storeToRefs(dsaStore);
+const F81Data = computed(() => dataProfile.value.F81);
 const onRowEditSave = (data) => {
   let { newData, index } = data;
-  dataSetting.value.F81[index] = newData;
+  dataProfile.value.F81[index] = newData;
 };
 
 const onDeleteRow = (data) => {
-  dataSetting.value.F81 = dataSetting.value.F81.filter((item) => item.measurement !== data.measurement);
+  dataProfile.value.F81 = dataProfile.value.F81.filter((item) => item.measurement !== data.measurement);
 };
 
 const createNewRow = (data) => {
-  dataSetting.value.F81.push(data);
+  dataProfile.value.F81.push(data);
 };
+
 </script>

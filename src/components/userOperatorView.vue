@@ -8,8 +8,8 @@
         <div class="p-fluid flex-column flex h-full">
           <div>
             <div class="inline-flex align-items-center justify-content-center gap-2 text-2xl">
-              <Avatar v-if="userForm.role === 'admin'" image="/app/admin.png" shape="circle" />
-              <Avatar v-else image="/app/operator.jpg" shape="circle" />
+              <Avatar v-if="userForm.role === 'admin'" image="/img/admin.png" shape="circle" />
+              <Avatar v-else image="/img/operator.jpg" shape="circle" />
 
               <span class="font-bold white-space-nowrap">{{ user }}</span>
             </div>
@@ -101,7 +101,7 @@ onMounted(() => {});
   min-height: 35rem;
   // width: 100%;
   object-fit: cover;
-  background: linear-gradient(rgb(72, 0, 72, 0.7), rgb(192, 72, 72, 0.6)), url('/app/operator_back.jpg');
+  background: linear-gradient(rgb(72, 0, 72, 0.7), rgb(192, 72, 72, 0.6)), url('/img/operator_back.jpg');
   background-position: bottom center;
   background-repeat: no-repeat;
 }

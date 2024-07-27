@@ -7,7 +7,7 @@ const { layoutConfig } = useLayout();
 
 <template>
   <div class="layout-footer">
-    <img src="/favicon.ico" alt="Logo" height="20" class="mr-2" />
+    <img src="/img/favicon.ico" alt="Logo" height="20" class="mr-2" />
     by
     <span class="font-medium ml-2">Ats.jsc</span>
   </div>

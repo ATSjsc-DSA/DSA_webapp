@@ -28,57 +28,64 @@ const chartData = ref({
     Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
     CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
   },
-  modificationTime: 0,
+  modificationTime: '',
 });
 
-const radarChartContainerWidth = computed(() => {
-  let a = signalUpdate.value;
-  let width = 300;
-
-  if (refRadarChartContainer.value) {
-    let clWidth = refRadarChartContainer.value.clientWidth;
-    let clientHeight = refRadarChartContainer.value.clientHeight;
-    let finalSize = Math.min(clientHeight, clWidth);
-    width = finalSize;
-  }
-  width = width < 300 ? 300 : width;
-  return width;
-});
-const getDataSub = async () => {
-  try {
-    const res = await dsa_api.getdataSub();
-    if (!res.data.success) {
-      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      chartData.value = res.data.payload;
+const transformApiResponse = (apiResponse, modificationTime) => {
+  // Initialize the result object
+  const result = {
+    Key: [],
+    data: {
+      Rate1: [],
+      Rate2: [],
+      Rate3: [],
+      CurentState: [],
+    },
+    modificationTime: 0,
+  };
+  result.modificationTime = modificationTime;
+  // Iterate through each item in the API response
+  apiResponse.forEach((item) => {
+    if (item.modificationTime > result.modificationTime) {
+      result.modificationTime = item.modificationTime;
     }
+    result.Key.push(item.name);
+    result.data.Rate1.push(item.rate1);
+    result.data.Rate2.push(item.rate2);
+    result.data.Rate3.push(item.rate3);
+    result.data.CurentState.push(item.currentState);
+  });
+
+  return result;
+};
+
+const getDataCriteria = async () => {
+  try {
+    const res = await dsa_api.getdataCriteria();
+    chartData.value = transformApiResponse(res.data.criteria, res.data.modificationTime);
   } catch (error) {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 
 onMounted(async () => {
-  await getDataSub();
+  await getDataCriteria();
   interval.value = setInterval(() => {
-    getDataSub();
+    getDataCriteria();
   }, intervalTime);
 });
 onUnmounted(() => {
   clearInterval(interval.value);
 });
 const refeshData = () => {
-  getDataSub();
+  getDataCriteria();
 };
-
-onUpdated(() => {
-  signalUpdate.value = !signalUpdate.value;
-});
 </script>
 
 <template>
   <!--  <Toast></Toast> -->
-  <div ref="refRadarChartContainer" class="radarChartContainer">
-    <radar-chart :chartData="chartData" :parentWidth="radarChartContainerWidth" @refeshData="refeshData"></radar-chart>
+  <div class="radarChartContainer">
+    <radar-chart :chartData="chartData" @refeshData="refeshData"></radar-chart>
   </div>
 </template>
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
 <script setup>
 import barChartBase from './barChartBase.vue';
-import TSA_api from '@/api/tsa_api';
+import TSA_api from '@/module/TSA/api/tsa_api';
 import chartOverLayPanel from './chartOverLayPanel.vue';
 import { intervalTime } from '@/Constants/';
 import { computed, ref, watch } from 'vue';
@@ -8,6 +8,9 @@ import { computed, ref, watch } from 'vue';
 
 // import { useToast } from 'primevue/usetoast';
 // import Toast from 'primevue/toast';
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { psm_active } = storeToRefs(commonStore);
 
 const props = defineProps({
   enabledFieldset: Boolean,
@@ -26,60 +29,33 @@ const baseValueChart = {
 const chartBlock1 = ref(baseValueChart);
 const typelineActive = ref('');
 const listTypeLine = ref([]);
-const getListTypeLine = async () => {
+const getListAreaTC = async () => {
   try {
-    const res = await TSA_api.getListTypeLine();
-    if (!res.data.success) {
-      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      if (res.data.payload[0]) {
-        listTypeLine.value = res.data.payload;
-        typelineActive.value = res.data.payload[0].name;
-      }
-    }
-  } catch (error) {
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
+    const res = await TSA_api.getListAreaTC();
+    listTypeLine.value = res.data;
+    typelineActive.value = listTypeLine.value[0]?.name;
+  } catch (error) {}
 };
 
-const getchartData = async (param) => {
-  if (param === '') {
-    // Tránh gọi getchartData khi param rỗng
+const getchartData = async (typeline) => {
+  if (!typeline) {
+    // Tránh gọi getchartData khi typeline hoặc psm_id rỗng
     return;
   }
   try {
-    const res = await TSA_api.getTransCap(param);
-    if (!res.data.success) {
-      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      let a = res.data.payload;
-      let output = {
-        name: res.data.payload.name,
-        Key: ['Thermal', 'VSA', 'TSAT'],
-        data: {
-          Offline: [],
-          Online: [],
-          Current: [],
-        },
-        modificationTime: res.data.payload.modificationTime,
-      };
-      for (let i = 0; i < a['Key'].length; i++) {
-        let key = a['Key'][i];
-        if (key.includes('Offline') && key.includes('Limitation')) {
-          output.data['Offline'].push(a.data.value[i]);
-        } else if (key.includes('_Current')) {
-          output.data['Current'].push(a.data.value[i]);
-        } else {
-          if (key.includes('Limitation')) {
-            output.data['Online'].push(a.data.value[i]);
-          }
-        }
-      }
-      chartBlock1.value = output;
-    }
-  } catch (error) {
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-  }
+    const { data } = await TSA_api.getDetailTC(typeline);
+    const { thermal, pv, TSAT, modificationTime } = data;
+    chartBlock1.value = {
+      name: data.name,
+      Key: ['Thermal', 'VSA', 'TSAT'],
+      data: {
+        Offline: [thermal.offline, pv.offline, TSAT.offline],
+        Online: [thermal.online, pv.online, TSAT.online],
+        Current: [thermal.current, pv.current, TSAT.current],
+      },
+      modificationTime: modificationTime,
+    };
+  } catch (error) {}
 };
 
 const displayFieldset = computed(() => {
@@ -91,8 +67,17 @@ const changeSubActive = async (param) => {
   await getchartData(param);
 };
 
+watch(psm_active, async (newValue, oldValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    setTimeout(async () => {
+      await getListAreaTC();
+      await getchartData(typelineActive.value);
+    }, 1000);
+  }
+});
+
 onMounted(async () => {
-  await getListTypeLine();
+  await getListAreaTC();
   await getchartData(typelineActive.value);
   interval.value = setInterval(() => {
     getchartData(typelineActive.value);

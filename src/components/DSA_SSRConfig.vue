@@ -10,16 +10,16 @@
       <div class="flex flex-wrap gap-6 p-fluid">
         <div class="flex-auto">
           <label for="fmin" class="font-bold block mb-2"> fmin </label>
-          <InputNumber v-model="dataSetting.SSR_setting.f_min" inputId="fmin" suffix=" Hz" />
+          <InputNumber v-model="dataProfile.SSR_setting.f_min" inputId="fmin" suffix=" Hz" />
         </div>
         <div class="flex-auto">
           <label for="fmax" class="font-bold block mb-2"> fmax </label>
-          <InputNumber v-model="dataSetting.SSR_setting.f_max" inputId="fmax" suffix=" Hz" />
+          <InputNumber v-model="dataProfile.SSR_setting.f_max" inputId="fmax" suffix=" Hz" />
         </div>
         <div class="flex-auto">
           <label for="step" class="font-bold block mb-2"> step </label>
           <InputNumber
-            v-model="dataSetting.SSR_setting.step"
+            v-model="dataProfile.SSR_setting.step"
             inputId="step"
             :minFractionDigits="0"
             :maxFractionDigits="5"
@@ -37,9 +37,9 @@
       <div class="p-fluid">
         <DataTable
           v-model:editingRows="editingRows"
-          :value="dataSetting.SSR_Gen"
+          :value="dataProfile.SSR_Gen"
           editMode="row"
-          dataKey="id"
+          dataKey="gen"
           @row-edit-save="onRowEditSave"
           :pt="{
             table: { style: 'min-width: 50rem' },
@@ -60,11 +60,23 @@
             </div>
           </template>
           <Column field="gen" header="Gen" style="width: 10%">
+            <template #body="slotProps">
+              <Tag :value="slotProps.data.gen" severity="secondary" />
+            </template>
             <template #editor="{ data, field }">
-              <InputText v-model="data[field]" />
+              <!-- <Dropdown
+                v-model="data[field]"
+                :options="listGen"
+                optionLabel="name"
+                optionValue="name"
+                placeholder="Select Gen"
+                editable
+              >
+              </Dropdown> -->
+              <AutoComplete v-model="data[field]" completeOnFocus :suggestions="listContingencies" @complete="search" />
             </template>
           </Column>
-          <Column field="enabled" header="Status" style="width: 10%">
+          <Column field="enabled" header="Status" style="width: 5%">
             <template #editor="{ data, field }">
               <Dropdown
                 v-model="data[field]"
@@ -134,25 +146,30 @@
               <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
             </template>
           </Column>
-          <Column field="Contingencies_id" header="Contingencies" style="width: 20%">
+          <Column field="contingencies" header="Contingencies" style="width: 10%">
             <template #editor="{ data, field }">
-              <MultiSelect
+              <AutoComplete
+                completeOnFocus
                 v-model="data[field]"
-                :options="listContingencies"
-                placeholder="Select Contingencies"
-                :maxSelectedLabels="3"
-                class="w-full md:w-20rem"
+                multiple
+                :suggestions="listContingencies"
+                @complete="search"
               />
             </template>
             <template #body="slotProps">
-              <span v-for="(item, index) in slotProps.data.Contingencies_id.slice(0, 3)" :key="index">
+              <span
+                v-for="(item, index) in Array.isArray(slotProps.data?.contingencies)
+                  ? slotProps.data.contingencies.slice(0, 2)
+                  : []"
+                :key="index"
+              >
                 {{ item }}
-                <span v-if="index === 2 && slotProps.data.Contingencies_id.length > 3"> ...</span>
-                <span v-else="index < 2 && index === slotProps.data.Contingencies_id.length - 1">, </span>
+                <span v-if="index === 1 && slotProps.data.contingencies.length > 2"> ...</span>
+                <span v-else="index < 1 && index === slotProps.data.contingencies.length - 1">, </span>
               </span>
             </template>
           </Column>
-          <Column :rowEditor="true" style="width: 2%" bodyStyle="text-align:center"></Column>
+          <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
           <Column :exportable="false" style="width: 2%">
             <template #body="slotProps">
               <Button
@@ -178,13 +195,8 @@
   >
     <div class="field">
       <label for="gen">Gen</label>
-      <InputText
-        id="gen"
-        v-model.trim="rowData.gen"
-        required="true"
-        autofocus
-        :class="{ 'p-invalid': submitted && !rowData.gen }"
-      />
+      <AutoComplete v-model="rowData.gen" completeOnFocus :suggestions="listContingencies" @complete="search" />
+
       <small class="p-error" v-if="submitted && !rowData.gen">Measurement is required.</small>
     </div>
     <div class="field col">
@@ -316,13 +328,12 @@
     </div>
     <div class="field">
       <label for="Contingencies" class="mb-3">Contingencies</label>
-      <MultiSelect
-        v-model="rowData.Contingencies_id"
-        :options="listContingencies"
-        placeholder="Select Contingencies"
-        :maxSelectedLabels="3"
-        class="w-full"
-        :class="{ 'p-invalid': submitted && !rowData.Contingencies_id }"
+      <AutoComplete
+        v-model="rowData.contingencies"
+        completeOnFocus
+        multiple
+        :suggestions="listContingencies"
+        @complete="search"
       />
     </div>
     <template #footer>
@@ -334,18 +345,20 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { ProductService } from '@/service/ProductService';
 import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
 const dsaStore = useDSAStore();
-const { dataSetting } = storeToRefs(dsaStore);
+const { dataProfile, listGen, listContingencies } = storeToRefs(dsaStore);
 
-const listContingencies = ref([]);
-onMounted(() => {
-  ProductService.getListContingencies().then((data) => (listContingencies.value = data));
-});
+// MultiSelect
+const search = async (event) => {
+  await dsaStore.getListContingencies(event.query);
+};
+//
+
+onMounted(() => {});
 const editingRows = ref([]);
 const statuses = ref([
   { label: 'True', value: true },
@@ -353,7 +366,7 @@ const statuses = ref([
 ]);
 const onRowEditSave = (event) => {
   let { newData, index } = event;
-  dataSetting.value.SSR_Gen[index] = newData;
+  dataProfile.value.SSR_Gen[index] = newData;
 };
 const getStatusLabel = (status) => {
   switch (status) {
@@ -389,7 +402,7 @@ const confirmDeleteData = (event, dataCell) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: () => {
-      dataSetting.value.SSR_Gen = dataSetting.value.SSR_Gen.filter((item) => item.measurement !== dataCell.measurement);
+      dataProfile.value.SSR_Gen = dataProfile.value.SSR_Gen.filter((item) => item.measurement !== dataCell.measurement);
     },
     reject: () => {},
   });
@@ -425,12 +438,12 @@ const saveRowData = () => {
     'Td0_sub',
     'Rgen',
     'Xgen',
-    'Contingencies_id',
+    'contingencies',
   ];
 
   const isValid = requiredFields.every((field) => rowData.value[field] != null);
   if (isValid) {
-    dataSetting.value.SSR_Gen.push(rowData.value);
+    dataProfile.value.SSR_Gen.push(rowData.value);
     dialogVisible.value = false;
   }
 };

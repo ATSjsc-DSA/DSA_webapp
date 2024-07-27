@@ -1,12 +1,12 @@
 import { toRefs, reactive, computed } from 'vue';
 const theme = localStorage.getItem('theme') ? localStorage.getItem('theme') : 'aura-dark-green';
 const DarkMode = theme.includes('dark') ? true : false;
-
+const menuMode = localStorage.getItem('menuMode') ? localStorage.getItem('menuMode') : 'static';
 const layoutConfig = reactive({
   ripple: true,
   darkTheme: DarkMode,
   inputStyle: 'outlined',
-  menuMode: 'static',
+  menuMode: menuMode,
   theme: theme,
   scale: 14,
   activeMenuItem: null,

@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
+import { useCommonStore } from '@/store';
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
@@ -32,20 +33,36 @@ const router = createRouter({
           name: 'Info',
           component: () => import('@/views/Info_View.vue'),
         },
+
         {
-          path: '/DSA/Map',
-          name: 'Map',
-          component: () => import('@/views/MapVNA_View.vue'),
-        },
-        {
-          path: '/DSA/Setting',
+          path: '/DSA/Setting/Profile',
           name: 'Setting',
-          component: () => import('@/views/settingView.vue'),
+          component: () => import('@/views/ProfileSettingView.vue'),
         },
         {
           path: '/DSA/User',
           name: 'User',
           component: () => import('@/views/UserView.vue'),
+        },
+        {
+          path: '/DSA/Task',
+          name: 'Task',
+          component: () => import('@/views/TaskList.vue'),
+        },
+        {
+          path: '/DSA/Setting/System',
+          name: 'System',
+          component: () => import('@/views/DSA_SettingView.vue'),
+        },
+        {
+          path: '/DSA/Setting/Area',
+          name: 'Area',
+          component: () => import('@/views/AreaSettingView.vue'),
+        },
+        {
+          path: '/DSA/Setting/Monitor',
+          name: 'Monitor',
+          component: () => import('@/views/MonitorSettingView.vue'),
         },
       ],
     },
@@ -71,9 +88,18 @@ router.beforeEach(async (to, from) => {
       name: 'Login',
       query: { redirect: to.fullPath },
     };
+  } else {
+    useCommonStore().setLoading(true);
   }
 
   // next();
+});
+
+router.afterEach((to, from) => {
+  setTimeout(() => {
+    useCommonStore().setLoading(false);
+  }, 800);
+  // useCommonStore().setLoading(false);
 });
 
 export default router;

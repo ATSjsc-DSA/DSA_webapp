@@ -3,6 +3,7 @@ import chartComposable from '@/combosables/chartData';
 import Chart from 'primevue/chart';
 import { useLayout } from '@/layout/composables/layout';
 import modificationTimeFile from './modificationTimeFile.vue';
+import { computed, watch } from 'vue';
 
 const { convertDateTimeToString } = chartComposable();
 const { isDarkTheme } = useLayout();
@@ -19,38 +20,33 @@ const props = defineProps({
 });
 
 const emits = defineEmits(['refeshData']);
-
-const chartData = computed(() => {
-  return setChartData(props.chartData.data);
-});
-const modificationTime = computed(() => {
-  if (props.chartData.modificationTime) {
-    return convertDateTimeToString(props.chartData.modificationTime);
+const DataProps = computed(() => props.chartData);
+const chartData = ref();
+const modificationTime = ref();
+watch(DataProps, (newValue, oldValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    chartData.value = setChartData(newValue);
+    modificationTime.value = convertDateTimeToString(newValue.modificationTime);
   }
 });
-const label = computed(() => {
-  return props.chartData.Key;
-});
+
+// const chartData = computed(() => {
+//   return setChartData(props.chartData.data);
+// });
+
+// const modificationTime = computed(() => {
+//   if (props.chartData.modificationTime) {
+//     return convertDateTimeToString(props.chartData.modificationTime);
+//   }
+// });
+// const label = computed(() => {
+//   console.log('123');
+//   return props.chartData.Key;
+// });
 let maxAxisValue = 0.2;
 let titleStatus = 'Secure'; // Secure , Warning , Critical
 let colorStatus = 'rgba(0,128,0,1)';
 let colorTitle = 'blue'; // blue, darkOrange, red
-let defaultChartData = {
-  Key: [
-    'Line Loading',
-    'Tranformer Loading',
-    'Generator Loading',
-    'Excitation Limiter',
-    'Low/High Voltage',
-    'VSA Module',
-    'TSA Module',
-    'SSR Module',
-  ],
-  Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
-  Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
-  Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
-  CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
-};
 
 const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) => ({
   data: pdata,
@@ -92,12 +88,12 @@ const colorTitleChart = () => colorTitle;
 
 const setChartData = (radarData) => {
   const chartValue = [];
-  const numAxis = label.value.length;
+  const numAxis = radarData.Key.length;
 
-  const rate1 = radarData.Rate1;
-  const rate2 = radarData.Rate2;
-  const rate3 = radarData.Rate3;
-  const current = radarData.CurentState;
+  const rate1 = radarData.data.Rate1;
+  const rate2 = radarData.data.Rate2;
+  const rate3 = radarData.data.Rate3;
+  const current = radarData.data.CurentState;
 
   let reserve1Data = [];
   let reserve2Data = [];
@@ -139,7 +135,7 @@ const setChartData = (radarData) => {
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
   return {
-    labels: label.value,
+    labels: radarData.Key,
     datasets: chartValue,
   };
 };
@@ -153,20 +149,18 @@ const removeValueExceed20 = (reserveData) => {
   var reserveDataExceed20 = reserveData.map((item) => (item > 0.2 ? 0.2 : item));
   return reserveDataExceed20;
 };
+const chartOptions = ref();
 
 const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
-  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+  const textColor2nd = documentStyle.getPropertyValue('--text-color-secondary');
   const primaryColor = documentStyle.getPropertyValue('--primary-color');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-  const surface = documentStyle.getPropertyValue('--surface-ground');
   return {
     animation: false,
     maintainAspectRatio: true,
-    layout: {
-      padding: 0,
-    },
+
     scales: {
       r: {
         startAngle: 0,
@@ -184,26 +178,28 @@ const setChartOptions = () => {
           display: true,
           lineWidth: 1,
           color: [
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            'rgba(169,169,169,0.3)',
-            primaryColor,
-            primaryColor,
-            primaryColor,
+            surfaceBorder,
+            surfaceBorder,
+            surfaceBorder,
+            surfaceBorder,
+            surfaceBorder,
+            textColor2nd,
+            textColor2nd,
+            textColor2nd,
           ],
         },
         pointLabels: {
-          padding: 1,
+          padding: 2,
           color: textColor,
-          // backdropColor: [, , , , , highlightBg, highlightBg, highlightBg],
+          borderRadius: 2,
+          backdropColor: [, , , , , primaryColor, primaryColor, primaryColor],
           font: {
-            size: 11,
+            size: 10,
             style: 'normal',
             weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
           },
         },
+
         ticks: {
           display: true,
           stepSize: 0.05,
@@ -266,8 +262,9 @@ const setChartOptions = () => {
     },
   };
 };
-const chartOptions = ref();
-onMounted(() => {
+onMounted(async () => {
+  chartData.value = setChartData(props.chartData);
+  modificationTime.value = convertDateTimeToString(props.chartData.modificationTime);
   chartOptions.value = setChartOptions();
 });
 watch(isDarkTheme, () => {
@@ -282,7 +279,7 @@ const refeshData = () => {
 <template>
   <div class="card flex justify-content-center h-full">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
-    <Chart type="radar" :data="chartData" :options="chartOptions" :width="props.parentWidth + 'px'" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem" />
   </div>
 </template>
 

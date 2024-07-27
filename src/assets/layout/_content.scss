@@ -4,12 +4,19 @@
   // min-height: 100vh;
   height: 100vh;
   justify-content: space-between;
-  padding: 7rem 2rem 0.5rem 1rem;
+  padding: 6rem 2rem 0.5rem 1rem;
   transition: margin-left $transitionDuration;
 }
 
 .layout-main {
   // flex: 1 1 auto;
   height: 100%;
+  width: 100%;
   // display: flex;
+}
+
+.layout-content {
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
 }

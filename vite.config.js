@@ -6,6 +6,7 @@ import IconsResolver from 'unplugin-icons/resolver';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { PrimeVueResolver } from 'unplugin-vue-components/resolvers';
+import svgLoader from 'vite-svg-loader';
 
 export default ({ mode }) => {
   const { VITE_PORT, VITE_BASE_URL } = loadEnv(mode, process.cwd());
@@ -14,6 +15,7 @@ export default ({ mode }) => {
     base: VITE_BASE_URL,
     plugins: [
       vue(),
+      svgLoader(),
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],
         resolvers: [PrimeVueResolver()],
@@ -52,7 +54,7 @@ export default ({ mode }) => {
     server: {
       port: VITE_PORT,
       host: '0.0.0.0',
-      open: true,
+      open: false,
       cors: true,
       proxy: {},
       warmup: {

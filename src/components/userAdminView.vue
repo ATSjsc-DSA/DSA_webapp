@@ -7,7 +7,7 @@
         <div class="child diagonal-bottom-right grid">
           <div class="col-7"></div>
           <div class="col-5 flex justify-content-center align-items-center gap-4">
-            <Avatar image="/app/admin.png" class="mr-2" size="xlarge" shape="circle" />
+            <Avatar image="/img/admin.png" class="mr-2" size="xlarge" shape="circle" />
 
             <h1 class="text-5xl md:text-3xl lg:text-4xl mt-4 place-self-center">
               Hello, <br />
@@ -115,8 +115,8 @@
   >
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <Avatar v-if="userForm.role === 'admin'" image="/app/admin.png" shape="circle" />
-        <Avatar v-else image="/app/operator.jpg" shape="circle" />
+        <Avatar v-if="userForm.role === 'admin'" image="/img/admin.png" shape="circle" />
+        <Avatar v-else image="/img/operator.jpg" shape="circle" />
 
         <span class="font-bold white-space-nowrap">{{ userForm.username }}</span>
       </div>
@@ -259,7 +259,6 @@ const confirmDeleteData = (event, dataCell) => {
   });
 };
 const onDeleteRow = async (data) => {
-  console.log(data);
   try {
     const res = await user_api.deleteUser(data.id);
     list_user.value = list_user.value.filter((item) => item.id !== data.id);
@@ -299,7 +298,7 @@ onMounted(() => {
   clip-path: polygon(0 0, 60% 0%, 40% 100%, 0% 100%);
   background-color: blue; /* Màu sắc của tam giác 1 */
   object-fit: cover;
-  background: linear-gradient(rgb(72, 0, 72, 0.7), rgb(192, 72, 72, 0.6)), url('/app/operator_back.jpg');
+  background: linear-gradient(rgb(72, 0, 72, 0.7), rgb(192, 72, 72, 0.6)), url('/img/operator_back.jpg');
   background-repeat: no-repeat;
   background-position: bottom center;
 }
@@ -314,7 +313,7 @@ onMounted(() => {
 
 <!-- 
 <div class="col">
-          <Avatar image="/app/admin.png" class="mr-2" size="xlarge" shape="circle" />
+          <Avatar image="/img/admin.png" class="mr-2" size="xlarge" shape="circle" />
 
           <h1 class="text-5xl md:text-3xl lg:text-4xl mt-4 place-self-center">
             Hello, <br />

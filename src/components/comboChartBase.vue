@@ -1,6 +1,10 @@
 <template>
   <div class="card h-full">
-    <Chart type="line" :data="chartData" :options="chartOptions" class="chart" />
+    <modificationTimeFile
+      :modificationTime="convertDateTimeToString(props.modificationTime)"
+      @refeshData="refeshData"
+    ></modificationTimeFile>
+    <Chart ref="comboChart" type="line" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
 
@@ -12,7 +16,7 @@ import modificationTimeFile from './modificationTimeFile.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { watch } from 'vue';
 
-const { zoomOptions } = chartComposable();
+const { zoomOptions, convertDateTimeToString } = chartComposable();
 const { isDarkTheme } = useLayout();
 const emits = defineEmits(['refeshData']);
 const props = defineProps({
@@ -21,9 +25,20 @@ const props = defineProps({
     require: true,
     default: {},
   },
-  P_area: Number,
-  Pmax_area: Number,
+  modificationTime: {
+    type: Number,
+  },
+  P_area: {
+    type: Number,
+
+    default: 1,
+  },
+  Pmax_area: {
+    type: Number,
+    default: 1,
+  },
 });
+
 onMounted(() => {
   chartOptions.value = setChartOptions();
 });
@@ -142,29 +157,29 @@ const setChartData = (data) => {
       });
     });
 
-    const line = {
-      type: 'line',
-      label: '',
-      borderColor: documentStyle.getPropertyValue('--surface-card'),
-      pointRadius: 1,
-      borderWidth: 1,
-      yAxisID: 'y', // Choose the appropriate axis
-      tension: 0, // Use tension 0 to draw straight lines
-      data: [{ x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.1 }],
-    };
-    datasets.push(line);
-    const lineP95 = {
-      type: 'line',
-      label: '',
-      borderColor: documentStyle.getPropertyValue('--surface-card'),
-      pointRadius: 0,
-      borderWidth: 0,
-      yAxisID: 'y', // Choose the appropriate axis
-      tension: 0, // Use tension 0 to draw straight lines
-      data: [{ x: props.P_area, y: maxValue + 0.1 }],
-      z: 10,
-    };
-    datasets.push(lineP95);
+    // const line = {
+    //   type: 'line',
+    //   label: '',
+    //   borderColor: documentStyle.getPropertyValue('--surface-card'),
+    //   pointRadius: 1,
+    //   borderWidth: 1,
+    //   yAxisID: 'y', // Choose the appropriate axis
+    //   tension: 0, // Use tension 0 to draw straight lines
+    //   data: [{ x: (props.Pmax_area * 9.5) / 10, y: minValue - 0.1 }],
+    // };
+    // datasets.push(line);
+    // const lineP95 = {
+    //   type: 'line',
+    //   label: '',
+    //   borderColor: documentStyle.getPropertyValue('--surface-card'),
+    //   pointRadius: 0,
+    //   borderWidth: 0,
+    //   yAxisID: 'y', // Choose the appropriate axis
+    //   tension: 0, // Use tension 0 to draw straight lines
+    //   data: [{ x: props.P_area, y: maxValue + 0.1 }],
+    //   z: 10,
+    // };
+    // datasets.push(lineP95);
     // const linePmax = {
     //   type: 'line',
     //   label: 'P',
@@ -183,7 +198,7 @@ const setChartData = (data) => {
   }
 
   return {
-    labels: data.power,
+    labels: data.key,
     datasets: datasets,
   };
 };
@@ -273,6 +288,13 @@ watch(isDarkTheme, () => {
 // watch(titleChart, () => {
 //   chartOptions.value = setChartOptions();
 // });
+const comboChart = ref();
+
+const refeshData = () => {
+  comboChart.value.chart.resetZoom();
+  chartOptions.value = setChartOptions();
+  emits('refeshData');
+};
 </script>
 <style scoped>
 .chart {

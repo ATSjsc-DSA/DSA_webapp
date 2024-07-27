@@ -1,12 +1,17 @@
 <script setup>
 import DSA_Dashboards from '@/components/DSA_Dashboards.vue';
+import BreadcrumbPsm from '@/components/BreadcrumbPsm.vue';
 </script>
 <template>
-  <div class="h-full w-full">
-    <DSA_Dashboards></DSA_Dashboards>
+  <div class="container_dash w-full flex flex-column gap-1">
+    <BreadcrumbPsm></BreadcrumbPsm>
+    <DSA_Dashboards class="flex-1"></DSA_Dashboards>
   </div>
 </template>
 <style scoped>
+.container_dash {
+  height: calc(100vh - 9rem);
+}
 .circle-container {
   display: flex;
   align-items: center;

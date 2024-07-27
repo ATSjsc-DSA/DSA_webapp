@@ -22,37 +22,44 @@ const props = defineProps({
 
 const baseValueChart = {
   name: '',
-  dm: {
-    f: Number,
-    dmin: Number,
-    dmax: Number,
-  },
-  freq: [],
-  base: [],
-  lne_4001_8001_1: [],
-  lne_4001_4204_1: [],
-  lne_4001_4097_1: [],
-  lne_4001_4094_1: [],
-  lne_4001_4090_1: [],
-  lne_3906_4001_2: [],
-  lne_3906_4001_1: [],
+  f: Number,
+  dmin: Number,
+  dmax: Number,
+  SSR: Number,
+  data: [],
   modificationTime: 0,
 };
+
+// const baseValueChart = {
+//   name: '',
+//   dm: {
+//     f: Number,
+//     dmin: Number,
+//     dmax: Number,
+//   },
+//   freq: [],
+//   base: [],
+//   lne_4001_8001_1: [],
+//   lne_4001_4204_1: [],
+//   lne_4001_4097_1: [],
+//   lne_4001_4094_1: [],
+//   lne_4001_4090_1: [],
+//   lne_3906_4001_2: [],
+//   lne_3906_4001_1: [],
+//   modificationTime: 0,
+// };
 
 const listSub = ref([]);
 const interval = ref(null);
 const chartBlock = ref(baseValueChart);
 
-const getListSub = async () => {
+const getListGen = async () => {
   try {
-    const res = await SSR_api.getSubList();
-    if (!res.data.success) {
-      toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      listSub.value = res.data.payload;
-      if (listSub.value[props.linechartNumber]) {
-        subActive.value = listSub.value[props.linechartNumber].name;
-      }
+    const res = await SSR_api.getGenList();
+
+    listSub.value = res.data;
+    if (listSub.value[props.linechartNumber]) {
+      subActive.value = listSub.value[props.linechartNumber].name;
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
@@ -62,22 +69,19 @@ const getListSub = async () => {
 const getchartData = async (subName) => {
   try {
     const res = await SSR_api.getSubInfo(subName);
-    if (!res.data.success) {
-      // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
-    } else {
-      chartBlock.value = res.data.payload;
-    }
+
+    chartBlock.value = res.data;
   } catch (error) {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }
 };
 
 onMounted(async () => {
-  await getListSub();
+  await getListGen();
   await getchartData(subActive.value);
-  interval.value = setInterval(() => {
-    getchartData(subActive.value);
-  }, intervalTime);
+  // interval.value = setInterval(() => {
+  //   getchartData(subActive.value);
+  // }, intervalTime);
 });
 
 onUnmounted(() => {

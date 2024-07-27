@@ -2,12 +2,12 @@
 import DSA_DashboardsEmpty from '@/components/DSA_DashboardsEmpty.vue';
 import mapView from '@/components/mapView.vue';
 import DSA_RadarChar from '@/components/DSA_RadarChar.vue';
-import SSR_lineChart from '@/components/SSR_lineChart.vue';
-import TSA_F81Chart from '@/components/TSA_F81Chart.vue';
-import TSA_F27Chart from '@/components/TSA_F27Chart.vue';
-import TSA_PowerTransfer from '@/components/TSA_PowerTransfer.vue';
+import SSR_lineChart from '@/module/SSR/components/SSR_lineChart.vue';
+import TSA_F81Chart from '@/module/TSA/components/TSA_F81Chart.vue';
+import TSA_F27Chart from '@/module/TSA/components/TSA_F27Chart.vue';
+import TSA_PowerTransfer from '@/module/TSA/components/TSA_PowerTransfer.vue';
 import TSA_GTTTChart from '@/components/TSA_layoutTTTGCheck.vue';
-import DSA_logTable from '@/components/DSA_logTable.vue';
+// import DSA_logTable from '@/components/DSA_logTable.vue';
 import DSA_viewTrans from '@/components/VSA_moduleDashboard.vue';
 const useDashboardHelper = () => {
   const defaultSetting = {
@@ -16,9 +16,9 @@ const useDashboardHelper = () => {
     children: [
       {
         component: 'MAP',
-        meta: {
-          color: 'rgb(241, 131, 131)',
-        },
+        // meta: {
+        //   color: 'rgb(241, 131, 131)',
+        // },
         type: 'panel',
         size: 1,
       },
@@ -28,17 +28,17 @@ const useDashboardHelper = () => {
         children: [
           {
             component: 'RADAR',
-            meta: {
-              color: 'rgb(241, 131, 186)',
-            },
+            // meta: {
+            //   color: 'rgb(241, 131, 186)',
+            // },
             type: 'panel',
             size: 0.5,
           },
           {
-            component: 'LOG',
-            meta: {
-              color: 'rgb(241, 131, 186)',
-            },
+            component: 'SSR',
+            // meta: {
+            //   color: 'rgb(241, 131, 186)',
+            // },
             type: 'panel',
             size: 0.5,
           },
@@ -50,9 +50,9 @@ const useDashboardHelper = () => {
         children: [
           {
             component: 'Check',
-            meta: {
-              color: 'rgb(241, 131, 186)',
-            },
+            // meta: {
+            //   color: 'rgb(241, 131, 186)',
+            // },
             type: 'panel',
             size: 0.5,
           },
@@ -60,9 +60,9 @@ const useDashboardHelper = () => {
             type: 'panel',
             size: 0.5,
             component: 'TSA',
-            meta: {
-              color: 'rgb(241, 131, 186)',
-            },
+            // meta: {
+            //   color: 'rgb(241, 131, 186)',
+            // },
           },
         ],
       },
@@ -102,8 +102,8 @@ const useDashboardHelper = () => {
         return TSA_GTTTChart;
       case 'LINE':
         return DSA_RadarChar;
-      case 'LOG':
-        return DSA_logTable;
+      // case 'LOG':
+      //   return DSA_logTable;
       case 'PTT':
         return DSA_viewTrans;
       default:

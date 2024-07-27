@@ -1,6 +1,6 @@
 <script setup>
 import mapViewSSR from '@/components/SSR_mapView.vue';
-import SSR_Module from '@/components/SSR_Module.vue';
+import SSR_Module from '@/module/SSR/components/SSR_Module.vue';
 </script>
 
 <template>

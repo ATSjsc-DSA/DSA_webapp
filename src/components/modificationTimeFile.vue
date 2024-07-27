@@ -1,11 +1,10 @@
 <script setup>
 const props = defineProps({
   modificationTime: {
-    type: String,
+    // type: String,
     require: true,
   },
 });
-
 const emits = defineEmits(['refeshData']);
 
 const refeshData = () => {

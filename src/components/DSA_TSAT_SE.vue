@@ -2,7 +2,7 @@
   <div class="p-fluid">
     <DataTable
       v-model:editingRows="editingRows"
-      :value="dataSetting.TSA_SE"
+      :value="dataProfile.TSA_SE"
       editMode="row"
       dataKey="id"
       @row-edit-save="onRowEditSave"
@@ -24,9 +24,19 @@
           />
         </div>
       </template>
-      <Column field="case" header="Case" style="width: 10%">
+      <Column field="mon" header="Monitor" style="width: 10%">
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.mon" severity="secondary" />
+        </template>
         <template #editor="{ data, field }">
-          <InputText v-model="data[field]" />
+          <Dropdown
+            v-model="data[field]"
+            :options="listMonitor"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Select a Monitor"
+          >
+          </Dropdown>
         </template>
       </Column>
       <Column field="time" header="Time" style="width: 8%">
@@ -36,7 +46,7 @@
       </Column>
       <Column field="target" header="Target" style="width: 15%">
         <template #editor="{ data, field }">
-          <InputText v-model="data[field]" />
+          <AutoComplete completeOnFocus v-model="data[field]" :suggestions="listContingencies" @complete="search" />
         </template>
       </Column>
       <Column field="open" header="Open" style="width: 10%">
@@ -69,7 +79,7 @@
           <Tag :value="getLabel(slotProps.data.phaseC)" :severity="getStatusLabel(slotProps.data.phaseC)" />
         </template>
       </Column>
-      <Column :rowEditor="true" style="width: 2%" bodyStyle="text-align:center"></Column>
+      <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
       <Column :exportable="false" style="width: 2%">
         <template #body="slotProps">
           <Button
@@ -92,27 +102,24 @@
     class="p-fluid"
   >
     <div class="field">
-      <label for="case">Case</label>
-      <InputText
-        id="case"
-        v-model.trim="rowData.case"
-        required="true"
-        autofocus
-        :class="{ 'p-invalid': submitted && !rowData.case }"
-      />
-      <small class="p-error" v-if="submitted && !rowData.case">Case is required.</small>
+      <label for="mon">Monitor</label>
+      <Dropdown
+        id="mon"
+        v-model.trim="rowData.mon"
+        :options="listMonitor"
+        optionLabel="name"
+        optionValue="name"
+        placeholder="Select a Monitor"
+        :class="{ 'p-invalid': submitted && !rowData.mon }"
+      >
+      </Dropdown>
+      <small class="p-error" v-if="submitted && !rowData.case">Monitor is required.</small>
     </div>
 
     <div class="formgrid grid">
       <div class="field col">
         <label for="target">Target</label>
-        <InputNumber
-          :minFractionDigits="0"
-          :maxFractionDigits="5"
-          id="target"
-          v-model="rowData.target"
-          :class="{ 'p-invalid': submitted && !rowData.target }"
-        />
+        <AutoComplete completeOnFocus v-model="rowData.target" :suggestions="listContingencies" @complete="search" />
       </div>
       <div class="field col">
         <label for="open">Open</label>
@@ -167,13 +174,28 @@ import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const dsaStore = useDSAStore();
-const { dataSetting } = storeToRefs(dsaStore);
+const { dataProfile, listContingencies, listMonitor } = storeToRefs(dsaStore);
 
 const editingRows = ref([]);
 const Opens = ref([
   { label: 'True', value: true },
   { label: 'False', value: false },
 ]);
+
+//lazy Load
+const items = ref(Array.from({ length: listContingencies.value.length }));
+watch(
+  listContingencies,
+  (newVal) => {
+    items.value = Array.from({ length: newVal.length });
+  },
+  { immediate: true },
+);
+const search = async (event) => {
+  await dsaStore.getListContingencies(event.query);
+};
+//
+
 const getStatusLabel = (status) => {
   switch (status) {
     case true:
@@ -200,7 +222,7 @@ const getLabel = (status) => {
 };
 const onRowEditSave = (event) => {
   let { newData, index } = event;
-  dataSetting.value.TSA_SE[index] = newData;
+  dataProfile.value.TSA_SE[index] = newData;
 };
 const confirmDeleteData = (event, dataCell) => {
   confirm.require({
@@ -212,7 +234,7 @@ const confirmDeleteData = (event, dataCell) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: () => {
-      dataSetting.value.TSA_SE = dataSetting.value.TSA_SE.filter((item) => item.measurement !== dataCell.measurement);
+      dataProfile.value.TSA_SE = dataProfile.value.TSA_SE.filter((item) => item.measurement !== dataCell.measurement);
     },
     reject: () => {},
   });
@@ -240,7 +262,7 @@ const saveRowData = () => {
 
   const isValid = requiredFields.every((field) => rowData.value[field] != null);
   if (isValid) {
-    dataSetting.value.TSA_SE.push(rowData.value);
+    dataProfile.value.TSA_SE.push(rowData.value);
     dialogVisible.value = false;
   }
 };

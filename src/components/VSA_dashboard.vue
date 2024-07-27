@@ -1,6 +1,6 @@
 <script setup>
-import VSA_areaView from './VSA_areaView.vue';
-import VSA_areaClockChart from './VSA_areaClockChart.vue';
+import VSA_areaView from '../module/VSA/components/VSA_areaView.vue';
+import VSA_areaClockChart from '@/module/VSA/components/VSA_areaClockChart.vue';
 
 import Card from 'primevue/card';
 

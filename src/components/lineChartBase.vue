@@ -5,7 +5,8 @@ import modificationTimeFile from './modificationTimeFile.vue';
 import { onMounted, watch } from 'vue';
 const { zoomOptions, convertDateTimeToString } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
-
+import styleLocal from '@/combosables/style';
+const { getRandomColor } = styleLocal();
 const props = defineProps({
   chartData: {
     type: Object,
@@ -36,112 +37,32 @@ const modificationTime = computed(() => {
     return convertDateTimeToString(props.chartData.modificationTime);
   }
 });
+
+const getChartConfig = (label, borderColor, data, fill = false, tension = 0.4, pointRadius = 0.2, borderWidth = 2) => ({
+  label,
+  borderColor,
+  data,
+  fill,
+  tension,
+  pointRadius,
+  borderWidth,
+  yAxisID: 'y',
+});
+
 const setChartData = (dataSub) => {
   const documentStyle = getComputedStyle(document.documentElement);
+  const datasets = [];
+  const colorsUsed = [];
+
+  dataSub?.data?.slice(1).forEach((element) => {
+    const randomColor = getRandomColor(colorsUsed);
+    colorsUsed.push(randomColor);
+    datasets.push(getChartConfig(element.name, documentStyle.getPropertyValue(randomColor), element.data));
+  });
+
   return {
-    labels: dataSub.freq,
-    datasets: [
-      {
-        label: 'T',
-        fill: true,
-        borderColor: documentStyle.getPropertyValue('--green-700'), // Set your desired color
-        yAxisID: 'y', // Choose the appropriate axis
-        tension: 0.4, // Use tension 0 to draw straight lines
-        data: [{ x: dataSub.dm[0].x, y: 0.3 }],
-        pointRadius: 2,
-        borderWidth: 6,
-      },
-      {
-        label: 'Dm',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--red-600'), // Set your desired color
-        yAxisID: 'y', // Choose the appropriate axis
-        tension: 0.4, // Use tension 0 to draw straight lines
-        data: dataSub.dm,
-        pointRadius: 0.2,
-        borderWidth: 2,
-      },
-      {
-        label: 'Base',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--blue-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.base,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_4001_8001_1',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--green-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_4001_8001_1,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_4001_4204_1',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--purple-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_4001_4204_1,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_4001_4097_1',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--pink-400'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_4001_4097_1,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_4001_4094_1',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--teal-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_4001_4094_1,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_4001_4090_1',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--orange-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_4001_4090_1,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_3906_4001_2',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--indigo-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_3906_4001_2,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-      {
-        label: 'lne_3906_4001_1',
-        fill: false,
-        borderColor: documentStyle.getPropertyValue('--primary-500'),
-        yAxisID: 'y',
-        tension: 0.4,
-        data: dataSub.lne_3906_4001_1,
-        pointRadius: 0,
-        borderWidth: 2,
-      },
-    ],
+    labels: dataSub?.data && Array.isArray(dataSub.data) && dataSub.data.length > 0 ? dataSub.data[0].data : [],
+    datasets: datasets,
   };
 };
 

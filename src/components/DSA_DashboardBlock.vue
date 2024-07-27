@@ -5,6 +5,7 @@
       'dashboard__block dashboard__block--' + type + ' dashboard__block--' + state + ' dashboard__block--' + component
     "
     :style="{ flexBasis: flexBasis }"
+    class="overflow-auto"
     ref="block"
     @drop="handleReplaceDrop"
   >
@@ -353,7 +354,6 @@ export default {
       this.$refs.refRealComponent.ShowSetting();
     },
     handleUpdateDataRealComponent(data) {
-
       const thisComponent = this.$parent.children[this.i];
       if (thisComponent) {
         if (!thisComponent.meta) {
@@ -411,8 +411,6 @@ export default {
         const offsetAsPercentage = offset / parentSize;
 
         const minPerc = minimumSizes[isHorizontal ? 'width' : 'height'] / parentSize;
-
-      
 
         if (offsetAsPercentage > 0) {
           if (currentStartSize - offsetAsPercentage <= minPerc) {

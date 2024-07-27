@@ -34,7 +34,9 @@ const onConfigButtonClick = () => {
 const onChangeTheme = (theme, mode) => {
   $primevue.changeTheme(layoutConfig.theme.value, theme, 'theme-css', () => {
     layoutConfig.theme.value = theme;
-    layoutConfig.darkTheme.value = mode;
+    setTimeout(() => {
+      layoutConfig.darkTheme.value = mode;
+    }, 10);
   });
 };
 const decrementScale = () => {
@@ -53,19 +55,16 @@ const onInputStyleChange = (value) => {
 };
 const onMenuModeChange = (value) => {
   layoutConfig.menuMode.value = value;
+  localStorage.setItem('menuMode', value);
 };
-// const onRippleChange = (value) => {
-//   layoutConfig.ripple.value = value;
-// };
 const onDarkModeChange = (value) => {
   const newThemeName = value
     ? layoutConfig.theme.value.replace('light', 'dark')
     : layoutConfig.theme.value.replace('dark', 'light');
 
-  console.log(layoutConfig.darkTheme.value, 'layoutConfig.darkTheme.value');
-  layoutConfig.darkTheme.value = value;
   onChangeTheme(newThemeName, value);
   localStorage.setItem('theme', newThemeName);
+  // layoutConfig.darkTheme.value = value;
 };
 // const changeTheme = (theme, color) => {
 //   let newTheme, dark;
@@ -124,8 +123,7 @@ onMounted(() => {
   // Kiểm tra xem theme có giá trị hay không trước khi thực hiện thay đổi
   if (theme !== null) {
     const DarkMode = theme.includes('dark') ? true : false;
-    layoutConfig.theme.value = theme;
-    layoutConfig.theme.darkTheme = DarkMode;
+
     const linkElement = document.getElementById('theme-css');
 
     // Thay đổi giá trị href bằng cách sử dụng replace
@@ -134,6 +132,8 @@ onMounted(() => {
         .getAttribute('href')
         .replace(/\/themes\/.*\/theme\.css/, `/themes/${theme}/theme.css`);
     }
+    layoutConfig.theme.value = theme;
+    layoutConfig.theme.darkTheme = DarkMode;
   }
 });
 </script>

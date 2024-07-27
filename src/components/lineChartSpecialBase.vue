@@ -20,22 +20,19 @@ const props = defineProps({
     default: false,
   },
 });
-// const chartData = computed(() => {
-//   return setChartData(props.chartData.data);
-// });
 const chartData = ref();
 watch(
   () => props.chartData,
   (newValue, oldValue) => {
-    if (JSON.stringify(newValue.data) !== JSON.stringify(oldValue.data)) {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
       nextTick(() => {
-        chartData.value = setChartData(newValue.data);
+        chartData.value = setChartData(newValue);
       });
     }
   },
 );
 const titleChart = computed(() => (props.labelChart === 'value' ? 'Angle chart' : 'Power Transfer'));
-const lineName = computed(() => props.chartData.name);
+const lineName = computed(() => props.chartData.load_scale);
 const getChartConfig = (label, borderColor, data, pointRadius = 1, borderDash) => ({
   label,
   fill: false,
@@ -55,17 +52,17 @@ const setChartData = (dataSub) => {
   ];
   if (props.ChartStabe) {
     const peakChartData = [
-      { x: dataSub.time[0], y: dataSub.peak[0] },
-      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.peak[0] },
+      { x: dataSub.time[0], y: dataSub.peak },
+      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.peak },
     ];
 
     const meanChartData = [
-      { x: dataSub.time[0], y: dataSub.mean[0] },
-      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean[0] },
+      { x: dataSub.time[0], y: dataSub.mean },
+      { x: dataSub.time[dataSub.time.length - 1], y: dataSub.mean },
     ];
     const stablilityChartData = [
-      { x: dataSub.t_stablility[0], y: Math.min(...dataSub.value) },
-      { x: dataSub.t_stablility[0], y: Math.max(...dataSub.value) },
+      { x: dataSub.t_stablility, y: Math.min(...dataSub.value) },
+      { x: dataSub.t_stablility, y: Math.max(...dataSub.value) },
     ];
     const chartPeakValue = getChartConfig('peak', documentStyle.getPropertyValue('--green-400'), peakChartData, 0, 5);
     const chartMeanValue = getChartConfig('mean', documentStyle.getPropertyValue('--green-300'), meanChartData, 0, 5);

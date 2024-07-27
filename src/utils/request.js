@@ -4,7 +4,7 @@ import router from '@/router';
 import { BASE_URL } from '@/Constants';
 const instance = axios.create({
   baseURL: BASE_URL + '/api',
-  timeout: 1000,
+  timeout: 5000,
   headers: {
     'Access-Control-Allow-Origin': '*',
   },
@@ -55,7 +55,6 @@ instance.interceptors.response.use(
           const res = await instance.post('/auth/token', {
             refresh_token: refreshToken,
           });
-          console.log(res, 'res');
           // set new token
           localStorage.setItem('token', res.data.access_token);
 
@@ -77,7 +76,6 @@ instance.interceptors.response.use(
         return Promise.reject(error);
       }
     } else {
-      console.log(error, 'error');
       return Promise.reject(response);
     }
   },
@@ -114,23 +112,33 @@ export const get = (url, params = {}) => {
  * @param {object} data
  * @param {object} params
  */
-export const put = (url, data = {}, params = {}) => {
-  return instance({
+export const put = (url, data = {}, params = {}, customTimeout = null) => {
+  const config = {
     method: 'put',
     url,
     params,
     data,
-  });
+  };
+
+  // Nếu customTimeout được cung cấp, ghi đè giá trị timeout
+  if (customTimeout !== null) {
+    config.timeout = customTimeout;
+  }
+
+  return instance(config);
 };
 
 /**
  * @param {string} url
  * @param {object} params
+ * @param {object} data
+
  */
-export const _delete = (url, params = {}) => {
+export const _delete = (url, data = {}, params = {}) => {
   return instance({
     method: 'delete',
     url,
+    data,
     params,
   });
 };

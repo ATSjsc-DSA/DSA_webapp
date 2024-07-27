@@ -1,7 +1,7 @@
 <template>
   <DSA_F_table
-    :dataSetting="dataSetting.F27"
-    name="F27"
+    :dataSetting="dataProfile.F27"
+    name="F27 List"
     @onRowEditSave="onRowEditSave"
     @onDeleteRow="onDeleteRow"
     @createNewRow="createNewRow"
@@ -12,18 +12,18 @@
 import { useDSAStore } from '@/store';
 import DSA_F_table from './DSA_F_table.vue';
 const dsaStore = useDSAStore();
-const { dataSetting } = storeToRefs(dsaStore);
+const { dataProfile, listLoad } = storeToRefs(dsaStore);
 
 const onRowEditSave = (data) => {
   let { newData, index } = data;
-  dataSetting.value.F27[index] = newData;
+  dataProfile.value.F27[index] = newData;
 };
 
 const onDeleteRow = (data) => {
-  dataSetting.value.F27 = dataSetting.value.F27.filter((item) => item.measurement !== data.measurement);
+  dataProfile.value.F27 = dataProfile.value.F27.filter((item) => item.measurement !== data.measurement);
 };
 
 const createNewRow = (data) => {
-  dataSetting.value.F27.push(data);
+  dataProfile.value.F27.push(data);
 };
 </script>

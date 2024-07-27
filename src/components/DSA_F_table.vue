@@ -66,22 +66,26 @@
       </Column>
       <Column field="Trip" header="Trip" style="width: 20%">
         <template #editor="{ data, field }">
-          <MultiSelect
+          <AutoComplete
+            completeOnFocus
             v-model="data[field]"
-            :options="listTrip"
-            placeholder="Select Trip"
-            :maxSelectedLabels="3"
-            class="w-full md:w-20rem"
+            multiple
+            :suggestions="listContingencies"
+            @complete="search"
           />
         </template>
         <template #body="slotProps">
-          <span v-for="(item, index) in slotProps.data.Trip" :key="index">
+          <span
+            v-for="(item, index) in Array.isArray(slotProps.data?.Trip) ? slotProps.data.Trip.slice(0, 2) : []"
+            :key="index"
+          >
             {{ item }}
-            <span v-if="index < slotProps.data.Trip.length - 1">, </span>
+            <span v-if="index === 1 && slotProps.data.Trip.length > 2"> ...</span>
+            <span v-else="index < 1 && index === slotProps.data.Trip.length - 1">, </span>
           </span>
         </template>
       </Column>
-      <Column :rowEditor="true" style="width: 2%" bodyStyle="text-align:center"></Column>
+      <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
       <Column :exportable="false" style="width: 2%">
         <template #body="slotProps">
           <Button
@@ -166,14 +170,12 @@
     </div>
     <div class="field">
       <label for="trips" class="mb-3">Trips</label>
-      <MultiSelect
-        id="trips"
+      <AutoComplete
+        completeOnFocus
         v-model="rowData.Trip"
-        :options="listTrip"
-        placeholder="Select Trip"
-        :maxSelectedLabels="3"
-        class="w-full"
-        :class="{ 'p-invalid': submitted && !rowData.Trip }"
+        multiple
+        :suggestions="listContingencies"
+        @complete="search"
       />
     </div>
     <template #footer>
@@ -190,6 +192,9 @@ import { useConfirm } from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
 
 import { ProductService } from '@/service/ProductService';
+import { useDSAStore } from '@/store';
+const dsaStore = useDSAStore();
+const { listContingencies } = storeToRefs(dsaStore);
 const confirm = useConfirm();
 
 const props = defineProps({
@@ -213,9 +218,15 @@ const dataSetting = ref(props.dataSetting);
 watch(
   () => props.dataSetting,
   (newValue, oldValue) => {
-    dataSetting.value = newValue;
+    if (newValue !== oldValue) {
+      dataSetting.value = newValue;
+    }
   },
 );
+//autocomplete
+const search = async (event) => {
+  await dsaStore.getListContingencies(event.query);
+};
 
 onMounted(() => {
   ProductService.getListTrip().then((data) => (listTrip.value = data));

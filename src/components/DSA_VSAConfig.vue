@@ -2,7 +2,7 @@
   <div class="p-fluid">
     <DataTable
       v-model:editingRows="editingRows"
-      :value="dataSetting.VSA_Case"
+      :value="dataProfile.VSA_Case"
       editMode="row"
       dataKey="id"
       @row-edit-save="onRowEditSave"
@@ -131,7 +131,7 @@
           </span>
         </template>
       </Column>
-      <Column :rowEditor="true" style="width: 2%" bodyStyle="text-align:center"></Column>
+      <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
       <Column :exportable="false" style="width: 2%">
         <template #body="slotProps">
           <Button
@@ -297,7 +297,7 @@ import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const dsaStore = useDSAStore();
-const { dataSetting } = storeToRefs(dsaStore);
+const { dataProfile } = storeToRefs(dsaStore);
 
 const listContingencies = ref([]);
 const listTrips = ref([]);
@@ -320,7 +320,7 @@ const APDs = ref([
 ]);
 const onRowEditSave = (event) => {
   let { newData, index } = event;
-  dataSetting.value.VSA_Case[index] = newData;
+  dataProfile.value.VSA_Case[index] = newData;
 };
 const getStatusLabel = (status) => {
   switch (status) {
@@ -356,7 +356,7 @@ const confirmDeleteData = (event, dataCell) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: () => {
-      dataSetting.value.VSA_Case = dataSetting.value.VSA_Case.filter(
+      dataProfile.value.VSA_Case = dataProfile.value.VSA_Case.filter(
         (item) => item.measurement !== dataCell.measurement,
       );
     },
@@ -398,7 +398,7 @@ const saveRowData = () => {
 
   const isValid = requiredFields.every((field) => rowData.value[field] != null);
   if (isValid) {
-    dataSetting.value.VSA_Case.push(rowData.value);
+    dataProfile.value.VSA_Case.push(rowData.value);
     dialogVisible.value = false;
   }
 };

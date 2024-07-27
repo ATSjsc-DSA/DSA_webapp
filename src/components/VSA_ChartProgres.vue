@@ -10,6 +10,11 @@
         {{ (95 / 100) * Pmax_area - p_area > 0 ? ((95 / 100) * Pmax_area - p_area).toFixed(2) : zeroData }}
       </div>
     </div>
+    <div v-if="visible100Progress" class="progress progress-3" :style="{ width: progressBarWidth100 }">
+      <div class="progress-label">
+        <!-- {{ Pmax_area - p_area > 0 ? (Pmax_area - p_area).toFixed(2) : zeroData }} -->
+      </div>
+    </div>
     <div class="ticks">
       <div v-for="tick in ticks" :key="tick" class="tick">
         <span class="tick-label">{{ tick }}</span>
@@ -43,6 +48,8 @@ const props = defineProps({
 const zeroData = ref(0);
 const visible80Progress = computed(() => (80 / 100) * Pmax_area.value > p_area.value);
 const visible95Progress = computed(() => (95 / 100) * Pmax_area.value > p_area.value);
+const visible100Progress = computed(() => Pmax_area.value > p_area.value);
+
 const p_area = computed(() => props.P_area);
 const Pmax_area = computed(() => props.Pmax_area);
 const PmaxZone = computed(() => props.PmaxZone);
@@ -52,6 +59,8 @@ const progressBarWidth80 = computed(
 const progressBarWidth95 = computed(
   () => ((((95 / 100) * Pmax_area.value - p_area.value) / (Pmax_area.value - p_area.value)) * 100).toFixed(1) + '%',
 );
+
+const progressBarWidth100 = computed(() => '100%');
 const ticks = computed(() => {
   const numTicks = 4;
   const tickInterval = parseInt((PmaxZone.value - p_area.value) / numTicks);
@@ -65,7 +74,7 @@ const ticks = computed(() => {
 <style scoped>
 .progress-bar {
   width: 100%;
-  height: 60%;
+  height: 1rem;
   background-color: #a51016;
   position: relative;
 }
@@ -82,6 +91,11 @@ const ticks = computed(() => {
 }
 .progress-2 {
   background-color: #dda409;
+  z-index: 80;
+}
+.progress-3 {
+  background-color: #a51016; /* Màu đỏ */
+  z-index: 70;
 }
 .progress-label {
   position: absolute;
@@ -111,16 +125,17 @@ const ticks = computed(() => {
   position: absolute;
   bottom: 0.5rem;
   transform: translateX(50%);
-  height: 1rem;
+  height: 0.5rem;
   width: 1px;
   background-color: var(--text-color-secondary);
-  z-index: 1000;
+  z-index: 0;
 }
 .tick-label {
   position: absolute;
   left: -5%;
   font-size: small;
   color: var(--text-color-secondary);
+  z-index: 0;
 }
 .pmax {
   width: 2px;

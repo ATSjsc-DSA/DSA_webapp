@@ -2,9 +2,9 @@
   <div class="p-fluid">
     <DataTable
       v-model:editingRows="editingRows"
-      :value="dataSetting.TSA_Case"
+      :value="dataProfile.TSA_Case"
       editMode="row"
-      dataKey="id"
+      dataKey="mon"
       @row-edit-save="onRowEditSave"
       :pt="{
         table: { style: 'min-width: 50rem' },
@@ -24,37 +24,17 @@
           />
         </div>
       </template>
-      <Column field="case" header="Case" style="width: 10%">
-        <template #editor="{ data, field }">
-          <InputText v-model="data[field]" />
-        </template>
-      </Column>
-      <Column field="enabled" header="Status" style="width: 5%">
-        <template #editor="{ data, field }">
-          <Dropdown
-            v-model="data[field]"
-            :options="statuses"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select a Status"
-          >
-            <template #option="slotProps">
-              <Tag :value="getLabel(slotProps.option.value)" :severity="getStatusLabel(slotProps.option.value)" />
-            </template>
-          </Dropdown>
-        </template>
+      <Column field="mon" header="Monitor" style="width: 10%">
         <template #body="slotProps">
-          <Tag :value="getLabel(slotProps.data.enabled)" :severity="getStatusLabel(slotProps.data.enabled)" />
+          <Tag :value="slotProps.data.mon" severity="secondary" />
         </template>
-      </Column>
-      <Column field="APD" header="APD" style="width: 8%">
         <template #editor="{ data, field }">
           <Dropdown
             v-model="data[field]"
-            :options="APDs"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select a APD"
+            :options="listMonitor"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Select a Monitor"
           >
           </Dropdown>
         </template>
@@ -74,58 +54,101 @@
           <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
         </template>
       </Column>
-      <Column field="num_steps" header="Num step" style="width: 8%">
-        <template #editor="{ data, field }">
-          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
+      <Column field="load_scale_pos" header="Load Pos" style="width: 10%">
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.load_scale_pos" severity="secondary" />
         </template>
-      </Column>
-      <Column field="MW_scale" header="MW scale" style="width: 8%">
         <template #editor="{ data, field }">
-          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
-        </template>
-      </Column>
-      <Column field="gen_scale" header="Gen scale" style="width: 8%">
-        <template #editor="{ data, field }">
-          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
-        </template>
-      </Column>
-      <Column field="load_scale" header="Load scale" style="width: 15%">
-        <template #editor="{ data, field }">
-          <MultiSelect
+          <Dropdown
             v-model="data[field]"
-            :options="listTrips"
-            placeholder="Select trip"
-            :maxSelectedLabels="3"
-            class="w-full md:w-10rem"
+            :options="listArea"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Select a Area"
+          >
+          </Dropdown>
+        </template>
+      </Column>
+      <Column field="gen_scale_pos" header="Gen Pos" style="width: 10%">
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.gen_scale_pos" severity="secondary" />
+        </template>
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data[field]"
+            :options="listArea"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Select a Area"
+          >
+          </Dropdown>
+        </template>
+      </Column>
+
+      <Column field="MW_max_pos" header="MW Max Pos" style="width: 8%">
+        <template #editor="{ data, field }">
+          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="load_scale_neg" header="Load Neg" style="width: 10%">
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.load_scale_neg" severity="secondary" />
+        </template>
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data[field]"
+            :options="listArea"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Select a Area"
+          >
+          </Dropdown>
+        </template>
+      </Column>
+      <Column field="gen_scale_neg" header="Gen Neg" style="width: 10%">
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.gen_scale_neg" severity="secondary" />
+        </template>
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data[field]"
+            :options="listArea"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Select a Area"
+          >
+          </Dropdown>
+        </template>
+      </Column>
+      <Column field="MW_max_neg" header="MW Max Neg" style="width: 8%">
+        <template #editor="{ data, field }">
+          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="MW_step" header="MW_step" style="width: 8%">
+        <template #editor="{ data, field }">
+          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="contingencies" header="Contingencies" style="width: 10%">
+        <template #editor="{ data, field }">
+          <AutoComplete
+            completeOnFocus
+            v-model="data[field]"
+            multiple
+            :suggestions="listContingencies"
+            @complete="search"
           />
         </template>
         <template #body="slotProps">
-          <span v-for="(item, index) in slotProps.data.load_scale.slice(0, 3)" :key="index">
+          <span v-for="(item, index) in slotProps.data.contingencies.slice(0, 3)" :key="index">
             {{ item }}
-            <span v-if="index === 2 && slotProps.data.load_scale.length > 3"> ...</span>
-            <span v-else="index < 2 && index === slotProps.data.load_scale.length - 1">, </span>
+            <span v-if="index === 2 && slotProps.data.contingencies.length > 3"> ...</span>
+            <span v-else="index < 2 && index === slotProps.data.contingencies.length - 1">, </span>
           </span>
         </template>
       </Column>
-      <Column field="lines" header="Lines" style="width: 18%">
-        <template #editor="{ data, field }">
-          <MultiSelect
-            v-model="data[field]"
-            :options="listContingencies"
-            placeholder="Select Contingencies"
-            :maxSelectedLabels="3"
-            class="w-full md:w-10rem"
-          />
-        </template>
-        <template #body="slotProps">
-          <span v-for="(item, index) in slotProps.data.lines.slice(0, 3)" :key="index">
-            {{ item }}
-            <span v-if="index === 2 && slotProps.data.lines.length > 3"> ...</span>
-            <span v-else="index < 2 && index === slotProps.data.lines.length - 1">, </span>
-          </span>
-        </template>
-      </Column>
-      <Column :rowEditor="true" style="width: 2%" bodyStyle="text-align:center"></Column>
+      <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
       <Column :exportable="false" style="width: 2%">
         <template #body="slotProps">
           <Button
@@ -148,46 +171,16 @@
     class="p-fluid"
   >
     <div class="field">
-      <label for="case">Case</label>
-      <InputText
-        id="case"
-        v-model.trim="rowData.case"
-        required="true"
-        autofocus
-        :class="{ 'p-invalid': submitted && !rowData.case }"
-      />
+      <label for="case">Monitor</label>
+      <Dropdown
+        v-model="rowData.mon_id"
+        :options="listMonitor"
+        optionLabel="name"
+        optionValue="name"
+        placeholder="Select a Monitor"
+      >
+      </Dropdown>
       <small class="p-error" v-if="submitted && !rowData.case">Case is required.</small>
-    </div>
-    <div class="formgrid grid">
-      <div class="field col">
-        <label for="enabled" class="mb-3">Enabled</label>
-        <Dropdown
-          id="enabled"
-          v-model="rowData.enabled"
-          :options="statuses"
-          optionValue="value"
-          optionLabel="label"
-          placeholder="Select a Status"
-          :class="{ 'p-invalid': submitted && !rowData.enabled }"
-        >
-          <template #option="slotProps">
-            <Tag :value="getLabel(slotProps.option.value)" :severity="getStatusLabel(slotProps.option.value)" />
-          </template>
-        </Dropdown>
-      </div>
-      <div class="field col">
-        <label for="APD" class="mb-3">APD</label>
-        <Dropdown
-          id="APD"
-          v-model="rowData.APD"
-          :options="APDs"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select a APD"
-          :class="{ 'p-invalid': submitted && !rowData.APD }"
-        >
-        </Dropdown>
-      </div>
     </div>
     <div class="formgrid grid">
       <div class="field col">
@@ -223,60 +216,96 @@
         />
       </div>
       <div class="field col">
-        <label for="num_steps">Num steps</label>
+        <label for="time_stability">MW Step</label>
         <InputNumber
-          :minFractionDigits="0"
-          :maxFractionDigits="5"
-          id="num_steps"
-          v-model="rowData.num_steps"
-          :class="{ 'p-invalid': submitted && !rowData.num_steps }"
+          id="time_stability"
+          v-model="rowData.MW_step"
+          :class="{ 'p-invalid': submitted && !rowData.MW_step }"
         />
       </div>
     </div>
     <div class="formgrid grid">
       <div class="field col">
-        <label for="MW_scale">MW scale</label>
+        <label for="MW_max_pos">MW Max Pos</label>
         <InputNumber
           :minFractionDigits="0"
           :maxFractionDigits="5"
           id="MW_scale"
-          v-model="rowData.MW_scale"
+          v-model="rowData.MW_max_pos"
           :class="{ 'p-invalid': submitted && !rowData.MW_scale }"
         />
       </div>
       <div class="field col">
-        <label for="gen_scale">Gen scale</label>
+        <label for="MW_max_pos">MW Max Neg</label>
         <InputNumber
           :minFractionDigits="0"
           :maxFractionDigits="5"
-          id="gen_scale"
-          v-model="rowData.gen_scale"
-          :class="{ 'p-invalid': submitted && !rowData.gen_scale }"
+          id="MW_scale"
+          v-model="rowData.MW_max_neg"
+          :class="{ 'p-invalid': submitted && !rowData.MW_scale }"
         />
       </div>
     </div>
-    <div class="field">
-      <label for="load_scale" class="mb-3">Load scale</label>
-      <MultiSelect
-        v-model="rowData.load_scale"
-        :options="listContingencies"
-        placeholder="Select Contingencies"
-        :maxSelectedLabels="3"
-        class="w-full"
-        :class="{ 'p-invalid': submitted && !rowData.load_scale }"
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="gen_scale">Gen scale Pos</label>
+        <Dropdown
+          v-model="rowData.gen_scale_pos"
+          :options="listArea"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="Select a Area"
+        >
+        </Dropdown>
+      </div>
+      <div class="field col">
+        <label for="load_scale">Load scale Pos</label>
+        <Dropdown
+          v-model="rowData.load_scale_pos"
+          :options="listArea"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="Select a Area"
+        >
+        </Dropdown>
+      </div>
+    </div>
+
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="gen_scale">Gen scale Neg</label>
+        <Dropdown
+          v-model="rowData.gen_scale_neg"
+          :options="listArea"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="Select a Area"
+        >
+        </Dropdown>
+      </div>
+      <div class="field col">
+        <label for="load_scale">Load scale Neg</label>
+        <Dropdown
+          v-model="rowData.load_scale_neg"
+          :options="listArea"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="Select a Area"
+        >
+        </Dropdown>
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <label for="load_scale">List Contingencies</label>
+      <AutoComplete
+        completeOnFocus
+        v-model="rowData.load_scale_neg"
+        multiple
+        :suggestions="listContingencies"
+        @complete="search"
       />
     </div>
-    <div class="field">
-      <label for="lines" class="mb-3">Lines</label>
-      <MultiSelect
-        v-model="rowData.lines"
-        :options="listTrips"
-        placeholder="Select Trip"
-        :maxSelectedLabels="3"
-        class="w-full"
-        :class="{ 'p-invalid': submitted && !rowData.lines }"
-      />
-    </div>
+
     <template #footer>
       <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
       <Button label="Save" icon="pi pi-check" text @click="saveRowData" />
@@ -286,60 +315,23 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { ProductService } from '@/service/ProductService';
 import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const dsaStore = useDSAStore();
-const { dataSetting } = storeToRefs(dsaStore);
+const { dataProfile, listArea, listMonitor, listContingencies } = storeToRefs(dsaStore);
 
-const listContingencies = ref([]);
-const listTrips = ref([]);
-
-onMounted(() => {
-  ProductService.getListTrip().then((data) => (listTrips.value = data));
-  ProductService.getListContingencies().then((data) => (listContingencies.value = data));
-});
 const editingRows = ref([]);
-const statuses = ref([
-  { label: 'True', value: true },
-  { label: 'False', value: false },
-]);
 
-const APDs = ref([
-  { label: 'Rated', value: 'rated' },
-  { label: 'Rransmit Capacity', value: 'cap' },
-  { label: 'Merit Order', value: 'mo' },
-  { label: 'User', value: 'user' },
-]);
+const search = async (event) => {
+  await dsaStore.getListContingencies(event.query);
+};
+//
 const onRowEditSave = (event) => {
   let { newData, index } = event;
-  dataSetting.value.TSA_Case[index] = newData;
+  dataProfile.value.TSA_Case[index] = newData;
 };
-const getStatusLabel = (status) => {
-  switch (status) {
-    case true:
-      return 'success';
 
-    case false:
-      return 'danger';
-
-    default:
-      return null;
-  }
-};
-const getLabel = (status) => {
-  switch (status) {
-    case true:
-      return 'True';
-
-    case false:
-      return 'False';
-
-    default:
-      return null;
-  }
-};
 const confirmDeleteData = (event, dataCell) => {
   confirm.require({
     target: event.currentTarget,
@@ -350,7 +342,7 @@ const confirmDeleteData = (event, dataCell) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: () => {
-      dataSetting.value.TSA_Case = dataSetting.value.TSA_Case.filter(
+      dataProfile.value.TSA_Case = dataProfile.value.TSA_Case.filter(
         (item) => item.measurement !== dataCell.measurement,
       );
     },
@@ -377,22 +369,21 @@ const hideDialog = () => {
 const saveRowData = () => {
   submitted.value = true;
   const requiredFields = [
-    'case',
+    'mon_id',
     'stop_time',
     'max_peak',
     'time_stability',
-    'load_scale',
-    'MW_scale',
-    'num_steps',
-    'Td0_sub',
-    'gen_scale',
-    'lines',
-    'APD',
+    'gen_scale_pos',
+    'load_scale_pos',
+    'MW_max_pos',
+    'MW_max_neg',
+    'gen_scale_neg',
+    'load_scale_neg',
   ];
 
   const isValid = requiredFields.every((field) => rowData.value[field] != null);
   if (isValid) {
-    dataSetting.value.TSA_Case.push(rowData.value);
+    dataProfile.value.TSA_Case.push(rowData.value);
     dialogVisible.value = false;
   }
 };
