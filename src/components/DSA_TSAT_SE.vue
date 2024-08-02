@@ -2,7 +2,7 @@
   <div class="p-fluid">
     <DataTable
       v-model:editingRows="editingRows"
-      :value="dataProfile.TSA_SE"
+      :value="dataList"
       editMode="row"
       dataKey="id"
       @row-edit-save="onRowEditSave"
@@ -24,21 +24,6 @@
           />
         </div>
       </template>
-      <Column field="mon" header="Monitor" style="width: 10%">
-        <template #body="slotProps">
-          <Tag :value="slotProps.data.mon" severity="secondary" />
-        </template>
-        <template #editor="{ data, field }">
-          <Dropdown
-            v-model="data[field]"
-            :options="listMonitor"
-            optionLabel="name"
-            optionValue="name"
-            placeholder="Select a Monitor"
-          >
-          </Dropdown>
-        </template>
-      </Column>
       <Column field="time" header="Time" style="width: 8%">
         <template #editor="{ data, field }">
           <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
@@ -46,7 +31,7 @@
       </Column>
       <Column field="target" header="Target" style="width: 15%">
         <template #editor="{ data, field }">
-          <AutoComplete completeOnFocus v-model="data[field]" :suggestions="listContingencies" @complete="search" />
+          <AutoComplete completeOnFocus v-model="data[field]" :suggestions="listEquipment" @complete="search" />
         </template>
       </Column>
       <Column field="open" header="Open" style="width: 10%">
@@ -101,25 +86,32 @@
     :modal="true"
     class="p-fluid"
   >
-    <div class="field">
-      <label for="mon">Monitor</label>
-      <Dropdown
-        id="mon"
-        v-model.trim="rowData.mon"
-        :options="listMonitor"
-        optionLabel="name"
-        optionValue="name"
-        placeholder="Select a Monitor"
-        :class="{ 'p-invalid': submitted && !rowData.mon }"
-      >
-      </Dropdown>
-      <small class="p-error" v-if="submitted && !rowData.case">Monitor is required.</small>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="Id">Id</label>
+        <InputNumber
+          :minFractionDigits="0"
+          :maxFractionDigits="5"
+          id="Id"
+          v-model="rowData.id"
+          :class="{ 'p-invalid': submitted && !rowData.id }"
+        />
+      </div>
+      <div class="field col">
+        <label for="Time">Time</label>
+        <InputNumber
+          id="Time"
+          :minFractionDigits="0"
+          :maxFractionDigits="5"
+          v-model="rowData.time"
+          :class="{ 'p-invalid': submitted && !rowData.time }"
+        />
+      </div>
     </div>
-
     <div class="formgrid grid">
       <div class="field col">
         <label for="target">Target</label>
-        <AutoComplete completeOnFocus v-model="rowData.target" :suggestions="listContingencies" @complete="search" />
+        <AutoComplete completeOnFocus v-model="rowData.target" :suggestions="listEquipment" @complete="search" />
       </div>
       <div class="field col">
         <label for="open">Open</label>
@@ -130,11 +122,11 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Select a value"
-          :class="{ 'p-invalid': submitted && !rowData.open }"
         >
         </Dropdown>
       </div>
     </div>
+
     <div class="formgrid grid">
       <div class="field col">
         <label for="all_phase">All Phase</label>
@@ -174,8 +166,28 @@ import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const dsaStore = useDSAStore();
-const { dataProfile, listContingencies, listMonitor } = storeToRefs(dsaStore);
+const { dataProfile, listEquipment, listMonitor } = storeToRefs(dsaStore);
+// props, emit, computed
+const props = defineProps({
+  dataList: {
+    type: Array,
+    default: [{ time: true, target: '', FL: 1, FT: 1 }],
+  },
+  dialogVisible: Boolean,
+});
+const emits = defineEmits(['deleteRow', 'createRow', 'update:dialogVisible']);
+const dataList = computed(() => props.dataList);
 
+const dialogVisible = computed({
+  get: () => {
+    return props.dialogVisible;
+  },
+  set: (v) => {
+    emits('update:dialogVisible', v);
+  },
+});
+
+//
 const editingRows = ref([]);
 const Opens = ref([
   { label: 'True', value: true },
@@ -183,16 +195,16 @@ const Opens = ref([
 ]);
 
 //lazy Load
-const items = ref(Array.from({ length: listContingencies.value.length }));
+const items = ref(Array.from({ length: listEquipment.value.length }));
 watch(
-  listContingencies,
+  listEquipment,
   (newVal) => {
     items.value = Array.from({ length: newVal.length });
   },
   { immediate: true },
 );
 const search = async (event) => {
-  await dsaStore.getListContingencies(event.query);
+  await dsaStore.getListEquipment(event.query);
 };
 //
 
@@ -222,7 +234,7 @@ const getLabel = (status) => {
 };
 const onRowEditSave = (event) => {
   let { newData, index } = event;
-  dataProfile.value.TSA_SE[index] = newData;
+  // dataProfile.value.TSA_SE[index] = newData;
 };
 const confirmDeleteData = (event, dataCell) => {
   confirm.require({
@@ -234,7 +246,7 @@ const confirmDeleteData = (event, dataCell) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: () => {
-      dataProfile.value.TSA_SE = dataProfile.value.TSA_SE.filter((item) => item.measurement !== dataCell.measurement);
+      emits('deleteRow', dataCell);
     },
     reject: () => {},
   });
@@ -242,13 +254,17 @@ const confirmDeleteData = (event, dataCell) => {
 
 // Dialog
 const submitted = ref(false);
-
-const dialogVisible = ref(false);
 const rowData = ref({});
 const openDialog = () => {
   submitted.value = false;
-
-  rowData.value = {};
+  rowData.value = {
+    target: '',
+    open: false,
+    all_phase: false,
+    phaseA: false,
+    phaseB: false,
+    phaseC: false,
+  };
   dialogVisible.value = true;
 };
 const hideDialog = () => {
@@ -257,13 +273,14 @@ const hideDialog = () => {
   dialogVisible.value = false;
 };
 const saveRowData = () => {
+  console.log('avbc');
   submitted.value = true;
-  const requiredFields = ['case', 'time', 'target', 'open', 'all_phase', 'phaseA', 'phaseB', 'phaseC'];
+  const requiredFields = ['id', 'time', 'target'];
 
   const isValid = requiredFields.every((field) => rowData.value[field] != null);
   if (isValid) {
-    dataProfile.value.TSA_SE.push(rowData.value);
-    dialogVisible.value = false;
+    console.log(rowData.value, 'rowData.value');
+    emits('createRow', rowData.value);
   }
 };
 </script>

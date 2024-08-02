@@ -2,7 +2,7 @@
   <div class="p-fluid">
     <DataTable
       v-model:editingRows="editingRows"
-      :value="dataProfile.TSA_SCE"
+      :value="dataList"
       editMode="row"
       dataKey="id"
       @row-edit-save="onRowEditSave"
@@ -24,21 +24,6 @@
           />
         </div>
       </template>
-      <Column field="mon" header="Monitor" style="width: 10%">
-        <template #body="slotProps">
-          <Tag :value="slotProps.data.mon" severity="secondary" />
-        </template>
-        <template #editor="{ data, field }">
-          <Dropdown
-            v-model="data[field]"
-            :options="listMonitor"
-            optionLabel="name"
-            optionValue="name"
-            placeholder="Select a Monitor"
-          >
-          </Dropdown>
-        </template>
-      </Column>
       <Column field="time" header="Time" style="width: 8%">
         <template #editor="{ data, field }">
           <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
@@ -46,7 +31,7 @@
       </Column>
       <Column field="target" header="Target" style="width: 15%">
         <template #editor="{ data, field }">
-          <AutoComplete completeOnFocus v-model="data[field]" :suggestions="listContingencies" @complete="search" />
+          <AutoComplete completeOnFocus v-model="data[field]" :suggestions="listEquipment" @complete="search" />
         </template>
       </Column>
       <Column field="FL" header="Fault Location" style="width: 10%">
@@ -59,7 +44,7 @@
           <Dropdown
             id="FT"
             v-model="data[field]"
-            :options="FTs"
+            :options="optionsFT"
             optionLabel="label"
             optionValue="value"
             placeholder="Select a FT"
@@ -91,20 +76,15 @@
     class="p-fluid"
   >
     <div class="field">
-      <label for="mon">Monitor</label>
-      <Dropdown
-        id="mon"
-        v-model.trim="rowData.mon"
-        :options="listMonitor"
-        optionLabel="name"
-        optionValue="name"
-        placeholder="Select a Monitor"
-        :class="{ 'p-invalid': submitted && !rowData.mon }"
-      >
-      </Dropdown>
-      <small class="p-error" v-if="submitted && !rowData.mon">Monitor is required.</small>
+      <label for="Id">Id</label>
+      <InputNumber
+        :minFractionDigits="0"
+        :maxFractionDigits="5"
+        id="Id"
+        v-model="rowData.id"
+        :class="{ 'p-invalid': submitted && !rowData.id }"
+      />
     </div>
-
     <div class="formgrid grid">
       <div class="field col">
         <label for="time">Time</label>
@@ -127,16 +107,17 @@
         />
       </div>
     </div>
+
     <div class="field">
       <label for="target">Target</label>
-      <AutoComplete completeOnFocus v-model="rowData.target" :suggestions="listContingencies" @complete="search" />
+      <AutoComplete completeOnFocus v-model="rowData.target" :suggestions="listEquipment" @complete="search" />
     </div>
     <div class="field">
       <label for="FT" class="mb-3">Fault Type</label>
       <Dropdown
         id="FT"
         v-model="rowData.FT"
-        :options="FTs"
+        :options="optionsFT"
         optionLabel="label"
         optionValue="value"
         placeholder="Select a FT"
@@ -157,35 +138,70 @@ import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const dsaStore = useDSAStore();
-const { dataProfile, listContingencies, listMonitor } = storeToRefs(dsaStore);
+const { listEquipment } = storeToRefs(dsaStore);
+// props, emit, computed
+const props = defineProps({
+  dataList: {
+    type: Array,
+    default: [{ time: true, target: '', FL: 1, FT: 1 }],
+  },
+  dialogVisible: Boolean,
+});
+const dialogVisible = computed({
+  get: () => {
+    return props.dialogVisible;
+  },
+  set: (v) => {
+    emits('update:dialogVisible', v);
+  },
+});
+const emits = defineEmits(['deleteRow', 'createRow', 'update:dialogVisible']);
+const dataList = computed(() => props.dataList);
+// options
+const optionsFT = [
+  {
+    value: 0,
+    label: 'three-phase fault',
+  },
+  {
+    value: 1,
+    label: 'two-phase fault',
+  },
+  {
+    value: 2,
+    label: 'single-phase to ground fault',
+  },
+  {
+    value: 3,
+    label: 'two-phase to ground fault',
+  },
+  {
+    value: 4,
+    label: 'clear fault',
+  },
+];
 
 //lazy Load
-const items = ref(Array.from({ length: listContingencies.value.length }));
+const items = ref(Array.from({ length: listEquipment.value.length }));
 watch(
-  listContingencies,
+  listEquipment,
   (newVal) => {
     items.value = Array.from({ length: newVal.length });
   },
   { immediate: true },
 );
 const search = async (event) => {
-  await dsaStore.getListContingencies(event.query);
+  await dsaStore.getListEquipment(event.query);
 };
 //
 
 const editingRows = ref([]);
-const FTs = ref([
-  { label: '3 phase', value: 0 },
-  { label: '2 phase', value: 1 },
-  { label: '1 phase with Earth fault', value: 2 },
-  { label: '2 phase with Earth fault', value: 3 },
-  { label: 'clear', value: 4 },
-]);
 const onRowEditSave = (event) => {
   let { newData, index } = event;
-  dataProfile.value.TSA_SCE[index] = newData;
+  // dataProfile.value.TSA_SCE[index] = newData;
 };
 const confirmDeleteData = (event, dataCell) => {
+  console.log(dataCell, 'dataCell');
   confirm.require({
     target: event.currentTarget,
     message: 'Do you want to delete this record?',
@@ -195,7 +211,8 @@ const confirmDeleteData = (event, dataCell) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: () => {
-      dataProfile.value.TSA_SCE = dataProfile.value.TSA_SCE.filter((item) => item.measurement !== dataCell.measurement);
+      emits('deleteRow', dataCell);
+      // dataProfile.value.TSA_SCE = dataProfile.value.TSA_SCE.filter((item) => item.measurement !== dataCell.measurement);
     },
     reject: () => {},
   });
@@ -204,7 +221,6 @@ const confirmDeleteData = (event, dataCell) => {
 // Dialog
 const submitted = ref(false);
 
-const dialogVisible = ref(false);
 const rowData = ref({});
 const openDialog = () => {
   submitted.value = false;
@@ -214,17 +230,15 @@ const openDialog = () => {
 };
 const hideDialog = () => {
   submitted.value = false;
-
   dialogVisible.value = false;
 };
 const saveRowData = () => {
   submitted.value = true;
-  const requiredFields = ['case', 'time', 'target', 'FL', 'FT'];
+  const requiredFields = ['id', 'time', 'target', 'FL', 'FT'];
 
   const isValid = requiredFields.every((field) => rowData.value[field] != null);
   if (isValid) {
-    dataProfile.value.TSA_SCE.push(rowData.value);
-    dialogVisible.value = false;
+    emits('createRow', rowData.value);
   }
 };
 </script>

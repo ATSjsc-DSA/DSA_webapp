@@ -1,15 +1,22 @@
 <template>
-  <div class="card layout-content">
+  <div class="card layout-content relative h-full pt-6">
+    <BreadcrumbCommon :items="items"></BreadcrumbCommon>
+
     <DataTable
       :value="listTask"
       paginator
       :rows="10"
       :totalRecords="totalList"
+      rowGroupMode="rowspan"
+      groupRowsBy="powerSystemModelDetails.name"
+      sortMode="single"
+      sortField="powerSystemModelDetails.name"
       dataKey="_id"
       tableStyle="min-width: 50rem"
       :rowClass="rowClass"
       :lazy="true"
       @page="onPageChange"
+      :sortOrder="1"
     >
       <template #header>
         <div class="flex justify-content-between">
@@ -17,21 +24,22 @@
             <InputIcon>
               <i class="pi pi-search" />
             </InputIcon>
-            <InputText v-model="filters['global'].value" placeholder="Global Search" />
+            <InputText v-model="filters['global'].value" placeholder="Global Search" size="sm" />
           </IconField>
           <div>
             <Button type="button" label="Add Task" icon="pi pi-plus" @click="addTask()" size="small" outlined />
           </div>
         </div>
       </template>
-      <Column field="name" header="Name" style="width: 15%"> </Column>
-      <Column field="powerSystemModelId" header="PSM Name" style="width: 10%">
+      <Column field="powerSystemModelDetails.name" header="PSM Name" style="width: 10%">
         <template #body="{ data }">
           <div class="flex align-items-center gap-2">
             <span> {{ data.powerSystemModelDetails.name }}</span>
           </div>
         </template></Column
       >
+      <Column field="name" header="Name" style="width: 15%"> </Column>
+
       <Column field="createdTime" header="Created Time" sortable style="width: 12%">
         <template #body="{ data }">
           <div class="flex align-items-center gap-2">
@@ -87,7 +95,6 @@
           <div v-else></div>
         </template>
       </Column>
-      <template #empty> No customers found. </template>
     </DataTable>
   </div>
 </template>
@@ -102,6 +109,10 @@ import chartComposable from '@/combosables/chartData';
 import { useCommonStore } from '@/store';
 import { intervalTime } from '@/Constants/';
 import { useRouter, useRoute } from 'vue-router';
+import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
+
+const items = ref([{ label: 'Task List', route: '/DSA/Task' }]);
+
 const router = useRouter();
 
 const commonStore = useCommonStore();

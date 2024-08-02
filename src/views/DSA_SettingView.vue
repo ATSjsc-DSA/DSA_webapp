@@ -1,7 +1,9 @@
 <template>
-  <div class="h-full relative p-3 layout-content">
+  <div class="h-full relative py-8 layout-content">
+    <BreadcrumbCommon :items="items" class="BreadcrumbCommon"></BreadcrumbCommon>
+
     <div class="grid gap-2">
-      <Panel header="Manager Setting" class="col">
+      <Panel header="Manager Setting" class="col border-noround">
         <Fieldset legend="Database">
           <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-8">
@@ -63,7 +65,7 @@
           </div>
         </Fieldset>
       </Panel>
-      <Panel header="Engineer Setting" class="col">
+      <Panel header="Engineer Setting" class="col border-noround">
         <Fieldset legend="Database">
           <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-8">
@@ -99,24 +101,10 @@
       </Panel>
     </div>
     <div class="flex justify-content-center align-items-center p-5">
-      <Button label="Submit" outlined rounded @click="updateSettingDSA()" />
+      <Button label="Submit" outlined @click="updateSettingDSA()" class="border-noround" />
     </div>
   </div>
-  <Dialog v-model:visible="visible" modal header="Edit Profile" :style="{ width: '25rem' }">
-    <span class="p-text-secondary block mb-5">Update your information.</span>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="username" class="font-semibold w-6rem">Username</label>
-      <InputText id="username" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-5">
-      <label for="email" class="font-semibold w-6rem">Email</label>
-      <InputText id="email" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex justify-content-end gap-2">
-      <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-      <Button type="button" label="Save" @click="visible = false"></Button>
-    </div>
-  </Dialog>
+
   <Toast />
 </template>
 
@@ -125,9 +113,11 @@ import DSA_api from '@/api/dsa_api';
 import { onMounted } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
+//
+const items = ref([{ label: 'Config DSA Device', route: '/DSA/Setting' }]);
+//
 const toast = useToast();
-
-const visible = ref(false);
 
 const dataSettingDSA = ref({
   manager: {
@@ -151,13 +141,14 @@ const dataSettingDSA = ref({
   },
 });
 
-onMounted(async () => {
-  await getSettingDSA();
+onMounted(() => {
+  getSettingDSA();
 });
 
 const getSettingDSA = async () => {
   try {
     const res = await DSA_api.getDSASetting();
+    console.log(res.data, 'res');
     dataSettingDSA.value = res.data;
   } catch (error) {}
 };
@@ -165,6 +156,7 @@ const getSettingDSA = async () => {
 const updateSettingDSA = async () => {
   try {
     const res = await DSA_api.UpdateDSASetting(dataSettingDSA.value);
+
     dataSettingDSA.value = res.data;
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'update setting successfully', life: 3000 });
   } catch (error) {

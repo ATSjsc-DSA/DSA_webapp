@@ -1,14 +1,30 @@
 <template>
   <div class="card">
-    <Fieldset class="mb-2">
+    <Fieldset>
       <template #legend>
         <div class="flex align-items-center pl-1">
-          <i class="pi pi-file"></i>
-          <span class="font-bold">Profile Name</span>
+          <i class="pi pi-cog"></i>
+          <span class="font-bold">TSAT</span>
         </div>
       </template>
-      <div class="flex flex-column gap-2">
-        <InputText id="username" v-model="dataProfile.profileName" aria-describedby="username-help" />
+      <div class="flex flex-wrap gap-6 p-fluid">
+        <div class="flex-auto">
+          <label for="max_peak" class="font-bold block mb-2"> Max Peak </label>
+          <InputNumber v-model="dataProfile.GridCode.TSA.max_peak" inputId="max_peak" />
+        </div>
+        <div class="flex-auto">
+          <label for="time_stability" class="font-bold block mb-2"> Time Stability </label>
+          <InputNumber
+            v-model="dataProfile.GridCode.TSA.time_stability"
+            inputId="time_stability"
+            :minFractionDigits="2"
+            :maxFractionDigits="5"
+          />
+        </div>
+        <div class="flex-auto">
+          <label for="band" class="font-bold block mb-2"> Band </label>
+          <InputNumber v-model="dataProfile.GridCode.TSA.band" inputId="band" />
+        </div>
       </div>
     </Fieldset>
     <Fieldset>
@@ -69,7 +85,7 @@ const rateString = 'rate';
 const grLoadings = ref([]);
 
 const getGrLoadings = () => {
-  return dataProfile.value.rate_criteria.map((item) => ({
+  return dataProfile.value.GridCode.limitSetting.map((item) => ({
     name: item.name,
     rate1: item.rate1,
     rate2: item.rate2,
@@ -78,18 +94,18 @@ const getGrLoadings = () => {
 };
 
 onMounted(() => {
-  console.log(JSON.parse(JSON.stringify(dataProfile.value.rate_criteria))); // Kiểm tra dữ liệu ban đầu
-  grLoadings.value = dataProfile.value.rate_criteria;
+  console.log(JSON.parse(JSON.stringify(dataProfile.value.GridCode.limitSetting))); // Kiểm tra dữ liệu ban đầu
+  grLoadings.value = dataProfile.value.GridCode.limitSetting;
 });
 
 watch(dataProfile, () => {
-  grLoadings.value = dataProfile.value.rate_criteria;
+  grLoadings.value = dataProfile.value.GridCode.limitSetting;
   console.log(grLoadings.value, 'grLoadings.value');
 });
 
 const onCellEditComplete = (event) => {
   const { data, newValue, field, index } = event;
-  dataProfile.value.rate_criteria[index][field] = newValue;
+  dataProfile.value.GridCode.limitSetting[index][field] = newValue;
 };
 </script>
 

@@ -64,16 +64,12 @@
               <Tag :value="slotProps.data.gen" severity="secondary" />
             </template>
             <template #editor="{ data, field }">
-              <!-- <Dropdown
+              <AutoComplete
                 v-model="data[field]"
-                :options="listGen"
-                optionLabel="name"
-                optionValue="name"
-                placeholder="Select Gen"
-                editable
-              >
-              </Dropdown> -->
-              <AutoComplete v-model="data[field]" completeOnFocus :suggestions="listContingencies" @complete="search" />
+                completeOnFocus
+                :suggestions="listEquipment"
+                @complete="search($event, 'gen')"
+              />
             </template>
           </Column>
           <Column field="enabled" header="Status" style="width: 5%">
@@ -148,25 +144,17 @@
           </Column>
           <Column field="contingencies" header="Contingencies" style="width: 10%">
             <template #editor="{ data, field }">
-              <AutoComplete
-                completeOnFocus
+              <Dropdown
                 v-model="data[field]"
-                multiple
-                :suggestions="listContingencies"
-                @complete="search"
-              />
+                :options="listContingencies"
+                optionLabel="name"
+                optionValue="_id"
+                placeholder="Select a Contingencies"
+              >
+              </Dropdown>
             </template>
             <template #body="slotProps">
-              <span
-                v-for="(item, index) in Array.isArray(slotProps.data?.contingencies)
-                  ? slotProps.data.contingencies.slice(0, 2)
-                  : []"
-                :key="index"
-              >
-                {{ item }}
-                <span v-if="index === 1 && slotProps.data.contingencies.length > 2"> ...</span>
-                <span v-else="index < 1 && index === slotProps.data.contingencies.length - 1">, </span>
-              </span>
+              <Chip :label="getTripLabel(slotProps.data?.contingencies)" />
             </template>
           </Column>
           <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
@@ -195,7 +183,12 @@
   >
     <div class="field">
       <label for="gen">Gen</label>
-      <AutoComplete v-model="rowData.gen" completeOnFocus :suggestions="listContingencies" @complete="search" />
+      <AutoComplete
+        v-model="rowData.gen"
+        completeOnFocus
+        :suggestions="listEquipment"
+        @complete="search($event, 'gen')"
+      />
 
       <small class="p-error" v-if="submitted && !rowData.gen">Measurement is required.</small>
     </div>
@@ -328,13 +321,13 @@
     </div>
     <div class="field">
       <label for="Contingencies" class="mb-3">Contingencies</label>
-      <AutoComplete
+      <Dropdown
         v-model="rowData.contingencies"
-        completeOnFocus
-        multiple
-        :suggestions="listContingencies"
-        @complete="search"
-      />
+        :options="listContingencies"
+        optionLabel="name"
+        optionValue="_id"
+        placeholder="Select a Contingencies"
+      ></Dropdown>
     </div>
     <template #footer>
       <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
@@ -350,14 +343,16 @@ import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
 const dsaStore = useDSAStore();
-const { dataProfile, listGen, listContingencies } = storeToRefs(dsaStore);
+const { dataProfile, listContingencies, listEquipment } = storeToRefs(dsaStore);
 
-// MultiSelect
-const search = async (event) => {
-  await dsaStore.getListContingencies(event.query);
-};
 //
+const getTripLabel = (targetId) => {
+  return listContingencies.value.find((item) => item._id === targetId)?.name;
+};
 
+const search = async (event, type) => {
+  await dsaStore.getListEquipment(event.query, type);
+};
 onMounted(() => {});
 const editingRows = ref([]);
 const statuses = ref([

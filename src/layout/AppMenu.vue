@@ -20,22 +20,25 @@ const model = ref([
   {
     label: 'Utilities',
     items: [
-      { label: 'Data Initialize', icon: 'pi pi-fw pi-file', to: '/DSA/Setting/Area' },
-      { label: 'Link Monitoring', icon: 'pi pi-fw pi-clone', to: '/DSA/Setting/Monitor' },
+      { label: 'Data Initialize', icon: 'pi pi-fw pi-list', to: '/DSA/Initialize' },
       {
-        label: 'Setting',
-        icon: 'pi pi-fw pi-cog',
+        label: 'System Events',
+        icon: 'pi pi-fw  pi-clone',
         items: [
           {
-            label: 'System Configuration',
-            to: '/DSA/Setting/System',
+            label: 'Disturbances',
+            to: '/DSA/SystemEvents/Disturbances',
           },
           {
-            label: 'Profile Configuration',
-            to: '/DSA/Setting/Profile',
+            label: 'Contingencies',
+            to: '/DSA/SystemEvents/Contingencies',
           },
         ],
       },
+      { label: 'Branch Monitoring', icon: 'pi pi-fw pi-desktop', to: '/DSA/Monitor' },
+      { label: 'Profile', icon: 'pi pi-fw pi-file-edit', to: '/DSA/Profile' },
+
+      { label: 'Config DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
 
       { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
     ],

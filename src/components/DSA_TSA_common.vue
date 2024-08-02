@@ -1,35 +1,38 @@
 <template>
   <div class="h-full">
-    <div class="grid">
-      <div class="col">
+    <div class="grid h-1/2">
+      <div class="col h-full overflow-auto">
         <SPS_common_table
-          :dataTable="dataProfile.TSA_Common?.F27"
+          :header="'SPS-F27'"
+          :dataTable="dataProfile.SPSCheck?.F27"
           @onRowEditSave="onRowEditRowF27"
           @onDeleteRow="onDeleteRowF27"
           @createNewRow="createNewRowF27"
         ></SPS_common_table>
       </div>
-      <div class="col">
+      <div class="col h-full overflow-auto">
         <SPS_common_table
-          :dataTable="dataProfile.TSA_Common?.F81"
+          :header="'SPS-F81'"
+          :dataTable="dataProfile.SPSCheck?.F81"
           @onRowEditSave="onRowEditRowF81"
           @onDeleteRow="onDeleteRowF81"
           @createNewRow="createNewRowF81"
         ></SPS_common_table>
       </div>
     </div>
-    <div class="grid">
-      <div class="col">
+    <div class="grid h-1/2">
+      <div class="col h-full overflow-auto">
         <SPS_common_table
-          :dataTable="dataProfile.TSA_Common?.PT"
+          :header="'SPS-Power Transfer'"
+          :dataTable="dataProfile.SPSCheck?.PT"
           @onRowEditSave="onRowEditRowPT"
           @onDeleteRow="onDeleteRowPT"
           @createNewRow="createNewRowPT"
         ></SPS_common_table>
       </div>
-      <div class="col">
+      <div class="col h-full overflow-auto">
         <TC_common_table
-          :dataTable="dataProfile.TSA_Common?.TC"
+          :dataTable="dataProfile.SPSCheck?.TC"
           @onRowEditSave="onRowEditRowTC"
           @onDeleteRow="onDeleteRowTC"
           @createNewRow="createNewRowTC"
@@ -48,50 +51,50 @@ const { dataProfile, listLoad } = storeToRefs(dsaStore);
 
 const onRowEditRowF27 = (data) => {
   let { newData, index } = data;
-  dataProfile.value.TSA_Common.F27[index] = newData;
+  dataProfile.value.SPSCheck.F27[index] = newData;
 };
 
 const onDeleteRowF27 = (data) => {
-  dataProfile.value.TSA_Common.F27 = dataProfile.value.TSA_Common.F27.filter((item) => item.name !== data.name);
+  dataProfile.value.SPSCheck.F27 = dataProfile.value.SPSCheck.F27.filter((item) => item.name !== data.name);
 };
 
 const createNewRowF27 = (data) => {
-  dataProfile.value.TSA_Common.F27.push(data);
+  dataProfile.value.SPSCheck.F27.push(data);
 };
 
 const onRowEditRowF81 = (data) => {
   let { newData, index } = data;
-  dataProfile.value.TSA_Common.F81[index] = newData;
+  dataProfile.value.SPSCheck.F81[index] = newData;
 };
 
 const onDeleteRowF81 = (data) => {
-  dataProfile.value.TSA_Common.F81 = dataProfile.value.TSA_Common.F81.filter((item) => item.name !== data.name);
+  dataProfile.value.SPSCheck.F81 = dataProfile.value.SPSCheck.F81.filter((item) => item.name !== data.name);
 };
 
 const createNewRowF81 = (data) => {
-  dataProfile.value.TSA_Common.F81.push(data);
+  dataProfile.value.SPSCheck.F81.push(data);
 };
 
 const onRowEditRowPT = (data) => {
   let { newData, index } = data;
-  dataProfile.value.TSA_Common.PT[index] = newData;
+  dataProfile.value.SPSCheck.PT[index] = newData;
 };
 
 const onDeleteRowPT = (data) => {
-  dataProfile.value.TSA_Common.PT = dataProfile.value.TSA_Common.PT.filter((item) => item.name !== data.name);
+  dataProfile.value.SPSCheck.PT = dataProfile.value.SPSCheck.PT.filter((item) => item.name !== data.name);
 };
 
 const createNewRowPT = (data) => {
-  dataProfile.value.TSA_Common.TC.push(data);
+  dataProfile.value.SPSCheck.TC.push(data);
 };
 
 const onRowEditRowTC = (data) => {
   let { newData, index } = data;
-  dataProfile.value.TSA_Common.TC[index] = newData;
+  dataProfile.value.SPSCheck.TC[index] = newData;
 };
 
 const onDeleteRowTC = (data) => {
-  dataProfile.value.TSA_Common.TC = dataProfile.value.TSA_Common.TC.filter((item) => item.name !== data.name);
+  dataProfile.value.SPSCheck.TC = dataProfile.value.SPSCheck.TC.filter((item) => item.name !== data.name);
 };
 
 const createNewRowTC = (data) => {
@@ -115,6 +118,6 @@ const createNewRowTC = (data) => {
       },
     ],
   };
-  dataProfile.value.TSA_Common.TC.push(dataPush);
+  dataProfile.value.SPSCheck.TC.push(dataPush);
 };
 </script>

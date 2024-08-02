@@ -29,7 +29,7 @@ export default class DSA_api {
     return get('/dsa/transStandards');
   }
   static async generatorStandards() {
-    return get('/dsa/generatorStandards');
+    return get('/dsa/equipment/generatorStandards');
   }
   static async excitationLimiterStandards() {
     return get('/dsa/excitationLimiterStandards');
@@ -44,6 +44,9 @@ export default class DSA_api {
   // ---- setting profile----
   static async getProfile(param) {
     return get('/dsa/profile', param);
+  }
+  static async getProfileWithId(id) {
+    return get('/dsa/profile/' + id);
   }
   static async getProfileWithTime(time) {
     return get('/dsa/profile/' + time);
@@ -79,22 +82,22 @@ export default class DSA_api {
     return _delete('/dsa/area/data/' + param, data);
   }
   static async getListGen(param) {
-    return get('/dsa/gen', param);
+    return get('/dsa/equipment/gen', param);
   }
   static async deleteGen(data) {
-    return _delete('/dsa/gen', data);
+    return _delete('/dsa/equipment/gen', data);
   }
   static async createGen(data) {
-    return post('/dsa/gen', data);
+    return post('/dsa/equipment/gen', data);
   }
   static async getListLoad(param) {
-    return get('/dsa/load', param);
+    return get('/dsa/equipment/load', param);
   }
   static async deleteLoad(data) {
-    return _delete('/dsa/load', data);
+    return _delete('/dsa/equipment/load', data);
   }
   static async createLoad(data) {
-    return post('/dsa/load', data);
+    return post('/dsa/equipment/load', data);
   }
   static async getMonitor() {
     return get('/dsa/monitor');
@@ -133,13 +136,13 @@ export default class DSA_api {
     return _delete('/dsa/monitor/data/' + param, data);
   }
   static async getListBranch(param) {
-    return get('/dsa/branch', param);
+    return get('/dsa/equipment/branch', param);
   }
   static async deleteBranch(data) {
-    return _delete('/dsa/branch', data);
+    return _delete('/dsa/equipment/branch', data);
   }
   static async createBranch(data) {
-    return post('/dsa/branch', data);
+    return post('/dsa/equipment/branch', data);
   }
   static async getDSASetting() {
     return get('/dsa/setting');
@@ -153,7 +156,7 @@ export default class DSA_api {
     return get('/dsa/contingencies');
   }
   static async getContingenciesWithoutEquip() {
-    return get('/dsa/data/contingencies');
+    return get('/dsa/contingencies/data');
   }
   static async createContingencies(data) {
     return post('/dsa/contingencies', data);
@@ -167,6 +170,26 @@ export default class DSA_api {
   static async RemoveDataContingencies(param, data) {
     return _delete('/dsa/contingencies/data/' + param, data);
   }
+  //Disturbances
+  static async getDisturbances() {
+    return get('/dsa/disturbances');
+  }
+  static async getDisturbancesWithoutData() {
+    return get('/dsa/disturbances/data');
+  }
+  static async deleteDisturbances(param) {
+    return _delete('/dsa/disturbances/' + param);
+  }
+  static async createDisturbances(data) {
+    return post('/dsa/disturbances', data);
+  }
+  static async updateDataDisturbances(param, data) {
+    return put('/dsa/disturbances/data/' + param, data);
+  }
+  static async removeDataDisturbances(param, data) {
+    return _delete('/dsa/disturbances/data/' + param, data);
+  }
+
   //
   static async getDSASetting() {
     return get('/dsa/setting');
@@ -204,7 +227,7 @@ export default class DSA_api {
     return get('/common/download/contingencies');
   }
 
-  static async getSearchContingencies(data, param) {
+  static async getSearchEquipment(data, param) {
     return post('/dsa/search', data, param);
   }
 

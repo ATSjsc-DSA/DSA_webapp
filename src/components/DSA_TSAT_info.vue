@@ -44,16 +44,6 @@
           <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
         </template>
       </Column>
-      <Column field="max_peak" header="Max peak" style="width: 8%">
-        <template #editor="{ data, field }">
-          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
-        </template>
-      </Column>
-      <Column field="time_stability" header="Time stability" style="width: 10%">
-        <template #editor="{ data, field }">
-          <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
-        </template>
-      </Column>
       <Column field="load_scale_pos" header="Load Pos" style="width: 10%">
         <template #body="slotProps">
           <Tag :value="slotProps.data.load_scale_pos" severity="secondary" />
@@ -130,22 +120,34 @@
           <InputNumber :minFractionDigits="0" :maxFractionDigits="5" v-model="data[field]" />
         </template>
       </Column>
-      <Column field="contingencies" header="Contingencies" style="width: 10%">
+      <Column field="disturbances" header="Disturbances" style="width: 10%">
         <template #editor="{ data, field }">
-          <AutoComplete
-            completeOnFocus
+          <Dropdown
             v-model="data[field]"
-            multiple
-            :suggestions="listContingencies"
-            @complete="search"
-          />
+            :options="listDisturbances"
+            optionLabel="name"
+            optionValue="_id"
+            placeholder="Select a disturbances"
+          >
+          </Dropdown>
         </template>
         <template #body="slotProps">
-          <span v-for="(item, index) in slotProps.data.contingencies.slice(0, 3)" :key="index">
-            {{ item }}
-            <span v-if="index === 2 && slotProps.data.contingencies.length > 3"> ...</span>
-            <span v-else="index < 2 && index === slotProps.data.contingencies.length - 1">, </span>
-          </span>
+          <Chip :label="getDisturbancesLabel(slotProps.data?.disturbances)" />
+        </template>
+      </Column>
+      <Column field="contingencies" header="Contingencies" style="width: 10%">
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data[field]"
+            :options="listContingencies"
+            optionLabel="name"
+            optionValue="_id"
+            placeholder="Select a Contingencies"
+          >
+          </Dropdown>
+        </template>
+        <template #body="slotProps">
+          <Chip :label="getContingenciesLabel(slotProps.data?.contingencies)" />
         </template>
       </Column>
       <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
@@ -296,14 +298,28 @@
       </div>
     </div>
     <div class="formgrid grid">
-      <label for="load_scale">List Contingencies</label>
-      <AutoComplete
-        completeOnFocus
-        v-model="rowData.load_scale_neg"
-        multiple
-        :suggestions="listContingencies"
-        @complete="search"
-      />
+      <div class="field col">
+        <label for="Contingencies"> Contingencies</label>
+        <Dropdown
+          id="Contingencies"
+          v-model="rowData.contingencies"
+          :options="listContingencies"
+          optionLabel="name"
+          optionValue="_id"
+          placeholder="Select a Contingencies"
+        ></Dropdown>
+      </div>
+      <div class="field col">
+        <label for="Disturbances"> Disturbances</label>
+        <Dropdown
+          id="Disturbances"
+          v-model="rowData.disturbances"
+          :options="listDisturbances"
+          optionLabel="name"
+          optionValue="_id"
+          placeholder="Select a Disturbances"
+        ></Dropdown>
+      </div>
     </div>
 
     <template #footer>
@@ -319,12 +335,16 @@ import { useDSAStore } from '@/store';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const dsaStore = useDSAStore();
-const { dataProfile, listArea, listMonitor, listContingencies } = storeToRefs(dsaStore);
+const { dataProfile, listArea, listMonitor, listContingencies, listDisturbances } = storeToRefs(dsaStore);
 
 const editingRows = ref([]);
 
-const search = async (event) => {
-  await dsaStore.getListContingencies(event.query);
+const getContingenciesLabel = (targetId) => {
+  return listContingencies.value.find((item) => item._id === targetId)?.name;
+};
+
+const getDisturbancesLabel = (targetId) => {
+  return listDisturbances.value.find((item) => item._id === targetId)?.name;
 };
 //
 const onRowEditSave = (event) => {

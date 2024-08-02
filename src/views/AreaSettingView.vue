@@ -1,139 +1,22 @@
 <template>
-  <div class="card h-full relative layout-content">
+  <div class="card h-full relative layout-content pt-6">
     <AppProgressSpinner :showSpinner="progressSpinnerModal"></AppProgressSpinner>
+    <BreadcrumbCommon :items="itemsArea"></BreadcrumbCommon>
     <TabView class="custom-tabview">
       <TabPanel header="Area">
-        <DataTable v-model:expandedRows="expandedRows" :value="listArea" dataKey="_id" tableStyle="min-width: 60rem">
-          <template #header>
-            <div class="flex flex-wrap justify-content-end gap-2">
-              <Button
-                severity="secondary"
-                text
-                icon="pi pi-download
-"
-                label="Download Template"
-                @click="downloadFile()"
-              />
-
-              <Button severity="info" text icon="pi pi-upload" label="Upload" @click="uploadArea()" />
-              <Button text icon="pi pi-plus" label="Create" @click="areaHandleCreate" />
-            </div>
-          </template>
-          <Column expander style="width: 5rem" />
-          <Column header="Name">
-            <template #body="slotProps">
-              <img alt="flag" src="/img/global.jpg" width="32" style="vertical-align: middle" class="ml-2" />
-              <span class="vertical-align-middle ml-2 font-bold line-height-3">{{ slotProps.data.name }}</span>
-            </template>
-          </Column>
-          <Column :exportable="false" style="width: 8rem">
-            <template #body="slotProps">
-              <Button
-                icon="pi pi-trash"
-                outlined
-                rounded
-                severity="danger"
-                @click="confirmDeleteArea(slotProps.data.name, slotProps.data._id)"
-              />
-            </template>
-          </Column>
-          <template #expansion="slotProps">
-            <div class="p-3 grid gap-4">
-              <div class="col">
-                <div class="flex justify-content-between">
-                  <h6>Gen List</h6>
-                  <div class="grid">
-                    <Button
-                      size="small"
-                      text
-                      v-tooltip.top="{ value: 'Add Gen Area' }"
-                      icon="pi pi-plus"
-                      aria-label="Filter"
-                      class="col"
-                      @click="addDataTypeOnArea(slotProps.data._id, slotProps.data.gens_name, 'gen')"
-                    />
-                    <Button
-                      size="small"
-                      text
-                      class="col"
-                      v-tooltip.top="{ value: 'Delete Gen Active' }"
-                      icon="pi pi-times"
-                      severity="danger"
-                      aria-label="Cancel"
-                      @click="confirmRemoveDataOnArea($event, slotProps.data._id, slotProps.data.gens_name, 'gen')"
-                    />
-                  </div>
-                </div>
-                <ScrollPanel style="width: 100%; height: 200px">
-                  <ul class="values-list">
-                    <li
-                      v-for="value in slotProps.data.gens_name"
-                      :key="value.name"
-                      :class="{ selected: value.selected }"
-                      @click="
-                        () => {
-                          if (value.selected) {
-                            value.selected = false;
-                          } else {
-                            value.selected = true;
-                          }
-                        }
-                      "
-                    >
-                      {{ value.name }}
-                    </li>
-                  </ul>
-                </ScrollPanel>
-              </div>
-              <div class="col">
-                <div class="flex justify-content-between">
-                  <h6>Load List</h6>
-                  <div class="grid">
-                    <Button
-                      size="small"
-                      text
-                      v-tooltip.top="{ value: 'Add Load Area' }"
-                      icon="pi pi-plus"
-                      aria-label="Filter"
-                      class="col"
-                      @click="addDataTypeOnArea(slotProps.data._id, slotProps.data.loads_name, 'load')"
-                    />
-                    <Button
-                      size="small"
-                      text
-                      class="col"
-                      v-tooltip.top="{ value: 'Delete Load Active' }"
-                      icon="pi pi-times"
-                      severity="danger"
-                      aria-label="Cancel"
-                      @click="confirmRemoveDataOnArea($event, slotProps.data._id, slotProps.data.loads_name, 'load')"
-                    />
-                  </div>
-                </div>
-                <ScrollPanel style="width: 100%; height: 200px">
-                  <ul class="values-list">
-                    <li
-                      v-for="value in slotProps.data.loads_name"
-                      :key="value.name"
-                      :class="{ selected: value.selected }"
-                      @click="
-                        () => {
-                          if (value.selected) {
-                            value.selected = false;
-                          } else {
-                            value.selected = true;
-                          }
-                        }
-                      "
-                    >
-                      {{ value.name }}
-                    </li>
-                  </ul>
-                </ScrollPanel>
-              </div>
-            </div>
-          </template>
-        </DataTable>
+        <listShowSpiliter
+          :listDatatree="listArea"
+          @deleteDevice="deleteArea"
+          @createDevice="createArea"
+          @downloadFile="downloadFile"
+          @uploadFile="uploadArea"
+          @removeDataOnDevice="removeDataOnDevice"
+          @addDataOnDevice="addDataOnArea"
+          @onHideDataOnDeviceDialog="onHideDataOnAreaDialog"
+          v-model:createDataOnDeviceDialog="createDataOnAreaDialog"
+          v-model:deleteVisibleDialog="deleteAreaDialog"
+          v-model:createVisibleDialog="createAreaDialog"
+        ></listShowSpiliter>
       </TabPanel>
 
       <TabPanel header="Gen List">
@@ -169,19 +52,8 @@
       </TabPanel>
     </TabView>
   </div>
-  <Dialog v-model:visible="deleteAreaDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-    <div class="confirmation-content">
-      <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-      <span v-if="idAreaActiveDelete"
-        >Are you sure you want to delete <b>{{ idAreaActiveDelete.name }}</b
-        >?</span
-      >
-    </div>
-    <template #footer>
-      <Button label="No" icon="pi pi-times" text @click="deleteAreaDialog = false" />
-      <Button label="Yes" icon="pi pi-check" text @click="deleteArea()" />
-    </template>
-  </Dialog>
+
+  <!-- upload file  -->
   <Dialog v-model:visible="uploadDialog" @hide="onHide" :style="{ width: '50rem' }" header="" :modal="true">
     <TabView>
       <TabPanel header="Gen File Upload">
@@ -196,61 +68,25 @@
     </TabView>
   </Dialog>
 
-  <Dialog v-model:visible="createAreaDialog" :style="{ width: '30rem' }" header="Create New Area" :modal="true">
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-6rem">Area Name</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="areaNameCreate" />
-    </div>
-    <div class="flex justify-content-end gap-2">
-      <Button type="button" label="Cancel" severity="secondary" @click="createAreaDialog = false"></Button>
-      <Button type="button" label="Submit" @click="createArea()"></Button>
-    </div>
-  </Dialog>
-  <Dialog
-    v-model:visible="createDataOnAreaDialog"
-    modal
-    :header="headerDialogUpdate"
-    @hide="onHideDataOnAreaDialog"
-    :style="{ width: '25rem' }"
-  >
-    <div class="flex justify-content-center mb-6 mt-2">
-      <AutoComplete
-        completeOnFocus
-        v-model="dataAddOnArea"
-        forceSelection
-        :suggestions="listContingencies"
-        @complete="search"
-      />
-    </div>
-    <div class="flex justify-content-end gap-2">
-      <Button type="button" label="Cancel" severity="secondary" @click="createDataOnAreaDialog = false"></Button>
-      <Button type="button" label="Submit" @click="addDataOnArea()"></Button>
-    </div>
-  </Dialog>
   <Toast />
-  <ConfirmPopup></ConfirmPopup>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Toast from 'primevue/toast';
-import ConfirmPopup from 'primevue/confirmpopup';
-
 import { useToast } from 'primevue/usetoast';
 import DSA_api from '@/api/dsa_api';
 import uploadFileConfig from '../components/uploadFileConfig.vue';
 import ListOnArea from '@/components/ListOnArea.vue';
-import { useConfirm } from 'primevue/useconfirm';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useDSAStore } from '@/store';
+import listShowSpiliter from '@/components/listShowSplitter.vue';
+import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
 const dsaStore = useDSAStore();
-//
-//
 const { listGen, listLoad, listBranch, totalSizeGen, totalSizeLoad, totalSizeBranch, listContingencies } =
   storeToRefs(dsaStore);
 
 const progressSpinnerModal = ref(false);
-const confirm = useConfirm();
 const listArea = ref();
 const expandedRows = ref({});
 const toast = useToast();
@@ -259,23 +95,41 @@ const idAreaActiveDelete = ref({});
 const uploadDialog = ref(false);
 const createAreaDialog = ref(false);
 const createDataOnAreaDialog = ref(false);
-const typeUpdateArea = ref('gen');
-const search = async (event) => {
-  await dsaStore.getListContingencies(event.query, typeUpdateArea.value, datalistOnArea.value);
+
+onMounted(async () => {
+  cleanup();
+  await getArea();
+  dsaStore.getListGen();
+  dsaStore.getListLoad();
+  dsaStore.getListBranch();
+});
+
+onBeforeUnmount(() => {
+  cleanup();
+});
+
+const itemsArea = ref([{ label: 'Data Initialize', route: '/DSA/Initialize' }]);
+
+const cleanup = () => {
+  //   progressSpinnerModal.value = false;
+  //   listArea.value = [];
+  //   expandedRows.value = {};
+  //   deleteAreaDialog.value = false;
+  //   idAreaActiveDelete.value = {};
+  //   uploadDialog.value = false;
+  //   createAreaDialog.value = false;
+  //   createDataOnAreaDialog.value = false;
+  //   areaNameCreate.value = '';
+  //   listGen.value = [];
+  //   listLoad.value = [];
+  //   listBranch.value = [];
+  //   area_id.value = '';
 };
 
-const confirmDeleteArea = (name, id) => {
-  idAreaActiveDelete.value = {
-    name: name,
-    id: id,
-  };
-  deleteAreaDialog.value = true;
-};
-
-const deleteArea = async () => {
+const deleteArea = async (id) => {
   try {
     progressSpinnerModal.value = true;
-    await DSA_api.deleteArea(idAreaActiveDelete.value.id);
+    await DSA_api.deleteArea(id);
     await getArea();
     deleteAreaDialog.value = false;
     progressSpinnerModal.value = false;
@@ -286,49 +140,17 @@ const deleteArea = async () => {
   }
 };
 
-onMounted(async () => {
-  cleanup();
-  await getArea();
-  dsaStore.getListGen();
-  dsaStore.getListLoad();
-  dsaStore.getListBranch();
-});
+//
 
-const cleanup = () => {
-  progressSpinnerModal.value = false;
-  listArea.value = [];
-  expandedRows.value = {};
-  deleteAreaDialog.value = false;
-  idAreaActiveDelete.value = {};
-  uploadDialog.value = false;
-  createAreaDialog.value = false;
-  createDataOnAreaDialog.value = false;
-  areaNameCreate.value = '';
-  listGen.value = [];
-  listLoad.value = [];
-  listBranch.value = [];
-  area_id.value = '';
-};
-
-onBeforeUnmount(() => {
-  cleanup();
-});
 const uploadArea = () => {
   uploadDialog.value = true;
 };
 
-const areaNameCreate = ref('');
-const areaHandleCreate = () => {
-  createAreaDialog.value = true;
-};
-
-const createArea = async () => {
+const createArea = async (nameData) => {
   try {
     progressSpinnerModal.value = true;
     const formData = {
-      name: areaNameCreate.value,
-      // gens_name: [],
-      // loads_name: [],
+      name: nameData,
     };
     await DSA_api.createArea(formData);
     await getArea();
@@ -340,14 +162,7 @@ const createArea = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
-
-const onHide = () => {
-  getArea();
-  dsaStore.getListGen();
-  dsaStore.getListLoad();
-  dsaStore.getListBranch();
-};
-
+//upload
 const uploadGenFile = async (formData, callback) => {
   try {
     await DSA_api.putGenFile(formData);
@@ -356,6 +171,34 @@ const uploadGenFile = async (formData, callback) => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+const uploadLoadFile = async (formData, callback) => {
+  try {
+    await DSA_api.putLoadFile(formData);
+    callback();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const uploadBranchFile = async (formData, callback) => {
+  try {
+    await DSA_api.putBranchFile(formData);
+    callback();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const onHide = () => {
+  getArea();
+  dsaStore.getListGen();
+  dsaStore.getListLoad();
+  dsaStore.getListBranch();
+};
+
+//download
+
 const downloadFile = async () => {
   try {
     // Hàm để tải xuống tệp và tạo liên kết tải
@@ -381,24 +224,7 @@ const downloadFile = async () => {
   }
 };
 
-const uploadLoadFile = async (formData, callback) => {
-  try {
-    await DSA_api.putLoadFile(formData);
-    callback();
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
-
-const uploadBranchFile = async (formData, callback) => {
-  try {
-    await DSA_api.putBranchFile(formData);
-    callback();
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
-
+//get Data list
 const initializeData = (dataArray) => {
   return dataArray.map((item) => ({ name: item, selected: false }));
 };
@@ -417,6 +243,8 @@ const getArea = async () => {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+// Gen
 const getListGenHandle = async (pageNumber = 1) => {
   dsaStore.getListGen(pageNumber);
 };
@@ -440,6 +268,7 @@ const createGen = async (dataLoad) => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+// Load
 const getListLoadHandle = async (pageNumber = 1) => {
   dsaStore.getListLoad(pageNumber);
 };
@@ -465,6 +294,7 @@ const createLoad = async (dataLoad) => {
   }
 };
 
+//Branch
 const getListBranchHandle = async (pageNumber = 1) => {
   dsaStore.getListBranch(pageNumber);
 };
@@ -490,33 +320,21 @@ const createBranch = async (dataLoad) => {
   }
 };
 
-const area_id = ref('');
-const headerDialogUpdate = computed(() => 'Add ' + typeUpdateArea.value + ' on AREA');
-const dataAddOnArea = ref([]);
-const datalistOnArea = ref([]);
-const addDataTypeOnArea = (id_Area, datalistArea, type) => {
-  dataAddOnArea.value = '';
-  area_id.value = id_Area;
-  datalistOnArea.value = datalistArea;
-  typeUpdateArea.value = type;
-  createDataOnAreaDialog.value = true;
-};
-
-const addDataOnArea = async () => {
+// add Data on Area
+const addDataOnArea = async (id, name, type) => {
   try {
     let dataLoad = {
-      gens_name: [dataAddOnArea.value],
+      gens_name: [name],
     };
-    if (typeUpdateArea.value !== 'gen') {
+    if (type !== 'gen') {
       dataLoad = {
-        loads_name: [dataAddOnArea.value],
+        loads_name: [name],
       };
     }
-    await DSA_api.AddDataArea(area_id.value, dataLoad);
+    await DSA_api.AddDataArea(id, dataLoad);
 
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'create successfully', life: 3000 });
   } catch (error) {
-    console.log(error, 'error');
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
@@ -526,33 +344,19 @@ const onHideDataOnAreaDialog = () => {
   createDataOnAreaDialog.value = false;
 };
 
-const confirmRemoveDataOnArea = (event, id_Area, datalistArea, type) => {
-  confirm.require({
-    target: event.currentTarget,
-    message: 'Do you want to delete?',
-    icon: 'pi pi-info-circle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-danger p-button-sm',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Delete',
-    accept: () => {
-      if (type === 'gen') {
-        removeGenOnArea(id_Area, datalistArea);
-      } else {
-        removeLoadOnArea(id_Area, datalistArea);
-      }
-    },
-    reject: () => {},
-  });
+// Remove data on Area
+const removeDataOnDevice = (id, dataList, type) => {
+  if (type === 'gen') {
+    removeGenOnArea(id, dataList);
+  } else {
+    removeLoadOnArea(id, dataList);
+  }
 };
 
 const removeGenOnArea = async (id_Area, genlistArea) => {
   try {
-    const selectedIds = genlistArea
-      .filter((item) => item.selected) // Lọc các item có selected = true
-      .map((item) => item.name); // Lấy giá trị _id của các item đã lọc
     await DSA_api.RemoveDataArea(id_Area, {
-      gens_name: selectedIds,
+      gens_name: genlistArea,
     });
 
     getArea();
@@ -564,11 +368,8 @@ const removeGenOnArea = async (id_Area, genlistArea) => {
 
 const removeLoadOnArea = async (id_Area, loadlistArea) => {
   try {
-    const selectedIds = loadlistArea
-      .filter((item) => item.selected) // Lọc các item có selected = true
-      .map((item) => item.name); // Lấy giá trị _id của các item đã lọc
     await DSA_api.RemoveDataArea(id_Area, {
-      loads_name: selectedIds,
+      loads_name: loadlistArea,
     });
 
     getArea();
@@ -602,6 +403,7 @@ const removeLoadOnArea = async (id_Area, loadlistArea) => {
   background-color: var(--highlight-bg); /* Màu nền */
 }
 .custom-tabview {
+  /* flex: 1; */
   height: 100%;
   display: flex;
   flex-direction: column;

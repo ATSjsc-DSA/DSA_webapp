@@ -22,7 +22,7 @@
     >
       <template #header>
         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="text-xl text-900 font-bold"></span>
+          <span class="text-900 font-bold">Transfer Capacity</span>
           <Button
             icon="pi pi-plus"
             text
@@ -173,7 +173,7 @@ const saveRowData = () => {
   submitted.value = true;
 
   const { name } = rowData.value;
-  if (name ) {
+  if (name) {
     emits('createNewRow', rowData.value);
     dialogVisible.value = false;
   }

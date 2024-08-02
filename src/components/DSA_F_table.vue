@@ -47,42 +47,36 @@
           <Tag :value="getLabel(slotProps.data.enabled)" :severity="getStatusLabel(slotProps.data.enabled)" />
         </template>
       </Column>
-      <Column v-if="props.name === 'F81'" field="F_Threshold" header="F_Threshold" style="width: 20%">
+      <Column v-if="props.name === 'F81'" field="F_Threshold" header="F Threshold" style="width: 20%">
         <template #editor="{ data, field }">
           <InputText v-model="data[field]" />
         </template>
       </Column>
 
-      <Column v-if="props.name === 'F27'" field="V_Threshold" header="V_Threshold" style="width: 20%">
+      <Column v-if="props.name === 'F27'" field="V_Threshold" header="V Threshold" style="width: 20%">
         <template #editor="{ data, field }">
           <InputText v-model="data[field]" />
         </template>
       </Column>
 
-      <Column field="F_Delay" header="F_Delay" style="width: 20%">
+      <Column field="T_Delay" header="Time Delay" style="width: 20%">
         <template #editor="{ data, field }">
           <InputNumber v-model="data[field]" />
         </template>
       </Column>
       <Column field="Trip" header="Trip" style="width: 20%">
         <template #editor="{ data, field }">
-          <AutoComplete
-            completeOnFocus
+          <Dropdown
             v-model="data[field]"
-            multiple
-            :suggestions="listContingencies"
-            @complete="search"
-          />
+            :options="listContingencies"
+            optionLabel="name"
+            optionValue="_id"
+            placeholder="Select a Contingencies"
+          >
+          </Dropdown>
         </template>
         <template #body="slotProps">
-          <span
-            v-for="(item, index) in Array.isArray(slotProps.data?.Trip) ? slotProps.data.Trip.slice(0, 2) : []"
-            :key="index"
-          >
-            {{ item }}
-            <span v-if="index === 1 && slotProps.data.Trip.length > 2"> ...</span>
-            <span v-else="index < 1 && index === slotProps.data.Trip.length - 1">, </span>
-          </span>
+          <Chip :label="getTripLabel(slotProps.data?.Trip)" />
         </template>
       </Column>
       <Column :rowEditor="true" style="width: 2%; min-width: 6rem" bodyStyle="text-align:center"></Column>
@@ -147,7 +141,7 @@
         />
       </div>
       <div v-else class="field col">
-        <label for="V_Threshold">V_Threshold</label>
+        <label for="V_Threshold">V Threshold</label>
         <InputNumber
           id="V_Threshold"
           v-model="rowData.V_Threshold"
@@ -157,26 +151,26 @@
         />
       </div>
       <div class="field col">
-        <label for="F_Delay">F_Delay</label>
+        <label for="T_Delay">Time Delay</label>
         <InputNumber
-          id="F_Delay"
-          v-model="rowData.F_Delay"
+          id="T_Delay"
+          v-model="rowData.T_Delay"
           integeronly
           :minFractionDigits="0"
           :maxFractionDigits="5"
-          :class="{ 'p-invalid': submitted && !rowData.F_Delay }"
+          :class="{ 'p-invalid': submitted && !rowData.T_Delay }"
         />
       </div>
     </div>
     <div class="field">
       <label for="trips" class="mb-3">Trips</label>
-      <AutoComplete
-        completeOnFocus
+      <Dropdown
         v-model="rowData.Trip"
-        multiple
-        :suggestions="listContingencies"
-        @complete="search"
-      />
+        :options="listContingencies"
+        optionLabel="name"
+        optionValue="_id"
+        placeholder="Select a Contingencies"
+      ></Dropdown>
     </div>
     <template #footer>
       <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
@@ -207,7 +201,6 @@ const props = defineProps({
 
 const emits = defineEmits(['onRowEditSave', 'onDeleteRow', 'createNewRow']);
 
-const listTrip = ref([]);
 const editingRows = ref([]);
 const statuses = ref([
   { label: 'True', value: true },
@@ -223,14 +216,8 @@ watch(
     }
   },
 );
-//autocomplete
-const search = async (event) => {
-  await dsaStore.getListContingencies(event.query);
-};
 
-onMounted(() => {
-  ProductService.getListTrip().then((data) => (listTrip.value = data));
-});
+onMounted(() => {});
 
 const onRowEditSave = (event) => {
   emits('onRowEditSave', event);
@@ -259,6 +246,10 @@ const getLabel = (status) => {
       return null;
   }
 };
+const getTripLabel = (targetId) => {
+  return listContingencies.value.find((item) => item._id === targetId)?.name;
+};
+
 const confirmDeleteData = (event, dataCell) => {
   confirm.require({
     target: event.currentTarget,
@@ -298,8 +289,8 @@ const rowData = ref({
 const saveRowData = () => {
   submitted.value = true;
 
-  const { measurement, enabled, F_Threshold, V_Threshold, F_Delay, Trip } = rowData.value;
-  if (measurement && enabled != null && F_Delay && Trip && (V_Threshold || F_Threshold)) {
+  const { measurement, enabled, F_Threshold, V_Threshold, T_Delay, Trip } = rowData.value;
+  if (measurement && enabled != null && T_Delay && Trip && (V_Threshold || F_Threshold)) {
     emits('createNewRow', rowData.value);
     dialogVisible.value = false;
   }

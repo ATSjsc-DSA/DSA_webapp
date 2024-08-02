@@ -286,6 +286,7 @@ onMounted(async () => {
   await getMonitor();
   await getGroupContingencies();
 });
+
 const initializeData = (dataArray, type) => {
   if (type === 'mon') {
     return dataArray.map((item) => ({ name: item.name, direction: item.direction, selected: false }));

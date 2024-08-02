@@ -35,8 +35,8 @@ const router = createRouter({
         },
 
         {
-          path: '/DSA/Setting/Profile',
-          name: 'Setting',
+          path: '/DSA/Profile',
+          name: 'Profile',
           component: () => import('@/views/ProfileSettingView.vue'),
         },
         {
@@ -50,19 +50,29 @@ const router = createRouter({
           component: () => import('@/views/TaskList.vue'),
         },
         {
-          path: '/DSA/Setting/System',
-          name: 'System',
+          path: '/DSA/Setting',
+          name: 'Setting',
           component: () => import('@/views/DSA_SettingView.vue'),
         },
         {
-          path: '/DSA/Setting/Area',
-          name: 'Area',
+          path: '/DSA/Initialize',
+          name: 'Initialize',
           component: () => import('@/views/AreaSettingView.vue'),
         },
         {
-          path: '/DSA/Setting/Monitor',
+          path: '/DSA/Monitor',
           name: 'Monitor',
-          component: () => import('@/views/MonitorSettingView.vue'),
+          component: () => import('@/views/BranchMoniterView.vue'),
+        },
+        {
+          path: '/DSA/SystemEvents/Disturbances',
+          name: 'Disturbances',
+          component: () => import('@/views/DisturbancesView.vue'),
+        },
+        {
+          path: '/DSA/SystemEvents/Contingencies',
+          name: 'Contingencies',
+          component: () => import('@/views/ContigenciesView.vue'),
         },
       ],
     },

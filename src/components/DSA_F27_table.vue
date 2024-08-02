@@ -1,7 +1,7 @@
 <template>
   <DSA_F_table
     :dataSetting="dataProfile.F27"
-    name="F27 List"
+    name="F27"
     @onRowEditSave="onRowEditSave"
     @onDeleteRow="onDeleteRow"
     @createNewRow="createNewRow"
@@ -13,6 +13,10 @@ import { useDSAStore } from '@/store';
 import DSA_F_table from './DSA_F_table.vue';
 const dsaStore = useDSAStore();
 const { dataProfile, listLoad } = storeToRefs(dsaStore);
+
+// const props = defineProps({
+//   F27
+// })
 
 const onRowEditSave = (data) => {
   let { newData, index } = data;

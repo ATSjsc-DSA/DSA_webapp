@@ -59,7 +59,32 @@ const setChartData = (dataSub) => {
     colorsUsed.push(randomColor);
     datasets.push(getChartConfig(element.name, documentStyle.getPropertyValue(randomColor), element.data));
   });
+  // Add the 'T' dataset
+  datasets.push({
+    label: 'T',
+    fill: true,
+    borderColor: documentStyle.getPropertyValue('--red-300'),
+    yAxisID: 'y',
+    tension: 0.4,
+    data: [{ x: dataSub.f, y: 0.3 }],
+    pointRadius: 2,
+    borderWidth: 6,
+  });
 
+  // Add the 'Dm' dataset
+  datasets.push({
+    label: 'Dm',
+    fill: false,
+    borderColor: documentStyle.getPropertyValue('--yellow-300'),
+    yAxisID: 'y',
+    tension: 0.4,
+    data: [
+      { x: dataSub.f, y: dataSub.dmin },
+      { x: dataSub.f, y: dataSub.dmax },
+    ],
+    pointRadius: 0.2,
+    borderWidth: 2,
+  });
   return {
     labels: dataSub?.data && Array.isArray(dataSub.data) && dataSub.data.length > 0 ? dataSub.data[0].data : [],
     datasets: datasets,
@@ -86,6 +111,10 @@ const setChartOptions = () => {
       },
       legend: {
         labels: {
+          filter: function (legendItem, chartData) {
+            // Hide legend for datasets with label 'T' and 'Dm'
+            return legendItem.text !== 'T' && legendItem.text !== 'Dm';
+          },
           usePointStyle: true,
           color: textColor,
           font: {

@@ -19,7 +19,7 @@
     >
       <template #header>
         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="text-xl text-900 font-bold"></span>
+          <span class="text-900 font-bold">{{ header }}</span>
           <Button
             icon="pi pi-plus"
             text
@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const props = defineProps({
@@ -104,13 +104,13 @@ const props = defineProps({
     type: Array,
     requide: true,
   },
-  name: String,
+  header: String,
 });
 
 const emits = defineEmits(['onRowEditSave', 'onDeleteRow', 'createNewRow']);
 
 const editingRows = ref([]);
-
+const header = computed(() => props.header);
 const dataTable = ref(props.dataTable);
 
 watch(
