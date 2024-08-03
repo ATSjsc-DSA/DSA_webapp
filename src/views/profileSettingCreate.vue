@@ -9,9 +9,23 @@
           </div> -->
         </template>
       </StepperPanel>
-      <StepperPanel header="SPS-F81">
+      <!-- <StepperPanel header="SPS-F81">
         <template #content="{ prevCallback, nextCallback }">
-          <DSA_F81_table></DSA_F81_table>
+          <div class="flex pt-4 justify-content-between">
+            <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
+            <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="nextCallback" />
+          </div>
+        </template>
+      </StepperPanel> -->
+      <StepperPanel header="SPS">
+        <template #content="{ prevCallback, nextCallback }">
+          <TabView>
+            <TabPanel header="F27">
+              <DSA_F27_table></DSA_F27_table>
+            </TabPanel>
+            <TabPanel header="F81"> <DSA_F81_table></DSA_F81_table> </TabPanel>
+            <TabPanel header="Power Transfer"><DSA_SPS_PowerTrans></DSA_SPS_PowerTrans> </TabPanel>
+          </TabView>
 
           <!-- <div class="flex pt-4 justify-content-between">
             <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
@@ -19,24 +33,15 @@
           </div> -->
         </template>
       </StepperPanel>
-      <StepperPanel header="SPS-F27">
+      <!-- <StepperPanel header="SPS-PT">
         <template #content="{ prevCallback, nextCallback }">
-          <DSA_F27_table></DSA_F27_table>
-          <!-- <div class="flex pt-4 justify-content-between">
+          
+           <div class="flex pt-4 justify-content-between">
             <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
             <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="nextCallback" />
-          </div> -->
+          </div> 
         </template>
-      </StepperPanel>
-      <StepperPanel header="SPS-PT">
-        <template #content="{ prevCallback, nextCallback }">
-          <DSA_SPS_PowerTrans></DSA_SPS_PowerTrans>
-          <!-- <div class="flex pt-4 justify-content-between">
-            <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
-            <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="nextCallback" />
-          </div> -->
-        </template>
-      </StepperPanel>
+      </StepperPanel> -->
       <StepperPanel header="SSR">
         <template #content="{ prevCallback, nextCallback }">
           <DSA_SSRConfig></DSA_SSRConfig>
