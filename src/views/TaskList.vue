@@ -97,6 +97,20 @@
       </Column>
     </DataTable>
   </div>
+  <!-- create task  -->
+  <Dialog v-model:visible="uploadDialog" @hide="onHide" :style="{ width: '50rem' }" header="" :modal="true">
+    <TabView>
+      <TabPanel header="Gen File Upload">
+        <uploadFileConfig @uploadFile="uploadGenFile"></uploadFileConfig>
+      </TabPanel>
+      <TabPanel header="Load File Upload">
+        <uploadFileConfig @uploadFile="uploadLoadFile"></uploadFileConfig>
+      </TabPanel>
+      <TabPanel header="Branch File Upload">
+        <uploadFileConfig @uploadFile="uploadBranchFile"></uploadFileConfig>
+      </TabPanel>
+    </TabView>
+  </Dialog>
 </template>
 <!-- && slotProps.data.state === 2 -->
 <script setup>

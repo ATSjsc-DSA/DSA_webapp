@@ -74,6 +74,16 @@ const router = createRouter({
           name: 'Contingencies',
           component: () => import('@/views/ContigenciesView.vue'),
         },
+        {
+          path: '/DSA/DataInitialize',
+          name: 'DataInitialize',
+          component: () => import('@/views/DataInitializeView.vue'),
+        },
+        {
+          path: '/DSA/StudyMode',
+          name: 'StudyMode',
+          component: () => import('@/views/StudyModeView.vue'),
+        },
       ],
     },
     {

@@ -7,7 +7,7 @@
       dataKey="name"
       @row-edit-save="onRowEditSave"
       scrollable
-      scrollHeight="210px"
+      scrollHeight="200px"
       :pt="{
         table: { style: 'min-width: 50rem' },
         column: {

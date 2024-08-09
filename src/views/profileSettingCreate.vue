@@ -17,6 +17,11 @@
           </div>
         </template>
       </StepperPanel> -->
+      <!-- <StepperPanel header="SPS Check">
+        <template #content="{ prevCallback }">
+          <DSA_TSA_common></DSA_TSA_common>
+        </template>
+      </StepperPanel> -->
       <StepperPanel header="SPS">
         <template #content="{ prevCallback, nextCallback }">
           <TabView>
@@ -25,6 +30,10 @@
             </TabPanel>
             <TabPanel header="F81"> <DSA_F81_table></DSA_F81_table> </TabPanel>
             <TabPanel header="Power Transfer"><DSA_SPS_PowerTrans></DSA_SPS_PowerTrans> </TabPanel>
+
+            <TabPanel header="SPS Check">
+              <DSA_TSA_common></DSA_TSA_common>
+            </TabPanel>
           </TabView>
 
           <!-- <div class="flex pt-4 justify-content-between">
@@ -54,16 +63,11 @@
       <StepperPanel header="TSAT">
         <template #content="{ prevCallback, nextCallback }">
           <DSA_TSAT_info></DSA_TSAT_info>
-          <!-- <div class="flex pt-4 justify-content-between">
-            <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
-            <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="nextCallback" />
-          </div> -->
         </template>
       </StepperPanel>
-
-      <StepperPanel header="SPS Check">
+      <StepperPanel header="Remedial">
         <template #content="{ prevCallback }">
-          <DSA_TSA_common></DSA_TSA_common>
+          <DSA_Remedial></DSA_Remedial>
           <div class="flex pt-4 justify-content-end">
             <!-- <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" /> -->
             <Button label="Submit" @click="createNewInitSetting" />
@@ -90,7 +94,7 @@ import chartComposable from '@/combosables/chartData';
 import DSA_TSA_common from '@/components/DSA_TSA_common.vue';
 // import DSA_TSAT_common from '@/components/DSA_TSAT_common.vue';
 import { useToast } from 'primevue/usetoast';
-
+import DSA_Remedial from '@/components/DSA_Remedial.vue';
 const emits = defineEmits(['createProfile']);
 const createNewInitSetting = async () => {
   emits('createProfile');

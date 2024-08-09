@@ -36,13 +36,23 @@
         <Button v-else text></Button>
       </div>
     </div>
-    <Dialog v-model:visible="visible" modal header="Change Power System Model" :style="{ width: '25rem' }">
+    <Dialog v-model:visible="visible" modal header="Change Power System Model" :style="{ width: '30rem' }">
       <span class="p-text-secondary block mb-5">Update power system model information.</span>
 
       <!-- <div class="flex flex-column gap-2 mb-3">
         <label for="mode" class="font-semibold">Mode</label>
         <Dropdown v-model="mode" :options="modes" placeholder="Select a City" class="w-full" />
       </div> -->
+      <div class="flex gap-2 mb-5">
+        <div class="flex-auto">
+          <label for="calendar-24h" class="font-bold block mb-2"> Date-time start </label>
+          <Calendar id="calendar-24h" v-model="timeStart" showTime hourFormat="24" />
+        </div>
+        <div class="flex-auto">
+          <label for="calendar-24h" class="font-bold block mb-2"> Date-time end </label>
+          <Calendar id="calendar-24h" v-model="timeEnd" showTime hourFormat="24" @update:modelValue="updatePSMList" />
+        </div>
+      </div>
       <div class="flex flex-column gap-2 mb-5">
         <label for="profile" class="font-semibold">Power System Model</label>
         <Dropdown
@@ -50,8 +60,9 @@
           v-model="psmSelect"
           :options="psmList"
           optionLabel="name"
-          placeholder="Select a PSM"
+          :placeholder="loadingPSM ? 'Loading...' : 'Select a PSM'"
           class="!w-full"
+          :loading="loadingPSM"
         >
           <template #option="slotProps">
             <div class="flex align-items-center">
@@ -73,18 +84,24 @@
 <script setup>
 import { useCommonStore } from '@/store';
 import chartComposable from '@/combosables/chartData';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
-
+const loadingPSM = ref(false);
 const { convertDateTimeToString } = chartComposable();
 const visible = ref(false);
 const commonStore = useCommonStore();
 const { psm_active, psmList, psm_automatic } = storeToRefs(commonStore);
-const psmSelect = ref(psm_active.value);
-const mode = ref(psm_automatic.value ? 'Automatic' : 'Study');
-const modes = ref(['Automatic', 'Study']);
+const psmSelect = ref(psm_active);
+const timeStart = ref();
+const timeEnd = ref();
+
+watch(psm_active, (oldValue, newValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    psmSelect.value = newValue;
+  }
+});
 
 const modifiedTimestamp = computed(() => convertDateTimeToString(psm_active.value.modifiedTimestamp));
 const createdTimestamp = computed(() => convertDateTimeToString(psm_active.value.createdTimestamp));
@@ -112,8 +129,20 @@ const updatePSM = async () => {
   psm_active.value = psmSelect.value;
   visible.value = false;
 };
+const updatePSMList = async () => {
+  try {
+    loadingPSM.value = true;
+    await commonStore.getListPsm(timeStart.value, timeEnd.value);
+    setTimeout(() => {
+      loadingPSM.value = false;
+    }, 1000);
+  } catch (error) {}
+};
 onMounted(async () => {
   await commonStore.getListPsm();
+});
+onUnmounted(() => {
+  commonStore.clearData();
 });
 </script>
 

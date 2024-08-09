@@ -190,21 +190,28 @@ export default class DSA_api {
     return _delete('/dsa/disturbances/data/' + param, data);
   }
 
+  //group
+  static async getGroup() {
+    return get('/dsa/group');
+  }
+  static async createGroup(data) {
+    return post('/dsa/group', data);
+  }
+  static async deleteGroup(param) {
+    return _delete('/dsa/group/' + param);
+  }
   //
   static async getDSASetting() {
     return get('/dsa/setting');
   }
   //common
-  static async getListPSM() {
-    return get('/common/psm-list');
-  }
 
   static async getPSMIdActive() {
     return get('/common/psm');
   }
 
-  static async getListPsm() {
-    return get('/common/psm-list');
+  static async getListPsm(param) {
+    return get('/common/psm-list/', param);
   }
 
   static async downloadFileGen() {
@@ -233,5 +240,13 @@ export default class DSA_api {
 
   static async getQueueTask(param) {
     return get('/common/task', param);
+  }
+
+  static async getElementsDefinition(parent_id) {
+    return get('/common/elementsdefinition/' + parent_id);
+  }
+
+  static async getElementsData(ElementsDefinition_id) {
+    return get('/common/elements/' + ElementsDefinition_id);
   }
 }

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import DSA_api from '@/api/dsa_api';
 import { intervalTime } from '@/Constants/';
+import DSA_Common from '@/combosables/DSA_common';
+const { convertTimeStringToInt } = DSA_Common();
 
 export const useCommonStore = defineStore('common', () => {
   const isLoading = ref(false);
@@ -20,11 +22,16 @@ export const useCommonStore = defineStore('common', () => {
     } catch (error) {}
   };
 
-  const getListPsm = async () => {
+  const getListPsm = async (time1 = 0, time2 = 0) => {
     try {
-      const res = await DSA_api.getListPsm();
+      const res = await DSA_api.getListPsm({
+        startTime: time1 === 0 ? 0 : convertTimeStringToInt(time1),
+        endTime: time2 === 0 ? 0 : convertTimeStringToInt(time2),
+      });
       psmList.value = res.data;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const startAutoUpdate = () => {
@@ -52,6 +59,9 @@ export const useCommonStore = defineStore('common', () => {
     }
   });
 
+  const clearData = () => {
+    psmList.value = [];
+  };
   return {
     psm_automatic,
     isLoading,
@@ -62,5 +72,6 @@ export const useCommonStore = defineStore('common', () => {
     getListPsm,
     startAutoUpdate,
     stopAutoUpdate,
+    clearData,
   };
 });

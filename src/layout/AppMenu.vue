@@ -20,6 +20,8 @@ const model = ref([
   {
     label: 'Utilities',
     items: [
+      { label: 'Group test', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
+      { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
       { label: 'Data Initialize', icon: 'pi pi-fw pi-list', to: '/DSA/Initialize' },
       {
         label: 'System Events',

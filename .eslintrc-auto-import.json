@@ -83,6 +83,7 @@
     "TSA_api": true,
     "TSA_F81Chart": true,
     "TSA_GTTTChart": true,
-    "Dialog": true
+    "Dialog": true,
+    "TabView": true
   }
 }

@@ -39,7 +39,7 @@
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="profileName" header="Name" style="width: 25%"> </Column>
+      <Column field="profileName" header="Name" style="width: 20%"> </Column>
       <Column field="timestamp" header="Created Time" sortable>
         <template #body="{ data }">
           <div class="flex align-items-center gap-2">
@@ -49,7 +49,11 @@
           </div>
         </template>
       </Column>
-
+      <Column field="group" header="Connected Group" filterMatchMode="equals" style="width: 20%">
+        <template #body="{ data }">
+          <Chip label="Group 1" />
+        </template>
+      </Column>
       <Column field="active" header="Active" filterMatchMode="equals" style="width: 20%">
         <template #body="{ data }">
           <Tag :value="data.active ? 'True' : 'False'" :severity="getSeverity(data.active)" />

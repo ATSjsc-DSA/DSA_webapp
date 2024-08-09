@@ -112,7 +112,7 @@ const items = ref([
     label: 'All',
     icon: 'pi pi-check-circle',
     command: () => {
-      selectedGens.value = listData.value.map((item) => item._id);
+      selectedGens.value = listData.value.map((item) => item.name);
     },
   },
 ]);

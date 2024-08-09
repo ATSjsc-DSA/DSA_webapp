@@ -43,11 +43,11 @@ watch(psm_active, async (newValue, oldValue) => {
           @changeSubActive="changeSubActive"
           class="ssr-block-overlay"
         ></chartOverLayPanel>
-        <TSA_GTTTChart :typelineActive="typelineActive" ></TSA_GTTTChart>
+        <TSA_GTTTChart :typelineActive="typelineActive"></TSA_GTTTChart>
       </div>
     </div>
     <div class="tsa-block-chart">
-      <TSA_ChartView :typelineActive="typelineActive" ></TSA_ChartView>
+      <TSA_ChartView :typelineActive="typelineActive"></TSA_ChartView>
     </div>
   </div>
 </template>

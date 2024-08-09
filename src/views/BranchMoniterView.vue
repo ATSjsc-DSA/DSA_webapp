@@ -1,6 +1,5 @@
 <template>
-  <div class="card h-full relative layout-content">
-    <BreadcrumbCommon :items="items"></BreadcrumbCommon>
+  <div class="h-full relative">
     <listShowSpiliter
       type="monitor"
       :listDatatree="listMonitor"

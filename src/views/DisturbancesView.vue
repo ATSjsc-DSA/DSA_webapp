@@ -1,75 +1,67 @@
 <template>
-  <div class="card h-full relative layout-content">
-    <AppProgressSpinner :showSpinner="progressSpinnerModal"></AppProgressSpinner>
-    <BreadcrumbCommon :items="items"></BreadcrumbCommon>
-
-    <div class="card h-full">
-      <div class="flex flex-wrap justify-content-end gap-2">
-        <!-- <Button severity="secondary" text icon="pi pi-download" label="Download Template" @click="downloadFile()" />
-  
-        <Button severity="info" text icon="pi pi-upload" label="Upload" @click="uploadTemplate" /> -->
-        <Button text icon="pi pi-plus" label="Create" @click="handleCreateDevice" />
-      </div>
-      <Splitter style="height: 100%">
-        <SplitterPanel
-          class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
-          :size="20"
-          :minSize="10"
-        >
-          <DataView :value="listDatatree" class="w-full">
-            <template #list="slotProps">
-              <div class="grid grid-nogutter">
-                <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
-                  <div
-                    class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
-                    :class="{
-                      'border-top-1 surface-border': index !== 0,
-                      'selected-item': selectedItem && selectedItem.name === item.name,
-                    }"
-                    @click="handleRowClick(item)"
-                  >
-                    <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1">
-                      <Chip :label="item.name" image="/img/global.jpg" />
-                    </div>
-                    <div class="flex flex-column md:align-items-end indexauto">
-                      <Button
-                        icon="pi pi-trash"
-                        text
-                        rounded
-                        severity="danger"
-                        @click="(event) => confirmDeleteItem(event, item.name, item._id)"
-                      />
-                    </div>
+  <div class="relative h-full">
+    <!-- <div class="flex flex-wrap justify-content-end gap-2">
+      <Button text icon="pi pi-plus" label="Create" @click="handleCreateDevice" />
+    </div> -->
+    <Splitter style="height: 100%">
+      <SplitterPanel
+        class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
+        :size="20"
+        :minSize="10"
+      >
+        <DataView :value="listDatatree" class="w-full">
+          <template #list="slotProps">
+            <div class="grid grid-nogutter">
+              <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
+                <div
+                  class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
+                  :class="{
+                    'border-top-1 surface-border': index !== 0,
+                    'selected-item': selectedItem && selectedItem.name === item.name,
+                  }"
+                  @click="handleRowClick(item)"
+                >
+                  <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1">
+                    <Chip :label="item.name" image="/img/global.jpg" />
+                  </div>
+                  <div class="flex flex-column md:align-items-end indexauto">
+                    <Button
+                      icon="pi pi-trash"
+                      text
+                      rounded
+                      severity="danger"
+                      @click="(event) => confirmDeleteItem(event, item.name, item._id)"
+                    />
                   </div>
                 </div>
               </div>
-            </template>
-          </DataView>
-        </SplitterPanel>
-        <SplitterPanel class="flex align-items-center justify-content-center" :size="80"
-          ><div v-if="selectedItem._id" class="h-full w-full p-3">
-            <TabView>
-              <TabPanel header="Short-circuit event">
-                <DSA_TSAT_SCE
-                  v-model:dialogVisible="sceDialogCreate"
-                  :dataList="selectedItem.sce_list"
-                  @deleteRow="deleteRowSCE"
-                  @createRow="createRowSCE"
-                ></DSA_TSAT_SCE>
-              </TabPanel>
-              <TabPanel header="Switch event">
-                <DSA_TSAT_SE
-                  v-model:dialogVisible="seDialogCreate"
-                  :dataList="selectedItem.se_list"
-                  @deleteRow="deleteRowSE"
-                  @createRow="createRowSE"
-                ></DSA_TSAT_SE>
-              </TabPanel>
-            </TabView>
-          </div>
-        </SplitterPanel>
-      </Splitter>
-    </div>
+            </div>
+          </template>
+        </DataView>
+      </SplitterPanel>
+      <SplitterPanel class="flex align-items-center justify-content-center" :size="80"
+        ><div v-if="selectedItem._id" class="h-full w-full p-3">
+          <TabView>
+            <TabPanel header="Short-circuit event">
+              <DSA_TSAT_SCE
+                v-model:dialogVisible="sceDialogCreate"
+                :dataList="selectedItem.sce_list"
+                @deleteRow="deleteRowSCE"
+                @createRow="createRowSCE"
+              ></DSA_TSAT_SCE>
+            </TabPanel>
+            <TabPanel header="Switch event">
+              <DSA_TSAT_SE
+                v-model:dialogVisible="seDialogCreate"
+                :dataList="selectedItem.se_list"
+                @deleteRow="deleteRowSE"
+                @createRow="createRowSE"
+              ></DSA_TSAT_SE>
+            </TabPanel>
+          </TabView>
+        </div>
+      </SplitterPanel>
+    </Splitter>
   </div>
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">

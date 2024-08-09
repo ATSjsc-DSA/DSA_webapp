@@ -1,24 +1,7 @@
 <template>
-  <div class="card h-full relative layout-content pt-6">
+  <div class="h-full relative layout-content">
     <AppProgressSpinner :showSpinner="progressSpinnerModal"></AppProgressSpinner>
-    <BreadcrumbCommon :items="itemsArea"></BreadcrumbCommon>
     <TabView class="custom-tabview">
-      <TabPanel header="Area">
-        <listShowSpiliter
-          :listDatatree="listArea"
-          @deleteDevice="deleteArea"
-          @createDevice="createArea"
-          @downloadFile="downloadFile"
-          @uploadFile="uploadArea"
-          @removeDataOnDevice="removeDataOnDevice"
-          @addDataOnDevice="addDataOnArea"
-          @onHideDataOnDeviceDialog="onHideDataOnAreaDialog"
-          v-model:createDataOnDeviceDialog="createDataOnAreaDialog"
-          v-model:deleteVisibleDialog="deleteAreaDialog"
-          v-model:createVisibleDialog="createAreaDialog"
-        ></listShowSpiliter>
-      </TabPanel>
-
       <TabPanel header="Gen List">
         <ListOnArea
           :listData="listGen"
@@ -49,6 +32,30 @@
           @deleteDatas="deleteBranch"
           @createData="createBranch"
         ></ListOnArea>
+      </TabPanel>
+      <TabPanel header="Area">
+        <listShowSpiliter
+          :listDatatree="listArea"
+          @deleteDevice="deleteArea"
+          @createDevice="createArea"
+          @downloadFile="downloadFile"
+          @uploadFile="uploadArea"
+          @removeDataOnDevice="removeDataOnDevice"
+          @addDataOnDevice="addDataOnArea"
+          @onHideDataOnDeviceDialog="onHideDataOnAreaDialog"
+          v-model:createDataOnDeviceDialog="createDataOnAreaDialog"
+          v-model:deleteVisibleDialog="deleteAreaDialog"
+          v-model:createVisibleDialog="createAreaDialog"
+        ></listShowSpiliter>
+      </TabPanel>
+      <TabPanel header="Monitor">
+        <BranchMoniterView></BranchMoniterView>
+      </TabPanel>
+      <TabPanel header="Contingencies">
+        <ContigenciesView></ContigenciesView>
+      </TabPanel>
+      <TabPanel header="Disturbances">
+        <DisturbancesView></DisturbancesView>
       </TabPanel>
     </TabView>
   </div>
@@ -82,6 +89,9 @@ import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useDSAStore } from '@/store';
 import listShowSpiliter from '@/components/listShowSplitter.vue';
 import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
+import BranchMoniterView from './BranchMoniterView.vue';
+import ContigenciesView from './ContigenciesView.vue';
+import DisturbancesView from './DisturbancesView.vue';
 const dsaStore = useDSAStore();
 const { listGen, listLoad, listBranch, totalSizeGen, totalSizeLoad, totalSizeBranch, listContingencies } =
   storeToRefs(dsaStore);

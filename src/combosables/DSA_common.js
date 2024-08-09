@@ -8,6 +8,9 @@ const DSA_Common = () => {
     const utcDate = new Date(dateTimeWithoutMilliseconds);
     return utcDate.toLocaleString(); // hoặc localDate.toLocaleDateString() tùy vào nhu cầu
   };
+  const convertTimeStringToInt = (dateStr) => {
+    return Math.floor(new Date(dateStr).getTime() / 1000);
+  };
 
   const downloadFile = async (apiMethod, filename) => {
     try {
@@ -26,6 +29,7 @@ const DSA_Common = () => {
   };
   return {
     convertUTCtoLocalTime,
+    convertTimeStringToInt,
     downloadFile,
   };
 };

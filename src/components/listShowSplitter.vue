@@ -1,11 +1,11 @@
 <template>
-  <div class="card h-full">
-    <div class="flex flex-wrap justify-content-end gap-2">
+  <div class="h-full">
+    <!-- <div class="flex flex-wrap justify-content-end gap-2">
       <Button severity="secondary" text icon="pi pi-download" label="Download Template" @click="downloadFile()" />
 
       <Button severity="info" text icon="pi pi-upload" label="Upload" @click="uploadTemplate" />
       <Button text icon="pi pi-plus" label="Create" @click="handleCreateDevice" />
-    </div>
+    </div> -->
     <Splitter style="height: 100%">
       <SplitterPanel
         class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
