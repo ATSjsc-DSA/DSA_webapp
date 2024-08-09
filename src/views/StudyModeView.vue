@@ -193,7 +193,7 @@ const onRowEditSave = (event) => {
 const getElementsData = async (selectedItem_id) => {
   try {
     progressSpinnerModal2.value = true;
-    const res = await DSA_api.getElementsData(selectedItem_id);
+    const res = await DSA_api.getElementsData(psmSelect.value.elementsDefinitionId, selectedItem_id);
     dataTable.value = res.data;
     console.log(listDatatree.value);
 

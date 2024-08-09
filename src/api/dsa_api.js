@@ -242,11 +242,11 @@ export default class DSA_api {
     return get('/common/task', param);
   }
 
-  static async getElementsDefinition(parent_id) {
-    return get('/common/elementsdefinition/' + parent_id);
+  static async getElementsDefinition(psm_id) {
+    return get('/common/elementsdefinition/' + psm_id);
   }
 
-  static async getElementsData(ElementsDefinition_id) {
-    return get('/common/elements/' + ElementsDefinition_id);
+  static async getElementsData(psm_id, ElementsDefinition_id) {
+    return get('/common/elements/' + psm_id + '/' + ElementsDefinition_id);
   }
 }
