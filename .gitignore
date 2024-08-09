@@ -36,3 +36,4 @@ dist-ssr
 
 # unplugin
 *.d.ts
+src/Constants/index.js
