@@ -20,25 +20,25 @@ const model = ref([
   {
     label: 'Utilities',
     items: [
-      { label: 'Group test', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
-      { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
-      { label: 'Data Initialize', icon: 'pi pi-fw pi-list', to: '/DSA/Initialize' },
-      {
-        label: 'System Events',
-        icon: 'pi pi-fw  pi-clone',
-        items: [
-          {
-            label: 'Disturbances',
-            to: '/DSA/SystemEvents/Disturbances',
-          },
-          {
-            label: 'Contingencies',
-            to: '/DSA/SystemEvents/Contingencies',
-          },
-        ],
-      },
-      { label: 'Branch Monitoring', icon: 'pi pi-fw pi-desktop', to: '/DSA/Monitor' },
+      { label: 'Group ', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
+      // { label: 'Data Initialize', icon: 'pi pi-fw pi-list', to: '/DSA/Initialize' },
+      // {
+      //   label: 'System Events',
+      //   icon: 'pi pi-fw  pi-clone',
+      //   items: [
+      //     {
+      //       label: 'Disturbances',
+      //       to: '/DSA/SystemEvents/Disturbances',
+      //     },
+      //     {
+      //       label: 'Contingencies',
+      //       to: '/DSA/SystemEvents/Contingencies',
+      //     },
+      //   ],
+      // },
+      // { label: 'Branch Monitoring', icon: 'pi pi-fw pi-desktop', to: '/DSA/Monitor' },
       { label: 'Profile', icon: 'pi pi-fw pi-file-edit', to: '/DSA/Profile' },
+      { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
 
       { label: 'Config DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
 
