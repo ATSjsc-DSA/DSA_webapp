@@ -7,7 +7,7 @@
           :inputId="layer.label"
           name="label"
           :value="layer.value"
-          @input="changeSelecet($event)"
+          @update:modelValue="changeSelecet($event)"
         />
         <label :for="layer.label" class="ml-2">{{ layer.label }}</label>
       </div>
@@ -39,6 +39,7 @@ const listLayer = ref([
 const selectedLayer = ref(props.selectedSubs);
 
 const findDifferentValues = (array1, array2) => {
+
   let differentValues = array1.filter((value) => !array2.includes(value));
   return differentValues[0];
 };

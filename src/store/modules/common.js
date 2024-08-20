@@ -9,6 +9,7 @@ export const useCommonStore = defineStore('common', () => {
   const psm_automatic = ref(true);
   const psm_active = ref({});
   const psmList = ref([]);
+  const projectId = ref('');
   let intervalId = null;
 
   const setLoading = (loading) => {
@@ -63,6 +64,7 @@ export const useCommonStore = defineStore('common', () => {
     psmList.value = [];
   };
   return {
+    projectId,
     psm_automatic,
     isLoading,
     setLoading,

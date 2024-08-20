@@ -2,13 +2,13 @@ import { get, post, put, _delete } from '@/utils/request';
 
 export default class DSA_api {
   static async getListSub() {
-    return get('/dsa/listSub');
+    return get('/geographic/sub');
+  }
+  static async getListLine() {
+    return get('/geographic/line');
   }
   static async getdataCriteria() {
     return get('/dsa/criteria');
-  }
-  static async getListLine() {
-    return get('/dsa/listLine');
   }
   static async voltageStandards() {
     return get('/dsa/voltageStandards');

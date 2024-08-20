@@ -17,6 +17,7 @@
       :lazy="true"
       @page="onPageChange"
       :sortOrder="1"
+      rowHover
     >
       <template #header>
         <div class="flex justify-content-between">

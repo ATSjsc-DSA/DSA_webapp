@@ -26,7 +26,7 @@ const login = async () => {
     if (redirect) {
       router.push(redirect);
     } else {
-      router.push('/');
+      router.push('/project');
     }
     setTimeout(() => {
       loadding.value = false;

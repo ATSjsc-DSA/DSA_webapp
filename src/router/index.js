@@ -84,7 +84,20 @@ const router = createRouter({
           name: 'StudyMode',
           component: () => import('@/views/StudyModeView.vue'),
         },
+        {
+          path: '/powersystem',
+          name: 'powersystem',
+          component: () => import('@/views/PowerSystem/PowerSystemView.vue'),
+        },
       ],
+    },
+    {
+      meta: {
+        title: 'Project',
+      },
+      path: '/Project',
+      name: 'Project',
+      component: () => import('@/views/ProjectView/ProjectView.vue'),
     },
     {
       meta: {

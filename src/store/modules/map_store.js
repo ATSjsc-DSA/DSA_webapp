@@ -77,7 +77,7 @@ export const useMapStore = defineStore('map_Store', () => {
     param.forEach((sub) => {
       featuresPoin.push(
         new Feature({
-          geometry: new Point(fromLonLat(sub.geo)),
+          geometry: new Point(fromLonLat([sub.long, sub.lat])),
           name: sub.name,
           id: 'sub',
           code: sub.code,
@@ -92,6 +92,8 @@ export const useMapStore = defineStore('map_Store', () => {
         }),
       );
     });
+    console.log(featuresPoin, 'featuresPoin');
+
     return featuresPoin;
   }
 
@@ -99,17 +101,21 @@ export const useMapStore = defineStore('map_Store', () => {
     const featuresline = [];
     if (param) {
       param.forEach((line) => {
-        const midPoint = [(line.geo[0][0] + line.geo[1][0]) / 2, (line.geo[0][1] + line.geo[1][1]) / 2];
+        const midPoint = [(line.long_start + line.long_end) / 2, (line.lat_start + line.lat_end) / 2];
 
         // Tính toán điểm thứ ba để tạo góc 30 độ
-        const angle = Math.atan2(line.geo[1][1] - line.geo[0][1], line.geo[1][0] - line.geo[0][0]);
+        const angle = Math.atan2(line.lat_end - line.lat_start, line.long_end - line.long_start);
         const distance = Math.sqrt(
-          Math.pow(line.geo[1][0] - line.geo[0][0], 2) + Math.pow(line.geo[1][1] - line.geo[0][1], 2),
+          Math.pow(line.long_end - line.long_start, 2) + Math.pow(line.lat_end - line.lat_start, 2),
         );
         const thirdPointX = midPoint[0] + (distance / 2) * Math.cos(angle + Math.PI / 3); // Góc 30 độ
         const thirdPointY = midPoint[1] + (distance / 2) * Math.sin(angle + Math.PI / 8); // Góc 30 độ
 
-        const lineStringCoords = [line.geo[0], [thirdPointX, thirdPointY], line.geo[1]];
+        const lineStringCoords = [
+          [line.long_start, line.lat_start],
+          [thirdPointX, thirdPointY],
+          [line.long_end, line.lat_end],
+        ];
         featuresline.push(
           new Feature({
             geometry: new LineString(lineStringCoords.map((coord) => fromLonLat(coord))),
@@ -254,21 +260,20 @@ export const useMapStore = defineStore('map_Store', () => {
   async function getListSub() {
     try {
       const res = await DSA_api.getListSub();
-      if (!res.data.success) {
-        throw res.data.error;
-      } else {
-        const newFeaturesArray = [
-          ...getFeaturesPoint(res.data.payload.sub500kV, 500, true),
-          ...getFeaturesPoint(res.data.payload.sub345kV, 345),
-          ...getFeaturesPoint(res.data.payload.sub287kV, 287),
-          ...getFeaturesPoint(res.data.payload.sub230kV, 230),
-          ...getFeaturesPoint(res.data.payload.sub138kV, 138),
-          ...getFeaturesPoint(res.data.payload.sub115kV, 115),
-          ...getFeaturesPoint(res.data.payload.sub20kV, 20),
-        ];
-        featuresSubLine.value = newFeaturesArray;
-        // features230.value = [...features230.value, ...getFeaturesPoint(res.data.payload.sub230kV)];
-      }
+      console.log(res.data, 'res');
+
+      const newFeaturesArray = [
+        ...getFeaturesPoint(res.data.sub500kV ?? [], 500, true),
+        ...getFeaturesPoint(res.data.sub345kV ?? [], 345),
+        ...getFeaturesPoint(res.data.sub287kV ?? [], 287),
+        ...getFeaturesPoint(res.data.sub230kV ?? [], 230),
+        ...getFeaturesPoint(res.data.sub138kV ?? [], 138),
+        ...getFeaturesPoint(res.data.sub115kV ?? [], 115),
+        ...getFeaturesPoint(res.data.sub20kV ?? [], 20),
+      ];
+      console.log(newFeaturesArray, 'newFeaturesArray');
+
+      featuresSubLine.value = newFeaturesArray;
     } catch (error) {
       throw error;
     }
@@ -276,20 +281,17 @@ export const useMapStore = defineStore('map_Store', () => {
   async function getListLine() {
     try {
       const res = await DSA_api.getListLine();
-      if (!res.data.success) {
-        throw res.data.error;
-      } else {
-        featuresSubLine.value = [
-          ...featuresSubLine.value,
-          ...getFeaturesLine(res.data.payload.line500kV, 500, true),
-          ...getFeaturesLine(res.data.payload.line345kV, 345),
-          ...getFeaturesLine(res.data.payload.line287kV, 287),
-          ...getFeaturesLine(res.data.payload.line230kV, 230),
-          ...getFeaturesLine(res.data.payload.line138kV, 138),
-          ...getFeaturesLine(res.data.payload.line115kV, 115),
-          ...getFeaturesLine(res.data.payload.line20kV, 20),
-        ];
-      }
+
+      featuresSubLine.value = [
+        ...featuresSubLine.value,
+        ...getFeaturesLine(res.data.line500kV ?? [], 500, true),
+        ...getFeaturesLine(res.data.line345kV ?? [], 345),
+        ...getFeaturesLine(res.data.line287kV ?? [], 287),
+        ...getFeaturesLine(res.data.line230kV ?? [], 230),
+        ...getFeaturesLine(res.data.line138kV ?? [], 138),
+        ...getFeaturesLine(res.data.line115kV ?? [], 115),
+        ...getFeaturesLine(res.data.line20kV ?? [], 20),
+      ];
     } catch (error) {
       throw error;
     }
@@ -303,6 +305,7 @@ export const useMapStore = defineStore('map_Store', () => {
       source: sourceSubline,
       style: getFeatureStyle.bind(null, Point230Color),
     });
+    console.log(layerSubLine.value, 'layerSubLine');
 
     map.value.addLayer(layerSubLine.value);
   }
