@@ -7,6 +7,10 @@ export default class api {
   static async createProject(data) {
     return post('/project', data);
   }
+
+  static async editProject(id, data) {
+    return put('/project/' + id, data);
+  }
   static async deleteroject(id) {
     return _delete('/project/' + id);
   }
