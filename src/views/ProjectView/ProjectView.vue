@@ -224,8 +224,6 @@ const deleteProject = async (event, projectId) => {
     accept: async () => {
       try {
         const res = await api.deleteroject(projectId);
-        console.log(res, 'res');
-
         getListProject();
         toast.add({ severity: 'success', summary: 'Success Message', detail: res.data.message, life: 3000 });
 
@@ -242,6 +240,7 @@ const deleteProject = async (event, projectId) => {
 };
 const runProject = (id) => {
   projectId.value = id;
+  localStorage.setItem('projectId', projectId.value);
   router.push('/powersystem');
 };
 </script>

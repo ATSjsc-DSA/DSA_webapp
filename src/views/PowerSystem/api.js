@@ -4,13 +4,40 @@ const commonStore = useCommonStore();
 const { psm_active, projectId } = storeToRefs(commonStore);
 
 export default class api {
-  static async getListPowerSystemData(project_id) {
-    return get('/project/' + project_id);
+  static async getPSD(data) {
+    return get('/powersystem/' + projectId.value + '/powersystemdata', data);
   }
-  static async createProject(data) {
-    return post('/project', data);
+
+  static async getComparePSD() {
+    return get('/powersystem/' + projectId.value + '/compare_powersystem');
+  }
+  static async createPS(data) {
+    return post('/powersystem/' + projectId.value + '/powersystemedit', {
+      _id: '',
+      projectId: projectId.value,
+      generalInfo: {
+        name: data.generalInfo.name,
+        uniqueId: '',
+        parrentId: '',
+        emsName: data.generalInfo.emsName,
+        emsUniqueId: data.generalInfo.emsUniqueId,
+        operationName: data.generalInfo.operationName,
+        operationUniqueId: '',
+        softwareName: data.generalInfo.softwareName,
+        softwareUniqueId: '',
+      },
+      engineInfo: {
+        elementsDefinitionId: '',
+        values: [''],
+      },
+      scadaInfo: {
+        skey: '',
+        scadaName: data.scadaInfo.scadaName,
+        scadaUniqueId: '',
+      },
+    });
   }
   static async deleteroject(id) {
-    return _delete('/project/' + id);
+    return _delete('/powersystem/' + id);
   }
 }
