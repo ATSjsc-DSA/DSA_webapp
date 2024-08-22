@@ -5,19 +5,23 @@ const { psm_active, projectId } = storeToRefs(commonStore);
 
 export default class api {
   static async getPSD(data) {
-    return get('/powersystem/' + projectId.value + '/powersystemdata', data);
+    return get(`/powersystem/${projectId.value}/powersystemdata`, data);
+  }
+
+  static async getPSDEdit(data) {
+    return get(`/powersystem/${projectId.value}/powersystemedit`, data);
   }
 
   static async getComparePSD() {
-    return get('/powersystem/' + projectId.value + '/compare_powersystem');
+    return get(`/powersystem/${projectId.value}/compare_powersystem`);
   }
   static async createPS(data) {
-    return post('/powersystem/' + projectId.value + '/powersystemedit', {
+    return post(`/powersystem/${projectId.value}/powersystemedit`, {
       _id: '',
       projectId: projectId.value,
       generalInfo: {
         name: data.generalInfo.name,
-        uniqueId: '',
+        // uniqueId: '',
         parrentId: '',
         emsName: data.generalInfo.emsName,
         emsUniqueId: data.generalInfo.emsUniqueId,
@@ -37,7 +41,11 @@ export default class api {
       },
     });
   }
-  static async deleteroject(id) {
-    return _delete('/powersystem/' + id);
+  static async editPSE(data) {
+    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, data);
+  }
+  static async deletePSE(psde_id) {
+    console.log('deletePSE', projectId.value, psde_id);
+    return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);
   }
 }

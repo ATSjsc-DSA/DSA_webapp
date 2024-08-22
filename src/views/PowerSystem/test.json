@@ -1,0 +1,17 @@
+{
+  "_id": "",
+  "projectId": "3f9cbb5d-acda-42bb-9e98-bcb3ed4c0f80",
+  "generalInfo": {
+    "name": "tao moi khong duoc",
+    "uniqueId": "",
+    "parrentId": "",
+    "emsName": "test",
+    "emsUniqueId": "test",
+    "operationName": "test",
+    "operationUniqueId": "",
+    "softwareName": "test",
+    "softwareUniqueId": ""
+  },
+  "engineInfo": { "elementsDefinitionId": "", "values": [""] },
+  "scadaInfo": { "skey": "", "scadaName": "test", "scadaUniqueId": "" }
+}
