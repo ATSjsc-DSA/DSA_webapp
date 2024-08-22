@@ -21,20 +21,72 @@
           <Button text icon="pi pi-plus" label="Create" @click="createVisibleDialog = true" />
         </div>
       </template>
+      <template #body="{ field, data }">
+        <div class="bg-red-300">{{ field }}</div>
+        <div class="bg-green-300">{{ data }}</div>
+      </template>
 
-      <Column field="generalInfo.name" header="Name" style="width: 15%"> </Column>
-      <Column field="generalInfo.emsName" header="Ems Name" style="width: 15%"> </Column>
-      <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
-      <Column field="generalInfo.operationName" header="Operation Name" style="width: 15%"> </Column>
-      <Column field="generalInfo.softwareName" header="Software Name" style="width: 15%"> </Column>
-      <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%"> </Column>
+      <Column field="generalInfo.name" header="Name" style="width: 15%">
+        <template #body="slotProps">
+          <div>
+            <span :class="slotProps.data._id === undefined ? 'text-green-500' : ''">
+              {{ slotProps.data.generalInfo.name }}
+            </span>
+          </div>
+        </template>
+      </Column>
+
+      <Column field="generalInfo.emsName" header="Ems Name" style="width: 15%">
+        <template #body="slotProps">
+          <div>
+            <span :class="slotProps.data._id === undefined ? 'text-green-500' : ''">
+              {{ slotProps.data.generalInfo.emsName }}
+            </span>
+          </div>
+        </template>
+      </Column>
+      <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+        <template #body="slotProps">
+          <div>
+            <span :class="slotProps.data._id === undefined ? 'text-green-500' : ''">
+              {{ slotProps.data.generalInfo.emsUniqueId }}
+            </span>
+          </div>
+        </template>
+      </Column>
+      <Column field="generalInfo.operationName" header="Operation Name" style="width: 15%">
+        <template #body="slotProps">
+          <div>
+            <span :class="slotProps.data._id === undefined ? 'text-green-500' : ''">
+              {{ slotProps.data.generalInfo.operationName }}
+            </span>
+          </div>
+        </template>
+      </Column>
+      <Column field="generalInfo.softwareName" header="Software Name" style="width: 15%">
+        <template #body="slotProps">
+          <div>
+            <span :class="slotProps.data._id === undefined ? 'text-green-500' : ''">
+              {{ slotProps.data.generalInfo.softwareName }}
+            </span>
+          </div>
+        </template>
+      </Column>
+      <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%">
+        <template #body="slotProps">
+          <div>
+            <span :class="slotProps.data._id === undefined ? 'text-green-500' : ''">
+              {{ slotProps.data.generalInfo.scadaName }}
+            </span>
+          </div>
+        </template>
+      </Column>
 
       <Column style="width: 1%; min-width: 5rem">
         <template #body="slotProps">
           <div class="flex justify-content-between">
             <Button icon="pi pi-pencil            " severity="success" text rounded />
             <Button icon="pi pi-trash" severity="danger" text rounded />
-            <Button icon="pi pi-caret-right" text rounded />
           </div>
         </template>
       </Column>
@@ -166,5 +218,3 @@ const handleCreatePS = async () => {
   }
 };
 </script>
-
-<style lang="scss" scoped></style>
