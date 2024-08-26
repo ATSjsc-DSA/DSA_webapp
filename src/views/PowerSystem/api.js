@@ -3,6 +3,9 @@ import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { psm_active, projectId } = storeToRefs(commonStore);
 
+console.log('projectId', projectId.value);
+console.log('psm_active', psm_active.value._id);
+
 export default class api {
   static async getPSD(data) {
     return get(`/powersystem/${projectId.value}/powersystemdata`, data);
@@ -11,33 +14,46 @@ export default class api {
   static async getPSDEdit(data) {
     return get(`/powersystem/${projectId.value}/powersystemedit`, data);
   }
-
   static async getComparePSD() {
     return get(`/powersystem/${projectId.value}/compare_powersystem`);
   }
-  static async createPS(data) {
+
+  static async createGeneralPSE(data) {
     return post(`/powersystem/${projectId.value}/powersystemedit`, {
-      _id: '',
       projectId: projectId.value,
-      generalInfo: {
-        name: data.generalInfo.name,
-        // uniqueId: '',
-        parrentId: '',
-        emsName: data.generalInfo.emsName,
-        emsUniqueId: data.generalInfo.emsUniqueId,
-        operationName: data.generalInfo.operationName,
-        operationUniqueId: '',
-        softwareName: data.generalInfo.softwareName,
-        softwareUniqueId: '',
-      },
+      generalInfo: data,
       engineInfo: {
         elementsDefinitionId: '',
         values: [''],
       },
       scadaInfo: {
         skey: '',
-        scadaName: data.scadaInfo.scadaName,
+        scadaName: '',
         scadaUniqueId: '',
+      },
+    });
+  }
+
+  static async createEnginePSE(data) {
+    return post(`/powersystem/${projectId.value}/powersystemedit`, {
+      _id: 'string',
+      projectId: 'string',
+      generalInfo: {
+        name: 'string',
+        uniqueId: 'string',
+        parrentId: 'string',
+        emsName: 'string',
+        emsUniqueId: 'string',
+        operationName: 'string',
+        operationUniqueId: 'string',
+        softwareName: 'string',
+        softwareUniqueId: 'string',
+      },
+      engineInfo: data,
+      scadaInfo: {
+        skey: 'string',
+        scadaName: 'string',
+        scadaUniqueId: 'string',
       },
     });
   }
@@ -45,7 +61,6 @@ export default class api {
     return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, data);
   }
   static async deletePSE(psde_id) {
-    console.log('deletePSE', projectId.value, psde_id);
     return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);
   }
 }

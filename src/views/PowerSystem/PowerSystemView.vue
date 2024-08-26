@@ -1,208 +1,212 @@
 <template>
   <div class="card layout-content">
-    totalList:{{ totalList }}
+    <TabView @tab-change="onTabChange">
+      <TabPanel header="">
+        <template #header>
+          <div>General</div>
+        </template>
+        <generalTabWidget
+          :data="powersystemData"
+          :currentPage="currentPage"
+          @update:currentPage="onPageChange"
+          @getData="getPSDEdit"
+          @editData="editPSE"
+          @deleteData="deletePSE"
+        />
+      </TabPanel>
+      <TabPanel>
+        <template #header>
+          <div>Engine</div>
+        </template>
+        <engineInfoTabWidget
+          :data="powersystemData"
+          :currentPage="currentPage"
+          @update:currentPage="onPageChange"
+          @getData="getPSDEdit"
+          @editData="editPSE"
+          @deleteData="deletePSE"
+        />
+      </TabPanel>
+      <TabPanel>
+        <template #header>
+          <div>Scada</div>
+        </template>
+        <scadaInfoTabWidget
+          :data="powersystemData"
+          :currentPage="currentPage"
+          @update:currentPage="onPageChange"
+          @getData="getPSDEdit"
+          @editData="editPSE"
+          @deleteData="deletePSE"
+        />
+      </TabPanel>
+      <TabPanel>
+        <template #header>
+          <div><i class="pi pi-history"></i> History</div>
+        </template>
+        <compareTabWidget :data="powersystemCompareData" @get-data="getComparePSD" />
+      </TabPanel>
+      <TabPanel>
+        <template #header>
+          <div><i class="pi pi-list"></i> Version</div>
+        </template>
+        <p class="m-0">Version</p>
+      </TabPanel>
+    </TabView>
 
-    <DataTable
-      :value="powersystemData"
-      paginator
-      :rows="10"
-      :totalRecords="totalList"
-      dataKey="_id"
-      tableStyle="min-width: 50rem"
-      :rowClass="rowClass"
-      :lazy="true"
-      @page="onPageChange"
-      :sortOrder="1"
-      rowHover
+    <Toast />
+
+    <!-- Compare dialog  -->
+    <Dialog
+      v-model:visible="showCompareDialog"
+      header="History "
+      :modal="true"
+      maximizable
+      :style="{ width: '80%' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
     >
       <template #header>
-        <div class="flex flex-wrap justify-content-end gap-2">
-          <Button severity="secondary" text icon="pi pi-download" label="Download" @click="downloadFile()" />
-          <Button severity="info" text icon="pi pi-upload" label="Upload" @click="uploadTemplate" />
-          <Button text icon="pi pi-plus" label="Create" @click="createVisibleDialog = true" />
+        <div class="flex align-items-center justify-content-between gap-2 w-full">
+          <span class="font-bold white-space-nowrap">History</span>
+          <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD()" />
         </div>
       </template>
-      <template #body="{ field, data }">
-        <div class="bg-red-300">{{ field }}</div>
-        <div class="bg-green-300">{{ data }}</div>
-      </template>
 
-      <Column field="generalInfo.name" header="Name" style="width: 15%"></Column>
-      <Column field="generalInfo.emsName" header="Ems Name" style="width: 15%"></Column>
-      <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
-      <Column field="generalInfo.operationName" header="Operation Name" style="width: 15%"></Column>
-      <Column field="generalInfo.softwareName" header="Software Name" style="width: 15%"></Column>
-      <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%"> </Column>
-
-      <Column style="width: 1%; min-width: 5rem">
-        <template #body="slotProps">
-          <div class="flex justify-content-between">
-            <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDeletePSE(slotProps.data)" />
+      <div style="height: 60vh">
+        <!-- Add  -->
+        <Panel v-if="powersystemCompareData.Add.length > 0" toggleable>
+          <template #header>
+            <div class="my-3 text-green-500">New Power System ({{ powersystemCompareData.Add.length }})</div>
+          </template>
+          <div class="pl-6">
+            <DataTable
+              :value="powersystemCompareData.Add"
+              dataKey="_id"
+              tableStyle="min-width: 50rem"
+              :rowClass="rowClass"
+              :lazy="true"
+              :sortOrder="1"
+              rowHover
+            >
+              <Column field="generalInfo.name" header="Name" style="width: 15%"></Column>
+              <Column field="generalInfo.emsName" header="Ems Name" style="width: 15%"></Column>
+              <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
+              <Column field="generalInfo.operationName" header="Operation Name" style="width: 15%"></Column>
+              <Column field="generalInfo.softwareName" header="Software Name" style="width: 15%"></Column>
+              <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%"> </Column>
+            </DataTable>
           </div>
-        </template>
-      </Column>
-    </DataTable>
+        </Panel>
 
-    <!-- create dialog data -->
-    <Dialog v-model:visible="createVisibleDialog" :style="{ width: '28rem' }" header="Create New " :modal="true">
-      <template #header>
-        <div class="inline-flex align-items-center justify-content-center gap-2">
-          <span class="font-bold white-space-nowrap">Power Systwem</span>
-        </div>
-      </template>
-      <span class="p-text-secondary block mb-5">Power Systwem information.</span>
+        <!-- Edit  -->
 
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="psCreate.generalInfo.name" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="psCreate.generalInfo.emsName" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="psCreate.generalInfo.emsUniqueId" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="psCreate.generalInfo.operationName" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="psCreate.generalInfo.softwareName" />
-      </div>
-      <span class="p-text-secondary block mt-5 mb-3">Scada information</span>
+        <Panel v-if="powersystemCompareData.Update.length > 0" toggleable>
+          <template #header>
+            <div class="my-3 text-orange-500">Update Power System ({{ powersystemCompareData.Update.length }})</div>
+          </template>
+          <div class="pl-6">
+            <DataTable
+              :value="powersystemCompareData.Update"
+              dataKey="_id"
+              tableStyle="min-width: 50rem"
+              :rowClass="rowClass"
+              :lazy="true"
+              :sortOrder="1"
+              rowHover
+            >
+              <Column header="Name" style="width: 15%">
+                <template #body="slotProps">
+                  <div>
+                    <div class="text-green-500">
+                      {{ slotProps.data.changes.generalInfo ? slotProps.data.changes.generalInfo[''].name : '' }}
+                    </div>
+                  </div>
+                </template>
+              </Column>
+              <Column header="Ems Name" style="width: 15%">
+                <template #body="slotProps">
+                  <div>
+                    <div class="text-green-500">
+                      {{ slotProps.data.changes.generalInfo ? slotProps.data.changes.generalInfo[''].emsName : '' }}
+                    </div>
+                  </div>
+                </template>
+              </Column>
 
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Scada Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="psCreate.scadaInfo.scadaName" />
-      </div>
+              <Column header="Ems UniqueId" style="width: 15%">
+                <template #body="slotProps">
+                  <div>
+                    <div class="text-green-500">
+                      {{ slotProps.data.changes.generalInfo ? slotProps.data.changes.generalInfo[''].emsUniqueId : '' }}
+                    </div>
+                  </div>
+                </template>
+              </Column>
 
+              <Column header="Operation Name" style="width: 15%">
+                <template #body="slotProps">
+                  <div>
+                    <div class="text-green-500">
+                      {{
+                        slotProps.data.changes.generalInfo ? slotProps.data.changes.generalInfo[''].operationName : ''
+                      }}
+                    </div>
+                  </div>
+                </template>
+              </Column>
+              <Column header="Software Name" style="width: 15%">
+                <template #body="slotProps">
+                  <div>
+                    <div class="text-green-500">
+                      {{
+                        slotProps.data.changes.generalInfo ? slotProps.data.changes.generalInfo[''].softwareName : ''
+                      }}
+                    </div>
+                  </div>
+                </template>
+              </Column>
+
+              <Column header="Scada Name" style="width: 15%">
+                <template #body="slotProps">
+                  <div>
+                    <div class="text-green-500">
+                      {{ slotProps.data.changes.scadaInfo ? slotProps.data.changes.scadaInfo[''].scadaName : '' }}
+                    </div>
+                  </div>
+                </template>
+              </Column>
+            </DataTable>
+          </div>
+        </Panel>
+
+        <!-- Delete  -->
+        <Panel v-if="powersystemCompareData.Delete.length > 0" toggleable>
+          <template #header>
+            <div class="my-3 text-red-500">Delete Power System ({{ powersystemCompareData.Delete.length }})</div>
+          </template>
+          <div class="pl-6">
+            <DataTable
+              :value="powersystemCompareData.Delete"
+              dataKey="_id"
+              tableStyle="min-width: 50rem"
+              :rowClass="rowClass"
+              :lazy="true"
+              :sortOrder="1"
+              rowHover
+            >
+              <Column field="generalInfo.name" header="Name" style="width: 15%"></Column>
+              <Column field="generalInfo.emsName" header="Ems Name" style="width: 15%"></Column>
+              <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
+              <Column field="generalInfo.operationName" header="Operation Name" style="width: 15%"></Column>
+              <Column field="generalInfo.softwareName" header="Software Name" style="width: 15%"></Column>
+              <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%"> </Column>
+            </DataTable>
+          </div>
+        </Panel>
+      </div>
       <template #footer>
-        <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
-        <Button type="button" label="Submit" @click="createPS()"></Button>
-      </template>
-    </Dialog>
-
-    <!-- Edit dialog data -->
-    <Dialog v-model:visible="editVisibleDialog" :style="{ width: '28rem' }" header="Edit " :modal="true">
-      <template #header>
-        <div class="inline-flex align-items-center justify-content-center gap-2">
-          <span class="font-bold white-space-nowrap">Update Power Systwem</span>
-        </div>
-      </template>
-      <span class="p-text-secondary block mb-5">Power Systwem information.</span>
-
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="pseEdit.generalInfo.name" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="pseEdit.generalInfo.emsName" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="pseEdit.generalInfo.emsUniqueId" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="pseEdit.generalInfo.operationName" />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="pseEdit.generalInfo.softwareName" />
-      </div>
-      <span class="p-text-secondary block mt-5 mb-3">Scada information</span>
-
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="areaname" class="font-semibold w-12rem"> Scada Name</label>
-        <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="pseEdit.scadaInfo.scadaName" />
-      </div>
-
-      <template #footer>
-        <Button type="button" label="Cancel" severity="secondary" @click="editVisibleDialog = false"></Button>
-        <Button type="button" label="Submit" @click="editPSE()"></Button>
-      </template>
-    </Dialog>
-
-    <!-- Delete dialog data -->
-    <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '28rem' }" header="Delete " :modal="true">
-      <template #header>
-        <div class="inline-flex align-items-center justify-content-center gap-2">
-          <span class="font-bold white-space-nowrap">Delete Power Systwem</span>
-        </div>
-      </template>
-      <span class="p-text-secondary block mb-5">Power Systwem information.</span>
-
-      <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-        <label for="areaname" class="font-semibold w-12rem"> Name</label>
-        <InputText
-          id="areaname"
-          v-model="pseDelete.generalInfo.name"
-          class="flex-auto"
-          readonly="true"
-          autocomplete="off"
-        />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-        <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
-        <InputText
-          id="areaname"
-          v-model="pseDelete.generalInfo.emsName"
-          class="flex-auto"
-          readonly="true"
-          autocomplete="off"
-        />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-        <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-        <InputText
-          id="areaname"
-          v-model="pseDelete.generalInfo.emsUniqueId"
-          class="flex-auto"
-          readonly="true"
-          autocomplete="off"
-        />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-        <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
-        <InputText
-          id="areaname"
-          v-model="pseDelete.generalInfo.operationName"
-          class="flex-auto"
-          readonly="true"
-          autocomplete="off"
-        />
-      </div>
-      <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-        <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
-        <InputText
-          id="areaname"
-          v-model="pseDelete.generalInfo.softwareName"
-          class="flex-auto"
-          readonly="true"
-          autocomplete="off"
-        />
-      </div>
-      <span class="p-text-secondary block mt-5 mb-3">Scada information</span>
-
-      <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-        <label for="areaname" class="font-semibold w-12rem"> Scada Name</label>
-        <InputText
-          id="areaname"
-          v-model="pseDelete.scadaInfo.scadaName"
-          class="flex-auto"
-          readonly="true"
-          autocomplete="off"
-        />
-      </div>
-
-      <template #footer>
-        <Button type="button" label="Cancel" severity="secondary" @click="deleteVisibleDialog = false"></Button>
-        <Button type="button" label="Submit" @click="deletePSE()"></Button>
+        <Button type="button" label="Cancel" severity="secondary" @click="showCompareDialog = false"></Button>
+        <Button type="button" label="Submit" @click="updatePS()"></Button>
       </template>
     </Dialog>
   </div>
@@ -210,24 +214,25 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import chartComposable from '@/combosables/chartData';
 import api from './api';
+
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
-import ConfirmPopup from 'primevue/confirmpopup';
-import { useCommonStore } from '@/store';
 
-const commonStore = useCommonStore();
-const { projectId, psm_automatic, psm_active, psmList } = storeToRefs(commonStore);
+import generalTabWidget from './generalTabWidget.vue';
+import engineInfoTabWidget from './engineInfoTabWidget.vue';
+import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
+import compareTabWidget from './compareTabWidget.vue';
+
 const toast = useToast();
 
 const listPSD = ref([]);
 const totalList = ref(0);
 const currentPage = ref(1);
 const powersystemData = ref([]);
-const powersystemCompareData = ref();
 
 const onPageChange = (event) => {
   currentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
@@ -238,6 +243,12 @@ onMounted(() => {
   getPSDEdit();
 });
 
+const onTabChange = (event) => {
+  if (event.index === 3) {
+    // compare tab
+    getComparePSD();
+  }
+};
 const getPSDEdit = async () => {
   try {
     const res = await api.getPSDEdit({ page: currentPage.value });
@@ -246,84 +257,46 @@ const getPSDEdit = async () => {
   } catch (error) {
     console.log('getPSDEdit: error ', error);
     // progressSpinnerModal.value = false;
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+//compare
+const powersystemCompareData = ref();
 
 const getComparePSD = async () => {
   try {
     const res = await api.getComparePSD();
     powersystemCompareData.value = res.data;
   } catch (error) {
+    powersystemCompareData.value = undefined;
+
     console.log('getComparePSD: error ', error);
-
-    // progressSpinnerModal.value = false;
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: JSON.stringify(error), life: 3000 });
-  }
-};
-
-// create
-const createVisibleDialog = ref(false);
-const psCreate = reactive({
-  generalInfo: {
-    name: 'test',
-    emsName: 'test',
-    emsUniqueId: 'test',
-    operationName: 'test',
-    softwareName: 'test',
-  },
-  scadaInfo: {
-    scadaName: 'test',
-  },
-});
-
-const createPS = async () => {
-  try {
-    const res = await api.createPS(psCreate);
-    powersystemData.value.push(res.data);
-    totalList.value = totalList.value + 1;
-    createVisibleDialog.value = false;
-  } catch (error) {
-    console.log('handleCreatePS: error ', error);
-    // progressSpinnerModal.value = false;
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 
 // Edit
-const editVisibleDialog = ref(false);
-const pseEdit = ref({});
-const handleEditPSE = (pseData) => {
-  pseEdit.value = pseData;
-  editVisibleDialog.value = true;
-};
-
-const editPSE = async () => {
+const editPSE = async (pseUpdate) => {
   try {
-    await api.editPSE(pseEdit.value);
-    editVisibleDialog.value = false;
+    await api.editPSE(pseUpdate);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
   } catch (error) {
     console.log('editPS: error ', error);
     // progressSpinnerModal.value = false;
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: JSON.stringify(error), life: 3000 });
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 
 // Delete
-const deleteVisibleDialog = ref(false);
-const pseDelete = ref({});
-const handleDeletePSE = (pseData) => {
-  pseDelete.value = pseData;
-  deleteVisibleDialog.value = true;
-};
-
-const deletePSE = async () => {
+const deletePSE = async (pseId) => {
   try {
-    const res = await api.deletePSE(pseDelete.value._id);
-    deleteVisibleDialog.value = false;
+    await api.deletePSE(pseId);
+    getPSDEdit();
+    toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
   } catch (error) {
     console.log('deletePSE: error ', error);
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: JSON.stringify(error), life: 3000 });
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 </script>
