@@ -1,16 +1,24 @@
 {
-  "_id": "",
+  "id": "66ce9a8faa0f4fbf53e499de",
+  "projectId": "66cbfbaa4cbf3b8182e3a100",
   "generalInfo": {
-    "name": "wmnZLLFAgJ",
-    "uniqueId": "wmnZLLFAgJ",
-    "emsName": "wmnZLLFAgJ",
-    "emsUniqueId": "wmnZLLFAgJ",
-    "operationName": "wmnZLLFAgJ",
-    "operationUniqueId": "wmnZLLFAgJ",
-    "softwareName": "wmnZLLFAgJ",
-    "softwareUniqueId": "wmnZLLFAgJ"
+    "name": "HRYrm1EVrX",
+    "uniqueId": "HRYrm1EVrX",
+    "parrentId": "",
+    "emsName": "HRYrm1EVrX",
+    "emsUniqueId": "HRYrm1EVrX",
+    "operationName": "HRYrm1EVrX",
+    "operationUniqueId": "HRYrm1EVrX",
+    "softwareName": "HRYrm1EVrX",
+    "softwareUniqueId": "HRYrm1EVrX"
   },
-  "engineInfo": { "powerSystemDefinitionId": "", "values": [""] },
-  "scadaInfo": { "skey": "wmnZLLFAgJ", "scadaName": "wmnZLLFAgJ", "scadaUniqueId": "wmnZLLFAgJ" },
-  "projectId": "66cbfbaa4cbf3b8182e3a100"
+  "engineInfo": {
+    "powerSystemDefinitionId": "",
+    "values": [""]
+  },
+  "scadaInfo": {
+    "skey": "HRYrm1EVrX",
+    "scadaName": "HRYrm1EVrX",
+    "scadaUniqueId": "HRYrm1EVrX"
+  }
 }

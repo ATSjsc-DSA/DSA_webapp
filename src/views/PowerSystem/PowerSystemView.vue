@@ -3,8 +3,8 @@
 
   <div class="card layout-content h-full">
     <Splitter style="height: 100%">
-      <SplitterPanel :size="25" :minSize="10">
-        <Card>
+      <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
+        <Card class="h-full">
           <template #title>
             <div class="flex flex-wrap justify-content-between align-items-center justify-center gap-2">
               <div>Power System definition</div>
@@ -46,7 +46,7 @@
           </template>
         </Card>
       </SplitterPanel>
-      <SplitterPanel :size="75">
+      <SplitterPanel :size="75" style="overflow-y: auto">
         <div class="m-3 flex gap-2 justify-content-between">
           <div class="flex gap-2 justify-content-start">
             <div class="flex gap-2 justify-content-start">
@@ -54,7 +54,8 @@
               <Button label="Engine" class="" :text="tabDataActive !== 1" @click="tabDataActive = 1" />
               <Button label="Scada" class="" :text="tabDataActive !== 2" @click="tabDataActive = 2" />
             </div>
-            <div class="pl-3 border-left-1">
+            <div class="pl-3 border-left-1"></div>
+            <div class="pl-1 flex gap-2 justify-content-start">
               <Button
                 icon="pi pi-history"
                 label="History"
@@ -78,7 +79,7 @@
           </div>
         </div>
 
-        <TabView v-model:activeIndex="tabDataActive" @tab-change="onTabDataChange">
+        <TabView v-model:activeIndex="tabDataActive">
           <TabPanel header="">
             <generalTabWidget
               :data="powersystemData"
@@ -146,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import api from './api';
 
 import TabView from 'primevue/tabview';
@@ -221,17 +222,20 @@ const getPSDEdit = async () => {
 const psCompareData = ref();
 
 const tabDataActive = ref(0);
-const onTabDataChange = (event) => {
-  if (event.index === 3) {
+watch(tabDataActive, (newId) => {
+  if (newId === 3) {
     // compare tab
     getComparePSD();
   }
-};
+});
 
-const getComparePSD = async () => {
+const getComparePSD = async (reload = false) => {
   try {
     const res = await api.getComparePSD();
     psCompareData.value = res.data;
+    if (reload) {
+      toast.add({ severity: 'info', summary: 'History', detail: 'Reload Successfully', life: 3000 });
+    }
   } catch (error) {
     psCompareData.value = undefined;
 
