@@ -40,6 +40,14 @@ instance.interceptors.response.use(
   },
   async (error) => {
     const { response } = error;
+    if (!response) {
+      console.log('SERVER ERROR 500');
+      return Promise.reject({
+        data: {
+          detail: 'SERVER ERROR NO DATA',
+        },
+      });
+    }
     if (response.status === 401) {
       if (response.data.detail === 'jwt expired') {
         const refreshToken = localStorage.getItem('refreshToken');

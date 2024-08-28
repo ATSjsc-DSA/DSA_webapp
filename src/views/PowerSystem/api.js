@@ -7,56 +7,30 @@ console.log('projectId', projectId.value);
 console.log('psm_active', psm_active.value._id);
 
 export default class api {
+  // power system definition
   static async getPSD(data) {
-    return get(`/powersystem/${projectId.value}/powersystemdata`, data);
+    return get(`/powersystem/${projectId.value}/powersystemdefinition`, data);
   }
 
-  static async getPSDEdit(data) {
-    return get(`/powersystem/${projectId.value}/powersystemedit`, data);
+  static async getActivePSD(psdId) {
+    return get(`/powersystem/${projectId.value}/powersystemdefinition/${psdId}`);
   }
+
+  static async getPSDEdit(psdId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${psdId}`);
+  }
+
+  // power system
+
   static async getComparePSD() {
     return get(`/powersystem/${projectId.value}/compare_powersystem`);
   }
 
-  static async createGeneralPSE(data) {
-    return post(`/powersystem/${projectId.value}/powersystemedit`, {
-      projectId: projectId.value,
-      generalInfo: data,
-      engineInfo: {
-        elementsDefinitionId: '',
-        values: [''],
-      },
-      scadaInfo: {
-        skey: '',
-        scadaName: '',
-        scadaUniqueId: '',
-      },
-    });
+  static async createPS(data) {
+    data.projectId = projectId.value;
+    return post(`/powersystem/${projectId.value}/powersystemedit`, data);
   }
 
-  static async createEnginePSE(data) {
-    return post(`/powersystem/${projectId.value}/powersystemedit`, {
-      _id: 'string',
-      projectId: 'string',
-      generalInfo: {
-        name: 'string',
-        uniqueId: 'string',
-        parrentId: 'string',
-        emsName: 'string',
-        emsUniqueId: 'string',
-        operationName: 'string',
-        operationUniqueId: 'string',
-        softwareName: 'string',
-        softwareUniqueId: 'string',
-      },
-      engineInfo: data,
-      scadaInfo: {
-        skey: 'string',
-        scadaName: 'string',
-        scadaUniqueId: 'string',
-      },
-    });
-  }
   static async editPSE(data) {
     return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, data);
   }
