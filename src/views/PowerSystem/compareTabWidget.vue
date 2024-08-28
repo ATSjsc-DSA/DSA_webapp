@@ -52,7 +52,7 @@
         <Column header="scadaName" sortable field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
-        <template #empty> No change. </template>
+        <template #empty> No change </template>
       </DataTable>
     </div>
   </Panel>
@@ -107,7 +107,7 @@
         <Column header="scadaName" sortable field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
-        <template #empty> No change. </template>
+        <template #empty> No change </template>
       </DataTable>
     </div>
   </Panel>
@@ -162,7 +162,7 @@
         <Column header="scadaName" sortable field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
-        <template #empty> No change. </template>
+        <template #empty> No change </template>
       </DataTable>
     </div>
   </Panel>

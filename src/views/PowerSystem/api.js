@@ -20,6 +20,11 @@ export default class api {
     return get(`/powersystem/${projectId.value}/powersystemedit/definition/${psdId}`);
   }
 
+  // tree
+
+  static async getChildOnPS(parentId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/child/${parentId}`);
+  }
   // power system
 
   static async getComparePSD() {

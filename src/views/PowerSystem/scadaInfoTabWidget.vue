@@ -20,6 +20,7 @@
         </div>
       </template>
     </Column>
+    <template #empty> No Data </template>
   </DataTable>
 
   <!-- Edit dialog data -->

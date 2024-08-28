@@ -20,7 +20,17 @@
             </div>
           </template>
           <template #content>
-            <template v-if="showListPSDAsTree"> </template>
+            <template v-if="showListPSDAsTree">
+              <Tree
+                v-model:selectionKeys="nodeSelected"
+                :value="treePs"
+                loadingMode="icon"
+                class="w-full md:w-[30rem]"
+                selectionMode="single"
+                @node-expand="onNodeExpand"
+                @node-select="onNodeSelect"
+              />
+            </template>
             <template v-else>
               <DataView :value="listPSD" class="w-full">
                 <template #list="slotProps">
@@ -58,7 +68,7 @@
             <div class="pl-1 flex gap-2 justify-content-start">
               <Button
                 icon="pi pi-history"
-                label="History"
+                label="Compare"
                 class=""
                 :outlined="tabDataActive !== 3"
                 @click="tabDataActive = 3"
@@ -161,6 +171,10 @@ import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTabWidget.vue';
 
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { projectId } = storeToRefs(commonStore);
+
 const toast = useToast();
 
 onMounted(async () => {
@@ -168,12 +182,13 @@ onMounted(async () => {
   if (listPSD.value.length > 0) {
     getActivePSD(listPSD.value[0]);
   }
+  treePs.value = await getLeaf(projectId.value);
 });
 
 // get data
 
 // --- Powersystem List
-const showListPSDAsTree = ref(false);
+const showListPSDAsTree = ref(true);
 const listPSD = ref([]);
 const getPSD = async () => {
   try {
@@ -186,6 +201,57 @@ const getPSD = async () => {
   }
 };
 
+// ---Powersystem tree
+const treePs = ref();
+
+const getLeaf = async (parentId) => {
+  try {
+    const childData = await api.getChildOnPS(parentId);
+    const data = [];
+    for (let index = 0; index < childData.data.length; index++) {
+      data.push({
+        key: childData.data[index]._id,
+        label: childData.data[index].name,
+        leaf: false,
+        loading: false,
+      });
+    }
+    return data;
+  } catch (error) {
+    console.log('getFirstChildOnPSTree: error ', error);
+    // progressSpinnerModal.value = false;
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const onNodeExpand = async (node) => {
+  if (!node.children) {
+    node.loading = true;
+    node.children = await getLeaf(node.key);
+    if (node.children.length == 0) {
+      node.leaf = true;
+    }
+    node.loading = false;
+  }
+  if (!node.leaf) {
+    for (let childInd = 0; childInd < node.children.length; childInd++) {
+      const grandchildrenData = await getLeaf(node.children[childInd].key);
+      if (grandchildrenData.length > 0) {
+        node.children[childInd].children = grandchildrenData;
+      } else {
+        node.children[childInd].leaf = true;
+      }
+    }
+  }
+};
+
+const nodeSelected = ref();
+const onNodeSelect = (node) => {
+  if (node.key != psdActiveId.value) {
+    psdActiveId.value = node.key;
+    getPSDEdit();
+  }
+};
 // --- Powersystem Active
 
 const psdActiveId = ref();
@@ -211,6 +277,9 @@ const getPSDEdit = async () => {
   try {
     const res = await api.getPSDEdit(psdActiveId.value);
     powersystemData.value = res.data;
+    // if (powersystemData.value.length === 0) {
+    //   toast.add({ severity: 'info', summary: 'Power System', detail: 'No data', life: 3000 });
+    // }
   } catch (error) {
     console.log('getPSDEdit: error ', error);
     // progressSpinnerModal.value = false;
@@ -234,7 +303,7 @@ const getComparePSD = async (reload = false) => {
     const res = await api.getComparePSD();
     psCompareData.value = res.data;
     if (reload) {
-      toast.add({ severity: 'info', summary: 'History', detail: 'Reload Successfully', life: 3000 });
+      toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
     }
   } catch (error) {
     psCompareData.value = undefined;

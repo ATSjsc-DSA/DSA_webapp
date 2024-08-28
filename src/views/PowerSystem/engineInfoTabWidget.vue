@@ -25,6 +25,7 @@
         </div>
       </template>
     </Column>
+    <template #empty> No Data </template>
   </DataTable>
 
   <Toast />
