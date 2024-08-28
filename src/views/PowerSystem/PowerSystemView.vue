@@ -32,7 +32,7 @@
               />
             </template>
             <template v-else>
-              <DataView :value="listPSD" class="w-full">
+              <DataView :value="definitionList" class="w-full">
                 <template #list="slotProps">
                   <div class="grid grid-nogutter">
                     <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -40,9 +40,9 @@
                         class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
                         :class="{
                           'border-top-1 surface-border': index !== 0,
-                          'selected-item': psdActiveId === item._id,
+                          'selected-item': definitionId === item._id,
                         }"
-                        @click="getActivePSD(item)"
+                        @click="getDefinitionHeader(item)"
                       >
                         <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
                           <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
@@ -60,9 +60,9 @@
         <div class="m-3 flex gap-2 justify-content-between">
           <div class="flex gap-2 justify-content-start">
             <div class="flex gap-2 justify-content-start">
-              <Button label="General" class="" :text="tabDataActive !== 0" @click="tabDataActive = 0" />
-              <Button label="Engine" class="" :text="tabDataActive !== 1" @click="tabDataActive = 1" />
-              <Button label="Scada" class="" :text="tabDataActive !== 2" @click="tabDataActive = 2" />
+              <Button label="General" class="" :text="tabMenuActive !== 0" @click="tabMenuActive = 0" />
+              <Button label="Engine" class="" :text="tabMenuActive !== 1" @click="tabMenuActive = 1" />
+              <Button label="Scada" class="" :text="tabMenuActive !== 2" @click="tabMenuActive = 2" />
             </div>
             <div class="pl-3 border-left-1"></div>
             <div class="pl-1 flex gap-2 justify-content-start">
@@ -70,15 +70,15 @@
                 icon="pi pi-history"
                 label="Compare"
                 class=""
-                :outlined="tabDataActive !== 3"
-                @click="tabDataActive = 3"
+                :outlined="tabMenuActive !== 3"
+                @click="tabMenuActive = 3"
               />
               <Button
                 icon="pi pi-list"
                 label="Version"
                 class=""
-                :outlined="tabDataActive !== 4"
-                @click="tabDataActive = 4"
+                :outlined="tabMenuActive !== 4"
+                @click="tabMenuActive = 4"
               />
             </div>
           </div>
@@ -89,30 +89,30 @@
           </div>
         </div>
 
-        <TabView v-model:activeIndex="tabDataActive">
+        <TabView v-model:activeIndex="tabMenuActive">
           <TabPanel header="">
             <generalTabWidget
-              :data="powersystemData"
-              :psdData="psdActiveData"
-              @getData="getPSDEdit"
+              :data="psData"
+              :psdData="definitionHeader"
+              @getData="getDefinitionListEdit"
               @editData="editPSE"
               @deleteData="deletePSE"
             />
           </TabPanel>
           <TabPanel>
             <engineInfoTabWidget
-              :data="powersystemData"
-              :psdData="psdActiveData"
-              @getData="getPSDEdit"
+              :data="psData"
+              :psdData="definitionHeader"
+              @getData="getDefinitionListEdit"
               @editData="editPSE"
               @deleteData="deletePSE"
             />
           </TabPanel>
           <TabPanel>
             <scadaInfoTabWidget
-              :data="powersystemData"
-              :psdData="psdActiveData"
-              @getData="getPSDEdit"
+              :data="psData"
+              :psdData="definitionHeader"
+              @getData="getDefinitionListEdit"
               @editData="editPSE"
               @deleteData="deletePSE"
             />
@@ -178,35 +178,71 @@ const { projectId } = storeToRefs(commonStore);
 const toast = useToast();
 
 onMounted(async () => {
-  await getPSD();
-  if (listPSD.value.length > 0) {
-    getActivePSD(listPSD.value[0]);
+  await getDefinitionList();
+  if (definitionList.value.length > 0) {
+    await getDefinitionHeader(definitionList.value[0]);
+    if (definitionHeader.value) {
+      await getDefinitionData();
+    }
   }
   treePs.value = await getLeaf(projectId.value);
 });
 
 // get data
-
-// --- Powersystem List
 const showListPSDAsTree = ref(true);
-const listPSD = ref([]);
-const getPSD = async () => {
+const psData = ref([]);
+
+//  -- list - definition list
+const definitionList = ref([]);
+const definitionId = ref();
+const definitionHeader = ref();
+
+const getDefinitionList = async () => {
   try {
-    const res = await api.getPSD();
-    listPSD.value = res.data;
+    const res = await api.getDefinitionList();
+    definitionList.value = res.data;
   } catch (error) {
-    console.log('getPSD: error ', error);
+    console.log('getDefinitionList: error ', error);
     // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 
-// ---Powersystem tree
+const getDefinitionHeader = async (definition) => {
+  definitionId.value = definition._id;
+  try {
+    const res = await api.getDefinitionHeader(definitionId.value);
+    definitionHeader.value = res.data;
+  } catch (error) {
+    definitionHeader.value = undefined;
+    console.log('getDefinitionHeader: error ', error);
+    // progressSpinnerModal.value = false;
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const getDefinitionData = async () => {
+  try {
+    const res = await api.getDefinitionData(definitionId.value);
+    psData.value = res.data;
+  } catch (error) {
+    console.log('getDefinitionData: error ', error);
+    // progressSpinnerModal.value = false;
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+//  tree - powersystem edit
 const treePs = ref();
-
+const nodeSelected = ref();
+const pseId = ref();
+const onNodeSelect = (node) => {
+  if (node.key != pseId.value) {
+    pseId.value = node.key;
+    getPSEditData();
+  }
+};
 const getLeaf = async (parentId) => {
   try {
-    const childData = await api.getChildOnPS(parentId);
+    const childData = await api.getChildOnPSEdit(parentId);
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
@@ -245,53 +281,21 @@ const onNodeExpand = async (node) => {
   }
 };
 
-const nodeSelected = ref();
-const onNodeSelect = (node) => {
-  if (node.key != psdActiveId.value) {
-    psdActiveId.value = node.key;
-    getPSDEdit();
-  }
-};
-// --- Powersystem Active
-
-const psdActiveId = ref();
-const psdActiveData = ref();
-
-const getActivePSD = async (psdData) => {
-  psdActiveId.value = psdData._id;
+const getPSEditData = async () => {
   try {
-    const res = await api.getActivePSD(psdActiveId.value);
-    psdActiveData.value = res.data;
-    getPSDEdit();
+    const res = await api.getPSEditData(pseId.value);
+    await getDefinitionHeader(res.data.engineInfo.powerSystemDefinitionId);
+    psData.value = [res.data];
   } catch (error) {
-    console.log('getActivePSD: error ', error);
+    console.log('getPSEditData: error ', error);
     // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
-
-// --- Powersystem Data
-const powersystemData = ref([]);
-
-const getPSDEdit = async () => {
-  try {
-    const res = await api.getPSDEdit(psdActiveId.value);
-    powersystemData.value = res.data;
-    // if (powersystemData.value.length === 0) {
-    //   toast.add({ severity: 'info', summary: 'Power System', detail: 'No data', life: 3000 });
-    // }
-  } catch (error) {
-    console.log('getPSDEdit: error ', error);
-    // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
-
 // --- compare
 const psCompareData = ref();
-
-const tabDataActive = ref(0);
-watch(tabDataActive, (newId) => {
+const tabMenuActive = ref(0);
+watch(tabMenuActive, (newId) => {
   if (newId === 3) {
     // compare tab
     getComparePSD();
@@ -344,7 +348,7 @@ const createPS = async () => {
     await api.createPS(psCreate);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    getPSDEdit();
+    getDefinitionListEdit();
   } catch (error) {
     console.log('createPS: error ', error);
     // progressSpinnerModal.value = false;
@@ -356,7 +360,7 @@ const editPSE = async (pseUpdate) => {
   try {
     await api.editPSE(pseUpdate);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    getPSDEdit();
+    getDefinitionListEdit();
   } catch (error) {
     console.log('editPS: error ', error);
     // progressSpinnerModal.value = false;
@@ -369,7 +373,7 @@ const deletePSE = async (pseId) => {
   try {
     await api.deletePSE(pseId);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
-    getPSDEdit();
+    getDefinitionListEdit();
   } catch (error) {
     console.log('deletePSE: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });

@@ -7,30 +7,30 @@ console.log('projectId', projectId.value);
 console.log('psm_active', psm_active.value._id);
 
 export default class api {
-  // power system definition
-  static async getPSD(data) {
+  // list - definition list
+  static async getDefinitionList(data) {
     return get(`/powersystem/${projectId.value}/powersystemdefinition`, data);
   }
 
-  static async getActivePSD(psdId) {
-    return get(`/powersystem/${projectId.value}/powersystemdefinition/${psdId}`);
+  static async getDefinitionHeader(definitionId) {
+    return get(`/powersystem/${projectId.value}/powersystemdefinition/${definitionId}`);
   }
 
-  static async getPSDEdit(psdId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${psdId}`);
+  static async getDefinitionData(definitionId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${definitionId}`);
   }
 
-  // tree
+  // tree - powersystem edit
 
-  static async getChildOnPS(parentId) {
+  static async getChildOnPSEdit(parentId) {
     return get(`/powersystem/${projectId.value}/powersystemedit/child/${parentId}`);
   }
-  // power system
 
-  static async getComparePSD() {
-    return get(`/powersystem/${projectId.value}/compare_powersystem`);
+  static async getPSEditData(pseId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/${pseId}`);
   }
 
+  // CRUD
   static async createPS(data) {
     data.projectId = projectId.value;
     return post(`/powersystem/${projectId.value}/powersystemedit`, data);
@@ -41,5 +41,11 @@ export default class api {
   }
   static async deletePSE(psde_id) {
     return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);
+  }
+
+  // compare
+
+  static async getComparePSD() {
+    return get(`/powersystem/${projectId.value}/compare_powersystem`);
   }
 }
