@@ -7,7 +7,6 @@
       :totalRecords="totalList"
       dataKey="_id"
       tableStyle="min-width: 50rem"
-      :rowClass="rowClass"
       :lazy="true"
       @page="onPageChange"
       :sortOrder="1"

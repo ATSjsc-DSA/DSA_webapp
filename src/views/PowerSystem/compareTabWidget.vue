@@ -1,6 +1,8 @@
 <template>
   <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
     <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="emit('getData', true)" />
+
+    <Button severity="success" icon="pi pi-save" label="Save" @click="createVisibleDialog = true" />
   </div>
   <!-- Add  -->
   <Panel toggleable>
@@ -12,7 +14,6 @@
         :value="data.Add"
         dataKey="_id"
         tableStyle="min-width: 50rem"
-        :rowClass="rowClass"
         :lazy="true"
         :sortOrder="1"
         rowHover
@@ -26,7 +27,7 @@
             <Column header="Scada" :colspan="3" />
           </Row>
           <Row>
-            <Column header="name" field="generalInfo.name" />
+            <Column header="name" sortable field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="emsName" field="generalInfo.emsName" />
             <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
@@ -35,12 +36,12 @@
             <Column header="softwareName" field="generalInfo.softwareName" />
             <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
             <Column header="skey" field="scadaInfo.skey" />
-            <Column header="scadaName" sortable field="scadaInfo.scadaName" />
+            <Column header="scadaName" field="scadaInfo.scadaName" />
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
 
-        <Column header="name" field="generalInfo.name" />
+        <Column header="name" sortable field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="emsName" field="generalInfo.emsName" />
         <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
@@ -49,7 +50,7 @@
         <Column header="softwareName" field="generalInfo.softwareName" />
         <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
         <Column header="skey" field="scadaInfo.skey" />
-        <Column header="scadaName" sortable field="scadaInfo.scadaName" />
+        <Column header="scadaName" field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
         <template #empty> No change </template>
@@ -67,7 +68,6 @@
         :value="data.Update"
         dataKey="_id"
         tableStyle="min-width: 50rem"
-        :rowClass="rowClass"
         :lazy="true"
         :sortOrder="1"
         rowHover
@@ -81,7 +81,7 @@
             <Column header="Scada" :colspan="3" />
           </Row>
           <Row>
-            <Column header="name" field="generalInfo.name" />
+            <Column header="name" sortable field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="emsName" field="generalInfo.emsName" />
             <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
@@ -90,12 +90,12 @@
             <Column header="softwareName" field="generalInfo.softwareName" />
             <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
             <Column header="skey" field="scadaInfo.skey" />
-            <Column header="scadaName" sortable field="scadaInfo.scadaName" />
+            <Column header="scadaName" field="scadaInfo.scadaName" />
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
 
-        <Column header="name" field="generalInfo.name" />
+        <Column header="name" sortable field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="emsName" field="generalInfo.emsName" />
         <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
@@ -104,7 +104,7 @@
         <Column header="softwareName" field="generalInfo.softwareName" />
         <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
         <Column header="skey" field="scadaInfo.skey" />
-        <Column header="scadaName" sortable field="scadaInfo.scadaName" />
+        <Column header="scadaName" field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
         <template #empty> No change </template>
@@ -122,7 +122,6 @@
         :value="data.Delete"
         dataKey="_id"
         tableStyle="min-width: 50rem"
-        :rowClass="rowClass"
         :lazy="true"
         :sortOrder="1"
         rowHover
@@ -136,7 +135,7 @@
             <Column header="Scada" :colspan="3" />
           </Row>
           <Row>
-            <Column header="name" field="generalInfo.name" />
+            <Column header="name" sortable field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="emsName" field="generalInfo.emsName" />
             <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
@@ -145,12 +144,12 @@
             <Column header="softwareName" field="generalInfo.softwareName" />
             <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
             <Column header="skey" field="scadaInfo.skey" />
-            <Column header="scadaName" sortable field="scadaInfo.scadaName" />
+            <Column header="scadaName" field="scadaInfo.scadaName" />
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
 
-        <Column header="name" field="generalInfo.name" />
+        <Column header="name" sortable field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="emsName" field="generalInfo.emsName" />
         <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
@@ -159,17 +158,45 @@
         <Column header="softwareName" field="generalInfo.softwareName" />
         <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
         <Column header="skey" field="scadaInfo.skey" />
-        <Column header="scadaName" sortable field="scadaInfo.scadaName" />
+        <Column header="scadaName" field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
         <template #empty> No change </template>
       </DataTable>
     </div>
   </Panel>
+
+  <!-- create dialog data -->
+  <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Power Systwem</span>
+      </div>
+    </template>
+
+    <div class="flex align-items-center gap-3 mb-3">
+      <label :for="nameVersion" class="font-semibold w-12rem"> Name Version</label>
+      <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label :for="scheduledOperationTime" class="font-semibold w-12rem"> Scheduled Operation Time</label>
+      <InputNumber :id="scheduledOperationTime" v-model="scheduledOperationTime" class="flex-auto" autocomplete="off" />
+    </div>
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" :disabled="!nameVersion" @click="createNewVersion"></Button>
+    </template>
+  </Dialog>
+  <Toast />
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, computed } from 'vue';
+import api from './api';
+
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+const toast = useToast();
 
 const props = defineProps({
   data: {
@@ -188,4 +215,20 @@ const data = computed(() => {
   }
   return props.data;
 });
+
+const createVisibleDialog = ref(false);
+const nameVersion = ref('');
+const scheduledOperationTime = ref();
+const createNewVersion = async () => {
+  try {
+    await api.createNewVersion(nameVersion.value);
+    createVisibleDialog.value = false;
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    emit('getData');
+  } catch (error) {
+    console.log('createPS: error ', error);
+    // progressSpinnerModal.value = false;
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
 </script>

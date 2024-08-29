@@ -10,28 +10,17 @@
               <div>Power System definition</div>
               <div>
                 <Button
-                  :icon="showListPSDAsTree ? 'pi pi-align-left' : 'pi pi-sitemap'"
+                  :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
                   severity="secondary"
                   aria-label="show List PSD As Tree"
-                  :title="showListPSDAsTree ? 'Show as list' : 'Show as menu'"
-                  @click="showListPSDAsTree = !showListPSDAsTree"
+                  :title="showDefinitionList ? 'Show as menu' : 'Show as list'"
+                  @click="showDefinitionList = !showDefinitionList"
                 />
               </div>
             </div>
           </template>
           <template #content>
-            <template v-if="showListPSDAsTree">
-              <Tree
-                v-model:selectionKeys="nodeSelected"
-                :value="treePs"
-                loadingMode="icon"
-                class="w-full md:w-[30rem]"
-                selectionMode="single"
-                @node-expand="onNodeExpand"
-                @node-select="onNodeSelect"
-              />
-            </template>
-            <template v-else>
+            <template v-if="showDefinitionList">
               <DataView :value="definitionList" class="w-full">
                 <template #list="slotProps">
                   <div class="grid grid-nogutter">
@@ -52,6 +41,17 @@
                   </div>
                 </template>
               </DataView>
+            </template>
+            <template v-else>
+              <Tree
+                v-model:selectionKeys="nodeSelected"
+                :value="treePs"
+                loadingMode="icon"
+                class="w-full md:w-[30rem]"
+                selectionMode="single"
+                @node-expand="onNodeExpand"
+                @node-select="onNodeSelect"
+              />
             </template>
           </template>
         </Card>
@@ -85,25 +85,18 @@
           <div>
             <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
             <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
-            <Button text icon="pi pi-plus" label="Create" @click="createVisibleDialog = true" />
+            <Button text icon="pi pi-plus" label="Create" @click="handleCreatePS" />
           </div>
         </div>
 
         <TabView v-model:activeIndex="tabMenuActive">
           <TabPanel header="">
-            <generalTabWidget
-              :data="psData"
-              :psdData="definitionHeader"
-              @getData="getDefinitionListEdit"
-              @editData="editPSE"
-              @deleteData="deletePSE"
-            />
+            <generalTabWidget :data="psData" :psdData="definitionHeader" @editData="editPSE" @deleteData="deletePSE" />
           </TabPanel>
           <TabPanel>
             <engineInfoTabWidget
               :data="psData"
               :psdData="definitionHeader"
-              @getData="getDefinitionListEdit"
               @editData="editPSE"
               @deleteData="deletePSE"
             />
@@ -112,7 +105,6 @@
             <scadaInfoTabWidget
               :data="psData"
               :psdData="definitionHeader"
-              @getData="getDefinitionListEdit"
               @editData="editPSE"
               @deleteData="deletePSE"
             />
@@ -121,7 +113,7 @@
             <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
           </TabPanel>
           <TabPanel>
-            <p class="m-0">Version</p>
+            <versionTabWidget :data="versionList" />
           </TabPanel>
         </TabView>
       </SplitterPanel>
@@ -137,10 +129,8 @@
       <span class="p-text-secondary block mb-5">General information.</span>
 
       <div v-for="(val, name) in psCreate.generalInfo" :key="name" class="flex align-items-center gap-3 mb-3">
-        <template v-if="name !== 'parrentId'">
-          <label :for="name" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(name) }} </label>
-          <InputText :id="name" v-model="psCreate.generalInfo[name]" class="flex-auto" autocomplete="off" />
-        </template>
+        <label :for="name" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(name) }} </label>
+        <InputText :id="name" v-model="psCreate.generalInfo[name]" class="flex-auto" autocomplete="off" />
       </div>
 
       <span class="p-text-secondary block my-5">Scada information.</span>
@@ -170,6 +160,7 @@ import generalTabWidget from './generalTabWidget.vue';
 import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTabWidget.vue';
+import versionTabWidget from './versionTabWidget.vue';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
@@ -186,12 +177,33 @@ onMounted(async () => {
     }
   }
   treePs.value = await getLeaf(projectId.value);
+
+  getVersionList();
 });
 
+const tabMenuActive = ref(0);
+watch(tabMenuActive, (newId) => {
+  if (newId === 3) {
+    // compare tab
+    getComparePSD();
+  }
+});
 // get data
-const showListPSDAsTree = ref(true);
+const showDefinitionList = ref(true);
 const psData = ref([]);
-
+const isAddNew = ref(false);
+const reloadData = async () => {
+  if (showDefinitionList.value) {
+    await getDefinitionData();
+  } else {
+    await getPSEditData();
+  }
+};
+watch(showDefinitionList, (newStatus) => {
+  if (newStatus === false && isAddNew.value) {
+    treePs.value = getLeaf(projectId.value);
+  }
+});
 //  -- list - definition list
 const definitionList = ref([]);
 const definitionId = ref();
@@ -204,7 +216,7 @@ const getDefinitionList = async () => {
   } catch (error) {
     console.log('getDefinitionList: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -217,7 +229,7 @@ const getDefinitionHeader = async (definition) => {
     definitionHeader.value = undefined;
     console.log('getDefinitionHeader: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Definition Header', detail: error.data.detail, life: 3000 });
   }
 };
 const getDefinitionData = async () => {
@@ -227,19 +239,15 @@ const getDefinitionData = async () => {
   } catch (error) {
     console.log('getDefinitionData: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
 };
 //  tree - powersystem edit
 const treePs = ref();
 const nodeSelected = ref();
+const parentNodeSelected = ref(projectId.value);
 const pseId = ref();
-const onNodeSelect = (node) => {
-  if (node.key != pseId.value) {
-    pseId.value = node.key;
-    getPSEditData();
-  }
-};
+
 const getLeaf = async (parentId) => {
   try {
     const childData = await api.getChildOnPSEdit(parentId);
@@ -248,6 +256,7 @@ const getLeaf = async (parentId) => {
       data.push({
         key: childData.data[index]._id,
         label: childData.data[index].name,
+        parentId: parentId,
         leaf: false,
         loading: false,
       });
@@ -256,7 +265,7 @@ const getLeaf = async (parentId) => {
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -281,26 +290,29 @@ const onNodeExpand = async (node) => {
   }
 };
 
-const getPSEditData = async () => {
+const onNodeSelect = (node) => {
+  console.log(node);
+  if (node.key != pseId.value) {
+    pseId.value = node.key;
+    parentNodeSelected.value = node.parentId;
+    getPSEditData(true);
+  }
+};
+const getPSEditData = async (getHeader = false) => {
   try {
     const res = await api.getPSEditData(pseId.value);
-    await getDefinitionHeader(res.data.engineInfo.powerSystemDefinitionId);
     psData.value = [res.data];
+    if (getHeader) {
+      await getDefinitionHeader(res.data.engineInfo.powerSystemDefinitionId);
+    }
   } catch (error) {
     console.log('getPSEditData: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
 // --- compare
 const psCompareData = ref();
-const tabMenuActive = ref(0);
-watch(tabMenuActive, (newId) => {
-  if (newId === 3) {
-    // compare tab
-    getComparePSD();
-  }
-});
 
 const getComparePSD = async (reload = false) => {
   try {
@@ -313,58 +325,66 @@ const getComparePSD = async (reload = false) => {
     psCompareData.value = undefined;
 
     console.log('getComparePSD: error ', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
   }
 };
 // create
 const createVisibleDialog = ref(false);
 
-const randomString = generateRandomString(10);
-const psCreate = reactive({
-  _id: '',
-  generalInfo: {
-    name: randomString,
-    parrentId: '',
-    uniqueId: randomString,
-    emsName: randomString,
-    emsUniqueId: randomString,
-    operationName: randomString,
-    operationUniqueId: randomString,
-    softwareName: randomString,
-    softwareUniqueId: randomString,
-  },
-  engineInfo: {
-    powerSystemDefinitionId: '',
-    values: [''],
-  },
-  scadaInfo: {
-    skey: randomString,
-    scadaName: randomString,
-    scadaUniqueId: randomString,
-  },
-});
+const psCreate = ref();
+
+const handleCreatePS = () => {
+  const randomString = generateRandomString(10);
+
+  psCreate.value = {
+    _id: '',
+    generalInfo: {
+      name: randomString,
+      parrentId: showDefinitionList.value ? definitionHeader.value.parrentId : parentNodeSelected.value,
+      uniqueId: randomString,
+      emsName: randomString,
+      emsUniqueId: randomString,
+      operationName: randomString,
+      operationUniqueId: randomString,
+      softwareName: randomString,
+      softwareUniqueId: randomString,
+    },
+    engineInfo: {
+      powerSystemDefinitionId: showDefinitionList.value ? definitionId.value : '',
+      values: [''],
+    },
+    scadaInfo: {
+      skey: randomString,
+      scadaName: randomString,
+      scadaUniqueId: randomString,
+    },
+  };
+
+  createVisibleDialog.value = true;
+};
 const createPS = async () => {
   try {
-    await api.createPS(psCreate);
+    await api.createPS(psCreate.value);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    getDefinitionListEdit();
+    reloadData();
   } catch (error) {
     console.log('createPS: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Create Power System', detail: error.data.detail, life: 3000 });
   }
 };
 // Edit
 const editPSE = async (pseUpdate) => {
+  console.log(pseUpdate);
   try {
     await api.editPSE(pseUpdate);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    getDefinitionListEdit();
+    // reloadData();
   } catch (error) {
     console.log('editPS: error ', error);
     // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Updated Power System', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -373,10 +393,10 @@ const deletePSE = async (pseId) => {
   try {
     await api.deletePSE(pseId);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
-    getDefinitionListEdit();
+    reloadData();
   } catch (error) {
     console.log('deletePSE: error ', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'Delete Power System', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -396,6 +416,18 @@ function generateRandomString(length) {
 
   return randomString;
 }
+
+// version
+const versionList = ref();
+const getVersionList = async () => {
+  try {
+    const res = await api.getVersionList();
+    versionList.value = res.data[0];
+  } catch (error) {
+    console.log('getVersionList: error ', error);
+    toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
+  }
+};
 </script>
 
 <style scoped>

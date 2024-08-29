@@ -4,7 +4,6 @@
     :totalRecords="data.length"
     dataKey="_id"
     tableStyle="min-width: 50rem"
-    :rowClass="rowClass"
     :lazy="true"
     :sortOrder="1"
     rowHover
@@ -20,7 +19,6 @@
         </div>
       </template>
     </Column>
-    <template #empty> No Data </template>
   </DataTable>
 
   <!-- Edit dialog data -->
@@ -42,7 +40,7 @@
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="scadaUniqueId" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText id="scadaUniqueId" v-model="pseEdit.scadaInfo.emsscadaUniqueId" class="flex-auto" autocomplete="off" />
+      <InputText id="scadaUniqueId" v-model="pseEdit.scadaInfo.scadaUniqueId" class="flex-auto" autocomplete="off" />
     </div>
 
     <template #footer>
@@ -72,7 +70,7 @@
       <label for="scadaUniqueId" class="font-semibold w-12rem"> Ems UniqueId</label>
       <InputText
         id="scadaUniqueId"
-        v-model="pseDelete.scadaInfo.emsscadaUniqueId"
+        v-model="pseDelete.scadaInfo.scadaUniqueId"
         class="flex-auto"
         autocomplete="off"
         disabled
@@ -100,7 +98,7 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(['getData', 'editData', 'deleteData']);
+const emit = defineEmits(['editData', 'deleteData']);
 
 // Edit
 const editVisibleDialog = ref(false);

@@ -4,7 +4,6 @@
     :totalRecords="data.length"
     dataKey="_id"
     tableStyle="min-width: 50rem"
-    :rowClass="rowClass"
     :lazy="true"
     :sortOrder="1"
     rowHover
@@ -45,13 +44,7 @@
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText
-        id="areaname"
-        v-model="pseEdit.generalInfo.emsUniqueId"
-        class="flex-auto"
-        autocomplete="off"
-        disabled
-      />
+      <InputText id="areaname" v-model="pseEdit.generalInfo.emsUniqueId" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
@@ -138,7 +131,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['getData', 'editData', 'deleteData']);
+const emit = defineEmits(['editData', 'deleteData']);
 
 // Edit
 const editVisibleDialog = ref(false);

@@ -37,7 +37,24 @@ export default class api {
   }
 
   static async editPSE(data) {
-    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, data);
+    const payload = {
+      generalInfo: {
+        name: data.name,
+        uniqueId: data.uniqueId,
+        emsName: data.emsName,
+        emsUniqueId: data.emsUniqueId,
+        operationName: data.operationName,
+        operationUniqueId: data.operationUniqueId,
+        softwareName: data.softwareName,
+        softwareUniqueId: data.softwareUniqueId,
+      },
+      scadaInfo: {
+        skey: data.skey,
+        scadaName: data.scadaName,
+        scadaUniqueId: data.scadaUniqueId,
+      },
+    };
+    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, payload);
   }
   static async deletePSE(psde_id) {
     return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);
@@ -47,5 +64,17 @@ export default class api {
 
   static async getComparePSD() {
     return get(`/powersystem/${projectId.value}/compare_powersystem`);
+  }
+
+  static async createNewVersion(nameVersion) {
+    return post(`/powersystem/${projectId.value}/newversion_powersystem`, { name: nameVersion });
+  }
+
+  // version
+  static async getVersionList() {
+    return get(`/powersystem/${projectId.value}/powersystemversion`);
+  }
+  static async rollbackVersion(versionId) {
+    return put(`/powersystem/${projectId.value}/powersystemversion/${versionId}`);
   }
 }
