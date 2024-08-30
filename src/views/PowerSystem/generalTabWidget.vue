@@ -1,0 +1,173 @@
+<template>
+  <DataTable
+    :value="data"
+    :totalRecords="data.length"
+    dataKey="_id"
+    tableStyle="min-width: 50rem"
+    :lazy="true"
+    :sortOrder="1"
+    rowHover
+  >
+    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+      <template #body="slotProps">
+        <div class="font-bold">
+          {{ slotProps.data.generalInfo.emsUniqueId }}
+        </div>
+      </template>
+    </Column>
+    <Column field="generalInfo.name" header="Name"></Column>
+    <Column field="generalInfo.emsName" header="Ems Name"></Column>
+    <Column field="generalInfo.operationName" header="Operation Name"></Column>
+    <Column field="generalInfo.softwareName" header="Software Name"></Column>
+
+    <Column style="width: 1%; min-width: 5rem">
+      <template #body="slotProps">
+        <div class="flex justify-content-between">
+          <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />
+          <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDeletePSE(slotProps.data)" />
+        </div>
+      </template>
+    </Column>
+    <template #empty> No Data </template>
+  </DataTable>
+
+  <!-- Edit dialog data -->
+  <Dialog v-model:visible="editVisibleDialog" :style="{ width: '28rem' }" header="Edit " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Update Power Systwem</span>
+      </div>
+    </template>
+    <span class="p-text-secondary block mb-5">General information.</span>
+
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText
+        id="areaname"
+        v-model="pseEdit.generalInfo.emsUniqueId"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.emsName" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.operationName" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.softwareName" class="flex-auto" autocomplete="off" />
+    </div>
+
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="editVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" @click="editPSE()"></Button>
+    </template>
+  </Dialog>
+
+  <!-- Delete dialog data -->
+  <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '28rem' }" header="Delete " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Delete Power Systwem</span>
+      </div>
+    </template>
+    <span class="p-text-secondary block mb-5">General information.</span>
+
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.emsUniqueId"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Name</label>
+      <InputText id="areaname" v-model="pseDelete.generalInfo.name" class="flex-auto" disabled autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
+      <InputText id="areaname" v-model="pseDelete.generalInfo.emsName" class="flex-auto" disabled autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.operationName"
+        class="flex-auto"
+        disabled
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.softwareName"
+        class="flex-auto"
+        disabled
+        autocomplete="off"
+      />
+    </div>
+
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="deleteVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" severity="danger" @click="deletePSE()"></Button>
+    </template>
+  </Dialog>
+  <Toast />
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const props = defineProps({
+  data: {
+    type: Array,
+    required: true,
+  },
+  psdData: {
+    type: Object,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['editData', 'deleteData']);
+
+// Edit
+const editVisibleDialog = ref(false);
+const pseEdit = ref({});
+const handleEditPSE = (pseData) => {
+  pseEdit.value = pseData;
+  editVisibleDialog.value = true;
+};
+
+const editPSE = async () => {
+  emit('editData', pseEdit.value);
+  editVisibleDialog.value = false;
+};
+
+// Delete
+const deleteVisibleDialog = ref(false);
+const pseDelete = ref({});
+const handleDeletePSE = (pseData) => {
+  pseDelete.value = pseData;
+  deleteVisibleDialog.value = true;
+};
+
+const deletePSE = async () => {
+  emit('deleteData', pseDelete.value._id);
+  deleteVisibleDialog.value = false;
+};
+</script>

@@ -7,22 +7,22 @@
       :totalRecords="totalList"
       dataKey="_id"
       tableStyle="min-width: 50rem"
-      :rowClass="rowClass"
       :lazy="true"
-      @page="onPageChange"
       :sortOrder="1"
       rowHover
+      @page="onPageChange"
     >
       <template #header>
-        <div class="flex justify-content-end">
+        <div class="flex justify-content-between">
           <Button
             type="button"
             label="Create Project"
             icon="pi pi-plus"
-            @click="handleCreateProject()"
             size="small"
             text
+            @click="handleCreateProject()"
           />
+          <Button v-tooltip.bottom="'Logout'" severity="secondary" icon="pi pi-sign-out" text @click="onLogout()" />
         </div>
       </template>
 
@@ -51,6 +51,13 @@
         <template #body="slotProps">
           <div class="flex justify-content-between">
             <Button
+              icon="pi pi-pencil            "
+              severity="success"
+              text
+              rounded
+              @click="handleEditProject(slotProps.data)"
+            />
+            <Button
               icon="pi pi-trash"
               severity="danger"
               text
@@ -76,16 +83,39 @@
     <span class="p-text-secondary block mb-5">profile information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-6rem"> Name</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="projectCreate.name" />
+      <InputText id="areaname" v-model="projectCreate.name" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-6rem"> Description</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="projectCreate.description" />
+      <InputText id="areaname" v-model="projectCreate.description" class="flex-auto" autocomplete="off" />
     </div>
 
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
       <Button type="button" label="Submit" @click="createProject()"></Button>
+    </template>
+  </Dialog>
+
+  <!-- edit dialog data -->
+  <Dialog v-model:visible="editVisibleDialog" :style="{ width: '28rem' }" header="Edit " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Profile</span>
+      </div>
+    </template>
+    <span class="p-text-secondary block mb-5">profile information.</span>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-6rem"> Name</label>
+      <InputText id="areaname" v-model="projectEdit.name" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-6rem"> Description</label>
+      <InputText id="areaname" v-model="projectEdit.description" class="flex-auto" autocomplete="off" />
+    </div>
+
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="editVisibleDialog = false"></Button>
+      <Button type="button" label="Update" @click="editProject()"></Button>
     </template>
   </Dialog>
 </template>
@@ -107,6 +137,11 @@ const confirm = useConfirm();
 const commonStore = useCommonStore();
 const { projectId } = storeToRefs(commonStore);
 
+const onLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  router.push('/login');
+};
 onMounted(() => {
   getListProject();
 });
@@ -130,14 +165,28 @@ const getListProject = async () => {
   }
 };
 const createVisibleDialog = ref(false);
+const editVisibleDialog = ref(false);
 
 const projectCreate = ref({
   name: '',
   description: '',
 });
 
+const projectEdit = ref({
+  _id: '',
+  name: '',
+  description: '',
+});
 const handleCreateProject = () => {
   createVisibleDialog.value = true;
+};
+const handleEditProject = (dataProject) => {
+  projectEdit.value = {
+    _id: dataProject._id,
+    name: dataProject.name,
+    description: dataProject.description,
+  };
+  editVisibleDialog.value = true;
 };
 
 const createProject = async () => {
@@ -147,6 +196,22 @@ const createProject = async () => {
     toast.add({ severity: 'success', summary: 'Success Message', detail: res.message, life: 3000 });
 
     createVisibleDialog.value = false;
+  } catch (error) {
+    // createVisibleDialog.value = false;
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const editProject = async () => {
+  try {
+    const res = await api.editProject(projectEdit.value._id, {
+      name: projectEdit.value.name,
+      description: projectEdit.value.description,
+    });
+    getListProject();
+    toast.add({ severity: 'success', summary: 'Success Message', detail: res.message, life: 3000 });
+
+    editVisibleDialog.value = false;
   } catch (error) {
     // createVisibleDialog.value = false;
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -164,8 +229,6 @@ const deleteProject = async (event, projectId) => {
     accept: async () => {
       try {
         const res = await api.deleteroject(projectId);
-        console.log(res, 'res');
-
         getListProject();
         toast.add({ severity: 'success', summary: 'Success Message', detail: res.data.message, life: 3000 });
 
@@ -182,6 +245,7 @@ const deleteProject = async (event, projectId) => {
 };
 const runProject = (id) => {
   projectId.value = id;
+  localStorage.setItem('projectId', projectId.value);
   router.push('/powersystem');
 };
 </script>

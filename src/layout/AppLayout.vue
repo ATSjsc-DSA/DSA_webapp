@@ -68,9 +68,9 @@ const isOutsideClicked = (event) => {
 <template>
   <div class="layout-wrapper" :class="containerClass">
     <app-topbar></app-topbar>
-    <div class="layout-sidebar">
+    <!-- <div class="layout-sidebar">
       <app-sidebar></app-sidebar>
-    </div>
+    </div> -->
     <div class="layout-main-container">
       <Loading v-if="isLoading"></Loading>
       <div class="layout-main">

@@ -1,0 +1,45 @@
+{
+  "_id": "66cf03184c5275bc62acb233",
+  "projectId": "66cbfbaa4cbf3b8182e3a100",
+  "generalInfo": {
+      "name": "nhan test - {{}}",
+      "uniqueId": "GX7onecDiU",
+      "parrentId": "66cc01094e27a6957d7acdb5",
+      "emsName": "GX7onecDiU",
+      "emsUniqueId": "GX7onecDiU",
+      "operationName": "GX7onecDiU",
+      "operationUniqueId": "GX7onecDiU",
+      "softwareName": "GX7onecDiU",
+      "softwareUniqueId": "GX7onecDiU"
+  },
+  "engineInfo": {
+      "powerSystemDefinitionId": "66890ef616c908a7a68aa994",
+      "values": [
+          ""
+      ]
+  },
+  "scadaInfo": {
+      "skey": "GX7onecDiU",
+      "scadaName": "GX7onecDiU",
+      "scadaUniqueId": "GX7onecDiU"
+  }
+}
+to -- 
+{
+  "generalInfo": {
+      "name": "nhan test - 0",
+      "uniqueId": "GX7onecDiU",
+      "emsName": "GX7onecDiU",
+      "emsUniqueId": "GX7onecDiU",
+      "operationName": "GX7onecDiU",
+      "operationUniqueId": "GX7onecDiU",
+      "softwareName": "GX7onecDiU",
+      "softwareUniqueId": "GX7onecDiU"
+  },
+
+  "scadaInfo": {
+      "skey": "GX7onecDiU",
+      "scadaName": "GX7onecDiU",
+      "scadaUniqueId": "GX7onecDiU"
+  }
+}

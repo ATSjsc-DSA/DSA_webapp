@@ -22,11 +22,11 @@ const login = async () => {
     const user = await user_api.getUserActive();
     localStorage.setItem('user', user.data.username);
     localStorage.setItem('role', user.data.role);
-    const redirect = router.currentRoute.value.query.redirect;
+    const { redirect } = router.currentRoute.value.query;
     if (redirect) {
       router.push(redirect);
     } else {
-      router.push('/project');
+      router.push('/Project');
     }
     setTimeout(() => {
       loadding.value = false;
@@ -62,29 +62,29 @@ const login = async () => {
             <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
             <InputText
               id="username"
+              v-model="username"
               type="text"
               placeholder="Username"
               class="w-full md:w-30rem mb-5"
               style="padding: 1rem"
-              v-model="username"
             />
 
             <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
             <Password
               id="password1"
+              v-model="password"
               placeholder="Password"
               :toggleMask="true"
               class="w-full mb-3"
               inputClass="w-full"
               :inputStyle="{ padding: '1rem' }"
               :feedback="false"
-              v-model="password"
               v-on:keyup.enter="login()"
             ></Password>
 
             <div class="flex align-items-center justify-content-between mb-5 gap-5">
               <div class="flex align-items-center">
-                <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
+                <Checkbox id="rememberme1" v-model="checked" binary class="mr-2"></Checkbox>
                 <label for="rememberme1">Remember me</label>
               </div>
               <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)"

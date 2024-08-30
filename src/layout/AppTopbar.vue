@@ -2,6 +2,9 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+
+import NavMenu from './NavMenu.vue';
+
 import DSA_api from '@/api/dsa_api';
 import chartComposable from '@/combosables/chartData';
 import { intervalTime } from '@/Constants/';
@@ -16,7 +19,7 @@ const router = useRouter();
 
 const logs = ref();
 const countLogs = ref('0');
-var logView = [];
+let logView = [];
 const interval = ref(null);
 const op = ref();
 const audioSrc = '@/public/img/Elevator Ding-SoundBible.com-685385892.mp3';
@@ -52,7 +55,7 @@ watch(logs, async (newValue, oldValue) => {
     if (logView.length !== 0) {
       await nextTick();
       console.log('abc');
-      var audio = new Audio('/img/SoundBible.mp3');
+      const audio = new Audio('/img/SoundBible.mp3');
       audio.play();
     }
     countLogs.value = logView.length > 5 ? '5+' : String(logView.length);
@@ -73,11 +76,11 @@ const toggle = async (event) => {
 const onTopBarUserView = () => {
   router.push('/DSA/user');
 };
-const onLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('refreshToken');
-  router.push('/login');
+const onProjectView = () => {
+  localStorage.removeItem('projectId');
+  router.push('/Project');
 };
+
 const topbarMenuClasses = computed(() => {
   return {
     'layout-topbar-menu-mobile-active': topbarMenuActive.value,
@@ -122,16 +125,14 @@ const isOutsideClicked = (event) => {
       <span>DSA Solution</span>
     </router-link>
 
-    <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
-      <i class="pi pi-bars"></i>
-    </button>
-
     <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
       <i class="pi pi-ellipsis-v"></i>
     </button>
 
+    <nav-menu />
+
     <div class="layout-topbar-menu" :class="topbarMenuClasses">
-      <div class="p-link layout-topbar-notifi" v-tooltip.bottom="'Notification'" type="text" @click="toggle">
+      <div v-tooltip.bottom="'Notification'" class="p-link layout-topbar-notifi" type="text" @click="toggle">
         <i v-if="countLogs === '0'" class="pi pi-bell"></i>
         <i v-else v-badge.danger="countLogs" class="pi pi-bell" />
         <OverlayPanel ref="op" appendTo="body">
@@ -152,13 +153,13 @@ const isOutsideClicked = (event) => {
           </DataTable>
         </OverlayPanel>
       </div>
-      <button @click="onTopBarUserView()" class="p-link layout-topbar-button" v-tooltip.bottom="'User'" type="text">
+      <button v-tooltip.bottom="'User'" class="p-link layout-topbar-button" type="text" @click="onTopBarUserView()">
         <i class="pi pi-user"></i>
         <span>Profile</span>
       </button>
-      <button @click="onLogout()" class="p-link layout-topbar-button" v-tooltip.bottom="'Logout'" type="text">
+      <button v-tooltip.bottom="'Project'" class="p-link layout-topbar-button" type="text" @click="onProjectView()">
         <i class="pi pi-sign-out"></i>
-        <span>Settings</span>
+        <span>Project</span>
       </button>
     </div>
   </div>
