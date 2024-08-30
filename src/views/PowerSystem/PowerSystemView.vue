@@ -2,6 +2,8 @@
   <Toast />
 
   <div class="card layout-content h-full">
+    <AppProgressSpinner :showSpinner="isLoading"></AppProgressSpinner>
+
     <Splitter style="height: 100%">
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
         <Card class="h-full">
@@ -31,7 +33,7 @@
                           'border-top-1 surface-border': index !== 0,
                           'selected-item': definitionId === item._id,
                         }"
-                        @click="getDefinitionHeader(item)"
+                        @click="getDefinitionHeader(item._id)"
                       >
                         <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
                           <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
@@ -85,11 +87,11 @@
           <div>
             <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
             <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
-            <Button text icon="pi pi-plus" label="Create" @click="handleCreatePS" />
+            <Button text icon="pi pi-plus" label="Create" :disabled="!showDefinitionList" @click="handleCreatePS" />
           </div>
         </div>
 
-        <TabView v-model:activeIndex="tabMenuActive">
+        <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
           <TabPanel header="">
             <generalTabWidget :data="psData" :psdData="definitionHeader" @editData="editPSE" @deleteData="deletePSE" />
           </TabPanel>
@@ -161,13 +163,14 @@ import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTabWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
+import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { projectId } = storeToRefs(commonStore);
 
 const toast = useToast();
-
+const isLoading = ref(false);
 onMounted(async () => {
   loadAllData();
 });
@@ -183,13 +186,14 @@ watch(tabMenuActive, (newId) => {
 const loadAllData = async () => {
   await getDefinitionList();
   if (definitionList.value.length > 0) {
-    await getDefinitionHeader(definitionList.value[0]);
+    await getDefinitionHeader(definitionList.value[0]._id);
     if (definitionHeader.value) {
       await getDefinitionData();
     }
   }
   treePs.value = await getLeaf(projectId.value);
   getVersionList();
+  tabMenuActive.value = 0;
 };
 // get data
 const showDefinitionList = ref(true);
@@ -224,7 +228,7 @@ const getDefinitionList = async () => {
 };
 
 const getDefinitionHeader = async (definition) => {
-  definitionId.value = definition._id;
+  definitionId.value = definition;
   try {
     const res = await api.getDefinitionHeader(definitionId.value);
     definitionHeader.value = res.data;
@@ -236,6 +240,7 @@ const getDefinitionHeader = async (definition) => {
   }
 };
 const getDefinitionData = async () => {
+  isLoading.value = true;
   try {
     const res = await api.getDefinitionData(definitionId.value);
     psData.value = res.data;
@@ -244,33 +249,13 @@ const getDefinitionData = async () => {
     // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
+  isLoading.value = false;
 };
 //  tree - powersystem edit
 const treePs = ref();
 const nodeSelected = ref();
 const parentNodeSelected = ref(projectId.value);
 const pseId = ref();
-
-const getLeaf = async (parentId) => {
-  try {
-    const childData = await api.getChildOnPSEdit(parentId);
-    const data = [];
-    for (let index = 0; index < childData.data.length; index++) {
-      data.push({
-        key: childData.data[index]._id,
-        label: childData.data[index].name,
-        parentId: parentId,
-        leaf: false,
-        loading: false,
-      });
-    }
-    return data;
-  } catch (error) {
-    console.log('getFirstChildOnPSTree: error ', error);
-    // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
-  }
-};
 
 const onNodeExpand = async (node) => {
   if (!node.children) {
@@ -293,6 +278,26 @@ const onNodeExpand = async (node) => {
   }
 };
 
+const getLeaf = async (parentId) => {
+  try {
+    const childData = await api.getChildOnPSEdit(parentId);
+    const data = [];
+    for (let index = 0; index < childData.data.length; index++) {
+      data.push({
+        key: childData.data[index]._id,
+        label: childData.data[index].name,
+        parentId: parentId,
+        leaf: false,
+        loading: false,
+      });
+    }
+    return data;
+  } catch (error) {
+    console.log('getFirstChildOnPSTree: error ', error);
+    // progressSpinnerModal.value = false;
+    toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
+  }
+};
 const onNodeSelect = (node) => {
   console.log(node);
   if (node.key != pseId.value) {
@@ -302,10 +307,11 @@ const onNodeSelect = (node) => {
   }
 };
 const getPSEditData = async (getHeader = false) => {
+  isLoading.value = true;
   try {
     const res = await api.getPSEditData(pseId.value);
     psData.value = [res.data];
-    if (getHeader) {
+    if (getHeader && res.data) {
       await getDefinitionHeader(res.data.engineInfo.powerSystemDefinitionId);
     }
   } catch (error) {
@@ -313,15 +319,17 @@ const getPSEditData = async (getHeader = false) => {
     // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
+  isLoading.value = false;
 };
 // --- compare
 const psCompareData = ref();
 
-const getComparePSD = async (reload = false) => {
+const getComparePSD = async (reloadMsg = false) => {
+  isLoading.value = true;
   try {
     const res = await api.getComparePSD();
     psCompareData.value = res.data;
-    if (reload) {
+    if (reloadMsg) {
       toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
     }
   } catch (error) {
@@ -330,6 +338,7 @@ const getComparePSD = async (reload = false) => {
     console.log('getComparePSD: error ', error);
     toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
   }
+  isLoading.value = false;
 };
 // create
 const createVisibleDialog = ref(false);
@@ -432,11 +441,8 @@ const getVersionList = async () => {
 };
 </script>
 
-<style scoped>
-.selected-item {
-  background-color: var(--highlight-bg);
-}
-ul.p-tabview-nav {
+<style>
+#ps-tab-view ul.p-tabview-nav {
   display: none !important;
 }
 </style>

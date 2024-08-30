@@ -16,9 +16,11 @@
       </template>
     </Column>
     <template v-for="col of columnList" :key="col.field">
-      <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)">
+      <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)" style="min-height: 57px">
         <template #body="slotProps">
-          <div>{{ slotProps.data.engineInfo.values[col.index] }}</div>
+          <div class="flex justify-content-between align-items-center" style="min-height: 35px">
+            {{ slotProps.data.engineInfo.values[col.index] }}
+          </div>
         </template>
       </Column>
     </template>
