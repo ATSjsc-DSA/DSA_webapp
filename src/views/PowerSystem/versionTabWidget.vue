@@ -43,6 +43,7 @@ const props = defineProps({
     required: true,
   },
 });
+const emit = defineEmits(['reloadAll']);
 
 const rollbackConfirmation = (event, versionId) => {
   console.log('rollbackConfirmation', versionId, event);
@@ -69,8 +70,8 @@ const rollbackVersion = async (versionId) => {
     await api.rollbackVersion(versionId);
     toast.add({ severity: 'info', summary: 'Rollback', detail: 'Rollback Successfully', life: 1000 });
     setTimeout(() => {
-      location.reload();
-    }, 1000);
+      emit('reloadAll');
+    }, 500);
   } catch (error) {
     console.log('getVersionList: error ', error);
 

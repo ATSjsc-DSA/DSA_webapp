@@ -8,6 +8,13 @@
     :sortOrder="1"
     rowHover
   >
+    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+      <template #body="slotProps">
+        <div class="font-bold">
+          {{ slotProps.data.generalInfo.emsUniqueId }}
+        </div>
+      </template>
+    </Column>
     <template v-for="col of columnList" :key="col.field">
       <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)">
         <template #body="slotProps">
@@ -16,13 +23,6 @@
       </Column>
     </template>
 
-    <Column style="width: 1%; min-width: 5rem">
-      <template #body="slotProps">
-        <div class="flex justify-content-between">
-          <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDeletePSE(slotProps.data)" />
-        </div>
-      </template>
-    </Column>
     <template #empty> No Data </template>
   </DataTable>
 
@@ -55,19 +55,6 @@ const columnList = computed(() => {
   }
   return [];
 });
-
-// Delete
-const deleteVisibleDialog = ref(false);
-const pseDelete = ref({});
-const handleDeletePSE = (pseData) => {
-  pseDelete.value = pseData;
-  deleteVisibleDialog.value = true;
-};
-
-const deletePSE = async () => {
-  emit('deleteData', pseDelete.value._id);
-  deleteVisibleDialog.value = false;
-};
 
 function capitalizeFirstLetter(string) {
   return string

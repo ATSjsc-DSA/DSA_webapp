@@ -7,7 +7,7 @@
         <Card class="h-full">
           <template #title>
             <div class="flex flex-wrap justify-content-between align-items-center justify-center gap-2">
-              <div>Power System definition</div>
+              <div>Power System {{ showDefinitionList ? 'definition' : 'edit' }}</div>
               <div>
                 <Button
                   :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
@@ -113,7 +113,7 @@
             <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
           </TabPanel>
           <TabPanel>
-            <versionTabWidget :data="versionList" />
+            <versionTabWidget :data="versionList" @reload-all="loadAllData" />
           </TabPanel>
         </TabView>
       </SplitterPanel>
@@ -169,16 +169,7 @@ const { projectId } = storeToRefs(commonStore);
 const toast = useToast();
 
 onMounted(async () => {
-  await getDefinitionList();
-  if (definitionList.value.length > 0) {
-    await getDefinitionHeader(definitionList.value[0]);
-    if (definitionHeader.value) {
-      await getDefinitionData();
-    }
-  }
-  treePs.value = await getLeaf(projectId.value);
-
-  getVersionList();
+  loadAllData();
 });
 
 const tabMenuActive = ref(0);
@@ -188,6 +179,18 @@ watch(tabMenuActive, (newId) => {
     getComparePSD();
   }
 });
+
+const loadAllData = async () => {
+  await getDefinitionList();
+  if (definitionList.value.length > 0) {
+    await getDefinitionHeader(definitionList.value[0]);
+    if (definitionHeader.value) {
+      await getDefinitionData();
+    }
+  }
+  treePs.value = await getLeaf(projectId.value);
+  getVersionList();
+};
 // get data
 const showDefinitionList = ref(true);
 const psData = ref([]);
@@ -376,7 +379,6 @@ const createPS = async () => {
 };
 // Edit
 const editPSE = async (pseUpdate) => {
-  console.log(pseUpdate);
   try {
     await api.editPSE(pseUpdate);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });

@@ -37,24 +37,23 @@ export default class api {
   }
 
   static async editPSE(data) {
-    const payload = {
+    const updateData = {
       generalInfo: {
-        name: data.name,
-        uniqueId: data.uniqueId,
-        emsName: data.emsName,
-        emsUniqueId: data.emsUniqueId,
-        operationName: data.operationName,
-        operationUniqueId: data.operationUniqueId,
-        softwareName: data.softwareName,
-        softwareUniqueId: data.softwareUniqueId,
+        name: data.generalInfo.name,
+        uniqueId: data.generalInfo.uniqueId,
+        emsName: data.generalInfo.emsName,
+        operationName: data.generalInfo.operationName,
+        operationUniqueId: data.generalInfo.operationUniqueId,
+        softwareName: data.generalInfo.softwareName,
+        softwareUniqueId: data.generalInfo.softwareUniqueId,
       },
       scadaInfo: {
-        skey: data.skey,
-        scadaName: data.scadaName,
-        scadaUniqueId: data.scadaUniqueId,
+        skey: data.scadaInfo.skey,
+        scadaName: data.scadaInfo.scadaName,
+        scadaUniqueId: data.scadaInfo.scadaUniqueId,
       },
     };
-    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, payload);
+    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, updateData);
   }
   static async deletePSE(psde_id) {
     return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);

@@ -23,34 +23,41 @@
       >
         <ColumnGroup type="header">
           <Row>
+            <Column header="Ems UniqueId" style="width: 15%" :rowspan="2" />
             <Column header="General" :colspan="4" />
             <Column header="Scada" :colspan="3" />
           </Row>
           <Row>
-            <Column header="name" sortable field="generalInfo.name" />
+            <Column header="Name" field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
-            <Column header="emsName" field="generalInfo.emsName" />
+            <Column header="Ems Name" field="generalInfo.emsName" />
             <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
-            <Column header="operationName" field="generalInfo.operationName" />
+            <Column header="Operation Name" field="generalInfo.operationName" />
             <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
-            <Column header="softwareName" field="generalInfo.softwareName" />
+            <Column header="Software Name" field="generalInfo.softwareName" />
             <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
-            <Column header="skey" field="scadaInfo.skey" />
-            <Column header="scadaName" field="scadaInfo.scadaName" />
+            <Column header="Skey" field="scadaInfo.skey" />
+            <Column header="Scada Name" field="scadaInfo.scadaName" />
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
-
-        <Column header="name" sortable field="generalInfo.name" />
+        <Column header="Ems UniqueId" style="width: 15%">
+          <template #body="slotProps">
+            <div class="font-bold">
+              {{ slotProps.data.generalInfo.emsUniqueId }}
+            </div>
+          </template>
+        </Column>
+        <Column header="Name" field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
-        <Column header="emsName" field="generalInfo.emsName" />
+        <Column header="Ems Name" field="generalInfo.emsName" />
         <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
-        <Column header="operationName" field="generalInfo.operationName" />
+        <Column header="Operation Name" field="generalInfo.operationName" />
         <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
-        <Column header="softwareName" field="generalInfo.softwareName" />
+        <Column header="Software Name" field="generalInfo.softwareName" />
         <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
-        <Column header="skey" field="scadaInfo.skey" />
-        <Column header="scadaName" field="scadaInfo.scadaName" />
+        <Column header="Skey" field="scadaInfo.skey" />
+        <Column header="Scada Name" field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
         <template #empty> No change </template>
@@ -77,34 +84,123 @@
       >
         <ColumnGroup type="header">
           <Row>
+            <Column header="Ems UniqueId" style="width: 15%" :rowspan="2" />
             <Column header="General" :colspan="4" />
             <Column header="Scada" :colspan="3" />
           </Row>
           <Row>
-            <Column header="name" sortable field="generalInfo.name" />
+            <Column header="Name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
-            <Column header="emsName" field="generalInfo.emsName" />
+            <Column header="Ems Name" />
             <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
-            <Column header="operationName" field="generalInfo.operationName" />
+            <Column header="Operation Name" />
             <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
-            <Column header="softwareName" field="generalInfo.softwareName" />
+            <Column header="Software Name" />
             <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
-            <Column header="skey" field="scadaInfo.skey" />
-            <Column header="scadaName" field="scadaInfo.scadaName" />
+            <Column header="Skey" />
+            <Column header="Scada Name" />
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
-
-        <Column header="name" sortable field="generalInfo.name" />
+        <Column header="Ems UniqueId" style="width: 15%">
+          <template #body="slotProps">
+            <div class="font-bold">
+              {{ slotProps.data.emsUniqueId }}
+            </div>
+          </template>
+        </Column>
+        <Column header="Name">
+          <template #body="slotProps">
+            <div v-if="!slotProps.data.changes.generalInfo || !slotProps.data.changes.generalInfo.name">No change</div>
+            <div v-else>
+              <div class="text-green-500">
+                {{ slotProps.data.changes.generalInfo.name.new }}
+              </div>
+              <div class="text-orange-500 line-through">
+                {{ slotProps.data.changes.generalInfo.name.old }}
+              </div>
+            </div>
+          </template>
+        </Column>
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
-        <Column header="emsName" field="generalInfo.emsName" />
+        <Column header="Ems Name" field="generalInfo.emsName">
+          <template #body="slotProps">
+            <div v-if="!slotProps.data.changes.generalInfo || !slotProps.data.changes.generalInfo.emsName">
+              No change
+            </div>
+            <div v-else>
+              <div class="text-green-500">
+                {{ slotProps.data.changes.generalInfo.emsName.new }}
+              </div>
+              <div class="text-orange-500 line-through">
+                {{ slotProps.data.changes.generalInfo.emsName.old }}
+              </div>
+            </div>
+          </template>
+        </Column>
         <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
-        <Column header="operationName" field="generalInfo.operationName" />
+        <Column header="Operation Name" field="generalInfo.operationName">
+          <template #body="slotProps">
+            <div v-if="!slotProps.data.changes.generalInfo || !slotProps.data.changes.generalInfo.operationName">
+              No change
+            </div>
+            <div v-else>
+              <div class="text-green-500">
+                {{ slotProps.data.changes.generalInfo.operationName.new }}
+              </div>
+              <div class="text-orange-500 line-through">
+                {{ slotProps.data.changes.generalInfo.operationName.old }}
+              </div>
+            </div>
+          </template>
+        </Column>
+
         <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
-        <Column header="softwareName" field="generalInfo.softwareName" />
+        <Column header="Software Name" field="generalInfo.softwareName">
+          <template #body="slotProps">
+            <div v-if="!slotProps.data.changes.generalInfo || !slotProps.data.changes.generalInfo.softwareName">
+              No change
+            </div>
+            <div v-else>
+              <div class="text-green-500">
+                {{ slotProps.data.changes.generalInfo.softwareName.new }}
+              </div>
+              <div class="text-orange-500 line-through">
+                {{ slotProps.data.changes.generalInfo.softwareName.old }}
+              </div>
+            </div>
+          </template>
+        </Column>
+
         <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
-        <Column header="skey" field="scadaInfo.skey" />
-        <Column header="scadaName" field="scadaInfo.scadaName" />
+        <Column header="Skey" field="scadaInfo.skey">
+          <template #body="slotProps">
+            <div v-if="!slotProps.data.changes.scadaInfo || !slotProps.data.changes.scadaInfo.skey">No change</div>
+            <div v-else>
+              <div class="text-green-500">
+                {{ slotProps.data.changes.scadaInfo.skey.new }}
+              </div>
+              <div class="text-orange-500 line-through">
+                {{ slotProps.data.changes.scadaInfo.skey.old }}
+              </div>
+            </div>
+          </template>
+        </Column>
+
+        <Column header="Scada Name" field="scadaInfo.scadaName">
+          <template #body="slotProps">
+            <div v-if="!slotProps.data.changes.scadaInfo || !slotProps.data.changes.scadaInfo.scadaName">No change</div>
+            <div v-else>
+              <div class="text-green-500">
+                {{ slotProps.data.changes.scadaInfo.scadaName.new }}
+              </div>
+              <div class="text-orange-500 line-through">
+                {{ slotProps.data.changes.scadaInfo.scadaName.old }}
+              </div>
+            </div>
+          </template>
+        </Column>
+
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
         <template #empty> No change </template>
@@ -131,34 +227,41 @@
       >
         <ColumnGroup type="header">
           <Row>
+            <Column header="Ems UniqueId" style="width: 15%" :rowspan="2" />
             <Column header="General" :colspan="4" />
             <Column header="Scada" :colspan="3" />
           </Row>
           <Row>
-            <Column header="name" sortable field="generalInfo.name" />
+            <Column header="Name" field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
-            <Column header="emsName" field="generalInfo.emsName" />
+            <Column header="Ems Name" field="generalInfo.emsName" />
             <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
-            <Column header="operationName" field="generalInfo.operationName" />
+            <Column header="Operation Name" field="generalInfo.operationName" />
             <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
-            <Column header="softwareName" field="generalInfo.softwareName" />
+            <Column header="Software Name" field="generalInfo.softwareName" />
             <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
-            <Column header="skey" field="scadaInfo.skey" />
-            <Column header="scadaName" field="scadaInfo.scadaName" />
+            <Column header="Skey" field="scadaInfo.skey" />
+            <Column header="Scada Name" field="scadaInfo.scadaName" />
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
-
-        <Column header="name" sortable field="generalInfo.name" />
+        <Column header="Ems UniqueId" style="width: 15%">
+          <template #body="slotProps">
+            <div class="font-bold">
+              {{ slotProps.data.generalInfo.emsUniqueId }}
+            </div>
+          </template>
+        </Column>
+        <Column header="Name" field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
-        <Column header="emsName" field="generalInfo.emsName" />
+        <Column header="Ems Name" field="generalInfo.emsName" />
         <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
-        <Column header="operationName" field="generalInfo.operationName" />
+        <Column header="Operation Name" field="generalInfo.operationName" />
         <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
-        <Column header="softwareName" field="generalInfo.softwareName" />
+        <Column header="Software Name" field="generalInfo.softwareName" />
         <!-- <Column header="softwareUniqueId" field="generalInfo.softwareUniqueId" /> -->
-        <Column header="skey" field="scadaInfo.skey" />
-        <Column header="scadaName" field="scadaInfo.scadaName" />
+        <Column header="Skey" field="scadaInfo.skey" />
+        <Column header="Scada Name" field="scadaInfo.scadaName" />
         <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
 
         <template #empty> No change </template>
@@ -184,7 +287,7 @@
     </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" :disabled="!nameVersion" @click="createNewVersion"></Button>
+      <Button type="button" label="Submit" :disabled="nameVersion === ''" @click="createNewVersion"></Button>
     </template>
   </Dialog>
   <Toast />

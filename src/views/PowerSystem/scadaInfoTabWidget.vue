@@ -8,6 +8,13 @@
     :sortOrder="1"
     rowHover
   >
+    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+      <template #body="slotProps">
+        <div class="font-bold">
+          {{ slotProps.data.generalInfo.emsUniqueId }}
+        </div>
+      </template>
+    </Column>
     <Column field="scadaInfo.skey" header="Name" style="width: 15%"></Column>
     <Column field="scadaInfo.scadaName" header="Ems Name" style="width: 15%"></Column>
     <Column field="scadaInfo.scadaUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
@@ -29,7 +36,16 @@
       </div>
     </template>
     <span class="p-text-secondary block mb-5">Scada information.</span>
-
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText
+        id="areaname"
+        v-model="pseEdit.generalInfo.emsUniqueId"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="skey" class="font-semibold w-12rem"> Skey</label>
       <InputText id="skey" v-model="pseEdit.scadaInfo.skey" class="flex-auto" autocomplete="off" />
@@ -57,6 +73,16 @@
       </div>
     </template>
     <span class="p-text-secondary block mb-5">Scada information.</span>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.emsUniqueId"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
 
     <div class="flex align-items-center gap-3 mb-3">
       <label for="skey" class="font-semibold w-12rem"> Skey</label>

@@ -8,11 +8,17 @@
     :sortOrder="1"
     rowHover
   >
-    <Column field="generalInfo.name" header="Name" style="width: 15%"></Column>
-    <Column field="generalInfo.emsName" header="Ems Name" style="width: 15%"></Column>
-    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
-    <Column field="generalInfo.operationName" header="Operation Name" style="width: 15%"></Column>
-    <Column field="generalInfo.softwareName" header="Software Name" style="width: 15%"></Column>
+    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+      <template #body="slotProps">
+        <div class="font-bold">
+          {{ slotProps.data.generalInfo.emsUniqueId }}
+        </div>
+      </template>
+    </Column>
+    <Column field="generalInfo.name" header="Name"></Column>
+    <Column field="generalInfo.emsName" header="Ems Name"></Column>
+    <Column field="generalInfo.operationName" header="Operation Name"></Column>
+    <Column field="generalInfo.softwareName" header="Software Name"></Column>
 
     <Column style="width: 1%; min-width: 5rem">
       <template #body="slotProps">
@@ -35,16 +41,22 @@
     <span class="p-text-secondary block mb-5">General information.</span>
 
     <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText
+        id="areaname"
+        v-model="pseEdit.generalInfo.emsUniqueId"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Name</label>
       <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
       <InputText id="areaname" v-model="pseEdit.generalInfo.emsName" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.emsUniqueId" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
@@ -70,6 +82,16 @@
     </template>
     <span class="p-text-secondary block mb-5">General information.</span>
 
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.emsUniqueId"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
     <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
       <label for="areaname" class="font-semibold w-12rem"> Name</label>
       <InputText id="areaname" v-model="pseDelete.generalInfo.name" class="flex-auto" disabled autocomplete="off" />
@@ -77,16 +99,6 @@
     <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
       <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
       <InputText id="areaname" v-model="pseDelete.generalInfo.emsName" class="flex-auto" disabled autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText
-        id="areaname"
-        v-model="pseDelete.generalInfo.emsUniqueId"
-        class="flex-auto"
-        disabled
-        autocomplete="off"
-      />
     </div>
     <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
       <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
