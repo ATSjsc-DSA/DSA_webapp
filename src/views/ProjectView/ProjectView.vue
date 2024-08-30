@@ -8,20 +8,21 @@
       dataKey="_id"
       tableStyle="min-width: 50rem"
       :lazy="true"
-      @page="onPageChange"
       :sortOrder="1"
       rowHover
+      @page="onPageChange"
     >
       <template #header>
-        <div class="flex justify-content-end">
+        <div class="flex justify-content-between">
           <Button
             type="button"
             label="Create Project"
             icon="pi pi-plus"
-            @click="handleCreateProject()"
             size="small"
             text
+            @click="handleCreateProject()"
           />
+          <Button v-tooltip.bottom="'Logout'" severity="secondary" icon="pi pi-sign-out" text @click="onLogout()" />
         </div>
       </template>
 
@@ -82,11 +83,11 @@
     <span class="p-text-secondary block mb-5">profile information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-6rem"> Name</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="projectCreate.name" />
+      <InputText id="areaname" v-model="projectCreate.name" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-6rem"> Description</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="projectCreate.description" />
+      <InputText id="areaname" v-model="projectCreate.description" class="flex-auto" autocomplete="off" />
     </div>
 
     <template #footer>
@@ -105,11 +106,11 @@
     <span class="p-text-secondary block mb-5">profile information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-6rem"> Name</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="projectEdit.name" />
+      <InputText id="areaname" v-model="projectEdit.name" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-6rem"> Description</label>
-      <InputText id="areaname" class="flex-auto" autocomplete="off" v-model="projectEdit.description" />
+      <InputText id="areaname" v-model="projectEdit.description" class="flex-auto" autocomplete="off" />
     </div>
 
     <template #footer>
@@ -136,6 +137,11 @@ const confirm = useConfirm();
 const commonStore = useCommonStore();
 const { projectId } = storeToRefs(commonStore);
 
+const onLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  router.push('/login');
+};
 onMounted(() => {
   getListProject();
 });
