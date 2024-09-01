@@ -44,195 +44,11 @@
       </SplitterPanel>
       <SplitterPanel class="flex align-items-center justify-content-center" :size="80">
         <div v-if="selectedItem._id" class="h-full w-full p-3">
-          <div v-if="type === 'area'" class="grid gap-4 h-full w-full">
-            <div class="col h-full">
-              <div class="flex justify-content-between">
-                <h6>Gen List</h6>
-                <div class="grid">
-                  <Button
-                    size="small"
-                    text
-                    v-tooltip.top="{ value: 'Add Gen Area' }"
-                    icon="pi pi-plus"
-                    aria-label="Filter"
-                    class="col"
-                    @click="addDataTypeOnDevice('gen')"
-                  />
-                  <Button
-                    size="small"
-                    text
-                    class="col"
-                    v-tooltip.top="{ value: 'Delete Gen Active' }"
-                    icon="pi pi-times"
-                    severity="danger"
-                    aria-label="Cancel"
-                    @click="confirmRemoveDataOnDevice($event, 'gen')"
-                  />
-                </div>
-              </div>
-              <ScrollPanel style="width: 100%; height: 100%" class="py-4">
-                <ul class="values-list">
-                  <li
-                    v-for="value in selectedItem.gens_name"
-                    :key="value.name"
-                    :class="{ selected: value.selected }"
-                    @click="
-                      () => {
-                        if (value.selected) {
-                          value.selected = false;
-                        } else {
-                          value.selected = true;
-                        }
-                      }
-                    "
-                  >
-                    {{ value.name }}
-                  </li>
-                </ul>
-              </ScrollPanel>
-            </div>
-            <div class="col h-full">
-              <div class="flex justify-content-between">
-                <h6>Load List</h6>
-                <div class="grid">
-                  <Button
-                    size="small"
-                    text
-                    v-tooltip.top="{ value: 'Add Load Area' }"
-                    icon="pi pi-plus"
-                    aria-label="Filter"
-                    class="col"
-                    @click="addDataTypeOnDevice('load')"
-                  />
-                  <Button
-                    size="small"
-                    text
-                    class="col"
-                    v-tooltip.top="{ value: 'Delete Load Active' }"
-                    icon="pi pi-times"
-                    severity="danger"
-                    aria-label="Cancel"
-                    @click="confirmRemoveDataOnDevice($event, 'load')"
-                  />
-                </div>
-              </div>
-              <ScrollPanel style="width: 100%; height: 100%" class="py-4">
-                <ul class="values-list">
-                  <li
-                    v-for="value in selectedItem.loads_name"
-                    :key="value.name"
-                    :class="{ selected: value.selected }"
-                    @click="
-                      () => {
-                        if (value.selected) {
-                          value.selected = false;
-                        } else {
-                          value.selected = true;
-                        }
-                      }
-                    "
-                  >
-                    {{ value.name }}
-                  </li>
-                </ul>
-              </ScrollPanel>
-            </div>
-          </div>
-          <div v-else-if="type === 'monitor'" class="col h-full">
-            <div class="flex justify-content-between">
-              <h6>Branch List</h6>
-              <div class="grid">
-                <Button
-                  size="small"
-                  text
-                  v-tooltip.top="{ value: 'Add Gen Area' }"
-                  icon="pi pi-plus"
-                  aria-label="Filter"
-                  class="col"
-                  @click="addDataTypeOnDevice('branch')"
-                />
-                <Button
-                  size="small"
-                  text
-                  class="col"
-                  v-tooltip.top="{ value: 'Delete Gen Active' }"
-                  icon="pi pi-times"
-                  severity="danger"
-                  aria-label="Cancel"
-                  @click="confirmRemoveDataOnDevice($event, 'branch')"
-                />
-              </div>
-            </div>
-            <ScrollPanel style="width: 100%; height: 100%" class="py-4">
-              <ul class="values-list">
-                <li
-                  v-for="value in selectedItem.branches_name"
-                  :key="value.name"
-                  :class="{ selected: value.selected }"
-                  @click="
-                    () => {
-                      if (value.selected) {
-                        value.selected = false;
-                      } else {
-                        value.selected = true;
-                      }
-                    }
-                  "
-                >
-                  <div class="flex justify-content-around">
-                    <span> {{ value.name }}</span>
-                    <Tag icon="pi pi-directions" :severity="value.direction === 1 ? 'success' : 'danger'"></Tag>
-                  </div>
-                </li>
-              </ul>
-            </ScrollPanel>
-          </div>
-          <div v-else class="col h-full">
-            <div class="flex justify-content-between">
-              <h6>Equipment List</h6>
-              <div class="grid">
-                <Button
-                  size="small"
-                  text
-                  v-tooltip.top="{ value: 'Add Gen Area' }"
-                  icon="pi pi-plus"
-                  aria-label="Filter"
-                  class="col"
-                  @click="addDataTypeOnDevice('')"
-                />
-                <Button
-                  size="small"
-                  text
-                  class="col"
-                  v-tooltip.top="{ value: 'Delete Gen Active' }"
-                  icon="pi pi-times"
-                  severity="danger"
-                  aria-label="Cancel"
-                  @click="confirmRemoveDataOnDevice($event, '')"
-                />
-              </div>
-            </div>
-            <ScrollPanel style="width: 100%; height: 100%" class="py-4">
-              <ul class="values-list">
-                <li
-                  v-for="value in selectedItem.equips_name"
-                  :key="value.name"
-                  :class="{ selected: value.selected }"
-                  @click="
-                    () => {
-                      if (value.selected) {
-                        value.selected = false;
-                      } else {
-                        value.selected = true;
-                      }
-                    }
-                  "
-                >
-                  {{ value.name }}
-                </li>
-              </ul>
-            </ScrollPanel>
-          </div>
+          <TabView>
+            <TabPanel v-for="tab in tabs" :key="tab.title" :header="tab.title">
+              <p class="m-0">{{ tab.content }}</p>
+            </TabPanel>
+          </TabView>
         </div>
       </SplitterPanel>
     </Splitter>
@@ -316,6 +132,9 @@ const props = defineProps({
   listDatatree: {
     type: Array,
   },
+  dataSelect: {
+    type: Array,
+  },
   deleteVisibleDialog: Boolean,
   createVisibleDialog: Boolean,
   createDataOnDeviceDialog: Boolean,
@@ -329,6 +148,7 @@ const emits = defineEmits([
   'deleteDevice',
   'createDevice',
   'downloadFile',
+  'getDataSelect',
   'uploadFile',
   'addDataOnDevice',
   'removeDataOnDevice',
@@ -336,6 +156,12 @@ const emits = defineEmits([
   'update:deleteVisibleDialog',
   'update:createVisibleDialog',
   'update:createDataOnDeviceDialog',
+]);
+
+const tabs = ref([
+  { title: 'Tab 1', content: 'Tab 1 Content' },
+  { title: 'Tab 2', content: 'Tab 2 Content' },
+  { title: 'Tab 3', content: 'Tab 3 Content' },
 ]);
 
 // define initializeData
@@ -400,8 +226,7 @@ watch(listDatatree, (newValue, oldValue) => {
 });
 const handleRowClick = (item) => {
   selectedItem.value = item;
-  gens_name.value = item.gens_name;
-  loads_name.value = item.loads_name;
+  emits('getDataSelect', item);
 };
 
 const confirmDeleteItem = (event, name, id) => {

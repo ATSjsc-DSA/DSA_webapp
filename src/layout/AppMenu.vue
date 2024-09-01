@@ -39,6 +39,7 @@ const model = ref([
       // },
       // { label: 'Branch Monitoring', icon: 'pi pi-fw pi-desktop', to: '/DSA/Monitor' },
       { label: 'Profile', icon: 'pi pi-fw pi-file-edit', to: '/DSA/Profile' },
+      { label: 'Configuration', icon: 'pi pi-fw pi-file-edit', to: '/Configuration' },
       { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
 
       { label: 'Config DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },

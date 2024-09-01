@@ -24,10 +24,10 @@ const items = ref([
     label: 'Utilities',
     items: [
       { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
-      { label: 'Group ', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
-      { label: 'Profile', icon: 'pi pi-fw pi-file-edit', to: '/DSA/Profile' },
+      { label: 'Configuration ', icon: 'pi pi-fw pi-file-edit', to: '/Configuration' },
+
       { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
-      { label: 'Config DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
+      { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
       { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
     ],
   },
@@ -42,7 +42,7 @@ const checkActiveRoute = (item) => {
 </script>
 
 <template>
-  <Menubar :model="items" class="border-0">
+  <Menubar :model="items" class="border-none">
     <template #item="{ item, props, hasSubmenu }">
       <router-link v-if="item.to" v-slot="{ href, navigate }" :to="item.to" custom>
         <a

@@ -89,6 +89,11 @@ const router = createRouter({
           name: 'powersystem',
           component: () => import('@/views/PowerSystem/PowerSystemView.vue'),
         },
+        {
+          path: '/Configuration',
+          name: 'Configuration',
+          component: () => import('@/views/ConfigurationView/ConfigurationView.vue'),
+        },
       ],
     },
     {

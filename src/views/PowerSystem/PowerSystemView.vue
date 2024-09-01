@@ -33,7 +33,7 @@
                           'border-top-1 surface-border': index !== 0,
                           'selected-item': definitionId === item._id,
                         }"
-                        @click="getDefinitionHeader(item._id)"
+                        @click="handleRowClick(item._id)"
                       >
                         <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
                           <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
@@ -58,66 +58,74 @@
           </template>
         </Card>
       </SplitterPanel>
-      <SplitterPanel :size="75" style="overflow-y: auto">
-        <div class="m-3 flex gap-2 justify-content-between">
-          <div class="flex gap-2 justify-content-start">
+      <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
+        <LoadingContainer v-show="progressSpinnerModal"></LoadingContainer>
+        <div>
+          <div class="m-3 flex gap-2 justify-content-between">
             <div class="flex gap-2 justify-content-start">
-              <Button label="General" class="" :text="tabMenuActive !== 0" @click="tabMenuActive = 0" />
-              <Button label="Engine" class="" :text="tabMenuActive !== 1" @click="tabMenuActive = 1" />
-              <Button label="Scada" class="" :text="tabMenuActive !== 2" @click="tabMenuActive = 2" />
+              <div class="flex gap-2 justify-content-start">
+                <Button label="General" class="" :text="tabMenuActive !== 0" @click="tabMenuActive = 0" />
+                <Button label="Engine" class="" :text="tabMenuActive !== 1" @click="tabMenuActive = 1" />
+                <Button label="Scada" class="" :text="tabMenuActive !== 2" @click="tabMenuActive = 2" />
+              </div>
+              <div class="pl-3 border-left-1"></div>
+              <div class="pl-1 flex gap-2 justify-content-start">
+                <Button
+                  icon="pi pi-history"
+                  label="Compare"
+                  class=""
+                  :outlined="tabMenuActive !== 3"
+                  @click="tabMenuActive = 3"
+                />
+                <Button
+                  icon="pi pi-list"
+                  label="Version"
+                  class=""
+                  :outlined="tabMenuActive !== 4"
+                  @click="tabMenuActive = 4"
+                />
+              </div>
             </div>
-            <div class="pl-3 border-left-1"></div>
-            <div class="pl-1 flex gap-2 justify-content-start">
-              <Button
-                icon="pi pi-history"
-                label="Compare"
-                class=""
-                :outlined="tabMenuActive !== 3"
-                @click="tabMenuActive = 3"
-              />
-              <Button
-                icon="pi pi-list"
-                label="Version"
-                class=""
-                :outlined="tabMenuActive !== 4"
-                @click="tabMenuActive = 4"
-              />
+            <div>
+              <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
+              <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
+              <Button text icon="pi pi-plus" label="Create" :disabled="!showDefinitionList" @click="handleCreatePS" />
             </div>
           </div>
-          <div>
-            <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
-            <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
-            <Button text icon="pi pi-plus" label="Create" :disabled="!showDefinitionList" @click="handleCreatePS" />
-          </div>
-        </div>
 
-        <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
-          <TabPanel header="">
-            <generalTabWidget :data="psData" :psdData="definitionHeader" @editData="editPSE" @deleteData="deletePSE" />
-          </TabPanel>
-          <TabPanel>
-            <engineInfoTabWidget
-              :data="psData"
-              :psdData="definitionHeader"
-              @editData="editPSE"
-              @deleteData="deletePSE"
-            />
-          </TabPanel>
-          <TabPanel>
-            <scadaInfoTabWidget
-              :data="psData"
-              :psdData="definitionHeader"
-              @editData="editPSE"
-              @deleteData="deletePSE"
-            />
-          </TabPanel>
-          <TabPanel>
-            <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
-          </TabPanel>
-          <TabPanel>
-            <versionTabWidget :data="versionList" @reload-all="loadAllData" />
-          </TabPanel>
-        </TabView>
+          <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
+            <TabPanel header="">
+              <generalTabWidget
+                :data="psData"
+                :psdData="definitionHeader"
+                @editData="editPSE"
+                @deleteData="deletePSE"
+              />
+            </TabPanel>
+            <TabPanel>
+              <engineInfoTabWidget
+                :data="psData"
+                :psdData="definitionHeader"
+                @editData="editPSE"
+                @deleteData="deletePSE"
+              />
+            </TabPanel>
+            <TabPanel>
+              <scadaInfoTabWidget
+                :data="psData"
+                :psdData="definitionHeader"
+                @editData="editPSE"
+                @deleteData="deletePSE"
+              />
+            </TabPanel>
+            <TabPanel>
+              <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
+            </TabPanel>
+            <TabPanel>
+              <versionTabWidget :data="versionList" @reload-all="loadAllData" />
+            </TabPanel>
+          </TabView>
+        </div>
       </SplitterPanel>
     </Splitter>
 
@@ -164,6 +172,7 @@ import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTabWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
+import LoadingContainer from '@/components/LoadingContainer.vue';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
@@ -171,6 +180,8 @@ const { projectId } = storeToRefs(commonStore);
 
 const toast = useToast();
 const isLoading = ref(false);
+const progressSpinnerModal = ref(false);
+
 onMounted(async () => {
   loadAllData();
 });
@@ -185,12 +196,12 @@ watch(tabMenuActive, (newId) => {
 
 const loadAllData = async () => {
   await getDefinitionList();
-  if (definitionList.value.length > 0) {
-    await getDefinitionHeader(definitionList.value[0]._id);
-    if (definitionHeader.value) {
-      await getDefinitionData();
-    }
-  }
+  // if (definitionList.value.length > 0) {
+  //   await getDefinitionHeader(definitionList.value[0]._id);
+  //   if (definitionHeader.value) {
+  //     await getDefinitionData();
+  //   }
+  // }
   treePs.value = await getLeaf(projectId.value);
   getVersionList();
   tabMenuActive.value = 0;
@@ -227,8 +238,13 @@ const getDefinitionList = async () => {
   }
 };
 
-const getDefinitionHeader = async (definition) => {
+const handleRowClick = async (definition) => {
   definitionId.value = definition;
+  await getDefinitionHeader();
+  await getDefinitionData();
+};
+
+const getDefinitionHeader = async () => {
   try {
     const res = await api.getDefinitionHeader(definitionId.value);
     definitionHeader.value = res.data;
@@ -312,7 +328,8 @@ const getPSEditData = async (getHeader = false) => {
     const res = await api.getPSEditData(pseId.value);
     psData.value = [res.data];
     if (getHeader && res.data) {
-      await getDefinitionHeader(res.data.engineInfo.powerSystemDefinitionId);
+      definitionId.value = res.data.engineInfo.powerSystemDefinitionId;
+      await getDefinitionHeader();
     }
   } catch (error) {
     console.log('getPSEditData: error ', error);
@@ -444,5 +461,15 @@ const getVersionList = async () => {
 <style>
 #ps-tab-view ul.p-tabview-nav {
   display: none !important;
+}
+.item-data:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  background-color: var(--surface-hover);
+}
+
+.selected-item {
+  background-color: var(--highlight-bg) !important;
 }
 </style>

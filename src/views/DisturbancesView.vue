@@ -1,8 +1,8 @@
 <template>
   <div class="relative h-full">
-    <!-- <div class="flex flex-wrap justify-content-end gap-2">
+    <div class="flex flex-wrap justify-content-end gap-2">
       <Button text icon="pi pi-plus" label="Create" @click="handleCreateDevice" />
-    </div> -->
+    </div>
     <Splitter style="height: 100%">
       <SplitterPanel
         class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
@@ -40,7 +40,7 @@
         </DataView>
       </SplitterPanel>
       <SplitterPanel class="flex align-items-center justify-content-center" :size="80"
-        ><div v-if="selectedItem._id" class="h-full w-full p-3">
+        ><div class="h-full w-full p-3">
           <TabView>
             <TabPanel header="Short-circuit event">
               <DSA_TSAT_SCE
