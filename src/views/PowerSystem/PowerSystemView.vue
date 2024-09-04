@@ -3,11 +3,15 @@
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
+    <div class="flex justify-content-between align-items-center gap-2 mb-3">
+      <div>version</div>
+      <Button icon="pi pi-history" label="Compare" class="" @click="handleDialogCompare" />
+    </div>
     <Splitter style="height: 100%">
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
         <Card class="h-full">
           <template #title>
-            <div class="flex flex-wrap justify-content-between align-items-center justify-center gap-2">
+            <div class="flex flex-wrap justify-content-between align-items-center gap-2">
               <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
               <div>
                 <Button
@@ -69,18 +73,11 @@
               <div class="pl-3 border-left-1"></div>
               <div class="pl-1 flex gap-2 justify-content-start">
                 <Button
-                  icon="pi pi-history"
-                  label="Compare"
-                  class=""
-                  :outlined="tabMenuActive !== 3"
-                  @click="tabMenuActive = 3"
-                />
-                <Button
                   icon="pi pi-list"
                   label="Version"
                   class=""
-                  :outlined="tabMenuActive !== 4"
-                  @click="tabMenuActive = 4"
+                  :outlined="tabMenuActive !== 3"
+                  @click="tabMenuActive = 3"
                 />
               </div>
             </div>
@@ -107,9 +104,7 @@
               <TabPanel>
                 <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
               </TabPanel>
-              <TabPanel>
-                <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
-              </TabPanel>
+
               <TabPanel>
                 <versionTabWidget :data="versionList" @reload-all="loadAllData" />
               </TabPanel>
@@ -119,7 +114,65 @@
       </SplitterPanel>
     </Splitter>
 
-    <!-- create dialog data -->
+    <!-- show compare dialog  -->
+    <Dialog
+      v-model:visible="compareVisibleDialog"
+      header="Compare"
+      :modal="true"
+      maximizable
+      :style="{ width: '80%' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+    >
+      <template #header>
+        <div class="flex align-items-center justify-content-between gap-2 w-full mr-3">
+          <div class="font-bold white-space-nowrap">Compare update</div>
+          <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD" />
+        </div>
+      </template>
+
+      <compareTabWidget :data="psCompareData" />
+
+      <template #footer>
+        <Button type="button" label="Cancel" severity="secondary" @click="compareVisibleDialog = false"></Button>
+        <Button severity="success" icon="pi pi-save" label="Build" @click="createVersionVisibleDialog = true" />
+      </template>
+    </Dialog>
+
+    <!-- create new version dialog  -->
+    <Dialog v-model:visible="createVersionVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
+      <template #header>
+        <div class="inline-flex align-items-center justify-content-center gap-2">
+          <span class="font-bold white-space-nowrap">Create new Version</span>
+        </div>
+      </template>
+
+      <div class="my-3">
+        <div class="flex flex-column gap-2 mb-3">
+          <label :for="nameVersion" class="font-semibold"> Name Version</label>
+          <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
+        </div>
+        <div class="flex flex-column gap-2 mb-3">
+          <label :for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
+          <InputNumber
+            :id="scheduledOperationTime"
+            v-model="scheduledOperationTime"
+            class="flex-auto"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+      <template #footer>
+        <Button type="button" label="Cancel" severity="secondary" @click="createVersionVisibleDialog = false"></Button>
+        <Button
+          type="button"
+          label="Submit"
+          :disabled="!nameVersion || !scheduledOperationTime"
+          @click="createNewVersion"
+        ></Button>
+      </template>
+    </Dialog>
+
+    <!-- create ps data dialog  -->
     <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
       <template #header>
         <div class="inline-flex align-items-center justify-content-center gap-2">
@@ -159,7 +212,7 @@ import { useToast } from 'primevue/usetoast';
 import generalTabWidget from './generalTabWidget.vue';
 import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
-import compareTabWidget from './compareTabWidget.vue';
+import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
@@ -175,12 +228,6 @@ onMounted(async () => {
 });
 
 const tabMenuActive = ref(0);
-watch(tabMenuActive, (newId) => {
-  if (newId === 3) {
-    // compare tab
-    getComparePSD();
-  }
-});
 
 const loadAllData = async () => {
   await getDefinitionList();
@@ -326,6 +373,12 @@ const getPSEditData = async (getHeader = false) => {
   }
 };
 // --- compare
+const compareVisibleDialog = ref(false);
+
+const handleDialogCompare = () => {
+  compareVisibleDialog.value = true;
+  getComparePSD();
+};
 const psCompareData = ref({});
 
 const getComparePSD = async (reloadMsg = false) => {
@@ -344,7 +397,25 @@ const getComparePSD = async (reloadMsg = false) => {
     isLoadingProgress.value = false;
   }, 500);
 };
-// create
+
+const createVersionVisibleDialog = ref(false);
+const nameVersion = ref('');
+const scheduledOperationTime = ref();
+const createNewVersion = async () => {
+  try {
+    await api.createNewVersion(nameVersion.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    getComparePSD();
+    createVersionVisibleDialog.value = false;
+    compareVisibleDialog.value = false;
+  } catch (error) {
+    console.log('createPS: error ', error);
+    // progressSpinnerModal.value = false;
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// create ps data
 const createVisibleDialog = ref(false);
 
 const psCreate = ref();
