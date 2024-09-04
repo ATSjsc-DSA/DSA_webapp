@@ -1,8 +1,6 @@
 <template>
-  <Toast />
-
   <div class="card layout-content h-full">
-    <AppProgressSpinner :showSpinner="isLoading"></AppProgressSpinner>
+    <Toast />
 
     <Splitter style="height: 100%">
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
@@ -59,7 +57,6 @@
         </Card>
       </SplitterPanel>
       <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
-        <!-- <LoadingContainer v-show="progressSpinnerModal"></LoadingContainer> -->
         <div>
           <div class="m-3 flex gap-2 justify-content-between">
             <div class="flex gap-2 justify-content-start">
@@ -95,33 +92,28 @@
 
           <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
             <TabPanel header="">
-              <generalTabWidget
-                :data="psData"
-                :psdData="definitionHeader"
-                @editData="editPSE"
-                @deleteData="deletePSE"
-              />
+              <LoadingContainer v-show="isLoading" style="top: auto" />
+              <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
             </TabPanel>
             <TabPanel>
+              <LoadingContainer v-show="isLoading" style="top: auto" />
               <engineInfoTabWidget
                 :data="psData"
-                :psdData="definitionHeader"
+                :headerData="definitionHeader"
                 @editData="editPSE"
                 @deleteData="deletePSE"
               />
             </TabPanel>
             <TabPanel>
-              <scadaInfoTabWidget
-                :data="psData"
-                :psdData="definitionHeader"
-                @editData="editPSE"
-                @deleteData="deletePSE"
-              />
+              <LoadingContainer v-show="isLoading" style="top: auto" />
+              <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
             </TabPanel>
             <TabPanel>
+              <LoadingContainer v-show="isLoading" style="top: auto" />
               <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
             </TabPanel>
             <TabPanel>
+              <LoadingContainer v-show="isLoading" style="top: auto" />
               <versionTabWidget :data="versionList" @reload-all="loadAllData" />
             </TabPanel>
           </TabView>
@@ -139,13 +131,13 @@
       <span class="p-text-secondary block mb-5">General information.</span>
 
       <div v-for="(val, name) in psCreate.generalInfo" :key="name" class="flex align-items-center gap-3 mb-3">
-        <label :for="name" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(name) }} </label>
+        <label :for="name" class="font-semibold w-10rem"> {{ capitalizeFirstLetter(name) }} </label>
         <InputText :id="name" v-model="psCreate.generalInfo[name]" class="flex-auto" autocomplete="off" />
       </div>
 
       <span class="p-text-secondary block my-5">Scada information.</span>
       <div v-for="(val, name) in psCreate.scadaInfo" :key="name" class="flex align-items-center gap-3 mb-3">
-        <label :for="name" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(name) }}</label>
+        <label :for="name" class="font-semibold w-10rem"> {{ capitalizeFirstLetter(name) }}</label>
         <InputText :id="name" v-model="psCreate.scadaInfo[name]" class="flex-auto" autocomplete="off" />
       </div>
       <template #footer>
@@ -157,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import api from './api';
 
 import TabView from 'primevue/tabview';
@@ -171,7 +163,6 @@ import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTabWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
-import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 
 import { useCommonStore } from '@/store';
@@ -180,8 +171,6 @@ const { projectId } = storeToRefs(commonStore);
 
 const toast = useToast();
 const isLoading = ref(false);
-const progressSpinnerModal = ref(false);
-
 onMounted(async () => {
   loadAllData();
 });
@@ -225,7 +214,7 @@ watch(showDefinitionList, (newStatus) => {
 //  -- list - definition list
 const definitionList = ref([]);
 const definitionId = ref();
-const definitionHeader = ref();
+const definitionHeader = ref({});
 
 const getDefinitionList = async () => {
   try {
@@ -233,7 +222,6 @@ const getDefinitionList = async () => {
     definitionList.value = res.data;
   } catch (error) {
     console.log('getDefinitionList: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
@@ -249,9 +237,8 @@ const getDefinitionHeader = async () => {
     const res = await api.getDefinitionHeader(definitionId.value);
     definitionHeader.value = res.data;
   } catch (error) {
-    definitionHeader.value = undefined;
+    definitionHeader.value = {};
     console.log('getDefinitionHeader: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Definition Header', detail: error.data.detail, life: 3000 });
   }
 };
@@ -262,7 +249,6 @@ const getDefinitionData = async () => {
     psData.value = res.data;
   } catch (error) {
     console.log('getDefinitionData: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
   isLoading.value = false;
@@ -310,7 +296,6 @@ const getLeaf = async (parentId) => {
     return data;
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
@@ -333,13 +318,12 @@ const getPSEditData = async (getHeader = false) => {
     }
   } catch (error) {
     console.log('getPSEditData: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
   isLoading.value = false;
 };
 // --- compare
-const psCompareData = ref();
+const psCompareData = ref({});
 
 const getComparePSD = async (reloadMsg = false) => {
   isLoading.value = true;
@@ -350,7 +334,7 @@ const getComparePSD = async (reloadMsg = false) => {
       toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
     }
   } catch (error) {
-    psCompareData.value = undefined;
+    psCompareData.value = {};
 
     console.log('getComparePSD: error ', error);
     toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
@@ -399,7 +383,6 @@ const createPS = async () => {
     reloadData();
   } catch (error) {
     console.log('createPS: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Create Power System', detail: error.data.detail, life: 3000 });
   }
 };
@@ -411,7 +394,6 @@ const editPSE = async (pseUpdate) => {
     // reloadData();
   } catch (error) {
     console.log('editPS: error ', error);
-    // progressSpinnerModal.value = false;
     toast.add({ severity: 'error', summary: 'Updated Power System', detail: error.data.detail, life: 3000 });
   }
 };
@@ -446,12 +428,13 @@ function generateRandomString(length) {
 }
 
 // version
-const versionList = ref();
+const versionList = ref([]);
 const getVersionList = async () => {
   try {
     const res = await api.getVersionList();
     versionList.value = res.data[0];
   } catch (error) {
+    versionList.value = [];
     console.log('getVersionList: error ', error);
     toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
   }
@@ -462,6 +445,7 @@ const getVersionList = async () => {
 #ps-tab-view ul.p-tabview-nav {
   display: none !important;
 }
+
 .item-data:hover {
   cursor: pointer;
   transform: scale(1.05);

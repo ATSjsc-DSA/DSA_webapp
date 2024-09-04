@@ -2,7 +2,7 @@
   <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
     <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="emit('getData', true)" />
 
-    <Button severity="success" icon="pi pi-save" label="Save" @click="createVisibleDialog = true" />
+    <Button severity="success" icon="pi pi-save" label="Build" @click="createVisibleDialog = true" />
   </div>
   <!-- Add  -->
   <Panel toggleable>
@@ -273,31 +273,41 @@
   <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Power Systwem</span>
+        <span class="font-bold white-space-nowrap">Create new Version</span>
       </div>
     </template>
 
-    <div class="flex align-items-center gap-3 mb-3">
-      <label :for="nameVersion" class="font-semibold w-12rem"> Name Version</label>
-      <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label :for="scheduledOperationTime" class="font-semibold w-12rem"> Scheduled Operation Time</label>
-      <InputNumber :id="scheduledOperationTime" v-model="scheduledOperationTime" class="flex-auto" autocomplete="off" />
+    <div class="my-3">
+      <div class="flex flex-column gap-2 mb-3">
+        <label :for="nameVersion" class="font-semibold"> Name Version</label>
+        <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex flex-column gap-2 mb-3">
+        <label :for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
+        <InputNumber
+          :id="scheduledOperationTime"
+          v-model="scheduledOperationTime"
+          class="flex-auto"
+          autocomplete="off"
+        />
+      </div>
     </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" :disabled="nameVersion === ''" @click="createNewVersion"></Button>
+      <Button
+        type="button"
+        label="Submit"
+        :disabled="!nameVersion || !scheduledOperationTime"
+        @click="createNewVersion"
+      ></Button>
     </template>
   </Dialog>
-  <Toast />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import api from './api';
 
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 const toast = useToast();
 
@@ -309,7 +319,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['getData']);
 const data = computed(() => {
-  if (!props.data) {
+  if (!props.data.Add) {
     return {
       Add: [],
       Update: [],

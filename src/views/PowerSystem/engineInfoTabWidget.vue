@@ -28,7 +28,6 @@
     <template #empty> No Data </template>
   </DataTable>
 
-  <Toast />
 </template>
 
 <script setup>
@@ -39,7 +38,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  psdData: {
+  headerData: {
     type: Object,
     required: true,
   },
@@ -47,10 +46,10 @@ const props = defineProps({
 
 const emit = defineEmits(['editData', 'deleteData']);
 const columnList = computed(() => {
-  if (props.psdData) {
+  if (props.headerData.inputAttributes) {
     const cols = [];
-    for (let ind = 0; ind < props.psdData.inputAttributes.length; ind++) {
-      const data = props.psdData.inputAttributes[ind];
+    for (let ind = 0; ind < props.headerData.inputAttributes.length; ind++) {
+      const data = props.headerData.inputAttributes[ind];
       cols.push({ index: ind, header: data.name, visible: data.display });
     }
     return cols;

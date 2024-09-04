@@ -126,7 +126,6 @@
       <Button type="button" label="Submit" severity="danger" @click="deletePSE()"></Button>
     </template>
   </Dialog>
-  <Toast />
 </template>
 
 <script setup>
@@ -135,10 +134,6 @@ import { ref } from 'vue';
 const props = defineProps({
   data: {
     type: Array,
-    required: true,
-  },
-  psdData: {
-    type: Object,
     required: true,
   },
 });

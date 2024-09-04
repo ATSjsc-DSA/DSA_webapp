@@ -1,11 +1,14 @@
 <template>
-  <Toast />
   <ConfirmPopup />
 
   <DataTable :value="data" tableStyle="min-width: 50rem">
     <Column field="name" header="Name"></Column>
     <Column field="version" header="Version"></Column>
-    <Column field="category" header="Category"></Column>
+    <Column field="type" header="Type">
+      <template #body="slotProps">
+        <Tag :value="getTypeValue(slotProps.data.type)" :severity="getTypeSeverity(slotProps.data.type)" />
+      </template>
+    </Column>
     <Column header="Created Time">
       <template #body="slotProps">
         {{ convertDateTimeToString(slotProps.data.createdTimestamp) }}
@@ -28,12 +31,12 @@
 <script setup>
 import chartComposable from '@/combosables/chartData';
 import ConfirmPopup from 'primevue/confirmpopup';
+
 import api from './api';
 
 const { convertDateTimeToString } = chartComposable();
 import { useToast } from 'primevue/usetoast';
 const toast = useToast();
-
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
@@ -44,6 +47,13 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['reloadAll']);
+
+const getTypeValue = (type) => {
+  return type === 0 ? 'ONLINE' : 'FUTURE';
+};
+const getTypeSeverity = (type) => {
+  return type === 0 ? 'primary' : 'info';
+};
 
 const rollbackConfirmation = (event, versionId) => {
   console.log('rollbackConfirmation', versionId, event);
