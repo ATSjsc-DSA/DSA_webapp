@@ -8,7 +8,7 @@
     :sortOrder="1"
     rowHover
   >
-    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+    <Column field="generalInfo.emsUniqueId" header="Unique Id" style="width: 15%">
       <template #body="slotProps">
         <div class="font-bold">
           {{ slotProps.data.generalInfo.emsUniqueId }}

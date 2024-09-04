@@ -23,7 +23,7 @@
       >
         <ColumnGroup type="header">
           <Row>
-            <Column header="Ems UniqueId" style="width: 15%" :rowspan="2" />
+            <Column header="Unique Id" style="width: 15%" :rowspan="2" />
             <Column header="General" :colspan="4" />
             <Column header="Scada" :colspan="3" />
           </Row>
@@ -41,7 +41,7 @@
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
-        <Column header="Ems UniqueId" style="width: 15%">
+        <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
             <div class="font-bold">
               {{ slotProps.data.generalInfo.emsUniqueId }}
@@ -84,7 +84,7 @@
       >
         <ColumnGroup type="header">
           <Row>
-            <Column header="Ems UniqueId" style="width: 15%" :rowspan="2" />
+            <Column header="Unique Id" style="width: 15%" :rowspan="2" />
             <Column header="General" :colspan="4" />
             <Column header="Scada" :colspan="3" />
           </Row>
@@ -102,7 +102,7 @@
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
-        <Column header="Ems UniqueId" style="width: 15%">
+        <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
             <div class="font-bold">
               {{ slotProps.data.emsUniqueId }}
@@ -227,7 +227,7 @@
       >
         <ColumnGroup type="header">
           <Row>
-            <Column header="Ems UniqueId" style="width: 15%" :rowspan="2" />
+            <Column header="Unique Id" style="width: 15%" :rowspan="2" />
             <Column header="General" :colspan="4" />
             <Column header="Scada" :colspan="3" />
           </Row>
@@ -245,7 +245,7 @@
             <!-- <Column header="scadaUniqueId" field="scadaInfo.scadaUniqueId" /> -->
           </Row>
         </ColumnGroup>
-        <Column header="Ems UniqueId" style="width: 15%">
+        <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
             <div class="font-bold">
               {{ slotProps.data.generalInfo.emsUniqueId }}

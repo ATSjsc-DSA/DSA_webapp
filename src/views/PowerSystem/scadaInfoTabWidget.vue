@@ -8,16 +8,16 @@
     :sortOrder="1"
     rowHover
   >
-    <Column field="generalInfo.emsUniqueId" header="Ems UniqueId" style="width: 15%">
+    <Column field="generalInfo.emsUniqueId" header="Unique Id" style="width: 15%">
       <template #body="slotProps">
         <div class="font-bold">
           {{ slotProps.data.generalInfo.emsUniqueId }}
         </div>
       </template>
     </Column>
-    <Column field="scadaInfo.skey" header="Name" style="width: 15%"></Column>
-    <Column field="scadaInfo.scadaName" header="Ems Name" style="width: 15%"></Column>
-    <Column field="scadaInfo.scadaUniqueId" header="Ems UniqueId" style="width: 15%"> </Column>
+    <Column field="scadaInfo.skey" header="Skey" style="width: 15%"></Column>
+    <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%"></Column>
+    <Column field="scadaInfo.scadaUniqueId" header="Scada Unique Id" style="width: 15%"> </Column>
     <Column style="width: 1%; min-width: 5rem">
       <template #body="slotProps">
         <div class="flex justify-content-between">
