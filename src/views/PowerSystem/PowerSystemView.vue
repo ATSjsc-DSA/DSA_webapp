@@ -59,7 +59,7 @@
         </Card>
       </SplitterPanel>
       <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
-        <LoadingContainer v-show="progressSpinnerModal"></LoadingContainer>
+        <!-- <LoadingContainer v-show="progressSpinnerModal"></LoadingContainer> -->
         <div>
           <div class="m-3 flex gap-2 justify-content-between">
             <div class="flex gap-2 justify-content-start">
