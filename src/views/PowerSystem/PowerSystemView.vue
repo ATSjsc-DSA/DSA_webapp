@@ -1,13 +1,14 @@
 <template>
   <div class="card layout-content h-full">
     <Toast />
+    <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
     <Splitter style="height: 100%">
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
         <Card class="h-full">
           <template #title>
             <div class="flex flex-wrap justify-content-between align-items-center justify-center gap-2">
-              <div>Power System {{ showDefinitionList ? 'definition' : 'edit' }}</div>
+              <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
               <div>
                 <Button
                   :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
@@ -89,34 +90,31 @@
               <Button text icon="pi pi-plus" label="Create" :disabled="!showDefinitionList" @click="handleCreatePS" />
             </div>
           </div>
-
-          <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
-            <TabPanel header="">
-              <LoadingContainer v-show="isLoading" style="top: auto" />
-              <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-            </TabPanel>
-            <TabPanel>
-              <LoadingContainer v-show="isLoading" style="top: auto" />
-              <engineInfoTabWidget
-                :data="psData"
-                :headerData="definitionHeader"
-                @editData="editPSE"
-                @deleteData="deletePSE"
-              />
-            </TabPanel>
-            <TabPanel>
-              <LoadingContainer v-show="isLoading" style="top: auto" />
-              <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-            </TabPanel>
-            <TabPanel>
-              <LoadingContainer v-show="isLoading" style="top: auto" />
-              <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
-            </TabPanel>
-            <TabPanel>
-              <LoadingContainer v-show="isLoading" style="top: auto" />
-              <versionTabWidget :data="versionList" @reload-all="loadAllData" />
-            </TabPanel>
-          </TabView>
+          <div>
+            <LoadingContainer v-show="isLoadingContainer" style="top: auto" />
+            <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
+              <TabPanel header="">
+                <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+              </TabPanel>
+              <TabPanel>
+                <engineInfoTabWidget
+                  :data="psData"
+                  :headerData="definitionHeader"
+                  @editData="editPSE"
+                  @deleteData="deletePSE"
+                />
+              </TabPanel>
+              <TabPanel>
+                <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+              </TabPanel>
+              <TabPanel>
+                <compareTabWidget :data="psCompareData" @get-data="getComparePSD" />
+              </TabPanel>
+              <TabPanel>
+                <versionTabWidget :data="versionList" @reload-all="loadAllData" />
+              </TabPanel>
+            </TabView>
+          </div>
         </div>
       </SplitterPanel>
     </Splitter>
@@ -164,13 +162,14 @@ import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTabWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
-
+import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { projectId } = storeToRefs(commonStore);
 
 const toast = useToast();
-const isLoading = ref(false);
+const isLoadingProgress = ref(false);
+const isLoadingContainer = ref(false);
 onMounted(async () => {
   loadAllData();
 });
@@ -227,9 +226,13 @@ const getDefinitionList = async () => {
 };
 
 const handleRowClick = async (definition) => {
+  isLoadingContainer.value = true;
   definitionId.value = definition;
   await getDefinitionHeader();
   await getDefinitionData();
+  setTimeout(() => {
+    isLoadingContainer.value = false;
+  }, 500);
 };
 
 const getDefinitionHeader = async () => {
@@ -243,7 +246,6 @@ const getDefinitionHeader = async () => {
   }
 };
 const getDefinitionData = async () => {
-  isLoading.value = true;
   try {
     const res = await api.getDefinitionData(definitionId.value);
     psData.value = res.data;
@@ -251,7 +253,6 @@ const getDefinitionData = async () => {
     console.log('getDefinitionData: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
-  isLoading.value = false;
 };
 //  tree - powersystem edit
 const treePs = ref();
@@ -300,15 +301,18 @@ const getLeaf = async (parentId) => {
   }
 };
 const onNodeSelect = (node) => {
-  console.log(node);
   if (node.key != pseId.value) {
+    isLoadingContainer.value = true;
+
     pseId.value = node.key;
     parentNodeSelected.value = node.parentId;
     getPSEditData(true);
+    setTimeout(() => {
+      isLoadingContainer.value = false;
+    }, 500);
   }
 };
 const getPSEditData = async (getHeader = false) => {
-  isLoading.value = true;
   try {
     const res = await api.getPSEditData(pseId.value);
     psData.value = [res.data];
@@ -320,26 +324,25 @@ const getPSEditData = async (getHeader = false) => {
     console.log('getPSEditData: error ', error);
     toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
-  isLoading.value = false;
 };
 // --- compare
 const psCompareData = ref({});
 
 const getComparePSD = async (reloadMsg = false) => {
-  isLoading.value = true;
   try {
     const res = await api.getComparePSD();
     psCompareData.value = res.data;
     if (reloadMsg) {
+      isLoadingProgress.value = true;
       toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
     }
   } catch (error) {
     psCompareData.value = {};
-
-    console.log('getComparePSD: error ', error);
     toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
   }
-  isLoading.value = false;
+  setTimeout(() => {
+    isLoadingProgress.value = false;
+  }, 500);
 };
 // create
 const createVisibleDialog = ref(false);
