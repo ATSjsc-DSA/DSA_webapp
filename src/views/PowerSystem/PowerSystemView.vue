@@ -32,6 +32,7 @@
         <span v-show="isEditingVersion > 0">(Editing)</span>
       </div>
     </div>
+    <Divider />
 
     <TabView id="on-top-tab-view" v-model:activeIndex="tabMenuOnTopActive">
       <!-- tab Power System table  -->
@@ -151,18 +152,16 @@
 
       <TabPanel>
         <div class="flex align-items-center justify-content-between gap-2 w-full mb-3">
-          <div
-            v-if="sampleVersion.name != editVersionData.name"
-            class="flex align-items-center justify-content-start gap-2 w-full mb-3"
-          >
-            <label for="">Sample Version</label>
-            <span class="py-1 px-2 rounded" style="background-color: var(--surface-200)">{{ sampleVersion.name }}</span>
-            <div class="arrow-1">
+          <div class="flex align-items-center justify-content-start gap-2 w-full mx-2">
+            <label class="">Sample Version:</label>
+            <Tag severity="secondary" :value="sampleVersion.name" style="font-size: 16px"></Tag>
+
+            <div class="px-3">
               <i class="pi pi-arrow-right" style="font-size: 18px" />
             </div>
 
-            <label for="">Editing Version </label>
-            <span class="py-1 px-2 rounded bg-primary">{{ editVersionData.name }}</span>
+            <label class="">Editing Version:</label>
+            <Tag severity="primary" :value="editVersionData.name" style="font-size: 16px"></Tag>
           </div>
           <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
             <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />

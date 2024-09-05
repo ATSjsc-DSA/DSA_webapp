@@ -63,7 +63,7 @@ const onPageChange = (event) => {
 };
 
 const getTypeValue = (type) => {
-  return type === 0 ? 'ONLINE' : 'FUTURE';
+  return type === 0 ? 'Present' : 'future';
 };
 const getTypeSeverity = (type) => {
   return type === 0 ? 'primary' : 'info';
@@ -74,9 +74,9 @@ const getStateValue = (state) => {
     case 0:
       return 'OLD';
     case 1:
-      return 'EDITING';
+      return 'EDIT';
     case 2:
-      return 'RUNNING';
+      return 'RUN';
     default:
       return 'OLD';
   }
