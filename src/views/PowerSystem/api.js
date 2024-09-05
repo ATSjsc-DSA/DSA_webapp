@@ -70,8 +70,11 @@ export default class api {
   }
 
   // version
-  static async getVersionList() {
-    return get(`/powersystem/${projectId.value}/powersystemversion`);
+  static async getVersionList(page) {
+    return get(`/powersystem/${projectId.value}/powersystemversion`, {
+      page: page,
+      page_size: 10,
+    });
   }
   static async rollbackVersion(versionId) {
     return put(`/powersystem/${projectId.value}/powersystemversion/${versionId}`);

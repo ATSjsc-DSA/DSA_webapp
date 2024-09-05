@@ -10,6 +10,7 @@ export const useCommonStore = defineStore('common', () => {
   const psm_active = ref({});
   const psmList = ref([]);
   const projectId = ref(localStorage.getItem('projectId') || '');
+  const currentVersion = ref({});
   let intervalId = null;
 
   const setLoading = (loading) => {

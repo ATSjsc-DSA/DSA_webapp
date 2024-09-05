@@ -117,7 +117,12 @@
             <span class="font-bold white-space-nowrap">Version</span>
           </div>
         </template>
-        <versionTabWidget :data="versionList" @reload-all="loadAllData" />
+        <versionTabWidget
+          :data="versionList"
+          :totalRecord="totalRecordVersion"
+          @getVersionList="getVersionList"
+          @reload-all="loadAllData"
+        />
       </TabPanel>
       <TabPanel>
         <template #header>
@@ -128,7 +133,12 @@
         </template>
         <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
           <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
-          <Button severity="success" icon="pi pi-save" label="Build" @click="createVersionVisibleDialog = true" />
+          <Button
+            severity="success"
+            icon="pi pi-save"
+            label="Create new Version"
+            @click="createVersionVisibleDialog = true"
+          />
         </div>
         <div style="overflow: auto">
           <compareTabWidget :data="psCompareData" />
@@ -489,10 +499,13 @@ function capitalizeFirstLetter(string) {
 
 // version
 const versionList = ref([]);
-const getVersionList = async () => {
+const totalRecordVersion = ref(0);
+
+const getVersionList = async (page = 1) => {
   try {
-    const res = await api.getVersionList();
+    const res = await api.getVersionList(page);
     versionList.value = res.data[0];
+    totalRecordVersion.value = res.data[1];
   } catch (error) {
     versionList.value = [];
     console.log('getVersionList: error ', error);
