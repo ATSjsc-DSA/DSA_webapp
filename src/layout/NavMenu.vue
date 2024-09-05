@@ -33,12 +33,7 @@ const items = ref([
   },
 ]);
 
-const checkActiveRoute = (item) => {
-  if (router.currentRoute.value.path === item.to) {
-    console.log(router.currentRoute.value.path, item.to, router.currentRoute.value.path === item.to);
-  }
-  return router.currentRoute.value.path === item.to;
-};
+const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 </script>
 
 <template>

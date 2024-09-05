@@ -1,142 +1,140 @@
 <template>
-  <div class="card layout-content h-full">
+  <div class="card layout-content min-h-full">
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
-    <div class="flex justify-content-between align-items-center gap-2 mb-3">
-      <div>version</div>
-      <Button icon="pi pi-history" label="Compare" class="" @click="handleDialogCompare" />
-    </div>
-    <Splitter style="height: 100%">
-      <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
-        <Card class="h-full">
-          <template #title>
-            <div class="flex flex-wrap justify-content-between align-items-center gap-2">
-              <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
-              <div>
-                <Button
-                  :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
-                  severity="secondary"
-                  aria-label="show List PSD As Tree"
-                  :title="showDefinitionList ? 'Show as menu' : 'Show as list'"
-                  @click="showDefinitionList = !showDefinitionList"
-                />
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <template v-if="showDefinitionList">
-              <DataView :value="definitionList" class="w-full">
-                <template #list="slotProps">
-                  <div class="grid grid-nogutter">
-                    <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
-                      <div
-                        class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
-                        :class="{
-                          'border-top-1 surface-border': index !== 0,
-                          'selected-item': definitionId === item._id,
-                        }"
-                        @click="handleRowClick(item._id)"
-                      >
-                        <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
-                          <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
+    <TabView @tab-change="onTabMenuTopChange">
+      <TabPanel>
+        <template #header>
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-table" />
+            <span class="font-bold white-space-nowrap">Power System</span>
+          </div>
+        </template>
+        <Splitter style="height: 76vh">
+          <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
+            <Card class="h-full">
+              <template #title>
+                <div class="flex flex-wrap justify-content-between align-items-center gap-2">
+                  <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
+                  <div>
+                    <Button
+                      :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
+                      severity="secondary"
+                      aria-label="show List PSD As Tree"
+                      :title="showDefinitionList ? 'Show as menu' : 'Show as list'"
+                      @click="showDefinitionList = !showDefinitionList"
+                    />
+                  </div>
+                </div>
+              </template>
+              <template #content>
+                <template v-if="showDefinitionList">
+                  <DataView :value="definitionList" class="w-full">
+                    <template #list="slotProps">
+                      <div class="grid grid-nogutter">
+                        <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
+                          <div
+                            class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
+                            :class="{
+                              'border-top-1 surface-border': index !== 0,
+                              'selected-item': definitionId === item._id,
+                            }"
+                            @click="handleRowClick(item._id)"
+                          >
+                            <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
+                              <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </template>
+                  </DataView>
                 </template>
-              </DataView>
-            </template>
-            <template v-else>
-              <Tree
-                v-model:selectionKeys="nodeSelected"
-                :value="treePs"
-                loadingMode="icon"
-                class="w-full md:w-[30rem]"
-                selectionMode="single"
-                @node-expand="onNodeExpand"
-                @node-select="onNodeSelect"
-              />
-            </template>
-          </template>
-        </Card>
-      </SplitterPanel>
-      <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
-        <div>
-          <div class="m-3 flex gap-2 justify-content-between">
-            <div class="flex gap-2 justify-content-start">
-              <div class="flex gap-2 justify-content-start">
-                <Button label="General" class="" :text="tabMenuActive !== 0" @click="tabMenuActive = 0" />
-                <Button label="Engine" class="" :text="tabMenuActive !== 1" @click="tabMenuActive = 1" />
-                <Button label="Scada" class="" :text="tabMenuActive !== 2" @click="tabMenuActive = 2" />
-              </div>
-              <div class="pl-3 border-left-1"></div>
-              <div class="pl-1 flex gap-2 justify-content-start">
-                <Button
-                  icon="pi pi-list"
-                  label="Version"
-                  class=""
-                  :outlined="tabMenuActive !== 3"
-                  @click="tabMenuActive = 3"
-                />
-              </div>
-            </div>
+                <template v-else>
+                  <Tree
+                    v-model:selectionKeys="nodeSelected"
+                    :value="treePs"
+                    loadingMode="icon"
+                    class="w-full md:w-[30rem]"
+                    selectionMode="single"
+                    @node-expand="onNodeExpand"
+                    @node-select="onNodeSelect"
+                  />
+                </template>
+              </template>
+            </Card>
+          </SplitterPanel>
+          <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
             <div>
-              <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
-              <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
-              <Button text icon="pi pi-plus" label="Create" :disabled="!showDefinitionList" @click="handleCreatePS" />
+              <div class="m-3 flex gap-2 justify-content-between">
+                <div class="flex gap-2 justify-content-start">
+                  <div class="flex gap-2 justify-content-start">
+                    <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
+                    <Button label="Engine" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
+                    <Button label="Scada" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
+                  </div>
+                </div>
+                <div>
+                  <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
+                  <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
+                  <Button
+                    text
+                    icon="pi pi-plus"
+                    label="Create"
+                    :disabled="!showDefinitionList"
+                    @click="handleCreatePS"
+                  />
+                </div>
+              </div>
+              <div>
+                <LoadingContainer v-show="isLoadingContainer" style="top: 10%" />
+                <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
+                  <TabPanel header="">
+                    <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+                  </TabPanel>
+                  <TabPanel>
+                    <engineInfoTabWidget
+                      :data="psData"
+                      :headerData="definitionHeader"
+                      @editData="editPSE"
+                      @deleteData="deletePSE"
+                    />
+                  </TabPanel>
+                  <TabPanel>
+                    <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+                  </TabPanel>
+                </TabView>
+              </div>
             </div>
+          </SplitterPanel>
+        </Splitter>
+      </TabPanel>
+      <TabPanel>
+        <template #header>
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-list" />
+            <span class="font-bold white-space-nowrap">Version</span>
           </div>
-          <div>
-            <LoadingContainer v-show="isLoadingContainer" style="top: auto" />
-            <TabView id="ps-tab-view" v-model:activeIndex="tabMenuActive">
-              <TabPanel header="">
-                <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-              </TabPanel>
-              <TabPanel>
-                <engineInfoTabWidget
-                  :data="psData"
-                  :headerData="definitionHeader"
-                  @editData="editPSE"
-                  @deleteData="deletePSE"
-                />
-              </TabPanel>
-              <TabPanel>
-                <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-              </TabPanel>
-
-              <TabPanel>
-                <versionTabWidget :data="versionList" @reload-all="loadAllData" />
-              </TabPanel>
-            </TabView>
+        </template>
+        <versionTabWidget :data="versionList" @reload-all="loadAllData" />
+      </TabPanel>
+      <TabPanel>
+        <template #header>
+          <div class="flex align-items-center gap-2 mx-3">
+            <i class="pi pi-history" />
+            <span class="font-bold white-space-nowrap">Compare</span>
           </div>
+        </template>
+        <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
+          <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
+          <Button severity="success" icon="pi pi-save" label="Build" @click="createVersionVisibleDialog = true" />
         </div>
-      </SplitterPanel>
-    </Splitter>
-
-    <!-- show compare dialog  -->
-    <Dialog
-      v-model:visible="compareVisibleDialog"
-      header="Compare"
-      :modal="true"
-      maximizable
-      :style="{ width: '80%' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    >
-      <template #header>
-        <div class="flex align-items-center justify-content-between gap-2 w-full mr-3">
-          <div class="font-bold white-space-nowrap">Compare update</div>
-          <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD" />
+        <div style="overflow: auto">
+          <compareTabWidget :data="psCompareData" />
         </div>
-      </template>
-
-      <compareTabWidget :data="psCompareData" />
-
-      <template #footer>
-        <Button type="button" label="Cancel" severity="secondary" @click="compareVisibleDialog = false"></Button>
-        <Button severity="success" icon="pi pi-save" label="Build" @click="createVersionVisibleDialog = true" />
-      </template>
-    </Dialog>
+      </TabPanel>
+    </TabView>
 
     <!-- create new version dialog  -->
     <Dialog v-model:visible="createVersionVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
@@ -227,7 +225,7 @@ onMounted(async () => {
   loadAllData();
 });
 
-const tabMenuActive = ref(0);
+const tabMenuPSActive = ref(0);
 
 const loadAllData = async () => {
   await getDefinitionList();
@@ -238,8 +236,7 @@ const loadAllData = async () => {
   //   }
   // }
   treePs.value = await getLeaf(projectId.value);
-  getVersionList();
-  tabMenuActive.value = 0;
+  tabMenuPSActive.value = 0;
 };
 // get data
 const showDefinitionList = ref(true);
@@ -369,18 +366,20 @@ const getPSEditData = async (getHeader = false) => {
     }
   } catch (error) {
     console.log('getPSEditData: error ', error);
-    toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
 // --- compare
-const compareVisibleDialog = ref(false);
 
-const handleDialogCompare = () => {
-  compareVisibleDialog.value = true;
-  getComparePSD();
-};
 const psCompareData = ref({});
-
+const onTabMenuTopChange = (event) => {
+  if (event.index === 1) {
+    getVersionList();
+  }
+  if (event.index === 2) {
+    getComparePSD();
+  }
+};
 const getComparePSD = async (reloadMsg = false) => {
   try {
     const res = await api.getComparePSD();
@@ -407,7 +406,6 @@ const createNewVersion = async () => {
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     getComparePSD();
     createVersionVisibleDialog.value = false;
-    compareVisibleDialog.value = false;
   } catch (error) {
     console.log('createPS: error ', error);
     // progressSpinnerModal.value = false;
@@ -421,29 +419,27 @@ const createVisibleDialog = ref(false);
 const psCreate = ref();
 
 const handleCreatePS = () => {
-  const randomString = generateRandomString(10);
-
   psCreate.value = {
     _id: '',
     generalInfo: {
-      name: randomString,
+      name: '',
       parrentId: showDefinitionList.value ? definitionHeader.value.parrentId : parentNodeSelected.value,
-      uniqueId: randomString,
-      emsName: randomString,
-      emsUniqueId: randomString,
-      operationName: randomString,
-      operationUniqueId: randomString,
-      softwareName: randomString,
-      softwareUniqueId: randomString,
+      uniqueId: '',
+      emsName: '',
+      emsUniqueId: '',
+      operationName: '',
+      operationUniqueId: '',
+      softwareName: '',
+      softwareUniqueId: '',
     },
     engineInfo: {
       powerSystemDefinitionId: showDefinitionList.value ? definitionId.value : '',
       values: [''],
     },
     scadaInfo: {
-      skey: randomString,
-      scadaName: randomString,
-      scadaUniqueId: randomString,
+      skey: '',
+      scadaName: '',
+      scadaUniqueId: '',
     },
   };
 
@@ -489,16 +485,6 @@ function capitalizeFirstLetter(string) {
     .split(/(?=[A-Z])/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-}
-function generateRandomString(length) {
-  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let randomString = '';
-
-  for (let i = 0; i < length; i++) {
-    randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-
-  return randomString;
 }
 
 // version
