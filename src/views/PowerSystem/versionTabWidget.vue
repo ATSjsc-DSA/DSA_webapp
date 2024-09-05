@@ -1,6 +1,6 @@
 <template>
   <ConfirmPopup />
-  <DataTable :value="data" tableStyle="min-width: 50rem">
+  <DataTable :value="data" tableStyle="min-width: 50rem" :rowStyle="rowStyle">
     <Column field="name" header="Name"></Column>
     <Column field="version" header="Version"></Column>
     <Column field="type" header="Type">
@@ -20,7 +20,7 @@
     </Column>
     <Column style="width: 10%" header="">
       <template #body="{ data }">
-        <Button icon="pi pi-pencil " label="Edit" outlined @click="rollbackConfirmation($event, data._id)"></Button>
+        <Button icon="pi pi-pencil " label="Edit" outlined @click="openVersionConfirmation($event, data)"></Button>
       </template>
     </Column>
     <template #empty> No Data </template>
@@ -34,6 +34,10 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import Paginator from 'primevue/paginator';
 
 import api from './api';
+
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { editVersionData } = storeToRefs(commonStore);
 
 const { convertDateTimeToString } = chartComposable();
 import { useToast } from 'primevue/usetoast';
@@ -69,16 +73,15 @@ const getStateValue = (state) => {
   switch (state) {
     case 0:
       return 'OLD';
-
     case 1:
       return 'EDITING';
-
     case 2:
       return 'RUNNING';
     default:
       return 'OLD';
   }
 };
+
 const getStateSeverity = (state) => {
   switch (state) {
     case 0:
@@ -93,8 +96,13 @@ const getStateSeverity = (state) => {
       return 'secondary';
   }
 };
-const rollbackConfirmation = (event, versionId) => {
-  console.log('rollbackConfirmation', versionId, event);
+
+const rowStyle = (data) => {
+  if (data._id === editVersionData.value._id) {
+    return { fontWeight: 'bold', fontStyle: 'italic', backgroundColor: 'var( --highlight-bg)' };
+  }
+};
+const openVersionConfirmation = (event, versionData) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Are you sure you want to proceed?',
@@ -108,20 +116,22 @@ const rollbackConfirmation = (event, versionId) => {
       label: 'Save',
     },
     accept: () => {
-      rollbackVersion(versionId);
+      openVersion(versionData);
     },
     reject: () => {},
   });
 };
-const rollbackVersion = async (versionId) => {
+
+const openVersion = async (versionData) => {
   try {
-    await api.rollbackVersion(versionId);
-    toast.add({ severity: 'info', summary: 'Rollback', detail: 'Rollback Successfully', life: 1000 });
+    await api.openVersion(versionData._id);
+    commonStore.editVersionData = versionData;
+    toast.add({ severity: 'info', summary: 'Version', detail: versionData.name, life: 3000 });
     setTimeout(() => {
       emit('reloadAll');
     }, 500);
   } catch (error) {
-    console.log('getVersionList: error ', error);
+    console.log('openVersion: error ', error);
 
     toast.add({ severity: 'error', summary: 'Rollback Version ', detail: error.data.detail, life: 3000 });
   }

@@ -76,7 +76,7 @@ export default class api {
       page_size: 10,
     });
   }
-  static async rollbackVersion(versionId) {
+  static async openVersion(versionId) {
     return put(`/powersystem/${projectId.value}/powersystemversion/${versionId}`);
   }
 }

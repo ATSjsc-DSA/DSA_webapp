@@ -3,14 +3,40 @@
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
-    <TabView @tab-change="onTabMenuTopChange">
+    <div class="flex gap-2 justify-content-between align-items-center px-3">
+      <div class="flex gap-2 justify-content-start">
+        <Button
+          icon="pi pi-table"
+          label="Power System"
+          text
+          :severity="tabMenuOnTopActive === 0 ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = 0"
+        />
+        <Button
+          icon="pi pi-list"
+          label="Version"
+          text
+          :severity="tabMenuOnTopActive === 1 ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = 1"
+        />
+        <Button
+          icon="pi pi-history"
+          label="Compare"
+          text
+          :severity="tabMenuOnTopActive === 2 ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = 2"
+        />
+      </div>
+      <div v-tooltip="'Current Version'" class="p-text-secondary font-semibold px-2">
+        {{ capitalizeFirstLetter(editVersionData.name) }}
+        <span v-show="isEditingVersion > 0">(Editing)</span>
+      </div>
+    </div>
+
+    <TabView id="on-top-tab-view" v-model:activeIndex="tabMenuOnTopActive">
+      <!-- tab Power System table  -->
+
       <TabPanel>
-        <template #header>
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-table" />
-            <span class="font-bold white-space-nowrap">Power System</span>
-          </div>
-        </template>
         <Splitter style="height: 76vh">
           <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
             <Card class="h-full">
@@ -110,35 +136,43 @@
           </SplitterPanel>
         </Splitter>
       </TabPanel>
+
+      <!-- tab version  -->
       <TabPanel>
-        <template #header>
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-list" />
-            <span class="font-bold white-space-nowrap">Version</span>
-          </div>
-        </template>
         <versionTabWidget
           :data="versionList"
           :totalRecord="totalRecordVersion"
-          @getVersionList="getVersionList"
+          @getVersionList="getVersionData"
           @reload-all="loadAllData"
         />
       </TabPanel>
+
+      <!-- tab compare -->
+
       <TabPanel>
-        <template #header>
-          <div class="flex align-items-center gap-2 mx-3">
-            <i class="pi pi-history" />
-            <span class="font-bold white-space-nowrap">Compare</span>
+        <div class="flex align-items-center justify-content-between gap-2 w-full mb-3">
+          <div
+            v-if="sampleVersion.name != editVersionData.name"
+            class="flex align-items-center justify-content-start gap-2 w-full mb-3"
+          >
+            <label for="">Sample Version</label>
+            <span class="py-1 px-2 rounded" style="background-color: var(--surface-200)">{{ sampleVersion.name }}</span>
+            <div class="arrow-1">
+              <i class="pi pi-arrow-right" style="font-size: 18px" />
+            </div>
+
+            <label for="">Editing Version </label>
+            <span class="py-1 px-2 rounded bg-primary">{{ editVersionData.name }}</span>
           </div>
-        </template>
-        <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
-          <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
-          <Button
-            severity="success"
-            icon="pi pi-save"
-            label="Create new Version"
-            @click="createVersionVisibleDialog = true"
-          />
+          <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
+            <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
+            <Button
+              severity="success"
+              icon="pi pi-save"
+              label="Create new Version"
+              @click="createVersionVisibleDialog = true"
+            />
+          </div>
         </div>
         <div style="overflow: auto">
           <compareTabWidget :data="psCompareData" />
@@ -226,7 +260,7 @@ import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectId } = storeToRefs(commonStore);
+const { projectId, editVersionData } = storeToRefs(commonStore);
 
 const toast = useToast();
 const isLoadingProgress = ref(false);
@@ -239,6 +273,8 @@ const tabMenuPSActive = ref(0);
 
 const loadAllData = async () => {
   await getDefinitionList();
+  await getVersionData();
+  await getComparePSD();
   // if (definitionList.value.length > 0) {
   //   await getDefinitionHeader(definitionList.value[0]._id);
   //   if (definitionHeader.value) {
@@ -380,16 +416,18 @@ const getPSEditData = async (getHeader = false) => {
   }
 };
 // --- compare
-
 const psCompareData = ref({});
-const onTabMenuTopChange = (event) => {
-  if (event.index === 1) {
-    getVersionList();
+const isEditingVersion = ref(false);
+const tabMenuOnTopActive = ref(0);
+watch(tabMenuOnTopActive, (newTab) => {
+  if (newTab === 1) {
+    getVersionData();
   }
-  if (event.index === 2) {
+  if (newTab === 2) {
     getComparePSD();
   }
-};
+});
+
 const getComparePSD = async (reloadMsg = false) => {
   try {
     const res = await api.getComparePSD();
@@ -398,6 +436,9 @@ const getComparePSD = async (reloadMsg = false) => {
       isLoadingProgress.value = true;
       toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
     }
+    isEditingVersion.value = Boolean(
+      psCompareData.value.Add.length + psCompareData.value.Update.length + psCompareData.value.Delete.length,
+    );
   } catch (error) {
     psCompareData.value = {};
     toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
@@ -491,6 +532,9 @@ const deletePSE = async (pseId) => {
 };
 
 function capitalizeFirstLetter(string) {
+  if (!string) {
+    return '';
+  }
   return string
     .split(/(?=[A-Z])/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -501,11 +545,21 @@ function capitalizeFirstLetter(string) {
 const versionList = ref([]);
 const totalRecordVersion = ref(0);
 
-const getVersionList = async (page = 1) => {
+const sampleVersion = ref({});
+
+const getVersionData = async (page = 1) => {
   try {
     const res = await api.getVersionList(page);
     versionList.value = res.data[0];
     totalRecordVersion.value = res.data[1];
+
+    // set version init
+    if (!sampleVersion.value.name) {
+      sampleVersion.value = versionList.value[0];
+    }
+    if (!editVersionData.value.name) {
+      commonStore.editVersionData = versionList.value[0];
+    }
   } catch (error) {
     versionList.value = [];
     console.log('getVersionList: error ', error);
@@ -515,7 +569,8 @@ const getVersionList = async (page = 1) => {
 </script>
 
 <style>
-#ps-tab-view ul.p-tabview-nav {
+#ps-tab-view ul.p-tabview-nav,
+#on-top-tab-view ul.p-tabview-nav {
   display: none !important;
 }
 
