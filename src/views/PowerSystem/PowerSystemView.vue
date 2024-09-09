@@ -3,7 +3,7 @@
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
-    <div class="flex gap-2 justify-content-between align-items-center px-3">
+    <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
           icon="pi pi-table"
@@ -38,7 +38,7 @@
       <!-- tab Power System table  -->
 
       <TabPanel>
-        <Splitter style="height: 76vh">
+        <Splitter style="min-height: 78vh">
           <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
             <Card class="h-full">
               <template #title>
@@ -93,7 +93,8 @@
             </Card>
           </SplitterPanel>
           <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
-            <div>
+            <div class="flex flex-column h-full">
+              <!-- ps table -  header  -->
               <div class="m-3 flex gap-2 justify-content-between">
                 <div class="flex gap-2 justify-content-start">
                   <div class="flex gap-2 justify-content-start">
@@ -103,8 +104,8 @@
                   </div>
                 </div>
                 <div>
-                  <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
-                  <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
+                  <Button severity="secondary" text icon="pi pi-download" label="Export" disabled />
+                  <Button severity="info" text icon="pi pi-upload" label="Import" disabled />
                   <Button
                     text
                     icon="pi pi-plus"
@@ -114,7 +115,8 @@
                   />
                 </div>
               </div>
-              <div>
+              <!-- ps table - table data  -->
+              <div class="flex-grow-1">
                 <LoadingContainer v-show="isLoadingContainer" style="top: 10%" />
                 <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                   <TabPanel header="">
@@ -132,6 +134,11 @@
                     <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
                   </TabPanel>
                 </TabView>
+              </div>
+              <!-- ps table - Paginator -->
+
+              <div v-if="psDataCount > psPageRowNumber">
+                <Paginator :rows="psPageRowNumber" :totalRecords="psDataCount" @page="onPagePsDataChange"></Paginator>
               </div>
             </div>
           </SplitterPanel>
@@ -152,7 +159,10 @@
 
       <TabPanel>
         <div class="flex align-items-center justify-content-between gap-2 w-full mb-3">
-          <div class="flex align-items-center justify-content-start gap-2 w-full mx-2">
+          <div
+            v-if="sampleVersion._id !== editVersionData._id"
+            class="flex align-items-center justify-content-start gap-2 w-full mx-2"
+          >
             <label class="">Sample Version:</label>
             <Tag severity="secondary" :value="sampleVersion.name" style="font-size: 16px"></Tag>
 
@@ -192,14 +202,16 @@
           <label :for="nameVersion" class="font-semibold"> Name Version</label>
           <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
         </div>
+
         <div class="flex flex-column gap-2 mb-3">
-          <label :for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
-          <InputNumber
+          <label for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
+          <!-- <DatePicker
             :id="scheduledOperationTime"
             v-model="scheduledOperationTime"
             class="flex-auto"
             autocomplete="off"
-          />
+          /> -->
+          <Calendar id="scheduledOperationTime" v-model="scheduledOperationTime" showTime hourFormat="24" />
         </div>
       </div>
       <template #footer>
@@ -283,10 +295,20 @@ const loadAllData = async () => {
   treePs.value = await getLeaf(projectId.value);
   tabMenuPSActive.value = 0;
 };
+
 // get data
 const showDefinitionList = ref(true);
 const psData = ref([]);
+const psDataCount = ref();
+const psCurrentPage = ref(1);
+const psPageRowNumber = ref(10);
+
 const isAddNew = ref(false);
+
+const onPagePsDataChange = (event) => {
+  psCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  reloadData();
+};
 const reloadData = async () => {
   if (showDefinitionList.value) {
     await getDefinitionData();
@@ -336,8 +358,9 @@ const getDefinitionHeader = async () => {
 };
 const getDefinitionData = async () => {
   try {
-    const res = await api.getDefinitionData(definitionId.value);
-    psData.value = res.data;
+    const res = await api.getDefinitionData(definitionId.value, psCurrentPage.value);
+    psData.value = res.data.items;
+    psDataCount.value = res.data.total;
   } catch (error) {
     console.log('getDefinitionData: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
@@ -452,7 +475,7 @@ const nameVersion = ref('');
 const scheduledOperationTime = ref();
 const createNewVersion = async () => {
   try {
-    await api.createNewVersion(nameVersion.value);
+    await api.createNewVersion(nameVersion.value, scheduledOperationTime.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     getComparePSD();
     createVersionVisibleDialog.value = false;

@@ -10,7 +10,7 @@
   >
     <Column field="generalInfo.emsUniqueId" header="Unique Id" style="width: 15%">
       <template #body="slotProps">
-        <div class="font-bold">
+        <div class="font-bold w-6rem">
           {{ slotProps.data.generalInfo.emsUniqueId }}
         </div>
       </template>

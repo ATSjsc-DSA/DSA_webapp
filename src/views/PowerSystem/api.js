@@ -3,6 +3,9 @@ import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { psm_active, projectId } = storeToRefs(commonStore);
 
+import DSA_Common from '@/combosables/DSA_common';
+const { convertTimeStringToInt } = DSA_Common();
+
 console.log('projectId', projectId.value);
 console.log('psm_active', psm_active.value._id);
 
@@ -16,8 +19,10 @@ export default class api {
     return get(`/powersystem/${projectId.value}/powersystemdefinition/${definitionId}`);
   }
 
-  static async getDefinitionData(definitionId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${definitionId}`);
+  static async getDefinitionData(definitionId, page) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${definitionId}`, {
+      page: page,
+    });
   }
 
   // tree - powersystem edit
@@ -65,8 +70,12 @@ export default class api {
     return get(`/powersystem/${projectId.value}/compare_powersystem`);
   }
 
-  static async createNewVersion(nameVersion) {
-    return post(`/powersystem/${projectId.value}/newversion_powersystem`, { name: nameVersion });
+  static async createNewVersion(nameVersion, scheduledOperationTime) {
+    return post(`/powersystem/${projectId.value}/newversion_powersystem`, {
+      name: nameVersion,
+      // tạo sẵn `scheduledOperationTime` chưa gửi
+      // scheduledOperationTime: convertTimeStringToInt(scheduledOperationTime),
+    });
   }
 
   // version
