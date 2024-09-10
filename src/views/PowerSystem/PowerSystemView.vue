@@ -3,6 +3,10 @@
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
+    <!-- this is for test  -->
+
+    <!-- end test  -->
+
     <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
@@ -65,9 +69,9 @@
                             class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
                             :class="{
                               'border-top-1 surface-border': index !== 0,
-                              'selected-item': definitionId === item._id,
+                              'selected-item': definitionSelected === item._id,
                             }"
-                            @click="handleRowClick(item._id)"
+                            @click="handleDefinitionRowClick(item)"
                           >
                             <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
                               <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
@@ -94,8 +98,9 @@
           </SplitterPanel>
           <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
             <div class="flex flex-column h-full">
-              <!-- ps table -  header  -->
-              <div class="m-3 flex gap-2 justify-content-between">
+              <!-- ps table -  header: tab & filter  -->
+              <div class="m-3 flex gap-2 justify-content-between align-items-center">
+                <!-- tab -->
                 <div class="flex gap-2 justify-content-start">
                   <div class="flex gap-2 justify-content-start">
                     <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
@@ -103,21 +108,196 @@
                     <Button label="Scada" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
                   </div>
                 </div>
+                <Divider layout="vertical" />
+                <!-- filter -->
+                <div class="flex-grow-1 m-3 flex gap-2 justify-content-between">
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-area">Select a Area</label>
+                    <Dropdown
+                      v-model="areaSelected"
+                      :options="areaList"
+                      showClear
+                      :virtualScrollerOptions="{
+                        lazy: areaList.length > 0,
+                        onLazyLoad: onLazyLoadArea,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingAreaFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!definitionSelected"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Area</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-zone">Select a Zone</label>
+                    <Dropdown
+                      v-model="zoneSelected"
+                      :options="zoneList"
+                      showClear
+                      :virtualScrollerOptions="{
+                        lazy: zoneList.length > 0,
+                        onLazyLoad: onLazyLoadZone,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingZoneFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!definitionSelected"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Zone</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-owner">Select a Owner</label>
+                    <Dropdown
+                      v-model="ownerSelected"
+                      showClear
+                      :options="ownerList"
+                      :virtualScrollerOptions="{
+                        lazy: ownerList.length > 0,
+                        onLazyLoad: onLazyLoadOwner,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingOwnerFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!definitionSelected"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Owner</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+                  <Divider type="solid" layout="vertical" />
+
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-sub">Select a Substation</label>
+                    <Dropdown
+                      v-model="subSelected"
+                      :options="subList"
+                      showClear
+                      :virtualScrollerOptions="{
+                        lazy: subList.length > 0,
+                        onLazyLoad: onLazyLoadSubstation,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingSubsFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!definitionSelected || subList.length === 0"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Substation</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+                  <div>
+                    <Button
+                      severity="primary"
+                      icon="pi pi-filter"
+                      style="width: 32px"
+                      :disabled="!definitionSelected"
+                      @click="getPsDataWithDefinitionFilter(definitionSelected.name)"
+                    />
+                  </div>
+                </div>
+                <Divider layout="vertical" />
+                <!-- menu import/export -->
                 <div>
-                  <Button severity="secondary" text icon="pi pi-download" label="Export" disabled />
-                  <Button severity="info" text icon="pi pi-upload" label="Import" disabled />
                   <Button
-                    text
-                    icon="pi pi-plus"
-                    label="Create"
-                    :disabled="!showDefinitionList"
-                    @click="handleCreatePS"
+                    severity="secondary"
+                    type="button"
+                    icon="pi pi-ellipsis-v"
+                    aria-haspopup="true"
+                    aria-controls="config_menu"
+                    style="width: 32px"
+                    @click="toggleMenuConfig"
                   />
+                  <Menu id="menuImportExport" ref="menuImportExport" :model="itemsMenuImportExport" :popup="true">
+                    <template #item="{ item }">
+                      <Button
+                        severity="secondary"
+                        text
+                        :icon="item.icon"
+                        :label="item.label"
+                        :disabled="item.disabled"
+                      />
+                    </template>
+                  </Menu>
                 </div>
               </div>
+
               <!-- ps table - table data  -->
               <div class="flex-grow-1">
-                <LoadingContainer v-show="isLoadingContainer" style="top: 10%" />
+                <LoadingContainer v-show="isLoadingContainer" />
                 <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                   <TabPanel header="">
                     <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
@@ -125,7 +305,7 @@
                   <TabPanel>
                     <engineInfoTabWidget
                       :data="psData"
-                      :headerData="definitionHeader"
+                      :headerData="definitionData"
                       @editData="editPSE"
                       @deleteData="deletePSE"
                     />
@@ -137,8 +317,12 @@
               </div>
               <!-- ps table - Paginator -->
 
-              <div v-if="psDataCount > psPageRowNumber">
-                <Paginator :rows="psPageRowNumber" :totalRecords="psDataCount" @page="onPagePsDataChange"></Paginator>
+              <div v-if="psDataListLength > psPageRowNumber">
+                <Paginator
+                  :rows="psPageRowNumber"
+                  :totalRecords="psDataListLength"
+                  @page="onPagePsDataChange"
+                ></Paginator>
               </div>
             </div>
           </SplitterPanel>
@@ -205,12 +389,6 @@
 
         <div class="flex flex-column gap-2 mb-3">
           <label for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
-          <!-- <DatePicker
-            :id="scheduledOperationTime"
-            v-model="scheduledOperationTime"
-            class="flex-auto"
-            autocomplete="off"
-          /> -->
           <Calendar id="scheduledOperationTime" v-model="scheduledOperationTime" showTime hourFormat="24" />
         </div>
       </div>
@@ -253,11 +431,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import api from './api';
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import FloatLabel from 'primevue/floatlabel';
+import Dropdown from 'primevue/dropdown';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -267,6 +447,7 @@ import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
+
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
@@ -276,6 +457,9 @@ const { projectId, editVersionData } = storeToRefs(commonStore);
 const toast = useToast();
 const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
+
+const versionId = ref('66decf1dcff005199529524b');
+
 onMounted(async () => {
   loadAllData();
 });
@@ -286,20 +470,16 @@ const loadAllData = async () => {
   await getDefinitionList();
   await getVersionData();
   await getComparePSD();
-  // if (definitionList.value.length > 0) {
-  //   await getDefinitionHeader(definitionList.value[0]._id);
-  //   if (definitionHeader.value) {
-  //     await getDefinitionData();
-  //   }
-  // }
   treePs.value = await getLeaf(projectId.value);
   tabMenuPSActive.value = 0;
+
+  await resetFilterList();
 };
 
 // get data
 const showDefinitionList = ref(true);
 const psData = ref([]);
-const psDataCount = ref();
+const psDataListLength = ref();
 const psCurrentPage = ref(1);
 const psPageRowNumber = ref(10);
 
@@ -311,7 +491,7 @@ const onPagePsDataChange = (event) => {
 };
 const reloadData = async () => {
   if (showDefinitionList.value) {
-    await getDefinitionData();
+    await getPsDataWithDefinition();
   } else {
     await getPSEditData();
   }
@@ -321,10 +501,10 @@ watch(showDefinitionList, (newStatus) => {
     treePs.value = getLeaf(projectId.value);
   }
 });
-//  -- list - definition list
+//  -- Flat List - definition list
 const definitionList = ref([]);
-const definitionId = ref();
-const definitionHeader = ref({});
+const definitionSelected = ref();
+const definitionData = ref({});
 
 const getDefinitionList = async () => {
   try {
@@ -336,36 +516,183 @@ const getDefinitionList = async () => {
   }
 };
 
-const handleRowClick = async (definition) => {
+const handleDefinitionRowClick = async (definition) => {
   isLoadingContainer.value = true;
-  definitionId.value = definition;
-  await getDefinitionHeader();
-  await getDefinitionData();
+  definitionSelected.value = definition;
+  await getDefinitionData(definitionSelected.value._id);
+  await getPsDataWithDefinition();
   setTimeout(() => {
     isLoadingContainer.value = false;
   }, 500);
 };
 
-const getDefinitionHeader = async () => {
+const getDefinitionData = async (id) => {
   try {
-    const res = await api.getDefinitionHeader(definitionId.value);
-    definitionHeader.value = res.data;
+    const res = await api.getDefinitionData(id);
+    definitionData.value = res.data;
   } catch (error) {
-    definitionHeader.value = {};
-    console.log('getDefinitionHeader: error ', error);
+    definitionData.value = {};
+    console.log('getDefinitionData: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Header', detail: error.data.detail, life: 3000 });
   }
 };
-const getDefinitionData = async () => {
+const getPsDataWithDefinition = async () => {
   try {
-    const res = await api.getDefinitionData(definitionId.value, psCurrentPage.value);
+    const res = await api.getPsDataWithDefinition(definitionSelected.value._id, versionId.value, psCurrentPage.value);
     psData.value = res.data.items;
-    psDataCount.value = res.data.total;
+    psDataListLength.value = res.data.total;
   } catch (error) {
-    console.log('getDefinitionData: error ', error);
+    console.log('getPsDataWithDefinition: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
 };
+
+// Flat List - filter
+
+const areaSelected = ref();
+const areaList = ref([]);
+const isLoadingAreaFilter = ref(false);
+const definitionArea = ref();
+
+const zoneSelected = ref();
+const zoneList = ref([]);
+const isLoadingZoneFilter = ref(false);
+const definitionZone = ref();
+
+const ownerSelected = ref();
+const ownerList = ref([]);
+const isLoadingOwnerFilter = ref(false);
+const definitionOwner = ref();
+
+const subSelected = ref();
+const subList = ref([]);
+const isLoadingSubsFilter = ref(false);
+const definitionSub = ref();
+
+const resetFilterList = async () => {
+  definitionArea.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'area')[0];
+  const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, 1, {});
+  areaList.value = Array.from({ length: areaFilterLength.data.total });
+
+  definitionZone.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'zone')[0];
+  const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, 1, {});
+  zoneList.value = Array.from({ length: zoneFilterLength.data.total });
+
+  definitionOwner.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'owner')[0];
+  const ownerFilterLength = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, 1, {});
+  ownerList.value = Array.from({ length: ownerFilterLength.data.total });
+
+  definitionSub.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'substation')[0];
+  updateSubstationFilterLength();
+};
+
+const onLazyLoadArea = async (event) => {
+  isLoadingAreaFilter.value = true;
+  const { first, last } = event;
+  const _items = [...areaList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+
+    const resData = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, page, {});
+    for (let i = 0; i < resData.data.items.length; i++) {
+      if (!resData.data.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
+    }
+  }
+  areaList.value = _items;
+  isLoadingAreaFilter.value = false;
+};
+
+const onLazyLoadZone = async (event) => {
+  isLoadingZoneFilter.value = true;
+  const { first, last } = event;
+  const _items = [...zoneList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+    const resData = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, page, {});
+    for (let i = 0; i < resData.data.items.length; i++) {
+      if (!resData.data.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
+    }
+  }
+  zoneList.value = _items;
+  isLoadingZoneFilter.value = false;
+};
+
+const onLazyLoadOwner = async (event) => {
+  isLoadingOwnerFilter.value = true;
+  const { first, last } = event;
+  const _items = [...ownerList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+    const resData = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, page, {});
+    for (let i = 0; i < resData.data.items.length; i++) {
+      if (!resData.data.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
+    }
+  }
+  ownerList.value = _items;
+  isLoadingOwnerFilter.value = false;
+};
+
+watch(areaSelected, () => {
+  updateSubstationFilterLength();
+});
+
+watch(zoneSelected, () => {
+  updateSubstationFilterLength();
+});
+
+watch(ownerSelected, () => {
+  updateSubstationFilterLength();
+});
+const updateSubstationFilterLength = async () => {
+  subSelected.value = undefined;
+  const subsFilterLength = await getPsDataWithDefinitionFilter('Substation', 1);
+  subList.value = Array.from({ length: subsFilterLength.total });
+};
+
+const onLazyLoadSubstation = async (event) => {
+  isLoadingSubsFilter.value = true;
+  const { first, last } = event;
+  const _items = [...subList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+    const resData = await getPsDataWithDefinitionFilter('Substation', page);
+    for (let i = 0; i < resData.items.length; i++) {
+      if (!resData.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.items[i].generalInfo.name, _id: resData.items[i]._id };
+    }
+  }
+  subList.value = _items;
+  isLoadingSubsFilter.value = false;
+};
+
+const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
+  try {
+    const definition = definitionList.value.filter((item) => item.name.toLowerCase() === nameFilter.toLowerCase())[0];
+    const res = await api.getPsDataWithDefinition(definition._id, versionId.value, page, {
+      area: areaSelected.value ? areaSelected.value._id : undefined,
+      zone: zoneSelected.value ? zoneSelected.value._id : undefined,
+      owner: ownerSelected.value ? ownerSelected.value._id : undefined,
+      sub: subSelected.value ? subSelected.value._id : undefined,
+    });
+    return res.data;
+  } catch (error) {
+    console.log('getDefinitionFilterData: error ', error);
+  }
+};
+
+// areaList.value = getDefinitionData();
+
 //  tree - powersystem edit
 const treePs = ref();
 const nodeSelected = ref();
@@ -395,7 +722,7 @@ const onNodeExpand = async (node) => {
 
 const getLeaf = async (parentId) => {
   try {
-    const childData = await api.getChildOnPSEdit(parentId);
+    const childData = await api.getChildOnPSEdit(parentId, versionId.value);
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
@@ -429,8 +756,7 @@ const getPSEditData = async (getHeader = false) => {
     const res = await api.getPSEditData(pseId.value);
     psData.value = [res.data];
     if (getHeader && res.data) {
-      definitionId.value = res.data.engineInfo.powerSystemDefinitionId;
-      await getDefinitionHeader();
+      await getDefinitionData(res.data.engineInfo.powerSystemDefinitionId);
     }
   } catch (error) {
     console.log('getPSEditData: error ', error);
@@ -496,7 +822,7 @@ const handleCreatePS = () => {
     _id: '',
     generalInfo: {
       name: '',
-      parrentId: showDefinitionList.value ? definitionHeader.value.parrentId : parentNodeSelected.value,
+      parrentId: showDefinitionList.value ? definitionData.value.parrentId : parentNodeSelected.value,
       uniqueId: '',
       emsName: '',
       emsUniqueId: '',
@@ -506,7 +832,7 @@ const handleCreatePS = () => {
       softwareUniqueId: '',
     },
     engineInfo: {
-      powerSystemDefinitionId: showDefinitionList.value ? definitionId.value : '',
+      powerSystemDefinitionId: showDefinitionList.value ? definitionSelected.value : '',
       values: [''],
     },
     scadaInfo: {
@@ -588,6 +914,42 @@ const getVersionData = async (page = 1) => {
     toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
   }
 };
+
+// menu import/export
+const menuImportExport = ref();
+const itemsMenuImportExport = computed(() => {
+  return [
+    {
+      label: 'Import/Export',
+      items: [
+        {
+          label: 'Export',
+          icon: 'pi pi-download',
+          disabled: true,
+          command: () => {},
+        },
+        {
+          label: 'Import',
+          icon: 'pi pi-upload',
+          disabled: true,
+          command: () => {},
+        },
+        {
+          label: 'Create',
+          icon: 'pi pi-plus',
+          disabled: !showDefinitionList.value,
+          command: () => {
+            handleCreatePS();
+          },
+        },
+      ],
+    },
+  ];
+});
+
+const toggleMenuConfig = (event) => {
+  menuImportExport.value.toggle(event);
+};
 </script>
 
 <style>
@@ -605,5 +967,9 @@ const getVersionData = async (page = 1) => {
 
 .selected-item {
   background-color: var(--highlight-bg) !important;
+}
+
+.p-dropdown-item {
+  min-height: 25px;
 }
 </style>

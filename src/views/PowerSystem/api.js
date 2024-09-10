@@ -10,38 +10,40 @@ console.log('projectId', projectId.value);
 console.log('psm_active', psm_active.value._id);
 
 export default class api {
-  // list - definition list
+  // flat list - definition list
   static async getDefinitionList(data) {
     return get(`/powersystem/${projectId.value}/powersystemdefinition`, data);
   }
 
-  static async getDefinitionHeader(definitionId) {
+  static async getDefinitionData(definitionId) {
     return get(`/powersystem/${projectId.value}/powersystemdefinition/${definitionId}`);
   }
 
-  static async getDefinitionData(definitionId, page) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${definitionId}`, {
+  static async getPsDataWithDefinition(definitionId, versionId, page, data = {}) {
+    console.log('getPsDataWithDefinition', data, definitionId);
+    return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/definition/${definitionId}`, {
+      ...data,
       page: page,
     });
   }
 
   // tree - powersystem edit
 
-  static async getChildOnPSEdit(parentId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/child/${parentId}`);
+  static async getChildOnPSEdit(parentId, versionId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/child/${parentId}`);
   }
 
-  static async getPSEditData(pseId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/${pseId}`);
+  static async getPSEditData(pseId, versionId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/${pseId}`);
   }
 
   // CRUD
-  static async createPS(data) {
+  static async createPS(data, versionId) {
     data.projectId = projectId.value;
-    return post(`/powersystem/${projectId.value}/powersystemedit`, data);
+    return post(`/powersystem/${projectId.value}/powersystemedit/${versionId}`, data);
   }
 
-  static async editPSE(data) {
+  static async editPSE(data, versionId) {
     const updateData = {
       generalInfo: {
         name: data.generalInfo.name,
@@ -58,10 +60,10 @@ export default class api {
         scadaUniqueId: data.scadaInfo.scadaUniqueId,
       },
     };
-    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, updateData);
+    return put(`/powersystem/${projectId.value}/powersystemedit/${versionId}/${data._id}`, updateData);
   }
-  static async deletePSE(psde_id) {
-    return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);
+  static async deletePSE(psde_id, versionId) {
+    return _delete(`/powersystem/${projectId.value}/powersystemedit/${versionId}/${psde_id}`);
   }
 
   // compare
