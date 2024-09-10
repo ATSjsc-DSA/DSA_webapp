@@ -3,15 +3,45 @@
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
-    <TabView @tab-change="onTabMenuTopChange">
+    <!-- this is for test  -->
+    <!-- end test  -->
+
+    <div class="flex gap-2 justify-content-between align-items-center">
+      <div class="flex gap-2 justify-content-start">
+        <Button
+          icon="pi pi-table"
+          label="Power System"
+          text
+          :severity="tabMenuOnTopActive === 0 ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = 0"
+        />
+        <Button
+          icon="pi pi-list"
+          label="Version"
+          text
+          :severity="tabMenuOnTopActive === 1 ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = 1"
+        />
+        <Button
+          icon="pi pi-history"
+          label="Compare"
+          text
+          :severity="tabMenuOnTopActive === 2 ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = 2"
+        />
+      </div>
+      <div v-tooltip="'Current Version'" class="p-text-secondary font-semibold px-2">
+        {{ capitalizeFirstLetter(editVersionData.name) }}
+        <span v-show="isEditingVersion > 0">(Editing)</span>
+      </div>
+    </div>
+    <Divider />
+
+    <TabView id="on-top-tab-view" v-model:activeIndex="tabMenuOnTopActive">
+      <!-- tab Power System table  -->
+
       <TabPanel>
-        <template #header>
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-table" />
-            <span class="font-bold white-space-nowrap">Power System</span>
-          </div>
-        </template>
-        <Splitter style="height: 76vh">
+        <Splitter style="min-height: 78vh">
           <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
             <Card class="h-full">
               <template #title>
@@ -38,9 +68,9 @@
                             class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
                             :class="{
                               'border-top-1 surface-border': index !== 0,
-                              'selected-item': definitionId === item._id,
+                              'selected-item': definitionSelected._id === item._id,
                             }"
-                            @click="handleRowClick(item._id)"
+                            @click="handleDefinitionRowClick(item)"
                           >
                             <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
                               <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
@@ -66,8 +96,10 @@
             </Card>
           </SplitterPanel>
           <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
-            <div>
-              <div class="m-3 flex gap-2 justify-content-between">
+            <div class="flex flex-column h-full">
+              <!-- ps table -  header: tab & filter  -->
+              <div class="m-3 flex gap-2 justify-content-between align-items-center">
+                <!-- tab -->
                 <div class="flex gap-2 justify-content-start">
                   <div class="flex gap-2 justify-content-start">
                     <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
@@ -75,20 +107,199 @@
                     <Button label="Scada" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
                   </div>
                 </div>
+                <Divider layout="vertical" />
+                <!-- filter -->
+                <div class="flex-grow-1 m-3 flex gap-2 justify-content-between">
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-area">Area</label>
+                    <Dropdown
+                      v-model="areaSelected"
+                      :options="areaList"
+                      showClear
+                      :virtualScrollerOptions="{
+                        lazy: areaList.length > 0,
+                        onLazyLoad: onLazyLoadArea,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingAreaFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!canUseDefinitionFilter"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Area</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-zone">Zone</label>
+                    <Dropdown
+                      v-model="zoneSelected"
+                      :options="zoneList"
+                      showClear
+                      :virtualScrollerOptions="{
+                        lazy: zoneList.length > 0,
+                        onLazyLoad: onLazyLoadZone,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingZoneFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!canUseDefinitionFilter"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Zone</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-owner">Owner</label>
+                    <Dropdown
+                      v-model="ownerSelected"
+                      showClear
+                      :options="ownerList"
+                      :virtualScrollerOptions="{
+                        lazy: ownerList.length > 0,
+                        onLazyLoad: onLazyLoadOwner,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingOwnerFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="!canUseDefinitionFilter"
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Owner</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+                  <Divider type="solid" layout="vertical" />
+
+                  <FloatLabel class="w-full md:w-34rem">
+                    <label for="filter-sub">Substation</label>
+                    <Dropdown
+                      v-model="subSelected"
+                      :options="subList"
+                      showClear
+                      :virtualScrollerOptions="{
+                        lazy: subList.length > 0,
+                        onLazyLoad: onLazyLoadSubstation,
+                        itemSize: psPageRowNumber,
+                        loading: isLoadingSubsFilter,
+                        delay: 250,
+                        showLoader: true,
+                      }"
+                      :disabled="
+                        !canUseDefinitionFilter || subList.length === 0 || definitionSelected.name === 'Substation'
+                      "
+                      class="w-full md:w-34rem"
+                    >
+                      <template #value="slotProps">
+                        <div class="flex align-items-center">
+                          <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                          <div v-else>Select a Substation</div>
+                        </div>
+                      </template>
+                      <template v-slot:option="slotProps">
+                        <div v-if="slotProps.option" class="flex align-items-center">
+                          <div class="py-6">{{ slotProps.option.label }}</div>
+                        </div>
+                      </template>
+
+                      <template v-slot:loader="{ options }">
+                        <div class="flex align-items-center p-1" style="height: 30px">
+                          <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                        </div>
+                      </template>
+                    </Dropdown>
+                  </FloatLabel>
+                  <div>
+                    <Button
+                      severity="primary"
+                      icon="pi pi-filter"
+                      style="width: 32px"
+                      :disabled="!definitionSelected"
+                      @click="handleFilterClick"
+                    />
+                  </div>
+                </div>
+                <Divider layout="vertical" />
+
+                <!-- menu import/export -->
                 <div>
-                  <Button severity="secondary" text icon="pi pi-download" label="Download" disabled />
-                  <Button severity="info" text icon="pi pi-upload" label="Upload" disabled />
                   <Button
-                    text
-                    icon="pi pi-plus"
-                    label="Create"
-                    :disabled="!showDefinitionList"
-                    @click="handleCreatePS"
+                    severity="secondary"
+                    type="button"
+                    icon="pi pi-ellipsis-v"
+                    aria-haspopup="true"
+                    aria-controls="config_menu"
+                    style="width: 32px"
+                    @click="toggleMenuConfig"
                   />
+                  <Menu id="menuImportExport" ref="menuImportExport" :model="itemsMenuImportExport" :popup="true">
+                    <template #item="{ item }">
+                      <Button
+                        severity="secondary"
+                        text
+                        :icon="item.icon"
+                        :label="item.label"
+                        :disabled="item.disabled"
+                      />
+                    </template>
+                  </Menu>
                 </div>
               </div>
-              <div>
-                <LoadingContainer v-show="isLoadingContainer" style="top: 10%" />
+
+              <!-- ps table - table data  -->
+              <div class="flex-grow-1">
+                <LoadingContainer v-show="isLoadingContainer" />
                 <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                   <TabPanel header="">
                     <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
@@ -96,7 +307,7 @@
                   <TabPanel>
                     <engineInfoTabWidget
                       :data="psData"
-                      :headerData="definitionHeader"
+                      :headerData="definitionData"
                       @editData="editPSE"
                       @deleteData="deletePSE"
                     />
@@ -106,29 +317,57 @@
                   </TabPanel>
                 </TabView>
               </div>
+              <!-- ps table - Paginator -->
+
+              <div v-if="psDataListLength > psPageRowNumber">
+                <Paginator
+                  :rows="psPageRowNumber"
+                  :totalRecords="psDataListLength"
+                  @page="onPagePsDataChange"
+                ></Paginator>
+              </div>
             </div>
           </SplitterPanel>
         </Splitter>
       </TabPanel>
+
+      <!-- tab version  -->
       <TabPanel>
-        <template #header>
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-list" />
-            <span class="font-bold white-space-nowrap">Version</span>
-          </div>
-        </template>
-        <versionTabWidget :data="versionList" @reload-all="loadAllData" />
+        <versionTabWidget
+          :data="versionList"
+          :totalRecord="totalRecordVersion"
+          @getVersionList="getVersionData"
+          @reload-all="loadAllData"
+        />
       </TabPanel>
+
+      <!-- tab compare -->
+
       <TabPanel>
-        <template #header>
-          <div class="flex align-items-center gap-2 mx-3">
-            <i class="pi pi-history" />
-            <span class="font-bold white-space-nowrap">Compare</span>
+        <div class="flex align-items-center justify-content-between gap-2 w-full mb-3">
+          <div
+            v-if="sampleVersion._id !== editVersionData._id"
+            class="flex align-items-center justify-content-start gap-2 w-full mx-2"
+          >
+            <label class="">Sample Version:</label>
+            <Tag severity="secondary" :value="sampleVersion.name" style="font-size: 16px"></Tag>
+
+            <div class="px-3">
+              <i class="pi pi-arrow-right" style="font-size: 18px" />
+            </div>
+
+            <label class="">Editing Version:</label>
+            <Tag severity="primary" :value="editVersionData.name" style="font-size: 16px"></Tag>
           </div>
-        </template>
-        <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
-          <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
-          <Button severity="success" icon="pi pi-save" label="Build" @click="createVersionVisibleDialog = true" />
+          <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
+            <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
+            <Button
+              severity="success"
+              icon="pi pi-save"
+              label="Create new Version"
+              @click="createVersionVisibleDialog = true"
+            />
+          </div>
         </div>
         <div style="overflow: auto">
           <compareTabWidget :data="psCompareData" />
@@ -149,14 +388,10 @@
           <label :for="nameVersion" class="font-semibold"> Name Version</label>
           <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
         </div>
+
         <div class="flex flex-column gap-2 mb-3">
-          <label :for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
-          <InputNumber
-            :id="scheduledOperationTime"
-            v-model="scheduledOperationTime"
-            class="flex-auto"
-            autocomplete="off"
-          />
+          <label for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
+          <Calendar id="scheduledOperationTime" v-model="scheduledOperationTime" showTime hourFormat="24" />
         </div>
       </div>
       <template #footer>
@@ -198,11 +433,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import api from './api';
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import FloatLabel from 'primevue/floatlabel';
+import Dropdown from 'primevue/dropdown';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -212,15 +449,19 @@ import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
+
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectId } = storeToRefs(commonStore);
+const { projectId, editVersionData } = storeToRefs(commonStore);
 
 const toast = useToast();
 const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
+
+const versionId = ref('66decf1dcff005199529524b');
+
 onMounted(async () => {
   loadAllData();
 });
@@ -229,22 +470,30 @@ const tabMenuPSActive = ref(0);
 
 const loadAllData = async () => {
   await getDefinitionList();
-  // if (definitionList.value.length > 0) {
-  //   await getDefinitionHeader(definitionList.value[0]._id);
-  //   if (definitionHeader.value) {
-  //     await getDefinitionData();
-  //   }
-  // }
+  await getVersionData();
+  await getComparePSD();
   treePs.value = await getLeaf(projectId.value);
   tabMenuPSActive.value = 0;
+
+  await resetFilterList();
 };
+
 // get data
 const showDefinitionList = ref(true);
 const psData = ref([]);
+const psDataListLength = ref();
+const psCurrentPage = ref(1);
+const psPageRowNumber = ref(10);
+
 const isAddNew = ref(false);
+
+const onPagePsDataChange = (event) => {
+  psCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  reloadData();
+};
 const reloadData = async () => {
   if (showDefinitionList.value) {
-    await getDefinitionData();
+    await getPsDataWithDefinition();
   } else {
     await getPSEditData();
   }
@@ -254,10 +503,10 @@ watch(showDefinitionList, (newStatus) => {
     treePs.value = getLeaf(projectId.value);
   }
 });
-//  -- list - definition list
+//  -- Flat List - definition list
 const definitionList = ref([]);
-const definitionId = ref();
-const definitionHeader = ref({});
+const definitionSelected = ref({});
+const definitionData = ref({});
 
 const getDefinitionList = async () => {
   try {
@@ -269,35 +518,203 @@ const getDefinitionList = async () => {
   }
 };
 
-const handleRowClick = async (definition) => {
+const handleDefinitionRowClick = async (definition) => {
   isLoadingContainer.value = true;
-  definitionId.value = definition;
-  await getDefinitionHeader();
-  await getDefinitionData();
+  definitionSelected.value = definition;
+  await getDefinitionData(definitionSelected.value._id);
+  await getPsDataWithDefinition();
   setTimeout(() => {
     isLoadingContainer.value = false;
   }, 500);
+  areaSelected.value = undefined;
+  zoneSelected.value = undefined;
+  ownerSelected.value = undefined;
+  subSelected.value = undefined;
 };
 
-const getDefinitionHeader = async () => {
+const getDefinitionData = async (id) => {
   try {
-    const res = await api.getDefinitionHeader(definitionId.value);
-    definitionHeader.value = res.data;
+    const res = await api.getDefinitionData(id);
+    definitionData.value = res.data;
   } catch (error) {
-    definitionHeader.value = {};
-    console.log('getDefinitionHeader: error ', error);
+    definitionData.value = {};
+    console.log('getDefinitionData: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Header', detail: error.data.detail, life: 3000 });
   }
 };
-const getDefinitionData = async () => {
+const getPsDataWithDefinition = async () => {
   try {
-    const res = await api.getDefinitionData(definitionId.value);
-    psData.value = res.data;
+    const res = await api.getPsDataWithDefinition(definitionSelected.value._id, versionId.value, psCurrentPage.value);
+    psData.value = res.data.items;
+    psDataListLength.value = res.data.total;
   } catch (error) {
-    console.log('getDefinitionData: error ', error);
+    console.log('getPsDataWithDefinition: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
 };
+
+// Flat List - filter
+const definitionNoFilterList = ref(['Area', 'Zone', 'Owner']);
+const canUseDefinitionFilter = computed(() => {
+  if (definitionSelected.value) {
+    return !definitionNoFilterList.value.includes(definitionSelected.value.name);
+  }
+  return false;
+});
+const areaSelected = ref();
+const areaList = ref([]);
+const isLoadingAreaFilter = ref(false);
+const definitionArea = ref();
+
+const zoneSelected = ref();
+const zoneList = ref([]);
+const isLoadingZoneFilter = ref(false);
+const definitionZone = ref();
+
+const ownerSelected = ref();
+const ownerList = ref([]);
+const isLoadingOwnerFilter = ref(false);
+const definitionOwner = ref();
+
+const subSelected = ref();
+const subList = ref([]);
+const isLoadingSubsFilter = ref(false);
+const definitionSub = ref();
+
+const resetFilterList = async () => {
+  definitionArea.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'area')[0];
+  const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, 1, {});
+  areaList.value = Array.from({ length: areaFilterLength.data.total });
+
+  definitionZone.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'zone')[0];
+  const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, 1, {});
+  zoneList.value = Array.from({ length: zoneFilterLength.data.total });
+
+  definitionOwner.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'owner')[0];
+  const ownerFilterLength = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, 1, {});
+  ownerList.value = Array.from({ length: ownerFilterLength.data.total });
+
+  definitionSub.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'substation')[0];
+  updateSubstationFilterLength();
+};
+
+const onLazyLoadArea = async (event) => {
+  isLoadingAreaFilter.value = true;
+  const { first, last } = event;
+  const _items = [...areaList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+
+    const resData = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, page, {});
+    for (let i = 0; i < resData.data.items.length; i++) {
+      if (!resData.data.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
+    }
+  }
+  areaList.value = _items;
+  isLoadingAreaFilter.value = false;
+};
+
+const onLazyLoadZone = async (event) => {
+  isLoadingZoneFilter.value = true;
+  const { first, last } = event;
+  const _items = [...zoneList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+    const resData = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, page, {});
+    for (let i = 0; i < resData.data.items.length; i++) {
+      if (!resData.data.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
+    }
+  }
+  zoneList.value = _items;
+  isLoadingZoneFilter.value = false;
+};
+
+const onLazyLoadOwner = async (event) => {
+  isLoadingOwnerFilter.value = true;
+  const { first, last } = event;
+  const _items = [...ownerList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+    const resData = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, page, {});
+    for (let i = 0; i < resData.data.items.length; i++) {
+      if (!resData.data.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
+    }
+  }
+  ownerList.value = _items;
+  isLoadingOwnerFilter.value = false;
+};
+
+watch(areaSelected, () => {
+  updateSubstationFilterLength();
+});
+
+watch(zoneSelected, () => {
+  updateSubstationFilterLength();
+});
+
+watch(ownerSelected, () => {
+  updateSubstationFilterLength();
+});
+const updateSubstationFilterLength = async () => {
+  subSelected.value = undefined;
+  const subsFilterLength = await getPsDataWithDefinitionFilter('Substation', 1);
+  subList.value = Array.from({ length: subsFilterLength.total });
+};
+
+const onLazyLoadSubstation = async (event) => {
+  isLoadingSubsFilter.value = true;
+  const { first, last } = event;
+  const _items = [...subList.value];
+  for (let row = first; row < last; row += 10) {
+    const page = Math.floor(row / 10) + 1;
+    const resData = await getPsDataWithDefinitionFilter('Substation', page);
+    for (let i = 0; i < resData.items.length; i++) {
+      if (!resData.items[i].generalInfo) {
+        break;
+      }
+      _items[row + i] = { label: resData.items[i].generalInfo.name, _id: resData.items[i]._id };
+    }
+  }
+  subList.value = _items;
+  isLoadingSubsFilter.value = false;
+};
+
+const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
+  try {
+    const definition = definitionList.value.filter((item) => item.name.toLowerCase() === nameFilter.toLowerCase())[0];
+    let data = {};
+    if (canUseDefinitionFilter.value) {
+      data = {
+        area: areaSelected.value ? areaSelected.value._id : undefined,
+        zone: zoneSelected.value ? zoneSelected.value._id : undefined,
+        owner: ownerSelected.value ? ownerSelected.value._id : undefined,
+        sub: subSelected.value ? subSelected.value._id : undefined,
+      };
+    }
+    const res = await api.getPsDataWithDefinition(definition._id, versionId.value, page, data);
+    return res.data;
+  } catch (error) {
+    console.log('getDefinitionFilterData: error ', error);
+  }
+};
+
+const handleFilterClick = async () => {
+  const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name);
+  psData.value = resData.items;
+  psDataListLength.value = resData.total;
+};
+
+// areaList.value = getDefinitionData();
+
 //  tree - powersystem edit
 const treePs = ref();
 const nodeSelected = ref();
@@ -327,7 +744,7 @@ const onNodeExpand = async (node) => {
 
 const getLeaf = async (parentId) => {
   try {
-    const childData = await api.getChildOnPSEdit(parentId);
+    const childData = await api.getChildOnPSEdit(parentId, versionId.value);
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
@@ -361,8 +778,7 @@ const getPSEditData = async (getHeader = false) => {
     const res = await api.getPSEditData(pseId.value);
     psData.value = [res.data];
     if (getHeader && res.data) {
-      definitionId.value = res.data.engineInfo.powerSystemDefinitionId;
-      await getDefinitionHeader();
+      await getDefinitionData(res.data.engineInfo.powerSystemDefinitionId);
     }
   } catch (error) {
     console.log('getPSEditData: error ', error);
@@ -370,16 +786,18 @@ const getPSEditData = async (getHeader = false) => {
   }
 };
 // --- compare
-
 const psCompareData = ref({});
-const onTabMenuTopChange = (event) => {
-  if (event.index === 1) {
-    getVersionList();
+const isEditingVersion = ref(false);
+const tabMenuOnTopActive = ref(0);
+watch(tabMenuOnTopActive, (newTab) => {
+  if (newTab === 1) {
+    getVersionData();
   }
-  if (event.index === 2) {
+  if (newTab === 2) {
     getComparePSD();
   }
-};
+});
+
 const getComparePSD = async (reloadMsg = false) => {
   try {
     const res = await api.getComparePSD();
@@ -388,6 +806,9 @@ const getComparePSD = async (reloadMsg = false) => {
       isLoadingProgress.value = true;
       toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
     }
+    isEditingVersion.value = Boolean(
+      psCompareData.value.Add.length + psCompareData.value.Update.length + psCompareData.value.Delete.length,
+    );
   } catch (error) {
     psCompareData.value = {};
     toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
@@ -402,7 +823,7 @@ const nameVersion = ref('');
 const scheduledOperationTime = ref();
 const createNewVersion = async () => {
   try {
-    await api.createNewVersion(nameVersion.value);
+    await api.createNewVersion(nameVersion.value, scheduledOperationTime.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     getComparePSD();
     createVersionVisibleDialog.value = false;
@@ -423,7 +844,7 @@ const handleCreatePS = () => {
     _id: '',
     generalInfo: {
       name: '',
-      parrentId: showDefinitionList.value ? definitionHeader.value.parrentId : parentNodeSelected.value,
+      parrentId: showDefinitionList.value ? definitionData.value.parrentId : parentNodeSelected.value,
       uniqueId: '',
       emsName: '',
       emsUniqueId: '',
@@ -433,7 +854,7 @@ const handleCreatePS = () => {
       softwareUniqueId: '',
     },
     engineInfo: {
-      powerSystemDefinitionId: showDefinitionList.value ? definitionId.value : '',
+      powerSystemDefinitionId: showDefinitionList.value ? definitionSelected.value : '',
       values: [''],
     },
     scadaInfo: {
@@ -481,6 +902,9 @@ const deletePSE = async (pseId) => {
 };
 
 function capitalizeFirstLetter(string) {
+  if (!string) {
+    return '';
+  }
   return string
     .split(/(?=[A-Z])/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -489,20 +913,70 @@ function capitalizeFirstLetter(string) {
 
 // version
 const versionList = ref([]);
-const getVersionList = async () => {
+const totalRecordVersion = ref(0);
+
+const sampleVersion = ref({});
+
+const getVersionData = async (page = 1) => {
   try {
-    const res = await api.getVersionList();
+    const res = await api.getVersionList(page);
     versionList.value = res.data[0];
+    totalRecordVersion.value = res.data[1];
+
+    // set version init
+    if (!sampleVersion.value.name) {
+      sampleVersion.value = versionList.value[0];
+    }
+    if (!editVersionData.value.name) {
+      commonStore.editVersionData = versionList.value[0];
+    }
   } catch (error) {
     versionList.value = [];
     console.log('getVersionList: error ', error);
     toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
   }
 };
+
+// menu import/export
+const menuImportExport = ref();
+const itemsMenuImportExport = computed(() => {
+  return [
+    {
+      label: 'Import/Export',
+      items: [
+        {
+          label: 'Export',
+          icon: 'pi pi-download',
+          disabled: true,
+          command: () => {},
+        },
+        {
+          label: 'Import',
+          icon: 'pi pi-upload',
+          disabled: true,
+          command: () => {},
+        },
+        {
+          label: 'Create',
+          icon: 'pi pi-plus',
+          disabled: !showDefinitionList.value,
+          command: () => {
+            handleCreatePS();
+          },
+        },
+      ],
+    },
+  ];
+});
+
+const toggleMenuConfig = (event) => {
+  menuImportExport.value.toggle(event);
+};
 </script>
 
 <style>
-#ps-tab-view ul.p-tabview-nav {
+#ps-tab-view ul.p-tabview-nav,
+#on-top-tab-view ul.p-tabview-nav {
   display: none !important;
 }
 
@@ -515,5 +989,9 @@ const getVersionList = async () => {
 
 .selected-item {
   background-color: var(--highlight-bg) !important;
+}
+
+.p-dropdown-item {
+  min-height: 25px;
 }
 </style>

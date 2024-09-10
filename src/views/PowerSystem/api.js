@@ -3,40 +3,46 @@ import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { psm_active, projectId } = storeToRefs(commonStore);
 
+import DSA_Common from '@/combosables/DSA_common';
+const { convertTimeStringToInt } = DSA_Common();
+
 console.log('projectId', projectId.value);
 console.log('psm_active', psm_active.value._id);
 
 export default class api {
-  // list - definition list
+  // flat list - definition list
   static async getDefinitionList(data) {
     return get(`/powersystem/${projectId.value}/powersystemdefinition`, data);
   }
 
-  static async getDefinitionHeader(definitionId) {
+  static async getDefinitionData(definitionId) {
     return get(`/powersystem/${projectId.value}/powersystemdefinition/${definitionId}`);
   }
 
-  static async getDefinitionData(definitionId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/definition/${definitionId}`);
+  static async getPsDataWithDefinition(definitionId, versionId, page, data = {}) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/definition/${definitionId}`, {
+      ...data,
+      page: page,
+    });
   }
 
   // tree - powersystem edit
 
-  static async getChildOnPSEdit(parentId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/child/${parentId}`);
+  static async getChildOnPSEdit(parentId, versionId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/child/${parentId}`);
   }
 
-  static async getPSEditData(pseId) {
-    return get(`/powersystem/${projectId.value}/powersystemedit/${pseId}`);
+  static async getPSEditData(pseId, versionId) {
+    return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/${pseId}`);
   }
 
   // CRUD
-  static async createPS(data) {
+  static async createPS(data, versionId) {
     data.projectId = projectId.value;
-    return post(`/powersystem/${projectId.value}/powersystemedit`, data);
+    return post(`/powersystem/${projectId.value}/powersystemedit/${versionId}`, data);
   }
 
-  static async editPSE(data) {
+  static async editPSE(data, versionId) {
     const updateData = {
       generalInfo: {
         name: data.generalInfo.name,
@@ -53,10 +59,10 @@ export default class api {
         scadaUniqueId: data.scadaInfo.scadaUniqueId,
       },
     };
-    return put(`/powersystem/${projectId.value}/powersystemedit/${data._id}`, updateData);
+    return put(`/powersystem/${projectId.value}/powersystemedit/${versionId}/${data._id}`, updateData);
   }
-  static async deletePSE(psde_id) {
-    return _delete(`/powersystem/${projectId.value}/powersystemedit/${psde_id}`);
+  static async deletePSE(psde_id, versionId) {
+    return _delete(`/powersystem/${projectId.value}/powersystemedit/${versionId}/${psde_id}`);
   }
 
   // compare
@@ -65,15 +71,22 @@ export default class api {
     return get(`/powersystem/${projectId.value}/compare_powersystem`);
   }
 
-  static async createNewVersion(nameVersion) {
-    return post(`/powersystem/${projectId.value}/newversion_powersystem`, { name: nameVersion });
+  static async createNewVersion(nameVersion, scheduledOperationTime) {
+    return post(`/powersystem/${projectId.value}/newversion_powersystem`, {
+      name: nameVersion,
+      // tạo sẵn `scheduledOperationTime` chưa gửi
+      // scheduledOperationTime: convertTimeStringToInt(scheduledOperationTime),
+    });
   }
 
   // version
-  static async getVersionList() {
-    return get(`/powersystem/${projectId.value}/powersystemversion`);
+  static async getVersionList(page) {
+    return get(`/powersystem/${projectId.value}/powersystemversion`, {
+      page: page,
+      page_size: 10,
+    });
   }
-  static async rollbackVersion(versionId) {
+  static async openVersion(versionId) {
     return put(`/powersystem/${projectId.value}/powersystemversion/${versionId}`);
   }
 }
