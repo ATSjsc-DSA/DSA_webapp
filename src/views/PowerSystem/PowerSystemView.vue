@@ -4,7 +4,6 @@
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
     <!-- this is for test  -->
-
     <!-- end test  -->
 
     <div class="flex gap-2 justify-content-between align-items-center">
@@ -69,7 +68,7 @@
                             class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
                             :class="{
                               'border-top-1 surface-border': index !== 0,
-                              'selected-item': definitionSelected === item._id,
+                              'selected-item': definitionSelected._id === item._id,
                             }"
                             @click="handleDefinitionRowClick(item)"
                           >
@@ -112,7 +111,7 @@
                 <!-- filter -->
                 <div class="flex-grow-1 m-3 flex gap-2 justify-content-between">
                   <FloatLabel class="w-full md:w-34rem">
-                    <label for="filter-area">Select a Area</label>
+                    <label for="filter-area">Area</label>
                     <Dropdown
                       v-model="areaSelected"
                       :options="areaList"
@@ -125,7 +124,7 @@
                         delay: 250,
                         showLoader: true,
                       }"
-                      :disabled="!definitionSelected"
+                      :disabled="!canUseDefinitionFilter"
                       class="w-full md:w-34rem"
                     >
                       <template #value="slotProps">
@@ -149,7 +148,7 @@
                   </FloatLabel>
 
                   <FloatLabel class="w-full md:w-34rem">
-                    <label for="filter-zone">Select a Zone</label>
+                    <label for="filter-zone">Zone</label>
                     <Dropdown
                       v-model="zoneSelected"
                       :options="zoneList"
@@ -162,7 +161,7 @@
                         delay: 250,
                         showLoader: true,
                       }"
-                      :disabled="!definitionSelected"
+                      :disabled="!canUseDefinitionFilter"
                       class="w-full md:w-34rem"
                     >
                       <template #value="slotProps">
@@ -186,7 +185,7 @@
                   </FloatLabel>
 
                   <FloatLabel class="w-full md:w-34rem">
-                    <label for="filter-owner">Select a Owner</label>
+                    <label for="filter-owner">Owner</label>
                     <Dropdown
                       v-model="ownerSelected"
                       showClear
@@ -199,7 +198,7 @@
                         delay: 250,
                         showLoader: true,
                       }"
-                      :disabled="!definitionSelected"
+                      :disabled="!canUseDefinitionFilter"
                       class="w-full md:w-34rem"
                     >
                       <template #value="slotProps">
@@ -224,7 +223,7 @@
                   <Divider type="solid" layout="vertical" />
 
                   <FloatLabel class="w-full md:w-34rem">
-                    <label for="filter-sub">Select a Substation</label>
+                    <label for="filter-sub">Substation</label>
                     <Dropdown
                       v-model="subSelected"
                       :options="subList"
@@ -237,7 +236,9 @@
                         delay: 250,
                         showLoader: true,
                       }"
-                      :disabled="!definitionSelected || subList.length === 0"
+                      :disabled="
+                        !canUseDefinitionFilter || subList.length === 0 || definitionSelected.name === 'Substation'
+                      "
                       class="w-full md:w-34rem"
                     >
                       <template #value="slotProps">
@@ -265,11 +266,12 @@
                       icon="pi pi-filter"
                       style="width: 32px"
                       :disabled="!definitionSelected"
-                      @click="getPsDataWithDefinitionFilter(definitionSelected.name)"
+                      @click="handleFilterClick"
                     />
                   </div>
                 </div>
                 <Divider layout="vertical" />
+
                 <!-- menu import/export -->
                 <div>
                   <Button
@@ -503,7 +505,7 @@ watch(showDefinitionList, (newStatus) => {
 });
 //  -- Flat List - definition list
 const definitionList = ref([]);
-const definitionSelected = ref();
+const definitionSelected = ref({});
 const definitionData = ref({});
 
 const getDefinitionList = async () => {
@@ -524,6 +526,10 @@ const handleDefinitionRowClick = async (definition) => {
   setTimeout(() => {
     isLoadingContainer.value = false;
   }, 500);
+  areaSelected.value = undefined;
+  zoneSelected.value = undefined;
+  ownerSelected.value = undefined;
+  subSelected.value = undefined;
 };
 
 const getDefinitionData = async (id) => {
@@ -548,7 +554,13 @@ const getPsDataWithDefinition = async () => {
 };
 
 // Flat List - filter
-
+const definitionNoFilterList = ref(['Area', 'Zone', 'Owner']);
+const canUseDefinitionFilter = computed(() => {
+  if (definitionSelected.value) {
+    return !definitionNoFilterList.value.includes(definitionSelected.value.name);
+  }
+  return false;
+});
 const areaSelected = ref();
 const areaList = ref([]);
 const isLoadingAreaFilter = ref(false);
@@ -679,16 +691,26 @@ const onLazyLoadSubstation = async (event) => {
 const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
   try {
     const definition = definitionList.value.filter((item) => item.name.toLowerCase() === nameFilter.toLowerCase())[0];
-    const res = await api.getPsDataWithDefinition(definition._id, versionId.value, page, {
-      area: areaSelected.value ? areaSelected.value._id : undefined,
-      zone: zoneSelected.value ? zoneSelected.value._id : undefined,
-      owner: ownerSelected.value ? ownerSelected.value._id : undefined,
-      sub: subSelected.value ? subSelected.value._id : undefined,
-    });
+    let data = {};
+    if (canUseDefinitionFilter.value) {
+      data = {
+        area: areaSelected.value ? areaSelected.value._id : undefined,
+        zone: zoneSelected.value ? zoneSelected.value._id : undefined,
+        owner: ownerSelected.value ? ownerSelected.value._id : undefined,
+        sub: subSelected.value ? subSelected.value._id : undefined,
+      };
+    }
+    const res = await api.getPsDataWithDefinition(definition._id, versionId.value, page, data);
     return res.data;
   } catch (error) {
     console.log('getDefinitionFilterData: error ', error);
   }
+};
+
+const handleFilterClick = async () => {
+  const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name);
+  psData.value = resData.items;
+  psDataListLength.value = resData.total;
 };
 
 // areaList.value = getDefinitionData();

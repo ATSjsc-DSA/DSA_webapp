@@ -20,7 +20,6 @@ export default class api {
   }
 
   static async getPsDataWithDefinition(definitionId, versionId, page, data = {}) {
-    console.log('getPsDataWithDefinition', data, definitionId);
     return get(`/powersystem/${projectId.value}/powersystemedit/${versionId}/definition/${definitionId}`, {
       ...data,
       page: page,
