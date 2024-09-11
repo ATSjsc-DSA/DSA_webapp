@@ -7,8 +7,9 @@
     :lazy="true"
     :sortOrder="1"
     rowHover
+    scrollable
   >
-    <Column field="generalInfo.emsUniqueId" header="Unique Id" style="width: 15%">
+    <Column field="generalInfo.emsUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
         <div class="font-bold w-6rem">
           {{ slotProps.data.generalInfo.emsUniqueId }}
@@ -16,9 +17,14 @@
       </template>
     </Column>
     <template v-for="col of columnList" :key="col.field">
-      <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)" style="min-height: 57px">
+      <Column
+        v-if="col.visible"
+        :header="capitalizeFirstLetter(col.header)"
+        bodyStyle="height:43px"
+        style="text-wrap: nowrap"
+      >
         <template #body="slotProps">
-          <div class="flex justify-content-between align-items-center" style="min-height: 35px">
+          <div class="flex justify-content-between align-items-center">
             {{ slotProps.data.engineInfo.values[col.index] }}
           </div>
         </template>

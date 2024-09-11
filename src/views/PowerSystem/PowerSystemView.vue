@@ -2,7 +2,6 @@
   <div class="card layout-content min-h-full">
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
-
     <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
@@ -38,9 +37,9 @@
       <!-- tab Power System table  -->
 
       <TabPanel>
-        <Splitter style="min-height: 78vh">
+        <Splitter style="height: 74vh">
           <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
-            <Card style="height: 78vh">
+            <Card style="height: 100%">
               <template #title>
                 <div class="flex flex-wrap justify-content-between align-items-center gap-2">
                   <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
@@ -93,262 +92,248 @@
               </template>
             </Card>
           </SplitterPanel>
-          <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
-            <!-- this is for test  -->
-
-            <!-- projectData {{ projectData }}
-            <div class="flex gap-6">
-              <div>
-                nodeSelected
-                <pre>
-      --{{ nodeSelected }}--
-    </pre
-                >
-              </div>
-              <div>
-                treePs
-                <pre>{{ treePs }}</pre>
-              </div>
-              <div>
-                psData
-                <pre>{{ psData }}</pre>
-              </div>
-            </div> -->
-            <!-- end test  -->
-
-            <div class="flex flex-column h-full">
+          <SplitterPanel :size="75" class="relative">
+            <Card style="height: 100%">
               <!-- ps table -  header: tab & filter  -->
-              <div class="m-3 flex gap-2 justify-content-between align-items-center">
-                <!-- tab -->
-                <div class="flex gap-2 justify-content-start">
+              <template #title>
+                <div class="m-3 flex gap-2 justify-content-between align-items-center">
+                  <!-- tab -->
                   <div class="flex gap-2 justify-content-start">
-                    <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
-                    <Button label="Engine" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
-                    <Button label="Scada" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
-                  </div>
-                </div>
-
-                <template v-if="showDefinitionList">
-                  <Divider layout="vertical" />
-                  <!-- filter -->
-                  <div class="flex-grow-1 m-3 flex gap-2 justify-content-between">
-                    <FloatLabel class="w-full md:w-34rem">
-                      <label for="filter-area">Area</label>
-                      <Dropdown
-                        v-model="areaSelected"
-                        :options="areaList"
-                        showClear
-                        :virtualScrollerOptions="{
-                          lazy: areaList.length > 0,
-                          onLazyLoad: onLazyLoadArea,
-                          itemSize: psPageRowNumber,
-                          loading: isLoadingAreaFilter,
-                          delay: 250,
-                          showLoader: true,
-                        }"
-                        :disabled="!canUseDefinitionFilter"
-                        class="w-full md:w-34rem"
-                      >
-                        <template #value="slotProps">
-                          <div class="flex align-items-center">
-                            <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                            <div v-else>Select a Area</div>
-                          </div>
-                        </template>
-                        <template v-slot:option="slotProps">
-                          <div v-if="slotProps.option" class="flex align-items-center">
-                            <div class="py-6">{{ slotProps.option.label }}</div>
-                          </div>
-                        </template>
-
-                        <template v-slot:loader="{ options }">
-                          <div class="flex align-items-center p-1" style="height: 30px">
-                            <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                          </div>
-                        </template>
-                      </Dropdown>
-                    </FloatLabel>
-
-                    <FloatLabel class="w-full md:w-34rem">
-                      <label for="filter-zone">Zone</label>
-                      <Dropdown
-                        v-model="zoneSelected"
-                        :options="zoneList"
-                        showClear
-                        :virtualScrollerOptions="{
-                          lazy: zoneList.length > 0,
-                          onLazyLoad: onLazyLoadZone,
-                          itemSize: psPageRowNumber,
-                          loading: isLoadingZoneFilter,
-                          delay: 250,
-                          showLoader: true,
-                        }"
-                        :disabled="!canUseDefinitionFilter"
-                        class="w-full md:w-34rem"
-                      >
-                        <template #value="slotProps">
-                          <div class="flex align-items-center">
-                            <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                            <div v-else>Select a Zone</div>
-                          </div>
-                        </template>
-                        <template v-slot:option="slotProps">
-                          <div v-if="slotProps.option" class="flex align-items-center">
-                            <div class="py-6">{{ slotProps.option.label }}</div>
-                          </div>
-                        </template>
-
-                        <template v-slot:loader="{ options }">
-                          <div class="flex align-items-center p-1" style="height: 30px">
-                            <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                          </div>
-                        </template>
-                      </Dropdown>
-                    </FloatLabel>
-
-                    <FloatLabel class="w-full md:w-34rem">
-                      <label for="filter-owner">Owner</label>
-                      <Dropdown
-                        v-model="ownerSelected"
-                        showClear
-                        :options="ownerList"
-                        :virtualScrollerOptions="{
-                          lazy: ownerList.length > 0,
-                          onLazyLoad: onLazyLoadOwner,
-                          itemSize: psPageRowNumber,
-                          loading: isLoadingOwnerFilter,
-                          delay: 250,
-                          showLoader: true,
-                        }"
-                        :disabled="!canUseDefinitionFilter"
-                        class="w-full md:w-34rem"
-                      >
-                        <template #value="slotProps">
-                          <div class="flex align-items-center">
-                            <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                            <div v-else>Select a Owner</div>
-                          </div>
-                        </template>
-                        <template v-slot:option="slotProps">
-                          <div v-if="slotProps.option" class="flex align-items-center">
-                            <div class="py-6">{{ slotProps.option.label }}</div>
-                          </div>
-                        </template>
-
-                        <template v-slot:loader="{ options }">
-                          <div class="flex align-items-center p-1" style="height: 30px">
-                            <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                          </div>
-                        </template>
-                      </Dropdown>
-                    </FloatLabel>
-                    <Divider type="solid" layout="vertical" />
-
-                    <FloatLabel class="w-full md:w-34rem">
-                      <label for="filter-sub">Substation</label>
-                      <Dropdown
-                        v-model="subSelected"
-                        :options="subList"
-                        showClear
-                        :virtualScrollerOptions="{
-                          lazy: subList.length > 0,
-                          onLazyLoad: onLazyLoadSubstation,
-                          itemSize: psPageRowNumber,
-                          loading: isLoadingSubsFilter,
-                          delay: 250,
-                          showLoader: true,
-                        }"
-                        :disabled="
-                          !canUseDefinitionFilter || subList.length === 0 || definitionSelected.name === 'Substation'
-                        "
-                        class="w-full md:w-34rem"
-                      >
-                        <template #value="slotProps">
-                          <div class="flex align-items-center">
-                            <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                            <div v-else>Select a Substation</div>
-                          </div>
-                        </template>
-                        <template v-slot:option="slotProps">
-                          <div v-if="slotProps.option" class="flex align-items-center">
-                            <div class="py-6">{{ slotProps.option.label }}</div>
-                          </div>
-                        </template>
-
-                        <template v-slot:loader="{ options }">
-                          <div class="flex align-items-center p-1" style="height: 30px">
-                            <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                          </div>
-                        </template>
-                      </Dropdown>
-                    </FloatLabel>
-                    <div>
-                      <Button
-                        severity="primary"
-                        icon="pi pi-filter"
-                        style="width: 32px"
-                        :disabled="!definitionSelected"
-                        @click="handleFilterClick"
-                      />
+                    <div class="flex gap-2 justify-content-start">
+                      <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
+                      <Button label="Engine" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
+                      <Button label="Scada" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
                     </div>
                   </div>
-                  <Divider layout="vertical" />
-                </template>
-                <!-- menu import/export -->
-                <div>
-                  <Button
-                    severity="secondary"
-                    type="button"
-                    icon="pi pi-ellipsis-v"
-                    aria-haspopup="true"
-                    aria-controls="config_menu"
-                    style="width: 32px"
-                    @click="toggleMenuConfig"
-                  />
-                  <Menu id="menuImportExport" ref="menuImportExport" :model="itemsMenuImportExport" :popup="true">
-                    <template #item="{ item }">
-                      <Button
-                        severity="secondary"
-                        text
-                        :icon="item.icon"
-                        :label="item.label"
-                        :disabled="item.disabled"
-                      />
-                    </template>
-                  </Menu>
+
+                  <template v-if="showDefinitionList">
+                    <Divider layout="vertical" />
+                    <!-- filter -->
+                    <div class="flex-grow-1 m-3 flex gap-2 justify-content-between">
+                      <FloatLabel class="w-full md:w-34rem">
+                        <label for="filter-area">Area</label>
+                        <Dropdown
+                          v-model="areaSelected"
+                          :options="areaList"
+                          showClear
+                          :virtualScrollerOptions="{
+                            lazy: areaList.length > 0,
+                            onLazyLoad: onLazyLoadArea,
+                            itemSize: psPageRowNumber,
+                            loading: isLoadingAreaFilter,
+                            delay: 250,
+                            showLoader: true,
+                          }"
+                          :disabled="!canUseDefinitionFilter"
+                          class="w-full md:w-34rem"
+                        >
+                          <template #value="slotProps">
+                            <div class="flex align-items-center">
+                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                              <div v-else>Select a Area</div>
+                            </div>
+                          </template>
+                          <template v-slot:option="slotProps">
+                            <div v-if="slotProps.option" class="flex align-items-center">
+                              <div class="py-6">{{ slotProps.option.label }}</div>
+                            </div>
+                          </template>
+
+                          <template v-slot:loader="{ options }">
+                            <div class="flex align-items-center p-1" style="height: 30px">
+                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                            </div>
+                          </template>
+                        </Dropdown>
+                      </FloatLabel>
+
+                      <FloatLabel class="w-full md:w-34rem">
+                        <label for="filter-zone">Zone</label>
+                        <Dropdown
+                          v-model="zoneSelected"
+                          :options="zoneList"
+                          showClear
+                          :virtualScrollerOptions="{
+                            lazy: zoneList.length > 0,
+                            onLazyLoad: onLazyLoadZone,
+                            itemSize: psPageRowNumber,
+                            loading: isLoadingZoneFilter,
+                            delay: 250,
+                            showLoader: true,
+                          }"
+                          :disabled="!canUseDefinitionFilter"
+                          class="w-full md:w-34rem"
+                        >
+                          <template #value="slotProps">
+                            <div class="flex align-items-center">
+                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                              <div v-else>Select a Zone</div>
+                            </div>
+                          </template>
+                          <template v-slot:option="slotProps">
+                            <div v-if="slotProps.option" class="flex align-items-center">
+                              <div class="py-6">{{ slotProps.option.label }}</div>
+                            </div>
+                          </template>
+
+                          <template v-slot:loader="{ options }">
+                            <div class="flex align-items-center p-1" style="height: 30px">
+                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                            </div>
+                          </template>
+                        </Dropdown>
+                      </FloatLabel>
+
+                      <FloatLabel class="w-full md:w-34rem">
+                        <label for="filter-owner">Owner</label>
+                        <Dropdown
+                          v-model="ownerSelected"
+                          showClear
+                          :options="ownerList"
+                          :virtualScrollerOptions="{
+                            lazy: ownerList.length > 0,
+                            onLazyLoad: onLazyLoadOwner,
+                            itemSize: psPageRowNumber,
+                            loading: isLoadingOwnerFilter,
+                            delay: 250,
+                            showLoader: true,
+                          }"
+                          :disabled="!canUseDefinitionFilter"
+                          class="w-full md:w-34rem"
+                        >
+                          <template #value="slotProps">
+                            <div class="flex align-items-center">
+                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                              <div v-else>Select a Owner</div>
+                            </div>
+                          </template>
+                          <template v-slot:option="slotProps">
+                            <div v-if="slotProps.option" class="flex align-items-center">
+                              <div class="py-6">{{ slotProps.option.label }}</div>
+                            </div>
+                          </template>
+
+                          <template v-slot:loader="{ options }">
+                            <div class="flex align-items-center p-1" style="height: 30px">
+                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                            </div>
+                          </template>
+                        </Dropdown>
+                      </FloatLabel>
+                      <Divider type="solid" layout="vertical" />
+
+                      <FloatLabel class="w-full md:w-34rem">
+                        <label for="filter-sub">Substation</label>
+                        <Dropdown
+                          v-model="subSelected"
+                          :options="subList"
+                          showClear
+                          :virtualScrollerOptions="{
+                            lazy: subList.length > 0,
+                            onLazyLoad: onLazyLoadSubstation,
+                            itemSize: psPageRowNumber,
+                            loading: isLoadingSubsFilter,
+                            delay: 250,
+                            showLoader: true,
+                          }"
+                          :disabled="
+                            !canUseDefinitionFilter || subList.length === 0 || definitionSelected.name === 'Substation'
+                          "
+                          class="w-full md:w-34rem"
+                        >
+                          <template #value="slotProps">
+                            <div class="flex align-items-center">
+                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
+                              <div v-else>Select a Substation</div>
+                            </div>
+                          </template>
+                          <template v-slot:option="slotProps">
+                            <div v-if="slotProps.option" class="flex align-items-center">
+                              <div class="py-6">{{ slotProps.option.label }}</div>
+                            </div>
+                          </template>
+
+                          <template v-slot:loader="{ options }">
+                            <div class="flex align-items-center p-1" style="height: 30px">
+                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
+                            </div>
+                          </template>
+                        </Dropdown>
+                      </FloatLabel>
+                      <div>
+                        <Button
+                          severity="primary"
+                          icon="pi pi-filter"
+                          style="width: 32px"
+                          :disabled="!definitionSelected"
+                          @click="handleFilterClick"
+                        />
+                      </div>
+                    </div>
+                    <Divider layout="vertical" />
+                  </template>
+                  <!-- menu import/export -->
+                  <div>
+                    <Button
+                      severity="secondary"
+                      type="button"
+                      icon="pi pi-ellipsis-v"
+                      aria-haspopup="true"
+                      aria-controls="config_menu"
+                      style="width: 32px"
+                      @click="toggleMenuConfig"
+                    />
+                    <Menu id="menuImportExport" ref="menuImportExport" :model="itemsMenuImportExport" :popup="true">
+                      <template #item="{ item }">
+                        <Button
+                          severity="secondary"
+                          text
+                          :icon="item.icon"
+                          :label="item.label"
+                          :disabled="item.disabled"
+                        />
+                      </template>
+                    </Menu>
+                  </div>
                 </div>
-              </div>
+              </template>
 
               <!-- ps table - table data  -->
-              <div class="flex-grow-1">
-                <LoadingContainer v-show="isLoadingContainer" />
-                <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
-                  <TabPanel header="">
-                    <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-                  </TabPanel>
-                  <TabPanel>
-                    <engineInfoTabWidget
-                      :data="psData"
-                      :headerData="definitionData"
-                      @editData="editPSE"
-                      @deleteData="deletePSE"
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-                  </TabPanel>
-                </TabView>
-              </div>
-              <!-- ps table - Paginator -->
+              <template #content>
+                <div class="flex flex-column h-full">
+                  <LoadingContainer v-show="isLoadingContainer" />
+                  <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
+                    <TabPanel header="">
+                      <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+                    </TabPanel>
+                    <TabPanel>
+                      <engineInfoTabWidget
+                        :data="psData"
+                        :headerData="definitionData"
+                        @editData="editPSE"
+                        @deleteData="deletePSE"
+                      />
+                    </TabPanel>
+                    <TabPanel>
+                      <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+                    </TabPanel>
+                  </TabView>
+                </div>
+              </template>
 
-              <div v-if="psDataListLength > psPageRowNumber">
-                <Paginator
-                  :rows="psPageRowNumber"
-                  :totalRecords="psDataListLength"
-                  @page="onPagePsDataChange"
-                ></Paginator>
-              </div>
-            </div>
+              <!-- ps table - Paginator -->
+              <template #footer>
+                <div v-if="psDataListLength > psPageRowNumber">
+                  <Paginator
+                    v-model:first="offset"
+                    :rows="psPageRowNumber"
+                    :totalRecords="psDataListLength"
+                    :page="psCurrentPage"
+                    @page="onPagePsDataChange"
+                  ></Paginator>
+                </div>
+              </template>
+            </Card>
           </SplitterPanel>
         </Splitter>
       </TabPanel>
@@ -477,31 +462,23 @@ import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { projectData, editVersionData } = storeToRefs(commonStore);
-import { intervalTime } from '@/Constants/';
 
 const toast = useToast();
 const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
 
 const versionId = ref('66decf1dcff005199529524b');
-const getDataInterval = ref();
 
 onMounted(async () => {
   loadAllData();
-
-  getDataInterval.value = setInterval(() => {
-    reloadData();
-  }, intervalTime);
 });
 
-onUnmounted(() => {
-  clearInterval(getDataInterval.value);
-});
+onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
 
 const loadAllData = async () => {
-  await getDefinitionList();
+  await setDefinitionList();
   await getVersionData();
   await getComparePSD();
   tabMenuPSActive.value = 0;
@@ -516,15 +493,17 @@ const psDataListLength = ref();
 const psCurrentPage = ref(1);
 const psPageRowNumber = ref(10);
 
+const offset = computed(() => psPageRowNumber.value * psCurrentPage.value - 1);
 const isAddNew = ref(false);
 
 const onPagePsDataChange = (event) => {
+  console.log('onPagePsDataChange', event.page);
   psCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
-  reloadData();
+  reloadPsData();
 };
-const reloadData = async () => {
+const reloadPsData = async () => {
   if (showDefinitionList.value && definitionSelected.value.name) {
-    const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name);
+    const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name, psCurrentPage.value);
     psData.value = resData.items;
     psDataListLength.value = resData.total;
   }
@@ -543,7 +522,7 @@ const definitionList = ref([]);
 const definitionSelected = ref({});
 const definitionData = ref({});
 
-const getDefinitionList = async () => {
+const setDefinitionList = async () => {
   try {
     const res = await api.getDefinitionList();
     definitionList.value = res.data;
@@ -554,20 +533,22 @@ const getDefinitionList = async () => {
 };
 
 const handleDefinitionRowClick = async (definition) => {
+  console.log('handleDefinitionRowClick');
   isLoadingContainer.value = true;
   definitionSelected.value = definition;
-  await getDefinitionData(definitionSelected.value._id);
-  await getPsDataWithDefinitionFilter(definitionSelected.value.name);
-  setTimeout(() => {
-    isLoadingContainer.value = false;
-  }, 500);
+  await setDefinitionData(definitionSelected.value._id);
+  psCurrentPage.value = 1;
+  const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name, psCurrentPage.value);
+  psData.value = resData.items;
+  psDataListLength.value = resData.total;
+  isLoadingContainer.value = false;
   areaSelected.value = undefined;
   zoneSelected.value = undefined;
   ownerSelected.value = undefined;
   subSelected.value = undefined;
 };
 
-const getDefinitionData = async (id) => {
+const setDefinitionData = async (id) => {
   try {
     const res = await api.getDefinitionData(id);
     definitionData.value = res.data;
@@ -744,11 +725,12 @@ const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
     return res.data;
   } catch (error) {
     console.log('getDefinitionFilterData: error ', error);
+    return {};
   }
 };
 
 const handleFilterClick = async () => {
-  const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name);
+  const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name, 1);
   psData.value = resData.items;
   psDataListLength.value = resData.total;
 };
@@ -820,31 +802,32 @@ const onNodeSelect = (node) => {
 
 const engineClassIdParentList = ref(['ElmArea', 'IntFolder', 'ElmSubstat']);
 const getPsDataWithTree = async (getHeader = false) => {
+  let parentId;
+
+  if (!engineClassIdParentList.value.includes(engineClassIdSelected.value)) {
+    parentId = parentNodeSelected.value;
+  }
   try {
-    let parentId;
-    if (!engineClassIdParentList.value.includes(engineClassIdSelected.value)) {
-      parentId = parentNodeSelected.value;
-    }
     const res = await api.getPsDataWithTree(pseId.value, versionId.value, psCurrentPage.value, parentId);
     psData.value = res.data.items;
     psDataListLength.value = res.data.total;
-    // console.log(
-    //   'getPsDataWithTree',
-    //   {
-    //     engineClassId: engineClassIdSelected.value,
-    //     page: psCurrentPage.value,
-    //     parentId: parentId,
-    //   },
-    //   res.data.total,
-    // );
+
     if (getHeader && res.data.items.length > 0) {
       const firstRow = res.data.items[0];
-      await getDefinitionData(firstRow.engineInfo.powerSystemDefinitionId);
+      await setDefinitionData(firstRow.engineInfo.powerSystemDefinitionId);
     }
   } catch (error) {
     psData.value = [];
     psDataListLength.value = 0;
-    console.log('getPsDataWithTree: error ', error);
+    console.table({
+      engineClassIdParentList: engineClassIdParentList.value.join(', '),
+      engineClassIdSelected: engineClassIdSelected.value,
+      includes: !engineClassIdParentList.value.includes(engineClassIdSelected.value),
+      engineClassId: engineClassIdSelected.value,
+      page: psCurrentPage.value,
+      parentId: parentId,
+    });
+    // console.log('getPsDataWithTree: error ', error);
     // toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
@@ -934,7 +917,7 @@ const createPS = async () => {
     await api.createPS(psCreate.value);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    reloadData();
+    reloadPsData();
   } catch (error) {
     console.log('createPS: error ', error);
     toast.add({ severity: 'error', summary: 'Create Power System', detail: error.data.detail, life: 3000 });
@@ -957,7 +940,7 @@ const deletePSE = async (pseId) => {
   try {
     await api.deletePSE(pseId);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
-    reloadData();
+    reloadPsData();
   } catch (error) {
     console.log('deletePSE: error ', error);
     toast.add({ severity: 'error', summary: 'Delete Power System', detail: error.data.detail, life: 3000 });
