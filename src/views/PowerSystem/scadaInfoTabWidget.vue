@@ -7,18 +7,19 @@
     :lazy="true"
     :sortOrder="1"
     rowHover
+    scrollable
   >
-    <Column field="generalInfo.emsUniqueId" header="Unique Id" style="width: 15%">
+    <Column field="generalInfo.emsUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
         <div class="font-bold w-6rem">
           {{ slotProps.data.generalInfo.emsUniqueId }}
         </div>
       </template>
     </Column>
-    <Column field="scadaInfo.skey" header="Skey" style="width: 15%"></Column>
-    <Column field="scadaInfo.scadaName" header="Scada Name" style="width: 15%"></Column>
-    <Column field="scadaInfo.scadaUniqueId" header="Scada Unique Id" style="width: 15%"> </Column>
-    <Column style="width: 1%; min-width: 5rem">
+    <Column field="scadaInfo.skey" header="Skey" style="text-wrap: nowrap"></Column>
+    <Column field="scadaInfo.scadaName" header="Scada Name" style="text-wrap: nowrap"></Column>
+    <Column field="scadaInfo.scadaUniqueId" header="Scada Unique Id" style="text-wrap: nowrap"> </Column>
+    <Column style="text-wrap: nowrap" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />

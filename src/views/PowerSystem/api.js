@@ -19,7 +19,7 @@ export default class api {
     return get(`/powersystem/${projectData.value._id}/powersystemdefinition/${definitionId}`);
   }
 
-  static async getPsDataWithDefinition(definitionId, versionId, page, data = {}) {
+  static async getPsDataWithDefinition(definitionId, versionId, page = 1, data = {}) {
     return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/definition/${definitionId}`, {
       ...data,
       page: page,

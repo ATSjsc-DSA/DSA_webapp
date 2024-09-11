@@ -9,7 +9,7 @@ const model = ref([
     items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }],
   },
   {
-    label: 'Dependency blocks',
+    label: 'Application View',
     items: [
       { label: 'SSR', icon: 'pi pi-fw pi-id-card', to: '/DSA/SSR' },
       { label: 'TSA', icon: 'pi pi-fw pi-check-square', to: '/DSA/TSA' },
@@ -18,7 +18,7 @@ const model = ref([
   },
 
   {
-    label: 'Utilities',
+    label: 'Configuration',
     items: [
       { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
       { label: 'Group ', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
