@@ -323,14 +323,17 @@
 
               <!-- ps table - Paginator -->
               <template #footer>
-                <div v-if="psDataListLength > psPageRowNumber">
+                <div class="flex justify-content-end align-items-center">
                   <Paginator
+                    v-if="psDataListLength > psPageRowNumber"
                     v-model:first="offset"
+                    class="flex-grow-1"
                     :rows="psPageRowNumber"
                     :totalRecords="psDataListLength"
                     :page="psCurrentPage"
                     @page="onPagePsDataChange"
                   ></Paginator>
+                  <div class="mr-3">Total: {{ psDataListLength }}</div>
                 </div>
               </template>
             </Card>
