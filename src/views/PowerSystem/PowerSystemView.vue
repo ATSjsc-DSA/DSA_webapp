@@ -748,6 +748,7 @@ const treePs = ref([
     leaf: false,
     loading: false,
     hasChilded: true,
+    engineClassId: ''
   },
 ]);
 const nodeSelected = ref();
@@ -778,6 +779,7 @@ const getLeaf = async (parentId) => {
         loading: false,
         leaf: !childData.data[index].childed,
         hasChilded: childData.data[index].childed,
+        engineClassId: childData.data[index].engineClassId,
       });
     }
     return data;
@@ -795,14 +797,16 @@ const onNodeSelect = (node) => {
   pseId.value = node._id;
   psCurrentPage.value = 1;
   parentNodeSelected.value = node.parentId;
-  getPsDataWithTree(true, node.hasChilded);
+  console.log(node,"node");
+  getPsDataWithTree(true, node.hasChilded, node.engineClassId);
   isLoadingContainer.value = false;
 };
 
-const getPsDataWithTree = async (getHeader = false, hasChilded = false) => {
+const getPsDataWithTree = async (getHeader = false, hasChilded = false, engineClassId = '') => {
   let parentId;
 
-  if (!hasChilded) {
+  if (!hasChilded && engineClassId !== "ElmLne") {
+    console.log(engineClassId, "abc");
     parentId = parentNodeSelected.value;
   }
   try {
