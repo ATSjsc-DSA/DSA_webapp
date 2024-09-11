@@ -77,7 +77,7 @@ const onTopBarUserView = () => {
   router.push('/DSA/user');
 };
 const onProjectView = () => {
-  localStorage.removeItem('projectId');
+  localStorage.removeItem('projectData');
   router.push('/Project');
 };
 

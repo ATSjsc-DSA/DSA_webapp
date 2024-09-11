@@ -3,9 +3,6 @@
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
-    <!-- this is for test  -->
-    <!-- end test  -->
-
     <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
@@ -47,7 +44,16 @@
               <template #title>
                 <div class="flex flex-wrap justify-content-between align-items-center gap-2">
                   <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
-                  <div>
+                  <div class="flex flex-wrap justify-content-between align-items-center gap-2">
+                    <Button
+                      v-if="!showDefinitionList"
+                      severity="secondary"
+                      type="button"
+                      text
+                      icon="pi pi-minus"
+                      @click="collapseAll"
+                    />
+
                     <Button
                       :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
                       severity="secondary"
@@ -59,43 +65,61 @@
                 </div>
               </template>
               <template #content>
-                <template v-if="showDefinitionList">
-                  <DataView :value="definitionList" class="w-full">
-                    <template #list="slotProps">
-                      <div class="grid grid-nogutter">
-                        <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
-                          <div
-                            class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
-                            :class="{
-                              'border-top-1 surface-border': index !== 0,
-                              'selected-item': definitionSelected._id === item._id,
-                            }"
-                            @click="handleDefinitionRowClick(item)"
-                          >
-                            <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
-                              <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
-                            </div>
+                <DataView v-if="showDefinitionList" :value="definitionList" class="w-full">
+                  <template #list="slotProps">
+                    <div class="grid grid-nogutter">
+                      <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
+                        <div
+                          class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
+                          :class="{
+                            'border-top-1 surface-border': index !== 0,
+                            'selected-item': definitionSelected._id === item._id,
+                          }"
+                          @click="handleDefinitionRowClick(item)"
+                        >
+                          <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
+                            <i class="pi pi-code text-cyan-300"></i>{{ item.name }}
                           </div>
                         </div>
                       </div>
-                    </template>
-                  </DataView>
-                </template>
-                <template v-else>
-                  <Tree
-                    v-model:selectionKeys="nodeSelected"
-                    :value="treePs"
-                    loadingMode="icon"
-                    class="w-full md:w-[30rem]"
-                    selectionMode="single"
-                    @node-expand="onNodeExpand"
-                    @node-select="onNodeSelect"
-                  />
-                </template>
+                    </div>
+                  </template>
+                </DataView>
+
+                <Tree
+                  v-else
+                  v-model:selectionKeys="nodeSelected"
+                  v-model:expandedTreeKeys="expandedTreeKeys"
+                  :value="treePs"
+                  loadingMode="icon"
+                  class="w-full md:w-[30rem]"
+                  selectionMode="single"
+                  :filter="true"
+                  filterMode="strict"
+                  @node-expand="onNodeExpand"
+                  @node-select="onNodeSelect"
+                />
               </template>
             </Card>
           </SplitterPanel>
           <SplitterPanel :size="75" style="overflow-y: auto" class="relative">
+            <!-- this is for test  -->
+
+            <!-- projectData {{ projectData }}
+            <div class="flex gap-6">
+              <div>
+                nodeSelected
+                <pre>
+      --{{ nodeSelected }}--
+    </pre
+                >
+              </div>
+              <div>
+                <pre>{{}}</pre>
+              </div>
+            </div> -->
+            <!-- end test  -->
+
             <div class="flex flex-column h-full">
               <!-- ps table -  header: tab & filter  -->
               <div class="m-3 flex gap-2 justify-content-between align-items-center">
@@ -454,7 +478,7 @@ import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectId, editVersionData } = storeToRefs(commonStore);
+const { projectData, editVersionData } = storeToRefs(commonStore);
 import { intervalTime } from '@/Constants/';
 
 const toast = useToast();
@@ -482,9 +506,11 @@ const loadAllData = async () => {
   await getDefinitionList();
   await getVersionData();
   await getComparePSD();
-  treePs.value = await getLeaf(projectId.value);
   tabMenuPSActive.value = 0;
+
   await resetFilterList();
+
+  await onNodeExpand(treePs.value[0]);
 };
 
 // get data
@@ -506,14 +532,14 @@ const reloadData = async () => {
     psData.value = resData.items;
     psDataListLength.value = resData.total;
   }
-  if (!showDefinitionList.value) {
+  if (!showDefinitionList.value && parentNodeSelected.value) {
     await getPSEditData();
   }
 };
 
 watch(showDefinitionList, (newStatus) => {
   if (newStatus === false && isAddNew.value) {
-    treePs.value = getLeaf(projectId.value);
+    // treePs.value = getLeaf(projectData.value);
   }
 });
 //  -- Flat List - definition list
@@ -586,19 +612,34 @@ const definitionSub = ref();
 
 const resetFilterList = async () => {
   definitionArea.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'area')[0];
-  const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, 1, {});
-  areaList.value = Array.from({ length: areaFilterLength.data.total });
+  if (definitionArea.value) {
+    const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, 1, {});
+    areaList.value = Array.from({ length: areaFilterLength.data.total });
+  } else {
+    areaList.value = [];
+  }
 
   definitionZone.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'zone')[0];
-  const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, 1, {});
-  zoneList.value = Array.from({ length: zoneFilterLength.data.total });
-
+  if (definitionZone.value) {
+    const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, 1, {});
+    zoneList.value = Array.from({ length: zoneFilterLength.data.total });
+  } else {
+    zoneList.value = [];
+  }
   definitionOwner.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'owner')[0];
-  const ownerFilterLength = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, 1, {});
-  ownerList.value = Array.from({ length: ownerFilterLength.data.total });
+
+  if (definitionArea.value) {
+    const ownerFilterLength = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, 1, {});
+    ownerList.value = Array.from({ length: ownerFilterLength.data.total });
+  } else {
+    ownerList.value = [];
+  }
 
   definitionSub.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'substation')[0];
-  updateSubstationFilterLength();
+
+  if (definitionArea.value) {
+    updateSubstationFilterLength();
+  }
 };
 
 const onLazyLoadArea = async (event) => {
@@ -719,11 +760,27 @@ const handleFilterClick = async () => {
 // areaList.value = getDefinitionData();
 
 //  tree - powersystem edit
-const treePs = ref();
+const treePs = ref([
+  {
+    key: projectData.value._id,
+    label: projectData.value.name,
+    parentId: projectData.value._id,
+    leaf: false,
+    loading: false,
+    childed: true,
+  },
+]);
 const nodeSelected = ref();
-const parentNodeSelected = ref(projectId.value);
+const parentNodeSelected = ref();
 const pseId = ref();
 
+const expandedTreeKeys = ref({});
+
+const collapseAll = () => {
+  expandedTreeKeys.value = {};
+};
+
+const expandGrandChildLimit = ref(4);
 const onNodeExpand = async (node) => {
   if (!node.children) {
     node.loading = true;
@@ -732,14 +789,18 @@ const onNodeExpand = async (node) => {
       node.leaf = true;
     }
     node.loading = false;
-  }
-  if (!node.leaf) {
-    for (let childInd = 0; childInd < node.children.length; childInd++) {
-      const grandchildrenData = await getLeaf(node.children[childInd].key);
-      if (grandchildrenData.length > 0) {
-        node.children[childInd].children = grandchildrenData;
-      } else {
-        node.children[childInd].leaf = true;
+    if (!node.leaf) {
+      const grandchildrenLengthLimit =
+        node.children.length > expandGrandChildLimit.value ? expandGrandChildLimit.value : node.children.length;
+      for (let childInd = 0; childInd < grandchildrenLengthLimit; childInd++) {
+        node.children[childInd].loading = true;
+        const grandchildren = await getLeaf(node.children[childInd].key);
+        if (grandchildren.length > 0) {
+          node.children[childInd].children = grandchildren;
+        } else {
+          node.children[childInd].leaf = true;
+        }
+        node.children[childInd].loading = false;
       }
     }
   }
@@ -754,8 +815,11 @@ const getLeaf = async (parentId) => {
         key: childData.data[index]._id,
         label: childData.data[index].name,
         parentId: parentId,
-        leaf: false,
         loading: false,
+        leaf: childData.data[index].childed,
+        engineClassId: childData.data[index].engineClassId,
+        engineLabel: childData.data[index].engineLabel,
+        children: null,
       });
     }
     return data;
@@ -767,7 +831,6 @@ const getLeaf = async (parentId) => {
 const onNodeSelect = (node) => {
   if (node.key != pseId.value) {
     isLoadingContainer.value = true;
-
     pseId.value = node.key;
     parentNodeSelected.value = node.parentId;
     getPSEditData(true);

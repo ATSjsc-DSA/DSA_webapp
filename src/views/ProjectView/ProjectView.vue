@@ -65,7 +65,7 @@
               @click="deleteProject($event, slotProps.data._id)"
             />
 
-            <Button icon="pi pi-caret-right" text rounded @click="runProject(slotProps.data._id)" />
+            <Button icon="pi pi-caret-right" text rounded @click="runProject(slotProps.data)" />
           </div>
         </template>
       </Column>
@@ -135,7 +135,7 @@ const { convertDateTimeToString } = chartComposable();
 const toast = useToast();
 const confirm = useConfirm();
 const commonStore = useCommonStore();
-const { projectId } = storeToRefs(commonStore);
+const { projectData } = storeToRefs(commonStore);
 
 const onLogout = () => {
   localStorage.removeItem('token');
@@ -243,9 +243,9 @@ const deleteProject = async (event, projectId) => {
     },
   });
 };
-const runProject = (id) => {
-  projectId.value = id;
-  localStorage.setItem('projectId', projectId.value);
+const runProject = (project) => {
+  projectData.value = project;
+  localStorage.setItem('projectData', JSON.stringify(projectData.value));
   router.push('/powersystem');
 };
 </script>
