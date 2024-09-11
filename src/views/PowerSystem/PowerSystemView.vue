@@ -739,24 +739,22 @@ const handleFilterClick = async () => {
 const treePs = ref([
   {
     key: projectData.value._id,
+    _id: projectData.value._id,
     label: projectData.value.name,
     parentId: projectData.value._id,
     leaf: false,
     loading: false,
-    childed: true,
-    engineClassId: 'root',
-    engineLabel: 'root',
+    hasChilded: true,
   },
 ]);
 const nodeSelected = ref();
 const parentNodeSelected = ref();
 const pseId = ref();
-const engineClassIdSelected = ref();
 
 const onNodeExpand = async (node) => {
   if (!node.children) {
     node.loading = true;
-    node.children = await getLeaf(node.key);
+    node.children = await getLeaf(node._id);
     if (node.children.length == 0) {
       node.leaf = true;
     }
@@ -770,14 +768,13 @@ const getLeaf = async (parentId) => {
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
-        key: childData.data[index]._id,
+        key: parentId + childData.data[index]._id,
+        _id: childData.data[index]._id,
         label: childData.data[index].name,
         parentId: parentId,
         loading: false,
         leaf: !childData.data[index].childed,
-        childed: childData.data[index].childed,
-        engineClassId: childData.data[index].engineClassId,
-        engineLabel: childData.data[index].engineLabel,
+        hasChilded: childData.data[index].childed,
       });
     }
     return data;
@@ -787,24 +784,22 @@ const getLeaf = async (parentId) => {
   }
 };
 const onNodeSelect = (node) => {
-  if (node.engineClassId === 'root') {
+  if (node.label === projectData.value.name) {
     nodeSelected.value = undefined;
     return;
   }
   isLoadingContainer.value = true;
-  pseId.value = node.key;
+  pseId.value = node._id;
   psCurrentPage.value = 1;
-  engineClassIdSelected.value = node.engineClassId;
   parentNodeSelected.value = node.parentId;
-  getPsDataWithTree(true);
+  getPsDataWithTree(true, node.hasChilded);
   isLoadingContainer.value = false;
 };
 
-const engineClassIdParentList = ref(['ElmArea', 'IntFolder', 'ElmSubstat']);
-const getPsDataWithTree = async (getHeader = false) => {
+const getPsDataWithTree = async (getHeader = false, hasChilded = false) => {
   let parentId;
 
-  if (!engineClassIdParentList.value.includes(engineClassIdSelected.value)) {
+  if (!hasChilded) {
     parentId = parentNodeSelected.value;
   }
   try {
@@ -819,16 +814,8 @@ const getPsDataWithTree = async (getHeader = false) => {
   } catch (error) {
     psData.value = [];
     psDataListLength.value = 0;
-    console.table({
-      engineClassIdParentList: engineClassIdParentList.value.join(', '),
-      engineClassIdSelected: engineClassIdSelected.value,
-      includes: !engineClassIdParentList.value.includes(engineClassIdSelected.value),
-      engineClassId: engineClassIdSelected.value,
-      page: psCurrentPage.value,
-      parentId: parentId,
-    });
-    // console.log('getPsDataWithTree: error ', error);
-    // toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
+    console.log('getPsDataWithTree: error ', error);
+    toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
 // --- compare
