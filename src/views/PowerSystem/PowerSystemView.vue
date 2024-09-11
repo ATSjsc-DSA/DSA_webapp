@@ -433,7 +433,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch, computed, onUnmounted } from 'vue';
 import api from './api';
 
 import TabView from 'primevue/tabview';
@@ -455,15 +455,25 @@ import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { projectId, editVersionData } = storeToRefs(commonStore);
+import { intervalTime } from '@/Constants/';
 
 const toast = useToast();
 const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
 
 const versionId = ref('66decf1dcff005199529524b');
+const getDataInterval = ref();
 
 onMounted(async () => {
   loadAllData();
+
+  getDataInterval.value = setInterval(() => {
+    reloadData();
+  }, intervalTime);
+});
+
+onUnmounted(() => {
+  clearInterval(getDataInterval.value);
 });
 
 const tabMenuPSActive = ref(0);
@@ -474,7 +484,6 @@ const loadAllData = async () => {
   await getComparePSD();
   treePs.value = await getLeaf(projectId.value);
   tabMenuPSActive.value = 0;
-
   await resetFilterList();
 };
 
@@ -492,12 +501,16 @@ const onPagePsDataChange = (event) => {
   reloadData();
 };
 const reloadData = async () => {
-  if (showDefinitionList.value) {
-    await getPsDataWithDefinition();
-  } else {
+  if (showDefinitionList.value && definitionSelected.value.name) {
+    const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name);
+    psData.value = resData.items;
+    psDataListLength.value = resData.total;
+  }
+  if (!showDefinitionList.value) {
     await getPSEditData();
   }
 };
+
 watch(showDefinitionList, (newStatus) => {
   if (newStatus === false && isAddNew.value) {
     treePs.value = getLeaf(projectId.value);
@@ -522,7 +535,7 @@ const handleDefinitionRowClick = async (definition) => {
   isLoadingContainer.value = true;
   definitionSelected.value = definition;
   await getDefinitionData(definitionSelected.value._id);
-  await getPsDataWithDefinition();
+  await getPsDataWithDefinitionFilter(definitionSelected.value.name);
   setTimeout(() => {
     isLoadingContainer.value = false;
   }, 500);
@@ -540,16 +553,6 @@ const getDefinitionData = async (id) => {
     definitionData.value = {};
     console.log('getDefinitionData: error ', error);
     toast.add({ severity: 'error', summary: 'Definition Header', detail: error.data.detail, life: 3000 });
-  }
-};
-const getPsDataWithDefinition = async () => {
-  try {
-    const res = await api.getPsDataWithDefinition(definitionSelected.value._id, versionId.value, psCurrentPage.value);
-    psData.value = res.data.items;
-    psDataListLength.value = res.data.total;
-  } catch (error) {
-    console.log('getPsDataWithDefinition: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition Data', detail: error.data.detail, life: 3000 });
   }
 };
 
