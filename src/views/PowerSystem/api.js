@@ -28,12 +28,15 @@ export default class api {
 
   // tree - powersystem edit
 
-  static async getChildOnPSEdit(parentId, versionId) {
+  static async getChildOnPs(parentId, versionId) {
     return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/child/${parentId}`);
   }
 
-  static async getPSEditData(pseId, versionId) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/${pseId}`);
+  static async getPsDataWithTree(psedId, versionId, page = 1, parentId = undefined) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/${psedId}`, {
+      page: page,
+      parentId: parentId,
+    });
   }
 
   // CRUD
