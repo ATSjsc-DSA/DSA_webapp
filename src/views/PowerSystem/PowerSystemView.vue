@@ -84,8 +84,6 @@
                   loadingMode="icon"
                   class="w-full md:w-[30rem] h-[40vh]"
                   selectionMode="single"
-                  :filter="true"
-                  filterMode="lenient"
                   @node-expand="onNodeExpand"
                   @node-select="onNodeSelect"
                 />
@@ -260,12 +258,19 @@
                           </template>
                         </Dropdown>
                       </FloatLabel>
-                      <div>
+                      <div class="flex gap-2">
+                        <Button
+                          severity="warning"
+                          icon="pi pi-times"
+                          style="width: 32px"
+                          :disabled="!(areaSelected || zoneSelected || ownerSelected || subSelected)"
+                          @click="clearFilterSelected"
+                        />
                         <Button
                           severity="primary"
                           icon="pi pi-filter"
                           style="width: 32px"
-                          :disabled="!definitionSelected"
+                          :disabled="!definitionSelected || !canUseDefinitionFilter"
                           @click="handleFilterClick"
                         />
                       </div>
@@ -304,18 +309,23 @@
                   <LoadingContainer v-show="isLoadingContainer" />
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                     <TabPanel header="">
-                      <generalTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
-                    </TabPanel>
-                    <TabPanel>
-                      <engineInfoTabWidget
+                      <generalTabWidget
                         :data="psData"
-                        :headerData="definitionData"
+                        :loading="isLoadingPsData"
                         @editData="editPSE"
                         @deleteData="deletePSE"
                       />
                     </TabPanel>
                     <TabPanel>
-                      <scadaInfoTabWidget :data="psData" @editData="editPSE" @deleteData="deletePSE" />
+                      <engineInfoTabWidget :data="psData" :headerData="definitionData" :loading="isLoadingPsData" />
+                    </TabPanel>
+                    <TabPanel>
+                      <scadaInfoTabWidget
+                        :data="psData"
+                        :loading="isLoadingPsData"
+                        @editData="editPSE"
+                        @deleteData="deletePSE"
+                      />
                     </TabPanel>
                   </TabView>
                 </div>
@@ -489,20 +499,21 @@ const loadAllData = async () => {
   await resetFilterList();
 };
 
-// get data
+// get PS data
 const showDefinitionList = ref(true);
 const psData = ref([]);
 const psDataListLength = ref();
 const psCurrentPage = ref(1);
 const psPageRowNumber = ref(10);
-
+const isLoadingPsData = ref(false);
 const offset = computed(() => psPageRowNumber.value * psCurrentPage.value - 1);
 const isAddNew = ref(false);
 
-const onPagePsDataChange = (event) => {
-  console.log('onPagePsDataChange', event.page);
+const onPagePsDataChange = async (event) => {
+  isLoadingPsData.value = true;
   psCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
-  reloadPsData();
+  await reloadPsData();
+  isLoadingPsData.value = false;
 };
 const reloadPsData = async () => {
   if (showDefinitionList.value && definitionSelected.value.name) {
@@ -511,7 +522,7 @@ const reloadPsData = async () => {
     psDataListLength.value = resData.total;
   }
   if (!showDefinitionList.value && nodeSelected.value) {
-    await getPsDataWithTree();
+    await setPsDataWithTree();
   }
 };
 
@@ -536,7 +547,6 @@ const setDefinitionList = async () => {
 };
 
 const handleDefinitionRowClick = async (definition) => {
-  console.log('handleDefinitionRowClick');
   isLoadingContainer.value = true;
   definitionSelected.value = definition;
   await setDefinitionData(definitionSelected.value._id);
@@ -565,7 +575,7 @@ const setDefinitionData = async (id) => {
 // Flat List - filter
 const definitionNoFilterList = ref(['Area', 'Zone', 'Owner']);
 const canUseDefinitionFilter = computed(() => {
-  if (definitionSelected.value) {
+  if (definitionSelected.value._id) {
     return !definitionNoFilterList.value.includes(definitionSelected.value.name);
   }
   return false;
@@ -688,6 +698,7 @@ watch(zoneSelected, () => {
 watch(ownerSelected, () => {
   updateSubstationFilterLength();
 });
+
 const updateSubstationFilterLength = async () => {
   subSelected.value = undefined;
   const subsFilterLength = await getPsDataWithDefinitionFilter('Substation', 1);
@@ -716,6 +727,7 @@ const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
   try {
     const definition = definitionList.value.filter((item) => item.name.toLowerCase() === nameFilter.toLowerCase())[0];
     let data = {};
+
     if (canUseDefinitionFilter.value) {
       data = {
         area: areaSelected.value ? areaSelected.value._id : undefined,
@@ -723,6 +735,9 @@ const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
         owner: ownerSelected.value ? ownerSelected.value._id : undefined,
         sub: subSelected.value ? subSelected.value._id : undefined,
       };
+      if (nameFilter === 'Substation') {
+        data.sub = undefined;
+      }
     }
     const res = await api.getPsDataWithDefinition(definition._id, versionId.value, page, data);
     return res.data;
@@ -731,11 +746,19 @@ const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
     return {};
   }
 };
+const clearFilterSelected = () => {
+  areaSelected.value = undefined;
+  zoneSelected.value = undefined;
+  ownerSelected.value = undefined;
+  subSelected.value = undefined;
+};
 
 const handleFilterClick = async () => {
+  isLoadingPsData.value = true;
   const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name, 1);
   psData.value = resData.items;
   psDataListLength.value = resData.total;
+  isLoadingPsData.value = false;
 };
 
 //  tree - powersystem edit
@@ -748,7 +771,7 @@ const treePs = ref([
     leaf: false,
     loading: false,
     hasChilded: true,
-    engineClassId: ''
+    engineClassId: '',
   },
 ]);
 const nodeSelected = ref();
@@ -797,16 +820,15 @@ const onNodeSelect = (node) => {
   pseId.value = node._id;
   psCurrentPage.value = 1;
   parentNodeSelected.value = node.parentId;
-  console.log(node,"node");
-  getPsDataWithTree(true, node.hasChilded, node.engineClassId);
+  setPsDataWithTree(true, node.hasChilded, node.engineClassId);
   isLoadingContainer.value = false;
 };
 
-const getPsDataWithTree = async (getHeader = false, hasChilded = false, engineClassId = '') => {
+const setPsDataWithTree = async (getHeader = false, hasChilded = false, engineClassId = '') => {
   let parentId;
 
-  if (!hasChilded && engineClassId !== "ElmLne") {
-    console.log(engineClassId, "abc");
+  if (!hasChilded && engineClassId !== 'ElmLne') {
+    console.log(engineClassId, 'abc');
     parentId = parentNodeSelected.value;
   }
   try {
@@ -816,7 +838,11 @@ const getPsDataWithTree = async (getHeader = false, hasChilded = false, engineCl
 
     if (getHeader && res.data.items.length > 0) {
       const firstRow = res.data.items[0];
-      await setDefinitionData(firstRow.engineInfo.powerSystemDefinitionId);
+      definitionSelected.value = {
+        _id: firstRow.engineInfo.powerSystemDefinitionId,
+      };
+
+      await setDefinitionData(definitionSelected.value._id);
     }
   } catch (error) {
     psData.value = [];
@@ -880,11 +906,19 @@ const createVisibleDialog = ref(false);
 const psCreate = ref();
 
 const handleCreatePS = () => {
+  let parentId = projectData.value._id;
+  const powerSystemDefinitionId = definitionSelected.value._id ? definitionSelected.value._id : '';
+  if (showDefinitionList.value && definitionSelected.value.name) {
+    parentId = definitionData.value.parrentId;
+  }
+  if (!showDefinitionList.value && nodeSelected.value) {
+    parentId = parentNodeSelected.value;
+  }
   psCreate.value = {
     _id: '',
     generalInfo: {
       name: '',
-      parrentId: showDefinitionList.value ? definitionData.value.parrentId : parentNodeSelected.value,
+      parrentId: parentId,
       uniqueId: '',
       emsName: '',
       emsUniqueId: '',
@@ -894,7 +928,7 @@ const handleCreatePS = () => {
       softwareUniqueId: '',
     },
     engineInfo: {
-      powerSystemDefinitionId: showDefinitionList.value ? definitionSelected.value : '',
+      powerSystemDefinitionId: powerSystemDefinitionId,
       values: [''],
     },
     scadaInfo: {
@@ -908,7 +942,7 @@ const handleCreatePS = () => {
 };
 const createPS = async () => {
   try {
-    await api.createPS(psCreate.value);
+    await api.createPS(psCreate.value, versionId.value);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     reloadPsData();
@@ -920,7 +954,7 @@ const createPS = async () => {
 // Edit
 const editPSE = async (pseUpdate) => {
   try {
-    await api.editPSE(pseUpdate);
+    await api.editPSE(pseUpdate, versionId.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     // reloadData();
   } catch (error) {
@@ -932,7 +966,7 @@ const editPSE = async (pseUpdate) => {
 // Delete
 const deletePSE = async (pseId) => {
   try {
-    await api.deletePSE(pseId);
+    await api.deletePSE(pseId, versionId.value);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     reloadPsData();
   } catch (error) {
@@ -999,7 +1033,7 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'Create',
           icon: 'pi pi-plus',
-          disabled: !showDefinitionList.value,
+          disabled: !showDefinitionList.value || !definitionSelected.value._id,
           command: () => {
             handleCreatePS();
           },

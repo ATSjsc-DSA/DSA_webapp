@@ -8,6 +8,7 @@
     :sortOrder="1"
     rowHover
     scrollable
+    :loading="loading"
   >
     <Column field="generalInfo.emsUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
@@ -47,9 +48,12 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['editData', 'deleteData']);
 const columnList = computed(() => {
   if (props.headerData.inputAttributes) {
     const cols = [];
