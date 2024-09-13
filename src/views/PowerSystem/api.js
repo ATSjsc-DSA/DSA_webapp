@@ -56,6 +56,11 @@ export default class api {
         softwareName: data.generalInfo.softwareName,
         softwareUniqueId: data.generalInfo.softwareUniqueId,
       },
+      engineInfo: {
+        powerSystemDefinitionId: data.engineInfo.powerSystemDefinitionId,
+        values: data.engineInfo.values,
+      },
+
       scadaInfo: {
         skey: data.scadaInfo.skey,
         scadaName: data.scadaInfo.scadaName,

@@ -323,6 +323,8 @@
                         :headerData="definitionData"
                         :loading="isLoadingPsData"
                         value-index="EMS"
+                        @editData="editPSE"
+                        @deleteData="deletePSE"
                       />
                     </TabPanel>
                     <TabPanel>
@@ -331,6 +333,8 @@
                         :headerData="definitionData"
                         :loading="isLoadingPsData"
                         value-index="PSSE"
+                        @editData="editPSE"
+                        @deleteData="deletePSE"
                       />
                     </TabPanel>
                     <TabPanel>
@@ -480,7 +484,6 @@ import { useToast } from 'primevue/usetoast';
 
 import generalTabWidget from './generalTabWidget.vue';
 import engineInfoTabWidget from './engineInfoTabWidget.vue';
-import engineEMSTabWidget from './engineEMSTabWidget.vue';
 
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTableWidget.vue';

@@ -22,7 +22,7 @@
     <Column field="generalInfo.operationName" header="Operation Name" style="text-wrap: nowrap"></Column>
     <Column field="generalInfo.softwareName" header="Software Name" style="text-wrap: nowrap"></Column>
 
-    <Column style="width: 1%; min-width: 5rem" bodyClass="p-1">
+    <Column frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />

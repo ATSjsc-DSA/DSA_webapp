@@ -20,7 +20,7 @@
     <Column field="scadaInfo.skey" header="Skey" style="text-wrap: nowrap"></Column>
     <Column field="scadaInfo.scadaName" header="Scada Name" style="text-wrap: nowrap"></Column>
     <Column field="scadaInfo.scadaUniqueId" header="Scada Unique Id" style="text-wrap: nowrap"> </Column>
-    <Column style="text-wrap: nowrap" bodyClass="p-1">
+    <Column frozen alignFrozen="right" style="text-wrap: nowrap; width: 1%; min-width: 5rem" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />
