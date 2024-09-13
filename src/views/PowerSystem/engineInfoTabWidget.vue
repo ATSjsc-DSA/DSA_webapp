@@ -18,15 +18,10 @@
       </template>
     </Column>
     <template v-for="col of columnList" :key="col.field">
-      <Column
-        v-if="col.visible"
-        :header="capitalizeFirstLetter(col.header)"
-        bodyStyle="height:43px"
-        style="text-wrap: nowrap"
-      >
+      <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)" style="text-wrap: nowrap">
         <template #body="slotProps">
           <div class="flex justify-content-between align-items-center">
-            {{ slotProps.data.engineInfo.values[col.index] }}
+            {{ slotProps.data.engineInfo.values[engineIndex][col.index] }}
           </div>
         </template>
       </Column>
@@ -37,7 +32,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, compile } from 'vue';
+import { VALUE_DATA_NAME } from './api'; // <= import it
 
 const props = defineProps({
   data: {
@@ -52,13 +48,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  valueIndex: {
+    type: String,
+    default: 'EMS',
+    validator(value) {
+      return VALUE_DATA_NAME.includes(value);
+    },
+  },
 });
 
+const engineIndex = computed(() => VALUE_DATA_NAME.indexOf(props.valueIndex));
 const columnList = computed(() => {
   if (props.headerData.inputAttributes) {
+    const dataHeader = props.headerData.inputAttributes[engineIndex.value];
     const cols = [];
-    for (let ind = 0; ind < props.headerData.inputAttributes.length; ind++) {
-      const data = props.headerData.inputAttributes[ind];
+    for (let ind = 0; ind < dataHeader.length; ind++) {
+      const data = dataHeader[ind];
       cols.push({ index: ind, header: data.name, visible: data.display });
     }
     return cols;

@@ -93,3 +93,5 @@ export default class api {
     return put(`/powersystem/${projectData.value._id}/powersystemversion/${versionId}`);
   }
 }
+
+export const VALUE_DATA_NAME = ['EMS', 'PSSE'];

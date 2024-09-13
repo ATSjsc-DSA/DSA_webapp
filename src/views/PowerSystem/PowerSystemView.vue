@@ -99,8 +99,9 @@
                   <div class="flex gap-2 justify-content-start">
                     <div class="flex gap-2 justify-content-start">
                       <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
-                      <Button label="Engine" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
-                      <Button label="Scada" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
+                      <Button label="EMS" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
+                      <Button label="PSSE" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
+                      <Button label="Scada" class="" :text="tabMenuPSActive !== 3" @click="tabMenuPSActive = 3" />
                     </div>
                   </div>
 
@@ -317,7 +318,20 @@
                       />
                     </TabPanel>
                     <TabPanel>
-                      <engineInfoTabWidget :data="psData" :headerData="definitionData" :loading="isLoadingPsData" />
+                      <engineInfoTabWidget
+                        :data="psData"
+                        :headerData="definitionData"
+                        :loading="isLoadingPsData"
+                        value-index="EMS"
+                      />
+                    </TabPanel>
+                    <TabPanel>
+                      <engineInfoTabWidget
+                        :data="psData"
+                        :headerData="definitionData"
+                        :loading="isLoadingPsData"
+                        value-index="PSSE"
+                      />
                     </TabPanel>
                     <TabPanel>
                       <scadaInfoTabWidget
@@ -466,6 +480,8 @@ import { useToast } from 'primevue/usetoast';
 
 import generalTabWidget from './generalTabWidget.vue';
 import engineInfoTabWidget from './engineInfoTabWidget.vue';
+import engineEMSTabWidget from './engineEMSTabWidget.vue';
+
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
@@ -604,7 +620,7 @@ const resetFilterList = async () => {
   definitionArea.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'area')[0];
   if (definitionArea.value) {
     const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, 1, {});
-    areaList.value = Array.from({ length: areaFilterLength.data.total });
+    areaList.value = Array.from({ length: areaFilterLength.data.total || 0 });
   } else {
     areaList.value = [];
   }
@@ -612,7 +628,7 @@ const resetFilterList = async () => {
   definitionZone.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'zone')[0];
   if (definitionZone.value) {
     const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, 1, {});
-    zoneList.value = Array.from({ length: zoneFilterLength.data.total });
+    zoneList.value = Array.from({ length: zoneFilterLength.data.total || 0 });
   } else {
     zoneList.value = [];
   }
@@ -620,7 +636,7 @@ const resetFilterList = async () => {
 
   if (definitionArea.value) {
     const ownerFilterLength = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, 1, {});
-    ownerList.value = Array.from({ length: ownerFilterLength.data.total });
+    ownerList.value = Array.from({ length: ownerFilterLength.data.total || 0 });
   } else {
     ownerList.value = [];
   }
@@ -640,6 +656,9 @@ const onLazyLoadArea = async (event) => {
     const page = Math.floor(row / 10) + 1;
 
     const resData = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, page, {});
+    if (!resData.data.items) {
+      break;
+    }
     for (let i = 0; i < resData.data.items.length; i++) {
       if (!resData.data.items[i].generalInfo) {
         break;
@@ -658,6 +677,9 @@ const onLazyLoadZone = async (event) => {
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
     const resData = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, page, {});
+    if (!resData.data.items) {
+      break;
+    }
     for (let i = 0; i < resData.data.items.length; i++) {
       if (!resData.data.items[i].generalInfo) {
         break;
@@ -676,6 +698,9 @@ const onLazyLoadOwner = async (event) => {
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
     const resData = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, page, {});
+    if (!resData.data.items) {
+      break;
+    }
     for (let i = 0; i < resData.data.items.length; i++) {
       if (!resData.data.items[i].generalInfo) {
         break;
@@ -702,7 +727,7 @@ watch(ownerSelected, () => {
 const updateSubstationFilterLength = async () => {
   subSelected.value = undefined;
   const subsFilterLength = await getPsDataWithDefinitionFilter('Substation', 1);
-  subList.value = Array.from({ length: subsFilterLength.total });
+  subList.value = Array.from({ length: subsFilterLength.total || 0 });
 };
 
 const onLazyLoadSubstation = async (event) => {
@@ -712,6 +737,9 @@ const onLazyLoadSubstation = async (event) => {
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
     const resData = await getPsDataWithDefinitionFilter('Substation', page);
+    if (!resData.data.items) {
+      break;
+    }
     for (let i = 0; i < resData.items.length; i++) {
       if (!resData.items[i].generalInfo) {
         break;
