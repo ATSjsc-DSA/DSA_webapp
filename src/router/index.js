@@ -106,6 +106,14 @@ const router = createRouter({
     },
     {
       meta: {
+        title: 'Global Definition',
+      },
+      path: '/globaldefinition',
+      name: 'Global Definition',
+      component: () => import('@/views/GlobalDefinitionView/GlobalDefinitionView.vue'),
+    },
+    {
+      meta: {
         title: 'Login',
       },
       path: '/login',

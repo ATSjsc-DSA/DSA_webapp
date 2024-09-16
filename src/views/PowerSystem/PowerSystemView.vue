@@ -94,7 +94,7 @@
             <Card style="height: 100%">
               <!-- ps table -  header: tab & filter  -->
               <template #title>
-                <div class="m-3 flex gap-2 justify-content-between align-items-center">
+                <div class="flex gap-2 justify-content-between align-items-center">
                   <!-- tab -->
                   <div class="flex gap-2 justify-content-start">
                     <div class="flex gap-2 justify-content-start">
@@ -108,7 +108,7 @@
                   <template v-if="showDefinitionList">
                     <Divider layout="vertical" />
                     <!-- filter -->
-                    <div class="flex-grow-1 m-3 flex gap-2 justify-content-between">
+                    <div class="flex-grow-1 flex gap-2 justify-content-between">
                       <FloatLabel class="w-full md:w-34rem">
                         <label for="filter-area">Area</label>
                         <Dropdown
