@@ -9,7 +9,7 @@ export default class api {
       Governor: 'Governor',
       Generic: 'Generic',
     },
-    Renew: {
+    Renews: {
       Stabilizer: 'Stabilizer',
       Renewable: 'Renewable',
       PlanControl: 'PlanControl',
