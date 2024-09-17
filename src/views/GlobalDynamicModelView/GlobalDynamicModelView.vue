@@ -330,7 +330,7 @@ const dynamicDefinition = ref();
 const isGroupedValueByFirstLetter = ref(false);
 const getDynamicDefinitionList = async () => {
   try {
-    const res = await api.getGlobalDynamicModelDefinitionList(globaldefinitionId.value, 1);
+    const res = await api.getGlobalDynamicModelDefinitionList( 1);
     let data = res.data.items;
     if (res.data.total > pageRowNumber.value) {
       for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
@@ -338,7 +338,7 @@ const getDynamicDefinitionList = async () => {
         if (page === 1) {
           continue;
         }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList(globaldefinitionId.value, page);
+        const resPgae = await api.getGlobalDynamicModelDefinitionList( page);
         data = data.concat(resPgae.data.items);
       }
     }
@@ -403,7 +403,7 @@ const definitionTypeOptions = computed(() => [
 ]);
 const createDynamicDefinition = async () => {
   try {
-    const res = await api.createGlobalDynamicModelDefinitionList(globaldefinitionId.value, definitionData.value);
+    const res = await api.createGlobalDynamicModelDefinitionList( definitionData.value);
     dynamicDefinition.value.unshift(res.data);
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
     definitionVisibleDialog.value = false;
@@ -422,7 +422,7 @@ const handleUpdateDynamicDefinition = (data) => {
 };
 const updateDynamicDefinition = async () => {
   try {
-    const res = await api.updateGlobalDynamicModelDefinition(globaldefinitionId.value, definitionData.value._id, {
+    const res = await api.updateGlobalDynamicModelDefinition( definitionData.value._id, {
       name: definitionData.value.name,
       modeltype: definitionData.value.modeltype,
       values: definitionData.value.values,
@@ -461,7 +461,7 @@ const confirmDeleteDynamic = (data, type = 'definition') => {
 
 const deleteDynamicDefinition = async (dynamicDefinition_id) => {
   try {
-    const res = await api.deleteGlobalDynamicModelDefinition(globaldefinitionId.value, dynamicDefinition_id);
+    const res = await api.deleteGlobalDynamicModelDefinition( dynamicDefinition_id);
     toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
     getDynamicDefinitionList();
   } catch (error) {
@@ -474,7 +474,7 @@ const deleteDynamicDefinition = async (dynamicDefinition_id) => {
 const dynamicMapping = ref();
 const getDynamicMappingList = async () => {
   try {
-    const res = await api.getGlobalDynamicModelMappingList(globaldefinitionId.value, 1);
+    const res = await api.getGlobalDynamicModelMappingList( 1);
     let data = res.data.items;
     if (res.data.total > pageRowNumber.value) {
       for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
@@ -482,7 +482,7 @@ const getDynamicMappingList = async () => {
         if (page === 1) {
           continue;
         }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList(globaldefinitionId.value, page);
+        const resPgae = await api.getGlobalDynamicModelDefinitionList( page);
         data = data.concat(resPgae.data.items);
       }
     }
@@ -540,7 +540,7 @@ const handleCreateDynamicMapping = () => {
 
 const createDynamicMapping = async () => {
   try {
-    const res = await api.createGlobalDynamicModelMappingList(globaldefinitionId.value, {
+    const res = await api.createGlobalDynamicModelMappingList( {
       name: mappingData.value.name,
       globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
       mapOrder: mappingData.value.mapOrder,
@@ -562,7 +562,7 @@ const handleUpdateDynamicMapping = (data) => {
 };
 const updateDynamicMapping = async () => {
   try {
-    const res = await api.updateGlobalDynamicModelMapping(globaldefinitionId.value, mappingData.value._id, {
+    const res = await api.updateGlobalDynamicModelMapping( mappingData.value._id, {
       name: mappingData.value.name,
       globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
       mapOrder: mappingData.value.mapOrder,
@@ -578,7 +578,7 @@ const updateDynamicMapping = async () => {
 
 const deleteDynamicMapping = async (mapping_id) => {
   try {
-    const res = await api.deleteGlobalDynamicModelMapping(globaldefinitionId.value, mapping_id);
+    const res = await api.deleteGlobalDynamicModelMapping(mapping_id);
     toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
     getDynamicMappingList();
   } catch (error) {

@@ -16,7 +16,7 @@
     >
       <template #header>
         <div class="flex justify-content-end gap-3">
-          <Button type="button" label="Create" icon="pi pi-plus" @click="createVisibleDialog = true" />
+          <Button type="button" label="Create" icon="pi pi-plus" @click="createVisibleDialog = true" text />
         </div>
       </template>
 
@@ -46,11 +46,12 @@
       <Column style="width: 1%; min-width: 5rem">
         <template #body="{ data }">
           <div class="flex justify-content-between">
-            <Button icon="pi pi-pencil" severity="success" text rounded @click="handleEdit(data)" />
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDelete(data)" />
+            <Button icon="pi pi-pencil" severity="info" text rounded @click="handleEdit(data)" />
+            <Button v-tooltip.bottom="'Active'" icon="pi pi-caret-right" text rounded @click="handleActive(data)" />
             <router-link :to="`/globaldefinition/${data._id}`" rel="globaldefinition">
-              <Button icon="pi pi-caret-right" text rounded />
+              <Button  icon="pi pi-wrench" severity="warning"  text rounded />
             </router-link>
+            <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDelete(data)" />
           </div>
         </template>
       </Column>
@@ -91,10 +92,10 @@
       <label for="Name" class="font-semibold w-8rem"> Name</label>
       <InputText id="Name" v-model="editData.name" class="flex-auto" autocomplete="off" />
     </div>
-    <div class="flex align-items-center gap-3 mb-3">
+    <!-- <div class="flex align-items-center gap-3 mb-3">
       <label for="active" class="font-semibold w-8rem"> Active</label>
       <InputSwitch id="active" v-model="editData.active" />
-    </div>
+    </div> -->
 
     <div class="flex align-items-center gap-3 py-3">
       <label for="modifiedTimestamp" class="font-semibold w-8rem"> Last Modified</label>
@@ -194,6 +195,16 @@ const editData = ref();
 const handleEdit = (data) => {
   editData.value = data;
   editVisibleDialog.value = true;
+};
+
+const handleActive =async (data) => {
+  try {
+    const res = await api.activeGlobaldefinition(data._id);
+    getGlobaldefinitionList();
+    toast.add({ severity: 'success', summary: 'Success Message', detail: res.message, life: 3000 });
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
 };
 const editGlobaldefinition = async () => {
   try {

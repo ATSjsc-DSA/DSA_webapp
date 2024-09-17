@@ -6,7 +6,9 @@ export default class api {
       page: page,
     });
   }
-
+  static async activeGlobaldefinition(id) {
+    return put(`/common/globaldefinition/active/${id}`);
+  }
   static async createGlobaldefinition(data) {
     return post('/common/globaldefinition', data);
   }
