@@ -101,7 +101,7 @@
                   severity="danger"
                   text
                   rounded
-                  @click="confirmDeleteDynamicDefinition(data)"
+                  @click="confirmDeleteDynamic(data, 'definition')"
                 />
               </div>
             </template>
@@ -113,15 +113,15 @@
         <DataTable :value="dynamicMapping" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
           <template #header>
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Create " icon="pi pi-plus" text />
+              <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicMapping" />
             </div>
           </template>
           <Column field="name" header="Name" sortable></Column>
 
-          <Column field="globalDynamicModelDefitionId" header=" Dynamic Defition">
+          <Column field="globalDynamicModelDefinitionId" header=" Dynamic Definition">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                {{ getNameDynamicDefinitionFromId(data.globalDynamicModelDefitionId) }}
+                {{ getNameDynamicDefinitionFromId(data.globalDynamicModelDefinitionId) }}
               </div>
             </template>
           </Column>
@@ -133,17 +133,32 @@
             </template>
           </Column>
 
-          <Column field="createdTimestamp" header="Created At">
+          <Column field="createdTimestamp" header="Created At" sortable>
             <template #body="{ data }">
               <div class="flex justify-content-between">
                 {{ convertDateTimeToString(data.createdTimestamp) }}
               </div>
             </template>
           </Column>
-          <Column field="modifiedTimestamp" header="Modified At">
+          <Column field="modifiedTimestamp" header="Modified At" sortable>
             <template #body="{ data }">
               <div class="flex justify-content-between">
                 {{ convertDateTimeToString(data.modifiedTimestamp) }}
+              </div>
+            </template>
+          </Column>
+          <Column style="width: 1%; min-width: 5rem">
+            <template #body="{ data }">
+              <div class="flex justify-content-between">
+                <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdateDynamicMapping(data)" />
+
+                <Button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  rounded
+                  @click="confirmDeleteDynamic(data, 'mapping')"
+                />
               </div>
             </template>
           </Column>
@@ -152,20 +167,21 @@
     </TabView>
   </div>
 
-  <!-- dynamicDefinition - create dialog -->
+  <!-- dynamicDefinition - create/Update dialog -->
   <Dialog v-model:visible="definitionVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Global Dynamic Model Definition</span>
       </div>
     </template>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="Name" class="font-semibold w-6rem"> Name</label>
-      <InputText id="Name" v-model="definitionData.name" class="flex-auto" autocomplete="off" />
+
+    <div>
+      <label for="Name" class="font-semibold"> Name</label>
+      <InputText id="Name" v-model="definitionData.name" class="w-full my-3" autocomplete="off" />
     </div>
 
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="modeltype" class="font-semibold w-6rem"> Type</label>
+    <div class="mt-3">
+      <label for="modeltype" class="font-semibold"> Type</label>
 
       <Dropdown
         v-model="definitionData.modeltype"
@@ -173,7 +189,7 @@
         optionGroupLabel="label"
         optionGroupChildren="items"
         placeholder="Select a Type"
-        class="flex-grow-1"
+        class="w-full my-3"
       >
         <template #optiongroup="slotProps">
           <div class="flex align-items-center">
@@ -190,13 +206,11 @@
         </template>
       </Dropdown>
     </div>
-    <div class="flex align-items-start gap-3 mb-3">
-      <label for="values" class="font-semibold w-6rem"> Values</label>
-      <div class="block flex-grow-1">
-        <Chips id="values" v-model="definitionData.values" class="w-full" autocomplete="off" />
-        <div class="p-1">
-          <small>Press Enter to Add.</small>
-        </div>
+    <div class="mt-3">
+      <label for="values" class="font-semibold"> Values</label>
+      <Chips id="values" v-model="definitionData.values" class="w-full mt-3" autocomplete="off" />
+      <div class="p-1">
+        <small>Press Enter to Add.</small>
       </div>
     </div>
     <template #footer>
@@ -210,7 +224,54 @@
     </template>
   </Dialog>
 
-  <ConfirmDialog group="dynamicDefinition">
+  <!-- dynamicMapping - create/Update dialog -->
+  <Dialog v-model:visible="mappingVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Global Dynamic Model Mapping</span>
+      </div>
+    </template>
+
+    <div>
+      <label for="Name" class="font-semibold"> Name</label>
+      <InputText id="Name" v-model="mappingData.name" class="w-full my-3" autocomplete="off" />
+    </div>
+
+    <div class="mt-3">
+      <label for="globalDynamicModelDefinitionId" class="font-semibold"> Global Dynamic Model Definition </label>
+
+      <Dropdown
+        v-model="mappingData.globalDynamicModelDefinitionId"
+        :options="globalDynamicModelDefinitionOpts"
+        optionValue="value"
+        optionLabel="name"
+        placeholder="Select a Model"
+        class="w-full my-3"
+      />
+    </div>
+    <div class="mt-3">
+      <label for="values" class="font-semibold"> Values</label>
+      <Chips id="values" v-model="mappingData.mapOrder" class="w-full mt-3" autocomplete="off" />
+      <div class="p-1">
+        <small>Press Enter to Add.</small>
+      </div>
+    </div>
+
+    <pre>
+      {{ mappingData }}
+    </pre>
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="mappingVisibleDialog = false"></Button>
+      <Button
+        type="button"
+        label="Save"
+        :disabled="!(mappingData.name && mappingData.globalDynamicModelDefinitionId)"
+        @click="handleChangeMapping()"
+      ></Button>
+    </template>
+  </Dialog>
+
+  <ConfirmDialog group="deleteConfirm">
     <template #message="slotProps">
       <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
         <div>
@@ -219,7 +280,7 @@
         <div class="flex flex-column gap-3 p-3">
           <div>Do you want to delete this model ?</div>
           <div>Name: {{ slotProps.message.data.name }}</div>
-          <div>
+          <div v-if="nameModel === 'definition'">
             Type:
             <Tag
               :value="slotProps.message.data.modeltype"
@@ -303,35 +364,6 @@ const groupedByFirstLetter = (arr) => {
   }, {});
 };
 
-// dynamicMapping
-const dynamicMapping = ref();
-const getDynamicMappingList = async () => {
-  try {
-    const res = await api.getGlobalDynamicModelMappingList(globaldefinitionId.value, 1);
-    let data = res.data.items;
-    if (res.data.total > pageRowNumber.value) {
-      for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
-        const page = Math.floor(row / 10) + 1;
-        if (page === 1) {
-          continue;
-        }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList(globaldefinitionId.value, page);
-        data = data.concat(resPgae.data.items);
-      }
-    }
-    dynamicMapping.value = data;
-  } catch (error) {
-    console.error('setGlobaldefinitionList error', error);
-  }
-};
-
-const getSeverityModelType = (type) => {
-  const isTraditionalType = Object.entries(api.TypeGlobalDynamicModelDefinition.Traditional).find(
-    ([key, value]) => value === type,
-  )?.[0];
-  return isTraditionalType ? 'info' : 'primary';
-};
-
 // --- dynamicDefinition - CRUD ---
 
 //  create
@@ -376,7 +408,7 @@ const createDynamicDefinition = async () => {
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
     definitionVisibleDialog.value = false;
   } catch (error) {
-    console.log('createGlobalDynamicModelDefinitionList error', error);
+    console.log('createDynamicDefinition error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
@@ -399,23 +431,29 @@ const updateDynamicDefinition = async () => {
     definitionVisibleDialog.value = false;
     getDynamicDefinitionList();
   } catch (error) {
-    console.log('editGlobalDynamicModelDefinitionList error', error);
+    console.log('updateDynamicDefinition error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 
-const confirmDeleteDynamicDefinition = (data) => {
+const confirmDeleteDynamic = (data, type = 'definition') => {
   confirm.require({
-    group: 'dynamicDefinition',
+    group: 'deleteConfirm',
     data: data,
-    header: 'Global Dynamic Model Definition',
+    header: type === 'definition' ? 'Global Dynamic Model Definition' : 'Global Dynamic Model Mapping',
+    nameModel: type,
     icon: 'pi pi-info-circle',
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     rejectClass: 'p-button-secondary p-button-outlined',
     acceptClass: 'p-button-danger',
     accept: () => {
-      deleteDynamicDefinition(data._id);
+      if (type === 'definition') {
+        deleteDynamicDefinition(data._id);
+      }
+      if (type === 'mapping') {
+        deleteDynamicMapping(data._id);
+      }
     },
     reject: () => {},
   });
@@ -427,7 +465,124 @@ const deleteDynamicDefinition = async (dynamicDefinition_id) => {
     toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
     getDynamicDefinitionList();
   } catch (error) {
-    console.log('editGlobalDynamicModelDefinitionList error', error);
+    console.log('deleteDynamicDefinition error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// ------- dynamicMapping
+const dynamicMapping = ref();
+const getDynamicMappingList = async () => {
+  try {
+    const res = await api.getGlobalDynamicModelMappingList(globaldefinitionId.value, 1);
+    let data = res.data.items;
+    if (res.data.total > pageRowNumber.value) {
+      for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
+        const page = Math.floor(row / 10) + 1;
+        if (page === 1) {
+          continue;
+        }
+        const resPgae = await api.getGlobalDynamicModelDefinitionList(globaldefinitionId.value, page);
+        data = data.concat(resPgae.data.items);
+      }
+    }
+    dynamicMapping.value = data;
+  } catch (error) {
+    console.error('getDynamicMappingList error', error);
+  }
+};
+
+const getSeverityModelType = (type) => {
+  const isTraditionalType = Object.entries(api.TypeGlobalDynamicModelDefinition.Traditional).find(
+    ([key, value]) => value === type,
+  )?.[0];
+  return isTraditionalType ? 'info' : 'primary';
+};
+
+// ------- CRUD -  dynamicMapping
+const mappingVisibleDialog = ref(false);
+const mappingData = ref();
+
+const handleChangeMapping = () => {
+  if (modeChange.value === 'create') {
+    createDynamicMapping();
+  }
+  if (modeChange.value === 'update') {
+    updateDynamicMapping();
+  }
+};
+
+const globalDynamicModelDefinitionOpts = computed(() => {
+  const opts = [];
+  if (dynamicDefinition.value) {
+    for (let index = 0; index < dynamicDefinition.value.length; index++) {
+      const model = dynamicDefinition.value[index];
+      opts.push({
+        name: model.name,
+        value: model._id,
+      });
+    }
+  }
+
+  return opts;
+});
+
+const handleCreateDynamicMapping = () => {
+  mappingData.value = {
+    name: '',
+    globalDynamicModelDefinitionId: '',
+    mapOrder: [],
+  };
+
+  mappingVisibleDialog.value = true;
+  modeChange.value = 'create';
+};
+
+const createDynamicMapping = async () => {
+  try {
+    const res = await api.createGlobalDynamicModelMappingList(globaldefinitionId.value, {
+      name: mappingData.value.name,
+      globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
+      mapOrder: mappingData.value.mapOrder,
+    });
+    dynamicMapping.value.unshift(res.data);
+    toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
+    mappingVisibleDialog.value = false;
+  } catch (error) {
+    console.log('createDynamicMapping error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const handleUpdateDynamicMapping = (data) => {
+  mappingData.value = JSON.parse(JSON.stringify(data));
+
+  mappingVisibleDialog.value = true;
+  modeChange.value = 'update';
+};
+const updateDynamicMapping = async () => {
+  try {
+    const res = await api.updateGlobalDynamicModelMapping(globaldefinitionId.value, mappingData.value._id, {
+      name: mappingData.value.name,
+      globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
+      mapOrder: mappingData.value.mapOrder,
+    });
+    toast.add({ severity: 'success', summary: 'Update Successfully', detail: res.message, life: 3000 });
+    mappingVisibleDialog.value = false;
+    getDynamicMappingList();
+  } catch (error) {
+    console.log('updateDynamicMapping error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const deleteDynamicMapping = async (mapping_id) => {
+  try {
+    const res = await api.deleteGlobalDynamicModelMapping(globaldefinitionId.value, mapping_id);
+    toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
+    getDynamicMappingList();
+  } catch (error) {
+    console.log('deleteDynamicMapping error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };

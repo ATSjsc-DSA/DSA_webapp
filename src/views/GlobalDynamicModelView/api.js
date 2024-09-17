@@ -7,10 +7,10 @@ export default class api {
       Generator: 'Generator',
       Excitation: 'Excitation ',
       Governor: 'Governor',
-      Generic: 'Generic',
+      Stabilizer: 'Stabilizer',
     },
     Renews: {
-      Stabilizer: 'Stabilizer',
+      Generic: 'Generic',
       Renewable: 'Renewable',
       PlanControl: 'PlanControl',
       DriveTrain: 'DriveTrain',
@@ -42,5 +42,17 @@ export default class api {
     return get(`/common/${globaldefinition_id}/globaldynamicmodelmapping`, {
       page: page,
     });
+  }
+
+  static async createGlobalDynamicModelMappingList(globalMapping_id, data) {
+    return post(`/common/${globalMapping_id}/globaldynamicmodelmapping`, data);
+  }
+
+  static async updateGlobalDynamicModelMapping(globalMapping_id, dynamicMapping_id, data) {
+    return put(`/common/${globalMapping_id}/globaldynamicmodelmapping/${dynamicMapping_id}`, data);
+  }
+
+  static async deleteGlobalDynamicModelMapping(globalMapping_id, dynamicMapping_id) {
+    return _delete(`/common/${globalMapping_id}/globaldynamicmodelmapping/${dynamicMapping_id}`);
   }
 }
