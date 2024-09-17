@@ -194,7 +194,6 @@ const editData = ref();
 const handleEdit = (data) => {
   editData.value = data;
   editVisibleDialog.value = true;
-  console.log('editData.value', editData.value);
 };
 const editGlobaldefinition = async () => {
   try {

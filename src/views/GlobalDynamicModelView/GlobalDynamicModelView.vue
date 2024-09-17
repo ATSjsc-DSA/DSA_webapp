@@ -8,13 +8,13 @@
 
     <TabView>
       <TabPanel header=" Global Dynamic Model Definition">
-        <DataTable :value="dynamicDefinintion" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
+        <DataTable :value="dynamicDefinition" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
           <template #header>
             <div class="flex justify-content-end gap-3">
               <Button type="button" label="Import" icon="pi pi-upload" severity="secondary" />
               <Button type="button" label="Export" icon="pi pi-download" severity="secondary" />
               <Divider layout="vertical" />
-              <Button type="button" label="Create " icon="pi pi-plus" text />
+              <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicDefinition" />
             </div>
           </template>
 
@@ -70,17 +70,39 @@
             </template>
           </Column>
 
-          <Column field="createdTimestamp" header="Created At">
+          <Column field="createdTimestamp" header="Created At" sortable>
             <template #body="{ data }">
               <div class="flex justify-content-between">
                 {{ convertDateTimeToString(data.createdTimestamp) }}
               </div>
             </template>
           </Column>
-          <Column field="modifiedTimestamp" header="Modified At">
+          <Column field="modifiedTimestamp" header="Modified At" sortable>
             <template #body="{ data }">
               <div class="flex justify-content-between">
                 {{ convertDateTimeToString(data.modifiedTimestamp) }}
+              </div>
+            </template>
+          </Column>
+
+          <Column style="width: 1%; min-width: 5rem">
+            <template #body="{ data }">
+              <div class="flex justify-content-between">
+                <Button
+                  icon="pi pi-pencil"
+                  severity="success"
+                  text
+                  rounded
+                  @click="handleUpdateDynamicDefinition(data)"
+                />
+
+                <Button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  rounded
+                  @click="confirmDeleteDynamicDefinition(data)"
+                />
               </div>
             </template>
           </Column>
@@ -99,7 +121,7 @@
           <Column field="globalDynamicModelDefitionId" header=" Dynamic Defition">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                {{ getNameDynamicDefinintionFromId(data.globalDynamicModelDefitionId) }}
+                {{ getNameDynamicDefinitionFromId(data.globalDynamicModelDefitionId) }}
               </div>
             </template>
           </Column>
@@ -130,13 +152,8 @@
     </TabView>
   </div>
 
-  <!-- dynamicDefinintion - create dialog -->
-  <Dialog
-    v-model:visible="createDefinintionVisibleDialog"
-    :style="{ width: '28rem' }"
-    header="Create New "
-    :modal="true"
-  >
+  <!-- dynamicDefinition - create dialog -->
+  <Dialog v-model:visible="definitionVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Global Dynamic Model Definition</span>
@@ -144,15 +161,15 @@
     </template>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="Name" class="font-semibold w-6rem"> Name</label>
-      <InputText id="Name" v-model="createDefinintionData.name" class="flex-auto" autocomplete="off" />
+      <InputText id="Name" v-model="definitionData.name" class="flex-auto" autocomplete="off" />
     </div>
 
     <div class="flex align-items-center gap-3 mb-3">
       <label for="modeltype" class="font-semibold w-6rem"> Type</label>
 
       <Dropdown
-        v-model="createDefinintionData.modeltype"
-        :options="definintionTypeOptions"
+        v-model="definitionData.modeltype"
+        :options="definitionTypeOptions"
         optionGroupLabel="label"
         optionGroupChildren="items"
         placeholder="Select a Type"
@@ -173,27 +190,46 @@
         </template>
       </Dropdown>
     </div>
-
     <div class="flex align-items-start gap-3 mb-3">
       <label for="values" class="font-semibold w-6rem"> Values</label>
-      <div class="">
-        <Chips id="values" v-model="createDefinintionData.values" style="width: 250px" autocomplete="off" />
+      <div class="block flex-grow-1">
+        <Chips id="values" v-model="definitionData.values" class="w-full" autocomplete="off" />
         <div class="p-1">
           <small>Press Enter to Add.</small>
         </div>
       </div>
     </div>
-    <pre></pre>
     <template #footer>
-      <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="definitionVisibleDialog = false"></Button>
       <Button
         type="button"
         label="Save"
-        :disabled="!(createDefinintionData.name && createDefinintionData.modeltype)"
-        @click="createGlobaldefinition()"
+        :disabled="!(definitionData.name && definitionData.modeltype)"
+        @click="handleChangeDefinition()"
       ></Button>
     </template>
   </Dialog>
+
+  <ConfirmDialog group="dynamicDefinition">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div>Do you want to delete this model ?</div>
+          <div>Name: {{ slotProps.message.data.name }}</div>
+          <div>
+            Type:
+            <Tag
+              :value="slotProps.message.data.modeltype"
+              :severity="getSeverityModelType(slotProps.message.data.modeltype)"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
 </template>
 
 <script setup>
@@ -202,39 +238,36 @@ import chartComposable from '@/combosables/chartData';
 import api from './api';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
 import Dropdown from 'primevue/dropdown';
-import Textarea from 'primevue/textarea';
+import ConfirmDialog from 'primevue/confirmdialog';
 
-import { useCommonStore } from '@/store';
 import { useRoute } from 'vue-router';
-import { Background } from '@vue-flow/background';
 const route = useRoute();
 
+import { useConfirm } from 'primevue/useconfirm';
+const confirm = useConfirm();
 const { convertDateTimeToString } = chartComposable();
 const toast = useToast();
-const confirm = useConfirm();
-const commonStore = useCommonStore();
 
 onMounted(async () => {
-  await getDynamicDefinintionList();
+  await getDynamicDefinitionList();
   await getDynamicMappingList();
 });
 
 watch(
   () => route.params.id,
   (newId, oldId) => {
-    // react to route changes...
+    globaldefinitionId.value = newId;
   },
 );
 // --- Get data
 const globaldefinitionId = ref(route.params.id);
 const pageRowNumber = ref(10);
 
-// dynamicDefinintion
-const dynamicDefinintion = ref();
+// dynamicDefinition
+const dynamicDefinition = ref();
 const isGroupedValueByFirstLetter = ref(false);
-const getDynamicDefinintionList = async () => {
+const getDynamicDefinitionList = async () => {
   try {
     const res = await api.getGlobalDynamicModelDefinitionList(globaldefinitionId.value, 1);
     let data = res.data.items;
@@ -248,15 +281,15 @@ const getDynamicDefinintionList = async () => {
         data = data.concat(resPgae.data.items);
       }
     }
-    dynamicDefinintion.value = data;
+    dynamicDefinition.value = data;
   } catch (error) {
     console.error('setGlobaldefinitionList error', error);
   }
 };
 
-const getNameDynamicDefinintionFromId = (id) => {
-  const dynamicDefinintionData = dynamicDefinintion.value.filter((val) => val._id === id)[0];
-  return dynamicDefinintionData ? dynamicDefinintionData.name : '';
+const getNameDynamicDefinitionFromId = (id) => {
+  const dynamicDefinitionData = dynamicDefinition.value.filter((val) => val._id === id)[0];
+  return dynamicDefinitionData ? dynamicDefinitionData.name : '';
 };
 
 const groupedByFirstLetter = (arr) => {
@@ -299,17 +332,32 @@ const getSeverityModelType = (type) => {
   return isTraditionalType ? 'info' : 'primary';
 };
 
-// --- dynamicDefinintion - CRUD ---
+// --- dynamicDefinition - CRUD ---
 
 //  create
-const createDefinintionVisibleDialog = ref(false);
-const createDefinintionData = ref({
-  name: '',
-  modeltype: '',
-  values: [],
-});
+const definitionVisibleDialog = ref(false);
+const definitionData = ref();
+const modeChange = ref();
 
-const definintionTypeOptions = computed(() => [
+const handleChangeDefinition = () => {
+  if (modeChange.value === 'create') {
+    createDynamicDefinition();
+  }
+  if (modeChange.value === 'update') {
+    updateDynamicDefinition();
+  }
+};
+const handleCreateDynamicDefinition = () => {
+  definitionData.value = {
+    name: '',
+    modeltype: '',
+    values: [],
+  };
+  definitionVisibleDialog.value = true;
+  modeChange.value = 'create';
+};
+
+const definitionTypeOptions = computed(() => [
   {
     label: 'Traditional',
     code: 'tra',
@@ -321,14 +369,65 @@ const definintionTypeOptions = computed(() => [
     items: Object.values(api.TypeGlobalDynamicModelDefinition.Renews),
   },
 ]);
-const createGlobaldefinition = async () => {
+const createDynamicDefinition = async () => {
   try {
-    const res = await api.createGlobalDynamicModelDefinitionList(globaldefinitionId.value, createDefinintionData.value);
-    getDynamicDefinintionList();
+    const res = await api.createGlobalDynamicModelDefinitionList(globaldefinitionId.value, definitionData.value);
+    dynamicDefinition.value.unshift(res.data);
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
-    createDefinintionVisibleDialog.value = false;
+    definitionVisibleDialog.value = false;
   } catch (error) {
     console.log('createGlobalDynamicModelDefinitionList error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+//  edit
+
+const handleUpdateDynamicDefinition = (data) => {
+  definitionData.value = JSON.parse(JSON.stringify(data));
+  definitionVisibleDialog.value = true;
+  modeChange.value = 'update';
+};
+const updateDynamicDefinition = async () => {
+  try {
+    const res = await api.updateGlobalDynamicModelDefinition(globaldefinitionId.value, definitionData.value._id, {
+      name: definitionData.value.name,
+      modeltype: definitionData.value.modeltype,
+      values: definitionData.value.values,
+    });
+    toast.add({ severity: 'success', summary: 'Update Successfully', detail: res.message, life: 3000 });
+    definitionVisibleDialog.value = false;
+    getDynamicDefinitionList();
+  } catch (error) {
+    console.log('editGlobalDynamicModelDefinitionList error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDeleteDynamicDefinition = (data) => {
+  confirm.require({
+    group: 'dynamicDefinition',
+    data: data,
+    header: 'Global Dynamic Model Definition',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    accept: () => {
+      deleteDynamicDefinition(data._id);
+    },
+    reject: () => {},
+  });
+};
+
+const deleteDynamicDefinition = async (dynamicDefinition_id) => {
+  try {
+    const res = await api.deleteGlobalDynamicModelDefinition(globaldefinitionId.value, dynamicDefinition_id);
+    toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
+    getDynamicDefinitionList();
+  } catch (error) {
+    console.log('editGlobalDynamicModelDefinitionList error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
@@ -336,6 +435,6 @@ const createGlobaldefinition = async () => {
 
 <style>
 .p-chips ul {
-  width: 250px;
+  width: 100%;
 }
 </style>

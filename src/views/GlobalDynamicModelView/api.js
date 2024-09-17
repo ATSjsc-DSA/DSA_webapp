@@ -29,6 +29,14 @@ export default class api {
     return post(`/common/${globaldefinition_id}/globaldynamicmodeldefinition`, data);
   }
 
+  static async updateGlobalDynamicModelDefinition(globaldefinition_id, dynamicDefinition_id, data) {
+    return put(`/common/${globaldefinition_id}/globaldynamicmodeldefinition/${dynamicDefinition_id}`, data);
+  }
+
+  static async deleteGlobalDynamicModelDefinition(globaldefinition_id, dynamicDefinition_id) {
+    return _delete(`/common/${globaldefinition_id}/globaldynamicmodeldefinition/${dynamicDefinition_id}`);
+  }
+
   //  Dynamic Mapping;
   static async getGlobalDynamicModelMappingList(globaldefinition_id, page = 1) {
     return get(`/common/${globaldefinition_id}/globaldynamicmodelmapping`, {
