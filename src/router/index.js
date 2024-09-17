@@ -109,9 +109,20 @@ const router = createRouter({
         title: 'Global Definition',
       },
       path: '/globaldefinition',
-      name: 'Global Definition',
-      component: () => import('@/views/GlobalDefinitionView/GlobalDefinitionView.vue'),
+      children: [
+        {
+          name: 'Global Definition',
+          path: '',
+          component: () => import('@/views/GlobalDefinitionView/GlobalDefinitionView.vue'),
+        },
+        {
+          path: ':id',
+          name: 'Global Dynamic Model',
+          component: () => import('@/views/GlobalDynamicModelView/GlobalDynamicModelView.vue'),
+        },
+      ],
     },
+
     {
       meta: {
         title: 'Login',
@@ -120,6 +131,7 @@ const router = createRouter({
       name: 'Login',
       component: () => import('@/views/LoginView.vue'),
     },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: '<h1>Hello App!</h1>' },
   ],
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { top: 0 };
