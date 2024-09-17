@@ -9,8 +9,16 @@
     <TabView>
       <TabPanel header=" Global Dynamic Model Definition">
         <DataTable :value="dynamicDefinintion" tableStyle="min-width: 50rem">
-          <Column field="name" header="Name"></Column>
+          <template #header>
+            <div class="flex justify-content-end gap-3">
+              <Button type="button" label="Import" icon="pi pi-upload" severity="secondary" />
+              <Button type="button" label="Export" icon="pi pi-download" severity="secondary" />
+              <Divider layout="vertical" />
+              <Button type="button" label="Create " icon="pi pi-plus" text />
+            </div>
+          </template>
 
+          <Column field="name" header="Name" sortable></Column>
           <Column field="modeltype" header="Type">
             <template #body="{ data }">
               <div class="flex justify-content-between">
@@ -18,11 +26,47 @@
               </div>
             </template>
           </Column>
-          <Column header="Values">
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                {{ data.values }}
+          <Column style="width: 50%">
+            <template #header>
+              <div
+                class="flex justify-content-start w-full gap-3 align-items-center"
+                @click="isGroupedValueByFirstLetter = !isGroupedValueByFirstLetter"
+              >
+                <div>Values</div>
+                <div>
+                  <Button
+                    type="button"
+                    :icon="isGroupedValueByFirstLetter ? 'pi pi-sort-alpha-down' : 'pi pi-sort-alt-slash'"
+                    :severity="isGroupedValueByFirstLetter ? 'primary' : 'secondary'"
+                    text
+                  />
+                </div>
               </div>
+            </template>
+
+            <template #body="{ data }">
+              <template v-if="isGroupedValueByFirstLetter">
+                <div
+                  v-for="(letterArr, key, index) in groupedByFirstLetter(data.values)"
+                  :key="key"
+                  class="py-2 m-1 border-round-sm"
+                  :style="{ backgroundColor: index % 2 === 0 ? 'var(--surface-50)' : 'var(--surface-0)' }"
+                >
+                  {{ letterArr.join(', ') }}
+                </div>
+              </template>
+              <template v-else>
+                <div class="flex flex-wrap">
+                  <div
+                    v-for="(val, index) in data.values.sort()"
+                    :key="val"
+                    class="px-2 m-1 border-round-sm"
+                    :style="{ backgroundColor: index % 2 === 0 ? 'var(--surface-50)' : 'var(--surface-0)' }"
+                  >
+                    {{ val }}
+                  </div>
+                </div>
+              </template>
             </template>
           </Column>
 
@@ -45,7 +89,12 @@
 
       <TabPanel header=" Global Dynamic Model Mapping">
         <DataTable :value="dynamicMapping" tableStyle="min-width: 50rem">
-          <Column field="name" header="Name"></Column>
+          <template #header>
+            <div class="flex justify-content-end gap-3">
+              <Button type="button" label="Create " icon="pi pi-plus" text />
+            </div>
+          </template>
+          <Column field="name" header="Name" sortable></Column>
 
           <Column field="globalDynamicModelDefitionId" header=" Dynamic Defition">
             <template #body="{ data }">
@@ -57,7 +106,7 @@
           <Column header="Values">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                {{ data.mapOrder }}
+                {{ data.mapOrder.join(', ') }}
               </div>
             </template>
           </Column>
@@ -92,17 +141,17 @@ import { useConfirm } from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useCommonStore } from '@/store';
 import { useRoute } from 'vue-router';
+import { Background } from '@vue-flow/background';
 const route = useRoute();
 
 const { convertDateTimeToString } = chartComposable();
 const toast = useToast();
 const confirm = useConfirm();
 const commonStore = useCommonStore();
-const { projectData } = storeToRefs(commonStore);
 
 onMounted(async () => {
-  await setDynamicDefinintion(globaldefinitionId.value);
-  await setDynamicMapping(globaldefinitionId.value);
+  await getDynamicDefinintion(globaldefinitionId.value);
+  await getDynamicMapping(globaldefinitionId.value);
 });
 
 watch(
@@ -111,14 +160,14 @@ watch(
     // react to route changes...
   },
 );
-// --- EDIT
+// --- Get data
 const globaldefinitionId = ref(route.params.id);
-
-const dynamicDefinintion = ref();
-const dynamicMapping = ref();
 const pageRowNumber = ref(10);
 
-const setDynamicDefinintion = async (globaldefinition_id) => {
+// dynamicDefinintion
+const dynamicDefinintion = ref();
+const isGroupedValueByFirstLetter = ref(false);
+const getDynamicDefinintion = async (globaldefinition_id) => {
   try {
     const res = await api.getGlobalDynamicModelDefinitionList(globaldefinition_id, 1);
     let data = res.data.items;
@@ -143,7 +192,20 @@ const getNameDynamicDefinintionFromId = (id) => {
   return dynamicDefinintionData ? dynamicDefinintionData.name : '';
 };
 
-const setDynamicMapping = async (globaldefinition_id) => {
+const groupedByFirstLetter = (arr) => {
+  return arr.reduce((acc, word) => {
+    const firstLetter = word[0].toLowerCase();
+    if (!acc[firstLetter]) {
+      acc[firstLetter] = [];
+    }
+    acc[firstLetter].push(word);
+    return acc;
+  }, {});
+};
+
+// dynamicMapping
+const dynamicMapping = ref();
+const getDynamicMapping = async (globaldefinition_id) => {
   try {
     const res = await api.getGlobalDynamicModelMappingList(globaldefinition_id, 1);
     let data = res.data.items;
@@ -161,10 +223,6 @@ const setDynamicMapping = async (globaldefinition_id) => {
   } catch (error) {
     console.error('setGlobaldefinitionList error', error);
   }
-};
-
-const editGlobaldefinition = () => {
-  toast.add({ severity: 'success', summary: 'Update Global definition', detail: 'this is for test', life: 3000 });
 };
 
 const getSeverityModelType = (type) => {
