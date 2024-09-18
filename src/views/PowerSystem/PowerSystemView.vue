@@ -94,7 +94,7 @@
             <Card style="height: 100%">
               <!-- ps table -  header: tab & filter  -->
               <template #title>
-                <div class="flex gap-2 justify-content-between align-items-center">
+                <div class="flex gap-2 justify-content-between align-items-center flex-wrap 2xl:flex-nowrap">
                   <!-- tab -->
                   <div class="flex gap-2 justify-content-start">
                     <div class="flex gap-2 justify-content-start">
@@ -102,14 +102,15 @@
                       <Button label="EMS" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
                       <Button label="PSSE" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
                       <Button label="Scada" class="" :text="tabMenuPSActive !== 3" @click="tabMenuPSActive = 3" />
+                      <Button label="Dynamic" class="" :text="tabMenuPSActive !== 4" @click="tabMenuPSActive = 4" />
                     </div>
                   </div>
 
                   <template v-if="showDefinitionList">
                     <Divider layout="vertical" />
                     <!-- filter -->
-                    <div class="flex-grow-1 flex gap-2 justify-content-between">
-                      <FloatLabel class="w-full md:w-34rem">
+                    <div class="flex gap-2 justify-content-start flex-wrap 2xl:flex-nowrap">
+                      <FloatLabel class="w-8rem 2xl:w-16rem">
                         <label for="filter-area">Area</label>
                         <Dropdown
                           v-model="areaSelected"
@@ -124,12 +125,12 @@
                             showLoader: true,
                           }"
                           :disabled="!canUseDefinitionFilter"
-                          class="w-full md:w-34rem"
+                          class="w-full"
                         >
                           <template #value="slotProps">
                             <div class="flex align-items-center">
                               <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Select a Area</div>
+                              <div v-else>Area</div>
                             </div>
                           </template>
                           <template v-slot:option="slotProps">
@@ -146,7 +147,7 @@
                         </Dropdown>
                       </FloatLabel>
 
-                      <FloatLabel class="w-full md:w-34rem">
+                      <FloatLabel class="w-8rem 2xl:w-16rem">
                         <label for="filter-zone">Zone</label>
                         <Dropdown
                           v-model="zoneSelected"
@@ -161,12 +162,12 @@
                             showLoader: true,
                           }"
                           :disabled="!canUseDefinitionFilter"
-                          class="w-full md:w-34rem"
+                          class="w-full"
                         >
                           <template #value="slotProps">
                             <div class="flex align-items-center">
                               <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Select a Zone</div>
+                              <div v-else>Zone</div>
                             </div>
                           </template>
                           <template v-slot:option="slotProps">
@@ -183,7 +184,7 @@
                         </Dropdown>
                       </FloatLabel>
 
-                      <FloatLabel class="w-full md:w-34rem">
+                      <FloatLabel class="w-8rem 2xl:w-16rem">
                         <label for="filter-owner">Owner</label>
                         <Dropdown
                           v-model="ownerSelected"
@@ -198,12 +199,12 @@
                             showLoader: true,
                           }"
                           :disabled="!canUseDefinitionFilter"
-                          class="w-full md:w-34rem"
+                          class="w-full"
                         >
                           <template #value="slotProps">
                             <div class="flex align-items-center">
                               <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Select a Owner</div>
+                              <div v-else>Owner</div>
                             </div>
                           </template>
                           <template v-slot:option="slotProps">
@@ -219,9 +220,10 @@
                           </template>
                         </Dropdown>
                       </FloatLabel>
+
                       <Divider type="solid" layout="vertical" />
 
-                      <FloatLabel class="w-full md:w-34rem">
+                      <FloatLabel class="w-10rem 2xl:w-16rem">
                         <label for="filter-sub">Substation</label>
                         <Dropdown
                           v-model="subSelected"
@@ -238,12 +240,12 @@
                           :disabled="
                             !canUseDefinitionFilter || subList.length === 0 || definitionSelected.name === 'Substation'
                           "
-                          class="w-full md:w-34rem"
+                          class="w-full"
                         >
                           <template #value="slotProps">
                             <div class="flex align-items-center">
                               <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Select a Substation</div>
+                              <div v-else>Substation</div>
                             </div>
                           </template>
                           <template v-slot:option="slotProps">
@@ -345,13 +347,16 @@
                         @deleteData="deletePSE"
                       />
                     </TabPanel>
+                    <TabPanel>
+                      <dynamicDefinitionTabWidget :data="dynamicModelList" :loading="isLoadingPsData" />
+                    </TabPanel>
                   </TabView>
                 </div>
               </template>
 
               <!-- ps table - Paginator -->
               <template #footer>
-                <div class="flex justify-content-end align-items-center">
+                <div v-if="tabMenuPSActive > 4" class="flex justify-content-end align-items-center">
                   <Paginator
                     v-if="psDataListLength > psPageRowNumber"
                     v-model:first="offset"
@@ -482,12 +487,12 @@ import Dropdown from 'primevue/dropdown';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import generalTabWidget from './generalTabWidget.vue';
-import engineInfoTabWidget from './engineInfoTabWidget.vue';
-
-import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
+import generalTabWidget from './generalTabWidget.vue';
+import engineInfoTabWidget from './engineInfoTabWidget.vue';
+import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
+import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
 
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
@@ -499,7 +504,8 @@ const toast = useToast();
 const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
 
-const versionId = ref('66decf1dcff005199529524b');
+const projectVersionId = ref('66decf1dcff005199529524b');
+const additionVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 onMounted(async () => {
   loadAllData();
@@ -578,6 +584,9 @@ const handleDefinitionRowClick = async (definition) => {
   zoneSelected.value = undefined;
   ownerSelected.value = undefined;
   subSelected.value = undefined;
+  if (definition.name === 'Generator') {
+    getDynamicModelList();
+  }
 };
 
 const setDefinitionData = async (id) => {
@@ -622,7 +631,7 @@ const definitionSub = ref();
 const resetFilterList = async () => {
   definitionArea.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'area')[0];
   if (definitionArea.value) {
-    const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, 1, {});
+    const areaFilterLength = await api.getPsDataWithDefinition(definitionArea.value._id, projectVersionId.value, 1, {});
     areaList.value = Array.from({ length: areaFilterLength.data.total || 0 });
   } else {
     areaList.value = [];
@@ -630,7 +639,7 @@ const resetFilterList = async () => {
 
   definitionZone.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'zone')[0];
   if (definitionZone.value) {
-    const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, 1, {});
+    const zoneFilterLength = await api.getPsDataWithDefinition(definitionZone.value._id, projectVersionId.value, 1, {});
     zoneList.value = Array.from({ length: zoneFilterLength.data.total || 0 });
   } else {
     zoneList.value = [];
@@ -638,7 +647,12 @@ const resetFilterList = async () => {
   definitionOwner.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'owner')[0];
 
   if (definitionArea.value) {
-    const ownerFilterLength = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, 1, {});
+    const ownerFilterLength = await api.getPsDataWithDefinition(
+      definitionOwner.value._id,
+      projectVersionId.value,
+      1,
+      {},
+    );
     ownerList.value = Array.from({ length: ownerFilterLength.data.total || 0 });
   } else {
     ownerList.value = [];
@@ -658,7 +672,7 @@ const onLazyLoadArea = async (event) => {
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
 
-    const resData = await api.getPsDataWithDefinition(definitionArea.value._id, versionId.value, page, {});
+    const resData = await api.getPsDataWithDefinition(definitionArea.value._id, projectVersionId.value, page, {});
     if (!resData.data.items) {
       break;
     }
@@ -679,7 +693,7 @@ const onLazyLoadZone = async (event) => {
   const _items = [...zoneList.value];
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
-    const resData = await api.getPsDataWithDefinition(definitionZone.value._id, versionId.value, page, {});
+    const resData = await api.getPsDataWithDefinition(definitionZone.value._id, projectVersionId.value, page, {});
     if (!resData.data.items) {
       break;
     }
@@ -700,7 +714,7 @@ const onLazyLoadOwner = async (event) => {
   const _items = [...ownerList.value];
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
-    const resData = await api.getPsDataWithDefinition(definitionOwner.value._id, versionId.value, page, {});
+    const resData = await api.getPsDataWithDefinition(definitionOwner.value._id, projectVersionId.value, page, {});
     if (!resData.data.items) {
       break;
     }
@@ -739,15 +753,15 @@ const onLazyLoadSubstation = async (event) => {
   const _items = [...subList.value];
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
-    const resData = await getPsDataWithDefinitionFilter('Substation', page);
-    if (!resData.data.items) {
+    const res = await getPsDataWithDefinitionFilter('Substation', page);
+    if (!res.items) {
       break;
     }
-    for (let i = 0; i < resData.items.length; i++) {
-      if (!resData.items[i].generalInfo) {
+    for (let i = 0; i < res.items.length; i++) {
+      if (!res.items[i].generalInfo) {
         break;
       }
-      _items[row + i] = { label: resData.items[i].generalInfo.name, _id: resData.items[i]._id };
+      _items[row + i] = { label: res.items[i].generalInfo.name, _id: res.items[i]._id };
     }
   }
   subList.value = _items;
@@ -770,7 +784,7 @@ const getPsDataWithDefinitionFilter = async (nameFilter, page = 1) => {
         data.sub = undefined;
       }
     }
-    const res = await api.getPsDataWithDefinition(definition._id, versionId.value, page, data);
+    const res = await api.getPsDataWithDefinition(definition._id, projectVersionId.value, page, data);
     return res.data;
   } catch (error) {
     console.log('getDefinitionFilterData: error ', error);
@@ -822,7 +836,7 @@ const onNodeExpand = async (node) => {
 
 const getLeaf = async (parentId) => {
   try {
-    const childData = await api.getChildOnPs(parentId, versionId.value);
+    const childData = await api.getChildOnPs(parentId, projectVersionId.value);
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
@@ -863,7 +877,7 @@ const setPsDataWithTree = async (getHeader = false, hasChilded = false, engineCl
     parentId = parentNodeSelected.value;
   }
   try {
-    const res = await api.getPsDataWithTree(pseId.value, versionId.value, psCurrentPage.value, parentId);
+    const res = await api.getPsDataWithTree(pseId.value, projectVersionId.value, psCurrentPage.value, parentId);
     psData.value = res.data.items;
     psDataListLength.value = res.data.total;
 
@@ -973,7 +987,7 @@ const handleCreatePS = () => {
 };
 const createPS = async () => {
   try {
-    await api.createPS(psCreate.value, versionId.value);
+    await api.createPS(psCreate.value, projectVersionId.value);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     reloadPsData();
@@ -985,7 +999,7 @@ const createPS = async () => {
 // Edit
 const editPSE = async (pseUpdate) => {
   try {
-    await api.editPSE(pseUpdate, versionId.value);
+    await api.editPSE(pseUpdate, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     // reloadData();
   } catch (error) {
@@ -997,7 +1011,7 @@ const editPSE = async (pseUpdate) => {
 // Delete
 const deletePSE = async (pseId) => {
   try {
-    await api.deletePSE(pseId, versionId.value);
+    await api.deletePSE(pseId, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     reloadPsData();
   } catch (error) {
@@ -1076,6 +1090,19 @@ const itemsMenuImportExport = computed(() => {
 
 const toggleMenuConfig = (event) => {
   menuImportExport.value.toggle(event);
+};
+
+// addition
+const dynamicModelList = ref([]);
+const getDynamicModelList = async () => {
+  try {
+    const res = await api.getDynamicModelList(additionVersionId.value);
+    dynamicModelList.value = res.data.items;
+  } catch (error) {
+    dynamicModelList.value = [];
+    console.log('getDynamicModelList: error ', error);
+    toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
+  }
 };
 </script>
 
