@@ -54,7 +54,7 @@
       <template #body="{ data }">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEdit(data)" />
-          <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDelete(data)" />
+          <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
         </div>
       </template>
     </Column>
@@ -383,12 +383,32 @@
       ></Button>
     </template>
   </Dialog>
+
+  <ConfirmDialog group="deleteConfirm">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div>Do you want to delete this model ?</div>
+          <div>Unique Id: {{ slotProps.message.data.powerSystemDataUniqueId }}</div>
+          <div>Type: {{ slotProps.message.data.modelType }}</div>
+          <div>Model Name: {{ slotProps.message.data.modelName }}</div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
 </template>
 
 <script setup>
 import { computed, onMounted, watch } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useConfirm } from 'primevue/useconfirm';
+const confirm = useConfirm();
 
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
 import additionApi from './additionApi';
@@ -726,7 +746,33 @@ watch(driveTrainModel, (newId) => {
 });
 
 const handleEdit = (data) => {};
-const handleDelete = (data) => {};
+const confirmDelete = (data) => {
+  confirm.require({
+    group: 'deleteConfirm',
+    data: data,
+    header: 'Dynamic Model Definition',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    accept: () => {
+      deleteDynamicModel(data.id);
+    },
+    reject: () => {},
+  });
+};
+
+const deleteDynamicModel = async (dynamicModel_id) => {
+  try {
+    await additionApi.deleteDynamicModel(additionVersionId.value, dynamicModel_id);
+    toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
+    getDynamicModelList();
+  } catch (error) {
+    console.log('deletePSE: error ', error);
+    toast.add({ severity: 'error', summary: 'Delete Power System', detail: error.data.detail, life: 3000 });
+  }
+};
 </script>
 <style>
 #psDynamicTable .frozen-column {
