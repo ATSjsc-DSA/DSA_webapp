@@ -1,5 +1,5 @@
 <template>
-  <div class="card layout-content m-4">
+  <div class="card layout-content w-full h-full">
     <Toast />
 
     <!-- this is for test  -->
@@ -11,8 +11,20 @@
         <DataTable :value="dynamicDefinition" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
           <template #header>
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Import" icon="pi pi-upload" severity="secondary" />
-              <Button type="button" label="Export" icon="pi pi-download" severity="secondary" />
+              <Button
+                type="button"
+                label="Import"
+                icon="pi pi-upload"
+                severity="secondary"
+                @click="handleImportDefinitionFile()"
+              />
+              <Button
+                type="button"
+                label="Export"
+                icon="pi pi-download"
+                severity="secondary"
+                @click="handleExportDefinitionFile()"
+              />
               <Divider layout="vertical" />
               <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicDefinition" />
             </div>
@@ -33,19 +45,19 @@
                 @click="isGroupedValueByFirstLetter = !isGroupedValueByFirstLetter"
               >
                 <div>Values</div>
-                <div>
+                <!-- <div>
                   <Button
                     type="button"
                     :icon="isGroupedValueByFirstLetter ? 'pi pi-sort-alt-slash' : 'pi pi-sort-alpha-down'"
                     :severity="isGroupedValueByFirstLetter ? 'secondary' : 'primary'"
                     text
                   />
-                </div>
+                </div> -->
               </div>
             </template>
 
             <template #body="{ data }">
-              <template v-if="isGroupedValueByFirstLetter">
+              <!-- <template v-if="isGroupedValueByFirstLetter">
                 <div
                   v-for="(letterArr, key, index) in groupedByFirstLetter(data.values)"
                   :key="key"
@@ -54,19 +66,19 @@
                 >
                   {{ letterArr.join(', ') }}
                 </div>
-              </template>
-              <template v-else>
-                <div class="flex flex-wrap">
-                  <div
-                    v-for="(val, index) in data.values.sort()"
-                    :key="val"
-                    class="px-2 m-1 border-round-sm"
-                    :style="{ backgroundColor: index % 2 === 0 ? 'var(--surface-50)' : 'var(--surface-0)' }"
-                  >
-                    {{ val }}
-                  </div>
+              </template> -->
+              <!-- <template> -->
+              <div class="flex flex-wrap">
+                <div
+                  v-for="(val, index) in data.values"
+                  :key="val"
+                  class="px-2 m-1 border-round-sm"
+                  :style="{ backgroundColor: index % 2 === 0 ? 'var(--surface-50)' : 'var(--surface-0)' }"
+                >
+                  {{ val }}
                 </div>
-              </template>
+              </div>
+              <!-- </template> -->
             </template>
           </Column>
 
@@ -113,6 +125,21 @@
         <DataTable :value="dynamicMapping" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
           <template #header>
             <div class="flex justify-content-end gap-3">
+              <Button
+                type="button"
+                label="Import"
+                icon="pi pi-upload"
+                severity="secondary"
+                @click="handleImportMappingFile"
+              />
+              <Button
+                type="button"
+                label="Export"
+                icon="pi pi-download"
+                severity="secondary"
+                @click="handleExportMappingFile()"
+              />
+              <Divider layout="vertical" />
               <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicMapping" />
             </div>
           </template>
@@ -121,7 +148,7 @@
           <Column field="globalDynamicModelDefinitionId" header=" Dynamic Definition">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                {{ getNameDynamicDefinitionFromId(data.globalDynamicModelDefinitionId) }}
+                <Chip :label="getNameDynamicDefinitionFromId(data.globalDynamicModelDefinitionId)"></Chip>
               </div>
             </template>
           </Column>
@@ -256,10 +283,6 @@
         <small>Press Enter to Add.</small>
       </div>
     </div>
-
-    <pre>
-      {{ mappingData }}
-    </pre>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="mappingVisibleDialog = false"></Button>
       <Button
@@ -291,6 +314,25 @@
       </div>
     </template>
   </ConfirmDialog>
+  <!-- upload file  -->
+  <Dialog
+    v-model:visible="uploadDialogGlobalDynamicDefinition"
+    @hide="onHide"
+    :style="{ width: '50rem' }"
+    header="Upload Dynamic Model Definition File"
+    :modal="true"
+  >
+    <uploadFileConfig @uploadFile="uploadGlobalDynamicModelFile"></uploadFileConfig>
+  </Dialog>
+  <Dialog
+    v-model:visible="uploadDialogGlobalDynamicMapping"
+    @hide="onHide"
+    :style="{ width: '50rem' }"
+    header="Upload Dynamic Model Mapping File"
+    :modal="true"
+  >
+    <uploadFileConfig @uploadFile="uploadGlobalDynamicModelMappingFile"></uploadFileConfig>
+  </Dialog>
 </template>
 
 <script setup>
@@ -301,6 +343,7 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import Dropdown from 'primevue/dropdown';
 import ConfirmDialog from 'primevue/confirmdialog';
+import uploadFileConfig from '../../components/uploadFileConfig.vue';
 
 import { useRoute } from 'vue-router';
 const route = useRoute();
@@ -330,7 +373,7 @@ const dynamicDefinition = ref();
 const isGroupedValueByFirstLetter = ref(false);
 const getDynamicDefinitionList = async () => {
   try {
-    const res = await api.getGlobalDynamicModelDefinitionList( 1);
+    const res = await api.getGlobalDynamicModelDefinitionList(1);
     let data = res.data.items;
     if (res.data.total > pageRowNumber.value) {
       for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
@@ -338,7 +381,7 @@ const getDynamicDefinitionList = async () => {
         if (page === 1) {
           continue;
         }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList( page);
+        const resPgae = await api.getGlobalDynamicModelDefinitionList(page);
         data = data.concat(resPgae.data.items);
       }
     }
@@ -403,7 +446,7 @@ const definitionTypeOptions = computed(() => [
 ]);
 const createDynamicDefinition = async () => {
   try {
-    const res = await api.createGlobalDynamicModelDefinitionList( definitionData.value);
+    const res = await api.createGlobalDynamicModelDefinitionList(definitionData.value);
     dynamicDefinition.value.unshift(res.data);
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
     definitionVisibleDialog.value = false;
@@ -422,7 +465,7 @@ const handleUpdateDynamicDefinition = (data) => {
 };
 const updateDynamicDefinition = async () => {
   try {
-    const res = await api.updateGlobalDynamicModelDefinition( definitionData.value._id, {
+    const res = await api.updateGlobalDynamicModelDefinition(definitionData.value._id, {
       name: definitionData.value.name,
       modeltype: definitionData.value.modeltype,
       values: definitionData.value.values,
@@ -461,7 +504,7 @@ const confirmDeleteDynamic = (data, type = 'definition') => {
 
 const deleteDynamicDefinition = async (dynamicDefinition_id) => {
   try {
-    const res = await api.deleteGlobalDynamicModelDefinition( dynamicDefinition_id);
+    const res = await api.deleteGlobalDynamicModelDefinition(dynamicDefinition_id);
     toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
     getDynamicDefinitionList();
   } catch (error) {
@@ -474,7 +517,7 @@ const deleteDynamicDefinition = async (dynamicDefinition_id) => {
 const dynamicMapping = ref();
 const getDynamicMappingList = async () => {
   try {
-    const res = await api.getGlobalDynamicModelMappingList( 1);
+    const res = await api.getGlobalDynamicModelMappingList(1);
     let data = res.data.items;
     if (res.data.total > pageRowNumber.value) {
       for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
@@ -482,7 +525,7 @@ const getDynamicMappingList = async () => {
         if (page === 1) {
           continue;
         }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList( page);
+        const resPgae = await api.getGlobalDynamicModelDefinitionList(page);
         data = data.concat(resPgae.data.items);
       }
     }
@@ -540,7 +583,7 @@ const handleCreateDynamicMapping = () => {
 
 const createDynamicMapping = async () => {
   try {
-    const res = await api.createGlobalDynamicModelMappingList( {
+    const res = await api.createGlobalDynamicModelMappingList({
       name: mappingData.value.name,
       globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
       mapOrder: mappingData.value.mapOrder,
@@ -562,7 +605,7 @@ const handleUpdateDynamicMapping = (data) => {
 };
 const updateDynamicMapping = async () => {
   try {
-    const res = await api.updateGlobalDynamicModelMapping( mappingData.value._id, {
+    const res = await api.updateGlobalDynamicModelMapping(mappingData.value._id, {
       name: mappingData.value.name,
       globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
       mapOrder: mappingData.value.mapOrder,
@@ -583,6 +626,84 @@ const deleteDynamicMapping = async (mapping_id) => {
     getDynamicMappingList();
   } catch (error) {
     console.log('deleteDynamicMapping error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// import file
+
+const uploadDialogGlobalDynamicDefinition = ref(false);
+const uploadDialogGlobalDynamicMapping = ref(false);
+
+const onHide = () => {
+  getDynamicDefinitionList();
+};
+const handleImportDefinitionFile = () => {
+  uploadDialogGlobalDynamicDefinition.value = true;
+};
+const handleImportMappingFile = () => {
+  uploadDialogGlobalDynamicMapping.value = true;
+};
+
+const uploadGlobalDynamicModelFile = async (formData, callback) => {
+  try {
+    await api.uploadGlobalDynamicModelDefinitionFile(formData);
+    callback();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const uploadGlobalDynamicModelMappingFile = async (formData, callback) => {
+  try {
+    await api.uploadGlobalDynamicModelMappingFile(formData);
+    callback();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+// export file
+const handleExportDefinitionFile = async () => {
+  try {
+    const response = await api.exportGlobalDynamicModelDefinitionFile();
+    // Tạo một Blob từ response (dữ liệu dạng file trả về từ API)
+    const blob = new Blob([response.data], { type: 'text/csv' });
+
+    // Tạo đường dẫn tạm thời để tải file
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    // Tạo một thẻ <a> để thực hiện việc tải file
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'export.csv'; // Tên file tải về
+    document.body.appendChild(link);
+    link.click();
+
+    // Sau khi tải file xong thì xoá thẻ <a>
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl); // Hủy đối tượng URL tạm thời
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const handleExportMappingFile = async () => {
+  try {
+    const response = await api.exportGlobalDynamicModelMappingFile();
+    // Tạo một Blob từ response (dữ liệu dạng file trả về từ API)
+    const blob = new Blob([response.data], { type: 'text/csv' });
+
+    // Tạo đường dẫn tạm thời để tải file
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    // Tạo một thẻ <a> để thực hiện việc tải file
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'export.csv'; // Tên file tải về
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl); // Hủy đối tượng URL tạm thời
+  } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
