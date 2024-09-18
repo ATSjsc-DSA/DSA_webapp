@@ -8,6 +8,7 @@ const { convertTimeStringToInt } = DSA_Common();
 
 console.log('projectId', projectData.value._id);
 console.log('psm_active', psm_active.value._id);
+export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export default class api {
   // flat list - definition list
@@ -97,6 +98,9 @@ export default class api {
   static async openVersion(versionId) {
     return put(`/powersystem/${projectData.value._id}/powersystemversion/${versionId}`);
   }
-}
 
-export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
+  // addition
+  static async getDynamicModelList(version_id) {
+    return get(`/addition/${projectData.value._id}/${version_id}/dynamicModel`);
+  }
+}

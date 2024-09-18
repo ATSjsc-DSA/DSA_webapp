@@ -5,7 +5,7 @@ export default class api {
   static TypeGlobalDynamicModelDefinition = {
     Traditional: {
       Generator: 'Generator',
-      Excitation: 'Excitation ',
+      Excitation: 'Excitation',
       Governor: 'Governor',
       Stabilizer: 'Stabilizer',
     },
@@ -25,6 +25,9 @@ export default class api {
     });
   }
 
+  static async getGlobalDynamicModelDefinitionByType(type) {
+    return get(`/common/globaldynamicmodeldefinition/${type}`);
+  }
   static async createGlobalDynamicModelDefinitionList(data) {
     return post(`/common/globaldynamicmodeldefinition`, data);
   }
