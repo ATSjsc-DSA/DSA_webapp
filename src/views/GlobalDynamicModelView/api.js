@@ -24,6 +24,7 @@ export default class api {
       page: page,
     });
   }
+
   static async getGlobalDynamicModelDefinitionByType(type) {
     return get(`/common/globaldynamicmodeldefinition/${type}`);
   }
@@ -37,6 +38,14 @@ export default class api {
 
   static async deleteGlobalDynamicModelDefinition(dynamicDefinition_id) {
     return _delete(`/common/globaldynamicmodeldefinition/${dynamicDefinition_id}`);
+  }
+
+  static async uploadGlobalDynamicModelDefinitionFile(data) {
+    return put(`/common/upload/globaldynamicmodeldefinition`, data);
+  }
+
+  static async exportGlobalDynamicModelDefinitionFile() {
+    return put(`/common/download/globaldynamicmodeldefinition`);
   }
 
   //  Dynamic Mapping;
@@ -55,5 +64,13 @@ export default class api {
 
   static async deleteGlobalDynamicModelMapping(dynamicMapping_id) {
     return _delete(`/common/globaldynamicmodelmapping/${dynamicMapping_id}`);
+  }
+
+  static async uploadGlobalDynamicModelMappingFile(data) {
+    return put(`/common/upload/globaldynamicmodeldefinitionmapping`, data);
+  }
+
+  static async exportGlobalDynamicModelMappingFile() {
+    return put(`/common/download/globaldynamicmodeldefinitionmapping`);
   }
 }
