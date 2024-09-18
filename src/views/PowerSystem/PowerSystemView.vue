@@ -1,4 +1,6 @@
 <template>
+  isDefinitionGenerator: {{ isDefinitionGenerator }}
+
   <div class="card layout-content min-h-full">
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
@@ -102,7 +104,13 @@
                       <Button label="EMS" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
                       <Button label="PSSE" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
                       <Button label="Scada" class="" :text="tabMenuPSActive !== 3" @click="tabMenuPSActive = 3" />
-                      <Button label="Dynamic" class="" :text="tabMenuPSActive !== 4" @click="tabMenuPSActive = 4" />
+                      <Button
+                        label="Dynamic"
+                        class=""
+                        :text="tabMenuPSActive !== 4"
+                        :disabled="!isDefinitionGenerator"
+                        @click="tabMenuPSActive = 4"
+                      />
                     </div>
                   </div>
 
@@ -347,8 +355,8 @@
                         @deleteData="deletePSE"
                       />
                     </TabPanel>
-                    <TabPanel>
-                      <dynamicDefinitionTabWidget :data="dynamicModelList" :loading="isLoadingPsData" />
+                    <TabPanel :disabled="!isDefinitionGenerator">
+                      <dynamicDefinitionTabWidget v-if="isDefinitionGenerator" :ps-data="psData" />
                     </TabPanel>
                   </TabView>
                 </div>
@@ -560,7 +568,14 @@ watch(showDefinitionList, (newStatus) => {
 const definitionList = ref([]);
 const definitionSelected = ref({});
 const definitionData = ref({});
+const isDefinitionGenerator = ref(false);
 
+watch(isDefinitionGenerator, (newStatus) => {
+  console.log(newStatus, tabMenuPSActive.value, newStatus && tabMenuPSActive.value === 4);
+  if (!newStatus && tabMenuPSActive.value === 4) {
+    tabMenuPSActive.value = 0;
+  }
+});
 const setDefinitionList = async () => {
   try {
     const res = await api.getDefinitionList();
@@ -584,9 +599,7 @@ const handleDefinitionRowClick = async (definition) => {
   zoneSelected.value = undefined;
   ownerSelected.value = undefined;
   subSelected.value = undefined;
-  if (definition.name === 'Generator') {
-    getDynamicModelList();
-  }
+  isDefinitionGenerator.value = definition.name === 'Generator';
 };
 
 const setDefinitionData = async (id) => {
@@ -827,7 +840,7 @@ const onNodeExpand = async (node) => {
   if (!node.children) {
     node.loading = true;
     node.children = await getLeaf(node._id);
-    if (node.children.length == 0) {
+    if (node.children || node.children.length == 0) {
       node.leaf = true;
     }
     node.loading = false;
@@ -861,6 +874,8 @@ const onNodeSelect = (node) => {
     nodeSelected.value = undefined;
     return;
   }
+  isDefinitionGenerator.value = node.label === 'Generator';
+
   isLoadingContainer.value = true;
   pseId.value = node._id;
   psCurrentPage.value = 1;
@@ -873,7 +888,6 @@ const setPsDataWithTree = async (getHeader = false, hasChilded = false, engineCl
   let parentId;
 
   if (!hasChilded && engineClassId !== 'ElmLne') {
-    console.log(engineClassId, 'abc');
     parentId = parentNodeSelected.value;
   }
   try {
@@ -1090,19 +1104,6 @@ const itemsMenuImportExport = computed(() => {
 
 const toggleMenuConfig = (event) => {
   menuImportExport.value.toggle(event);
-};
-
-// addition
-const dynamicModelList = ref([]);
-const getDynamicModelList = async () => {
-  try {
-    const res = await api.getDynamicModelList(additionVersionId.value);
-    dynamicModelList.value = res.data.items;
-  } catch (error) {
-    dynamicModelList.value = [];
-    console.log('getDynamicModelList: error ', error);
-    toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
-  }
 };
 </script>
 

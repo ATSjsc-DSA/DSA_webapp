@@ -99,8 +99,5 @@ export default class api {
     return put(`/powersystem/${projectData.value._id}/powersystemversion/${versionId}`);
   }
 
-  // addition
-  static async getDynamicModelList(version_id) {
-    return get(`/addition/${projectData.value._id}/${version_id}/dynamicModel`);
-  }
+
 }
