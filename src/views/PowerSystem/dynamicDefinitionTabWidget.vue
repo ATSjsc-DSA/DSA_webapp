@@ -11,8 +11,6 @@
     scrollHeight="38rem"
     showGridlines
     :loading="loading"
-    rowGroupMode="rowspan"
-    groupRowsBy="powerSystemDataUniqueId"
   >
     <template #header>
       <div class="flex justify-content-end">
@@ -26,30 +24,77 @@
         />
       </div>
     </template>
-    <Column
-      field="powerSystemDataUniqueId"
-      frozen
-      header="Unique Id"
-      class="frozen-column frozen-left-column"
-      style="text-wrap: nowrap"
-      :rowspan="4"
-    >
+
+    <ColumnGroup type="header">
+      <Row>
+        <Column header="Unique Id" :rowspan="2" />
+        <Column header="Name" :rowspan="2" />
+        <Column :colspan="4">
+          <template #header>
+            <div class="flex align-items-center justify-content-center w-full">Traditional</div>
+          </template>
+        </Column>
+        <Column :colspan="4" style="background-color: var(--surface-100)">
+          <template #header>
+            <div class="flex align-items-center justify-content-center w-full">Renewable</div>
+          </template>
+        </Column>
+        <Column header="" :rowspan="2" />
+
+      </Row>
+      <Row>
+        <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
+        <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
+        <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
+        <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
+
+        <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
+        <Column
+          field="Renewable.name"
+          header="Renewable"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="PlanControl.name"
+          header="PlanControl"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="DriveTrain.name"
+          header="DriveTrain"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+      </Row>
+    </ColumnGroup>
+
+    <Column field="powerSystemDataUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="{ data }">
         <div class="font-bold w-8rem text-center">
           {{ data.powerSystemDataUniqueId }}
         </div>
       </template>
     </Column>
-    <Column field="modelType" class="frozen-column frozen-left-column" header="Type" style="text-wrap: nowrap" />
-    <Column field="modelName" header="Model Name" style="text-wrap: nowrap" />
+    <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
 
-    <Column header="Values" field="modelData">
-      <template #body="{ data }">
-        <DataTable :value="data.modelData" tableStyle="min-width: 50rem" scrollable style="text-wrap: nowrap">
-          <Column v-for="(val, col) in data.modelData[0]" :key="col" :field="col" :header="col"></Column>
-        </DataTable>
-      </template>
-    </Column>
+    <!-- Traditional -->
+    <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
+    <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
+    <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
+    <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
+    <!-- Renewable -->
+    <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
+    <Column field="Renewable.name" header="Renewable" style="text-wrap: nowrap; background-color: var(--surface-100)" />
+    <Column
+      field="PlanControl.name"
+      header="PlanControl"
+      style="text-wrap: nowrap; background-color: var(--surface-100)"
+    />
+    <Column
+      field="DriveTrain.name"
+      header="DriveTrain"
+      style="text-wrap: nowrap; background-color: var(--surface-100)"
+    />
+
     <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
       <template #body="{ data }">
         <div class="flex justify-content-between">
@@ -480,33 +525,15 @@ const tableData = computed(() => {
   const data = [];
   for (let index = 0; index < dynamicModelList.value.length; index++) {
     const items = dynamicModelList.value[index];
-
     const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewable';
     const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
     for (const type of typeModelArr) {
       const typeData = items.model.filter((model) => {
         return model.modelType === type;
       })[0];
-
-      let dynamicModelDefinition = {};
-      let modelData;
-      if (typeData) {
-        modelData = {};
-        dynamicModelDefinition = getGlobalDynamicModelDefinitionById(typeData.modelId);
-        for (let index = 0; index < dynamicModelDefinition.values.length; index++) {
-          modelData[dynamicModelDefinition.values[index]] = typeData.values[index] || '';
-        }
-      }
-      data.push({
-        id: items.id,
-        powerSystemDataId: items.powerSystemDataId,
-        powerSystemDataUniqueId: items.powerSystemDataUniqueId,
-        modelType: type,
-        modelId: typeData ? typeData.modelId : undefined,
-        modelName: dynamicModelDefinition.name,
-        modelData: [modelData],
-      });
+      items[type] = typeData ? getGlobalDynamicModelDefinitionById(typeData.modelId) : '';
     }
+    data.push(items);
   }
   return data;
 });

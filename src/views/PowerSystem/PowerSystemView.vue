@@ -110,8 +110,10 @@
                         :label="tab"
                         class=""
                         :text="tabMenuPSActive !== index"
+                        :disabled="tab === 'Dynamic' && !isDefinitionGenerator"
                         @click="tabMenuPSActive = index"
-                      />
+                      >
+                      </Button>
                     </div>
                   </div>
 
@@ -577,7 +579,8 @@ const isDefinitionGenerator = ref(false);
 
 watch(isDefinitionGenerator, (newStatus) => {
   console.log(newStatus, tabMenuPSActive.value, newStatus && tabMenuPSActive.value === 4);
-  if (!newStatus && tabMenuPSActive.value === 4) {
+  const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
+  if (!newStatus && isDynamicTab) {
     tabMenuPSActive.value = 0;
   }
 });
