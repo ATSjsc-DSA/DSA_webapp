@@ -88,7 +88,7 @@
       <label for="type" class="font-semibold w-8rem"> Type</label>
       <Button
         :severity="createData.isTraditionalModel ? 'info' : 'primary'"
-        :label="createData.isTraditionalModel ? 'Traditional' : 'Renewal'"
+        :label="createData.isTraditionalModel ? 'Traditional' : 'Renewable'"
         @click="createData.isTraditionalModel = !createData.isTraditionalModel"
       />
     </div>
@@ -231,7 +231,7 @@
       </template>
     </template>
 
-    <!-- ---------- Renewal----- -->
+    <!-- ---------- Renewable----- -->
     <template v-else>
       <!-- generic  -->
       <div class="flex align-items-center gap-3 mb-3">
@@ -239,7 +239,7 @@
         <Dropdown
           v-if="definitionTypeOption"
           v-model="genericModel"
-          :options="definitionTypeOption['Renewal']['Generic']"
+          :options="definitionTypeOption['Renewable']['Generic']"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
@@ -273,7 +273,7 @@
         <Dropdown
           v-if="definitionTypeOption"
           v-model="renewableModel"
-          :options="definitionTypeOption['Renewal']['Renewable']"
+          :options="definitionTypeOption['Renewable']['Renewable']"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
@@ -307,7 +307,7 @@
         <Dropdown
           v-if="definitionTypeOption"
           v-model="planControlModel"
-          :options="definitionTypeOption['Renewal']['PlanControl']"
+          :options="definitionTypeOption['Renewable']['PlanControl']"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
@@ -341,7 +341,7 @@
         <Dropdown
           v-if="definitionTypeOption"
           v-model="driveTrainModel"
-          :options="definitionTypeOption['Renewal']['DriveTrain']"
+          :options="definitionTypeOption['Renewable']['DriveTrain']"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
@@ -481,7 +481,7 @@ const tableData = computed(() => {
   for (let index = 0; index < dynamicModelList.value.length; index++) {
     const items = dynamicModelList.value[index];
 
-    const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewal';
+    const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewable';
     const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
     for (const type of typeModelArr) {
       const typeData = items.model.filter((model) => {
@@ -691,7 +691,7 @@ watch(stabilizerModel, (newId) => {
   }
 });
 
-// Renewal: {
+// Renewable: {
 const genericModel = ref();
 const genericTable = ref();
 

@@ -439,9 +439,9 @@ const definitionTypeOptions = computed(() => [
     items: Object.values(api.TypeGlobalDynamicModelDefinition.Traditional),
   },
   {
-    label: 'Renewal',
-    code: 'Renewal',
-    items: Object.values(api.TypeGlobalDynamicModelDefinition.Renewal),
+    label: 'Renewable',
+    code: 'Renewable',
+    items: Object.values(api.TypeGlobalDynamicModelDefinition.Renewable),
   },
 ]);
 const createDynamicDefinition = async () => {

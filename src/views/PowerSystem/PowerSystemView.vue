@@ -104,16 +104,13 @@
                   <!-- tab -->
                   <div class="flex gap-2 justify-content-start">
                     <div class="flex gap-2 justify-content-start">
-                      <Button label="General" class="" :text="tabMenuPSActive !== 0" @click="tabMenuPSActive = 0" />
-                      <Button label="EMS" class="" :text="tabMenuPSActive !== 1" @click="tabMenuPSActive = 1" />
-                      <Button label="PSSE" class="" :text="tabMenuPSActive !== 2" @click="tabMenuPSActive = 2" />
-                      <Button label="Scada" class="" :text="tabMenuPSActive !== 3" @click="tabMenuPSActive = 3" />
                       <Button
-                        label="Dynamic"
+                        v-for="(tab, index) in tabMenuPSList"
+                        :key="tab"
+                        :label="tab"
                         class=""
-                        :text="tabMenuPSActive !== 4"
-                        :disabled="!isDefinitionGenerator"
-                        @click="tabMenuPSActive = 4"
+                        :text="tabMenuPSActive !== index"
+                        @click="tabMenuPSActive = index"
                       />
                     </div>
                   </div>
@@ -290,7 +287,7 @@
                         />
                       </div>
                     </div>
-                    <Divider layout="vertical" />
+                    <!-- <Divider layout="vertical" /> -->
                   </template>
                   <!-- menu import/export -->
                   <div>
@@ -323,7 +320,8 @@
                 <div class="flex flex-column" style="height: 43rem">
                   <LoadingContainer v-show="isLoadingContainer" />
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
-                    <TabPanel header="">
+                    <!-- ['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic'] -->
+                    <TabPanel id="General">
                       <generalTabWidget
                         :data="psData"
                         :loading="isLoadingPsData"
@@ -331,17 +329,7 @@
                         @deleteData="deletePSE"
                       />
                     </TabPanel>
-                    <TabPanel>
-                      <engineInfoTabWidget
-                        :data="psData"
-                        :headerData="definitionData"
-                        :loading="isLoadingPsData"
-                        value-index="EMS"
-                        @editData="editPSE"
-                        @deleteData="deletePSE"
-                      />
-                    </TabPanel>
-                    <TabPanel>
+                    <TabPanel id="Parameter">
                       <engineInfoTabWidget
                         :data="psData"
                         :headerData="definitionData"
@@ -351,7 +339,18 @@
                         @deleteData="deletePSE"
                       />
                     </TabPanel>
-                    <TabPanel>
+                    <TabPanel id="EMS">
+                      <engineInfoTabWidget
+                        :data="psData"
+                        :headerData="definitionData"
+                        :loading="isLoadingPsData"
+                        value-index="EMS"
+                        @editData="editPSE"
+                        @deleteData="deletePSE"
+                      />
+                    </TabPanel>
+                    <TabPanel id="PSSE"> Tôi là PSSE </TabPanel>
+                    <TabPanel id="Scada">
                       <scadaInfoTabWidget
                         :data="psData"
                         :loading="isLoadingPsData"
@@ -359,7 +358,7 @@
                         @deleteData="deletePSE"
                       />
                     </TabPanel>
-                    <TabPanel :disabled="!isDefinitionGenerator">
+                    <TabPanel id="Dynamic" :disabled="!isDefinitionGenerator">
                       <dynamicDefinitionTabWidget v-if="isDefinitionGenerator" :ps-data="psData" />
                     </TabPanel>
                   </TabView>
@@ -368,7 +367,10 @@
 
               <!-- ps table - Paginator -->
               <template #footer>
-                <div v-if="tabMenuPSActive < 4" class="flex justify-content-end align-items-center">
+                <div
+                  v-if="tabMenuPSList[tabMenuPSActive] !== 'Dynamic'"
+                  class="flex justify-content-end align-items-center"
+                >
                   <Paginator
                     v-if="psDataListLength > psPageRowNumber"
                     v-model:first="offset"
@@ -517,7 +519,6 @@ const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
 
 const projectVersionId = ref('66decf1dcff005199529524b');
-const additionVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 onMounted(async () => {
   loadAllData();
@@ -526,7 +527,7 @@ onMounted(async () => {
 onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
-
+const tabMenuPSList = ref(['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic']);
 const loadAllData = async () => {
   await setDefinitionList();
   await getVersionData();
