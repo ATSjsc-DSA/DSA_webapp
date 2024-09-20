@@ -126,306 +126,279 @@
   <Toast />
 
   <!-- create dialog data -->
-  <Dialog v-model:visible="visibleChangeDialog" style="width: 48rem" header="Create New " :modal="true">
+  <Dialog v-model:visible="visibleChangeDialog" style="width: 64rem" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Dynamic Model</span>
       </div>
     </template>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="globalDynamicModelDefinitionId" class="font-semibold w-12rem"> Power System </label>
+    <div style="height: 50rem">
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="globalDynamicModelDefinitionId" class="font-semibold w-12rem"> Power System </label>
 
-      <Dropdown
-        v-model="dataChange.powerSystemDataId"
-        :options="psData"
-        optionValue="_id"
-        optionLabel="generalInfo.name"
-        placeholder="Select a Power System"
-        class="w-20rem"
-      />
+        <Dropdown
+          v-model="dataChange.powerSystemDataId"
+          :options="psData"
+          optionValue="_id"
+          optionLabel="generalInfo.name"
+          placeholder="Select a Power System"
+          class="w-20rem"
+          :disabled="modeChange === 'Update'"
+        />
+      </div>
+      <span class="p-text-secondary block my-3">Dynamic Model information</span>
+
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="type" class="font-semibold w-12rem"> Type</label>
+        <Button
+          :severity="dataChange.isTraditionalModel ? 'info' : 'primary'"
+          :label="dataChange.isTraditionalModel ? 'Traditional' : 'Renewable'"
+          class="w-20rem"
+          @click="dataChange.isTraditionalModel = !dataChange.isTraditionalModel"
+        />
+      </div>
+
+      <!-- ---------- Traditional----- -->
+      <TabView v-if="dataChange.isTraditionalModel">
+        <TabPanel header="Generator">
+          <!-- Generator  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Generator:</label>
+            <Dropdown
+              v-model="generatorModel"
+              :options="traditionalGeneratorOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="traditionalGeneratorOpts.length === 0"
+              @change="generatorModelChange()"
+            />
+          </div>
+          <template v-if="generatorModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in generatorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="generatorTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+
+        <TabPanel header="Excitation">
+          <!-- Excitation  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Excitation:</label>
+            <Dropdown
+              v-model="excitationModel"
+              :options="traditionalExcitationOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="traditionalExcitationOpts.length === 0"
+              @change="excitationModelChange()"
+            />
+          </div>
+          <template v-if="excitationModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in excitationTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="excitationTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+        <TabPanel header="Governor">
+          <!-- Governor  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Governor:</label>
+            <Dropdown
+              v-model="governorModel"
+              :options="traditionalGovernorOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="traditionalGovernorOpts.length === 0"
+              @change="governorModelChange()"
+            />
+          </div>
+          <template v-if="governorModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in governorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="governorTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+        <TabPanel header="Stabilizer">
+          <!-- Stabilizer  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Stabilizer:</label>
+            <Dropdown
+              v-model="stabilizerModel"
+              :options="traditionalStabilizerOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="traditionalStabilizerOpts.length === 0"
+              @change="stabilizerModelChange()"
+            />
+          </div>
+          <template v-if="stabilizerModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in stabilizerTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="stabilizerTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+      </TabView>
+
+      <!-- ---------- Renewable----- -->
+      <TabView v-else>
+        <!-- generic  -->
+        <TabPanel header="Generic">
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Generic:</label>
+            <Dropdown
+              v-model="genericModel"
+              :options="renewableGenericOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="renewableGenericOpts.length === 0"
+              @change="genericModelChange"
+            />
+          </div>
+          <template v-if="genericModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in genericTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="genericTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+        <TabPanel header="Renewable">
+          <!-- Renewable  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Renewable:</label>
+            <Dropdown
+              v-model="renewableModel"
+              :options="renewableRenewableOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="renewableRenewableOpts.length === 0"
+              @change="renewableModelChange"
+            />
+          </div>
+          <template v-if="renewableModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in renewableTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="renewableTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+        <TabPanel header="Plan Control">
+          <!-- PlanControl  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Plan Control:</label>
+            <Dropdown
+              v-model="planControlModel"
+              :options="renewablePlanControlOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="renewablePlanControlOpts.length === 0"
+              @change="planControlModelChange"
+            />
+          </div>
+          <template v-if="planControlModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in planControlTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="planControlTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+        <TabPanel header=" Drive Train">
+          <!-- DriveTrain  -->
+          <div class="flex align-items-center gap-3 mb-3">
+            <label for="" class="font-semibold w-12rem block"> Drive Train:</label>
+            <Dropdown
+              v-model="driveTrainModel"
+              :options="renewableDriveTrainOpts"
+              optionValue="_id"
+              optionLabel="name"
+              placeholder="Select a Dynamic Model"
+              class="w-20rem"
+              showClear
+              :disabled="renewableDriveTrainOpts.length === 0"
+              @change="driveTrainModelChange"
+            />
+          </div>
+          <template v-if="driveTrainModel">
+            <div class="grid mt-3">
+              <div v-for="(val, col) in driveTrainTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
+                <div class="flex gap-1 align-items-center">
+                  <div class="w-12rem">
+                    {{ col }}
+                  </div>
+                  <InputText v-model="driveTrainTable[col]" class="w-14rem" />
+                </div>
+              </div>
+            </div>
+          </template>
+        </TabPanel>
+      </TabView>
     </div>
-    <span class="p-text-secondary block my-3">Dynamic Model information</span>
-
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="type" class="font-semibold w-12rem"> Type</label>
-      <Button
-        :severity="dataChange.isTraditionalModel ? 'info' : 'primary'"
-        :label="dataChange.isTraditionalModel ? 'Traditional' : 'Renewable'"
-        class="w-20rem"
-        @click="dataChange.isTraditionalModel = !dataChange.isTraditionalModel"
-      />
-    </div>
-
-    <template v-if="dataChange.isTraditionalModel">
-      <!-- Generator  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> Generator:</label>
-        <Dropdown
-          v-model="generatorModel"
-          :options="traditionalGeneratorOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="generatorModelChange()"
-        />
-      </div>
-      <template v-if="generatorModel">
-        <div class="grid">
-          <div v-for="(val, col) in generatorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="generatorTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-
-      <!-- Excitation  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> Excitation:</label>
-        <Dropdown
-          v-model="excitationModel"
-          :options="traditionalExcitationOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="excitationModelChange()"
-        />
-      </div>
-      <template v-if="excitationModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in excitationTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="excitationTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-
-      <!-- Governor  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> Governor:</label>
-        <Dropdown
-          v-model="governorModel"
-          :options="traditionalGovernorOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="governorModelChange()"
-        />
-      </div>
-      <template v-if="governorModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in governorTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="governorTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-
-      <!-- Stabilizer  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> Stabilizer:</label>
-        <Dropdown
-          v-model="stabilizerModel"
-          :options="traditionalStabilizerOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="stabilizerModelChange()"
-        />
-      </div>
-      <template v-if="stabilizerModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in stabilizerTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="stabilizerTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-    </template>
-
-    <!-- ---------- Renewable----- -->
-    <template v-else>
-      <!-- generic  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> Generic:</label>
-        <Dropdown
-          v-model="genericModel"
-          :options="renewableGenericOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="genericModelChange"
-        />
-      </div>
-      <template v-if="genericModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in genericTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="genericTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-
-      <!-- Renewable  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> Renewable:</label>
-        <Dropdown
-          v-model="renewableModel"
-          :options="renewableRenewableOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="renewableModelChange"
-        />
-      </div>
-      <template v-if="renewableModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in renewableTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="renewableTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-
-      <!-- PlanControl  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> PlanControl:</label>
-        <Dropdown
-          v-model="planControlModel"
-          :options="renewablePlanControlOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="planControlModelChange"
-        />
-      </div>
-      <template v-if="planControlModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in planControlTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="planControlTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-
-      <!-- DriveTrain  -->
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-12rem block"> DriveTrain:</label>
-        <Dropdown
-          v-model="driveTrainModel"
-          :options="renewableDriveTrainOpts"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Dynamic Model"
-          class="w-20rem"
-          showClear
-          @change="driveTrainModelChange"
-        />
-      </div>
-      <template v-if="driveTrainModel">
-        <div class="grid">
-          <div
-            v-for="(val, col) in driveTrainTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-6 pl-3 border-right-1 border-200"
-          >
-            <div class="flex gap-1 align-items-center">
-              <div class="w-12rem">
-                {{ col }}
-              </div>
-              <InputText v-model="driveTrainTable[col]" class="w-14rem" />
-            </div>
-          </div>
-        </div>
-        <Divider />
-      </template>
-    </template>
 
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="visibleChangeDialog = false"></Button>
@@ -436,13 +409,7 @@
         :disabled="!dataChange.powerSystemDataId"
         @click="createDynamicModel()"
       ></Button>
-      <Button
-        v-if="modeChange === 'Update'"
-        type="button"
-        label="Update"
-        :disabled="!dataChange.powerSystemDataId"
-        @click="updateDynamicModel()"
-      ></Button>
+      <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateDynamicModel()"></Button>
     </template>
   </Dialog>
 
