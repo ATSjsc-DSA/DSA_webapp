@@ -12,6 +12,9 @@ export default class additionApi {
     return post(`addition/${projectData.value._id}/${versionId}/dynamicModel`, data);
   }
 
+  static async updateDynamicModel(versionId, dynamicModel_id, data) {
+    return put(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`, data);
+  }
   static async deleteDynamicModel(versionId, dynamicModel_id) {
     return _delete(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`);
   }

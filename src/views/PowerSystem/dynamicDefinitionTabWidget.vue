@@ -1,167 +1,179 @@
 <template>
-  <DataTable
-    id="psDynamicTable"
-    :value="tableData"
-    dataKey="_id"
-    tableStyle="min-width: 50rem"
-    :lazy="true"
-    :sortOrder="1"
-    rowHover
-    scrollable
-    scrollHeight="38rem"
-    showGridlines
-    :loading="loading"
-  >
-    <template #header>
-      <div class="flex justify-content-end">
-        <Button
-          type="button"
-          label="Create Dynamic Model"
-          icon="pi pi-plus"
-          size="small"
-          text
-          @click="handleCreate()"
-        />
-      </div>
-    </template>
-
-    <ColumnGroup type="header">
-      <Row>
-        <Column header="Unique Id" :rowspan="2" />
-        <Column header="Name" :rowspan="2" />
-        <Column :colspan="4">
-          <template #header>
-            <div class="flex align-items-center justify-content-center w-full">Traditional</div>
-          </template>
-        </Column>
-        <Column :colspan="4" style="background-color: var(--surface-100)">
-          <template #header>
-            <div class="flex align-items-center justify-content-center w-full">Renewable</div>
-          </template>
-        </Column>
-        <Column header="" :rowspan="2" />
-
-      </Row>
-      <Row>
-        <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
-        <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
-        <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
-        <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
-
-        <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
-        <Column
-          field="Renewable.name"
-          header="Renewable"
-          style="text-wrap: nowrap; background-color: var(--surface-100)"
-        />
-        <Column
-          field="PlanControl.name"
-          header="PlanControl"
-          style="text-wrap: nowrap; background-color: var(--surface-100)"
-        />
-        <Column
-          field="DriveTrain.name"
-          header="DriveTrain"
-          style="text-wrap: nowrap; background-color: var(--surface-100)"
-        />
-      </Row>
-    </ColumnGroup>
-
-    <Column field="powerSystemDataUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
-      <template #body="{ data }">
-        <div class="font-bold w-8rem text-center">
-          {{ data.powerSystemDataUniqueId }}
+  <div style="height: 43rem; overflow: auto">
+    <DataTable
+      id="psDynamicTable"
+      :value="tableData"
+      dataKey="_id"
+      tableStyle="min-width: 50rem;"
+      :lazy="true"
+      :sortOrder="1"
+      rowHover
+      scrollable
+      scrollHeight="38rem"
+      showGridlines
+      :loading="isLoadingData"
+    >
+      <template #header>
+        <div class="flex justify-content-end">
+          <Button
+            type="button"
+            label="Create Dynamic Model"
+            icon="pi pi-plus"
+            size="small"
+            text
+            @click="handleCreate()"
+          />
         </div>
       </template>
-    </Column>
-    <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
 
-    <!-- Traditional -->
-    <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
-    <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
-    <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
-    <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
-    <!-- Renewable -->
-    <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
-    <Column field="Renewable.name" header="Renewable" style="text-wrap: nowrap; background-color: var(--surface-100)" />
-    <Column
-      field="PlanControl.name"
-      header="PlanControl"
-      style="text-wrap: nowrap; background-color: var(--surface-100)"
-    />
-    <Column
-      field="DriveTrain.name"
-      header="DriveTrain"
-      style="text-wrap: nowrap; background-color: var(--surface-100)"
-    />
+      <ColumnGroup type="header">
+        <Row>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Unique Id</div>
+            </template>
+          </Column>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Name</div>
+            </template>
+          </Column>
+          <Column :colspan="4">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Traditional</div>
+            </template>
+          </Column>
+          <Column :colspan="4" style="background-color: var(--surface-100)">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Renewable</div>
+            </template>
+          </Column>
+          <Column header="" :rowspan="2" />
+        </Row>
+        <Row>
+          <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
+          <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
+          <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
+          <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
 
-    <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
-      <template #body="{ data }">
-        <div class="flex justify-content-between">
-          <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEdit(data)" />
-          <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
-        </div>
-      </template>
-    </Column>
-  </DataTable>
-  <Paginator :rows="pageRowNumber" :totalRecords="totalRecords" :page="currentPage" @page="onPageChange"></Paginator>
+          <Column
+            field="Generic.name"
+            header="Generic"
+            style="text-wrap: nowrap; background-color: var(--surface-100)"
+          />
+          <Column
+            field="Renewable.name"
+            header="Renewable"
+            style="text-wrap: nowrap; background-color: var(--surface-100)"
+          />
+          <Column
+            field="PlanControl.name"
+            header="PlanControl"
+            style="text-wrap: nowrap; background-color: var(--surface-100)"
+          />
+          <Column
+            field="DriveTrain.name"
+            header="DriveTrain"
+            style="text-wrap: nowrap; background-color: var(--surface-100)"
+          />
+        </Row>
+      </ColumnGroup>
+
+      <Column field="powerSystemDataUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+        <template #body="{ data }">
+          <div class="font-bold w-8rem text-center">
+            {{ data.powerSystemDataUniqueId }}
+          </div>
+        </template>
+      </Column>
+      <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
+
+      <!-- Traditional -->
+      <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
+      <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
+      <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
+      <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
+      <!-- Renewable -->
+      <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
+      <Column
+        field="Renewable.name"
+        header="Renewable"
+        style="text-wrap: nowrap; background-color: var(--surface-100)"
+      />
+      <Column
+        field="PlanControl.name"
+        header="PlanControl"
+        style="text-wrap: nowrap; background-color: var(--surface-100)"
+      />
+      <Column
+        field="DriveTrain.name"
+        header="DriveTrain"
+        style="text-wrap: nowrap; background-color: var(--surface-100)"
+      />
+
+      <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+        <template #body="{ data }">
+          <div class="flex justify-content-between">
+            <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
+            <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+  </div>
+  <Paginator :rows="pageRowNumber" :totalRecords="totalRecords" :page="currentPage" @page="onPageChange()"></Paginator>
 
   <Toast />
 
   <!-- create dialog data -->
-  <Dialog v-model:visible="createVisibleDialog" :style="{ width: '80vw' }" header="Create New " :modal="true">
+  <Dialog v-model:visible="visibleChangeDialog" style="width: 48rem" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Dynamic Model</span>
       </div>
     </template>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="globalDynamicModelDefinitionId" class="font-semibold w-8rem"> Power System </label>
+      <label for="globalDynamicModelDefinitionId" class="font-semibold w-12rem"> Power System </label>
 
       <Dropdown
-        v-model="createData.powerSystemDataId"
+        v-model="dataChange.powerSystemDataId"
         :options="psData"
         optionValue="_id"
-        optionLabel="generalInfo.uniqueId"
-        placeholder="Select a unique Id"
-        class="w-16rem my-3"
+        optionLabel="generalInfo.name"
+        placeholder="Select a Power System"
+        class="w-20rem"
       />
     </div>
     <span class="p-text-secondary block my-3">Dynamic Model information</span>
 
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="type" class="font-semibold w-8rem"> Type</label>
+      <label for="type" class="font-semibold w-12rem"> Type</label>
       <Button
-        :severity="createData.isTraditionalModel ? 'info' : 'primary'"
-        :label="createData.isTraditionalModel ? 'Traditional' : 'Renewable'"
-        @click="createData.isTraditionalModel = !createData.isTraditionalModel"
+        :severity="dataChange.isTraditionalModel ? 'info' : 'primary'"
+        :label="dataChange.isTraditionalModel ? 'Traditional' : 'Renewable'"
+        class="w-20rem"
+        @click="dataChange.isTraditionalModel = !dataChange.isTraditionalModel"
       />
     </div>
 
-    <template v-if="createData.isTraditionalModel">
+    <template v-if="dataChange.isTraditionalModel">
       <!-- Generator  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> Generator:</label>
+        <label for="" class="font-semibold w-12rem block"> Generator:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="generatorModel"
-          :options="definitionTypeOption['Traditional']['Generator']"
+          :options="traditionalGeneratorOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="generatorModelChange()"
         />
       </div>
       <template v-if="generatorModel">
         <div class="grid">
-          <div
-            v-for="(val, col) in generatorTable"
-            :key="col"
-            :field="col"
-            :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
-          >
+          <div v-for="(val, col) in generatorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
                 {{ col }}
@@ -175,16 +187,16 @@
 
       <!-- Excitation  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> Excitation:</label>
+        <label for="" class="font-semibold w-12rem block"> Excitation:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="excitationModel"
-          :options="definitionTypeOption['Traditional']['Excitation']"
+          :options="traditionalExcitationOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="excitationModelChange()"
         />
       </div>
       <template v-if="excitationModel">
@@ -194,7 +206,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -209,16 +221,16 @@
 
       <!-- Governor  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> Governor:</label>
+        <label for="" class="font-semibold w-12rem block"> Governor:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="governorModel"
-          :options="definitionTypeOption['Traditional']['Governor']"
+          :options="traditionalGovernorOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="governorModelChange()"
         />
       </div>
       <template v-if="governorModel">
@@ -228,7 +240,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -243,16 +255,16 @@
 
       <!-- Stabilizer  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> Stabilizer:</label>
+        <label for="" class="font-semibold w-12rem block"> Stabilizer:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="stabilizerModel"
-          :options="definitionTypeOption['Traditional']['Stabilizer']"
+          :options="traditionalStabilizerOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="stabilizerModelChange()"
         />
       </div>
       <template v-if="stabilizerModel">
@@ -262,7 +274,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -280,16 +292,16 @@
     <template v-else>
       <!-- generic  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> Generic:</label>
+        <label for="" class="font-semibold w-12rem block"> Generic:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="genericModel"
-          :options="definitionTypeOption['Renewable']['Generic']"
+          :options="renewableGenericOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="genericModelChange"
         />
       </div>
       <template v-if="genericModel">
@@ -299,7 +311,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -314,16 +326,16 @@
 
       <!-- Renewable  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> Renewable:</label>
+        <label for="" class="font-semibold w-12rem block"> Renewable:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="renewableModel"
-          :options="definitionTypeOption['Renewable']['Renewable']"
+          :options="renewableRenewableOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="renewableModelChange"
         />
       </div>
       <template v-if="renewableModel">
@@ -333,7 +345,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -348,16 +360,16 @@
 
       <!-- PlanControl  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> PlanControl:</label>
+        <label for="" class="font-semibold w-12rem block"> PlanControl:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="planControlModel"
-          :options="definitionTypeOption['Renewable']['PlanControl']"
+          :options="renewablePlanControlOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="planControlModelChange"
         />
       </div>
       <template v-if="planControlModel">
@@ -367,7 +379,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -382,16 +394,16 @@
 
       <!-- DriveTrain  -->
       <div class="flex align-items-center gap-3 mb-3">
-        <label for="" class="font-semibold w-8rem block"> DriveTrain:</label>
+        <label for="" class="font-semibold w-12rem block"> DriveTrain:</label>
         <Dropdown
-          v-if="definitionTypeOption"
           v-model="driveTrainModel"
-          :options="definitionTypeOption['Renewable']['DriveTrain']"
+          :options="renewableDriveTrainOpts"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Dynamic Model"
-          class="w-16rem my-3"
+          class="w-20rem"
           showClear
+          @change="driveTrainModelChange"
         />
       </div>
       <template v-if="driveTrainModel">
@@ -401,7 +413,7 @@
             :key="col"
             :field="col"
             :header="col"
-            class="col-3 pl-3 border-right-1 border-200"
+            class="col-6 pl-3 border-right-1 border-200"
           >
             <div class="flex gap-1 align-items-center">
               <div class="w-12rem">
@@ -415,16 +427,21 @@
       </template>
     </template>
 
-    <!-- this is for test  -->
-
-    <!-- end test  -->
     <template #footer>
-      <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="visibleChangeDialog = false"></Button>
       <Button
+        v-if="modeChange === 'Create'"
         type="button"
-        label="Submit"
-        :disabled="!createData.powerSystemDataId"
+        label="Save"
+        :disabled="!dataChange.powerSystemDataId"
         @click="createDynamicModel()"
+      ></Button>
+      <Button
+        v-if="modeChange === 'Update'"
+        type="button"
+        label="Update"
+        :disabled="!dataChange.powerSystemDataId"
+        @click="updateDynamicModel()"
       ></Button>
     </template>
   </Dialog>
@@ -467,26 +484,39 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['getData']);
+// const emit = defineEmits(['getData']);
+
+const isLoadingData = ref(false);
 const modelDefinitionType = ref(globalDynamicModelApi.TypeGlobalDynamicModelDefinition);
 onMounted(async () => {
   await getDynamicDefinitionList();
 
   await getDynamicModelList();
+  // Traditional
+  traditionalGeneratorOpts.value = await getGlobalDynamicModelDefinitionByType('Generator');
+  traditionalExcitationOpts.value = await getGlobalDynamicModelDefinitionByType('Excitation');
+  traditionalGovernorOpts.value = await getGlobalDynamicModelDefinitionByType('Governor');
+  traditionalStabilizerOpts.value = await getGlobalDynamicModelDefinitionByType('Stabilizer');
+  // Renewable
+  renewableGenericOpts.value = await getGlobalDynamicModelDefinitionByType('Generic');
+  renewableRenewableOpts.value = await getGlobalDynamicModelDefinitionByType('Renewable');
+  renewablePlanControlOpts.value = await getGlobalDynamicModelDefinitionByType('PlanControl');
+  renewableDriveTrainOpts.value = await getGlobalDynamicModelDefinitionByType('DriveTrain');
 });
 
 // addition
 const pageRowNumber = ref(10);
 const totalRecords = ref(0);
 const currentPage = ref(1);
-
 const dynamicModelList = ref([]);
 
 const onPageChange = async (event) => {
   currentPage.value = event.page + 1;
   await getDynamicModelList();
 };
+
 const getDynamicModelList = async () => {
+  isLoadingData.value = true;
   try {
     const res = await additionApi.getDynamicModelList(additionVersionId.value, currentPage.value);
     dynamicModelList.value = res.data.items;
@@ -496,6 +526,7 @@ const getDynamicModelList = async () => {
     console.log('getDynamicModelList: error ', error);
     toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
   }
+  isLoadingData.value = false;
 };
 
 const dynamicDefinition = ref();
@@ -528,10 +559,19 @@ const tableData = computed(() => {
     const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewable';
     const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
     for (const type of typeModelArr) {
-      const typeData = items.model.filter((model) => {
+      const modelData = items.model.filter((model) => {
         return model.modelType === type;
       })[0];
-      items[type] = typeData ? getGlobalDynamicModelDefinitionById(typeData.modelId) : '';
+      if (modelData) {
+        const dynamicModeDefinitionData = getGlobalDynamicModelDefinitionById(modelData.modelId);
+        items[type] = {
+          name: dynamicModeDefinitionData.name,
+          modelId: modelData.modelId,
+          values: getDynamicModelTableOfType(modelData.modelId, modelData.values),
+        };
+      } else {
+        items[type] = '';
+      }
     }
     data.push(items);
   }
@@ -539,118 +579,119 @@ const tableData = computed(() => {
 });
 
 // CRUD
-const createVisibleDialog = ref(false);
-const createData = ref();
-const editData = ref();
+const visibleChangeDialog = ref(false);
+const dataChange = ref();
 const modeChange = ref();
-const modelDefinitionTypeForm = computed(() => {
-  const data = {};
-  for (const type in modelDefinitionType.value) {
-    const typeData = {};
-    for (const subtype in modelDefinitionType.value[type]) {
-      typeData[subtype] = {
-        modelId: '',
-        values: [],
-        modelType: subtype,
-      };
-    }
-    data[type] = typeData;
-  }
-  return data;
-});
+
 const handleCreate = async () => {
-  createData.value = {
+  clearModelOption();
+  dataChange.value = {
     powerSystemDataId: '',
     isTraditionalModel: true,
-    model: modelDefinitionTypeForm.value,
   };
-  createVisibleDialog.value = true;
-  await getdefinitionTypeOption();
+  visibleChangeDialog.value = true;
   modeChange.value = 'Create';
+};
+
+const clearModelOption = () => {
+  generatorModel.value = undefined;
+  excitationModel.value = undefined;
+  governorModel.value = undefined;
+  stabilizerModel.value = undefined;
+  genericModel.value = undefined;
+  renewableModel.value = undefined;
+  planControlModel.value = undefined;
+  driveTrainModel.value = undefined;
 };
 const createDynamicModel = async () => {
   try {
-    const data = { powerSystemDataId: createData.value.powerSystemDataId, model: [] };
-    if (createData.value.isTraditionalModel) {
-      if (generatorModel.value) {
-        data.model.push({
-          modelType: 'Generator',
-          modelId: generatorModel.value,
-          values: Object.values(generatorTable.value),
-        });
-      }
-      if (excitationModel.value) {
-        data.model.push({
-          modelType: 'Excitation',
-          modelId: excitationModel.value,
-          values: Object.values(excitationTable.value),
-        });
-      }
-      if (governorModel.value) {
-        data.model.push({
-          modelType: 'Governor',
-          modelId: governorModel.value,
-          values: Object.values(governorTable.value),
-        });
-      }
-      if (stabilizerModel.value) {
-        data.model.push({
-          modelType: 'Stabilizer',
-          modelId: stabilizerModel.value,
-          values: Object.values(stabilizerTable.value),
-        });
-      }
-    } else {
-      if (genericModel.value) {
-        data.model.push({
-          modelType: 'Generic',
-          modelId: genericModel.value,
-          values: Object.values(genericTable.value),
-        });
-      }
-      if (renewableModel.value) {
-        data.model.push({
-          modelType: 'Renewable',
-          modelId: renewableModel.value,
-          values: Object.values(renewableTable.value),
-        });
-      }
-      if (planControlModel.value) {
-        data.model.push({
-          modelType: 'PlanControl',
-          modelId: planControlModel.value,
-          values: Object.values(planControlTable.value),
-        });
-      }
-      if (driveTrainModel.value) {
-        data.model.push({
-          modelType: 'DriveTrain',
-          modelId: driveTrainModel.value,
-          values: Object.values(driveTrainTable.value),
-        });
-      }
-    }
-    await additionApi.createDynamicModel(additionVersionId.value, data);
+    await additionApi.createDynamicModel(additionVersionId.value, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    createVisibleDialog.value = false;
+    visibleChangeDialog.value = false;
     await getDynamicModelList();
   } catch (error) {
     console.log('getGlobalDynamicModelDefinitionByType: error ', error);
     toast.add({ severity: 'error', summary: 'Create', detail: error.data.detail, life: 3000 });
   }
 };
-const definitionTypeOption = ref();
-const getdefinitionTypeOption = async () => {
-  const opts = {};
-  for (const type in modelDefinitionType.value) {
-    const typeData = {};
-    for (const subtype in modelDefinitionType.value[type]) {
-      typeData[subtype] = await getGlobalDynamicModelDefinitionByType(subtype);
+const getValueModelInForm = () => {
+  const data = {
+    id: dataChange.value.id,
+    powerSystemDataId: dataChange.value.powerSystemDataId,
+    modelDynamicType: dataChange.value.isTraditionalModel ? 0 : 1,
+    model: [],
+  };
+  if (dataChange.value.isTraditionalModel) {
+    if (generatorModel.value) {
+      data.model.push({
+        modelType: 'Generator',
+        modelId: generatorModel.value,
+        values: Object.values(generatorTable.value),
+      });
     }
-    opts[type] = typeData;
+    if (excitationModel.value) {
+      data.model.push({
+        modelType: 'Excitation',
+        modelId: excitationModel.value,
+        values: Object.values(excitationTable.value),
+      });
+    }
+    if (governorModel.value) {
+      data.model.push({
+        modelType: 'Governor',
+        modelId: governorModel.value,
+        values: Object.values(governorTable.value),
+      });
+    }
+    if (stabilizerModel.value) {
+      data.model.push({
+        modelType: 'Stabilizer',
+        modelId: stabilizerModel.value,
+        values: Object.values(stabilizerTable.value),
+      });
+    }
+  } else {
+    if (genericModel.value) {
+      data.model.push({
+        modelType: 'Generic',
+        modelId: genericModel.value,
+        values: Object.values(genericTable.value),
+      });
+    }
+    if (renewableModel.value) {
+      data.model.push({
+        modelType: 'Renewable',
+        modelId: renewableModel.value,
+        values: Object.values(renewableTable.value),
+      });
+    }
+    if (planControlModel.value) {
+      data.model.push({
+        modelType: 'PlanControl',
+        modelId: planControlModel.value,
+        values: Object.values(planControlTable.value),
+      });
+    }
+    if (driveTrainModel.value) {
+      data.model.push({
+        modelType: 'DriveTrain',
+        modelId: driveTrainModel.value,
+        values: Object.values(driveTrainTable.value),
+      });
+    }
   }
-  definitionTypeOption.value = opts;
+  return data;
 };
+// Traditional
+const traditionalGeneratorOpts = ref();
+const traditionalExcitationOpts = ref();
+const traditionalGovernorOpts = ref();
+const traditionalStabilizerOpts = ref();
+// Renewable
+const renewableGenericOpts = ref();
+const renewableRenewableOpts = ref();
+const renewablePlanControlOpts = ref();
+const renewableDriveTrainOpts = ref();
 
 const getGlobalDynamicModelDefinitionByType = async (type) => {
   try {
@@ -664,123 +705,126 @@ const getGlobalDynamicModelDefinitionByType = async (type) => {
 
 // Traditional: {
 
+const getDynamicModelTableOfType = (dynamicModel_id, values = []) => {
+  const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(dynamicModel_id);
+  const table = {};
+  for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
+    table[dynamicModelDefinition.values[i]] = values[i] || '';
+  }
+  return table;
+};
+
 const generatorModel = ref();
 const generatorTable = ref();
+const generatorModelChange = () => {
+  generatorTable.value = getDynamicModelTableOfType(generatorModel.value);
+};
 
-watch(generatorModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    generatorTable.value = table;
-  }
-});
 const excitationModel = ref();
 const excitationTable = ref();
+const excitationModelChange = () => {
+  excitationTable.value = getDynamicModelTableOfType(excitationModel.value);
+};
 
-watch(excitationModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    excitationTable.value = table;
-  }
-});
 const governorModel = ref();
 const governorTable = ref();
-
-watch(governorModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    governorTable.value = table;
-  }
-});
+const governorModelChange = () => {
+  governorTable.value = getDynamicModelTableOfType(governorModel.value);
+};
 
 const stabilizerModel = ref();
 const stabilizerTable = ref();
-
-watch(stabilizerModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    stabilizerTable.value = table;
-  }
-});
+const stabilizerModelChange = () => {
+  stabilizerTable.value = getDynamicModelTableOfType(stabilizerModel.value);
+};
 
 // Renewable: {
 const genericModel = ref();
 const genericTable = ref();
-
-watch(genericModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    genericTable.value = table;
-  }
-});
+const genericModelChange = () => {
+  genericTable.value = getDynamicModelTableOfType(genericModel.value);
+};
 
 const renewableModel = ref();
 const renewableTable = ref();
-
-watch(renewableModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    renewableTable.value = table;
-  }
-});
+const renewableModelChange = () => {
+  renewableTable.value = getDynamicModelTableOfType(renewableModel.value);
+};
 
 const planControlModel = ref();
 const planControlTable = ref();
+const planControlModelChange = () => {
+  planControlTable.value = getDynamicModelTableOfType(planControlModel.value);
+};
 
-watch(planControlModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    planControlTable.value = table;
-  }
-});
 const driveTrainModel = ref();
 const driveTrainTable = ref();
+const driveTrainModelChange = () => {
+  driveTrainTable.value = getDynamicModelTableOfType(driveTrainModel.value);
+};
 
-watch(driveTrainModel, (newId) => {
-  if (newId) {
-    const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(newId);
-    const table = {};
-    for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
-      table[dynamicModelDefinition.values[i]] = '';
-    }
-    driveTrainTable.value = table;
+const handleUpdate = (data) => {
+  const updateData = JSON.parse(JSON.stringify(data));
+  updateData.isTraditionalModel = data.modelDynamicType === 0;
+  dataChange.value = updateData;
+
+  // traditional
+  if (updateData.Generator) {
+    generatorModel.value = updateData.Generator.modelId;
+    generatorTable.value = updateData.Generator.values;
+    console.log('generatorTable.value', generatorTable.value);
   }
-});
+  if (updateData.Excitation) {
+    excitationModel.value = updateData.Excitation.modelId;
+    excitationTable.value = updateData.Excitation.values;
+  }
+  if (updateData.Governor) {
+    governorModel.value = updateData.Governor.modelId;
+    governorTable.value = updateData.Governor.values;
+  }
 
-const handleEdit = (data) => {
-  const editData = JSON.parse(JSON.stringify(data));
-  editData.isTraditionalModel = Boolean(data.modelDynamicType);
-  editData.model = modelDefinitionTypeForm.value;
-  createData.value = editData;
-  createVisibleDialog.value = true;
+  if (updateData.Stabilizer) {
+    stabilizerModel.value = updateData.Stabilizer.modelId;
+    stabilizerTable.value = updateData.Stabilizer.values;
+  }
+  // renewable;
+  if (updateData.Generic) {
+    genericModel.value = updateData.Generic.modelId;
+    genericTable.value = updateData.Generic.values;
+  }
+  if (updateData.Renewable) {
+    renewableModel.value = updateData.Renewable.modelId;
+    renewableTable.value = updateData.Renewable.values;
+  }
+  if (updateData.PlanControl) {
+    planControlModel.value = updateData.PlanControl.modelId;
+    planControlTable.value = updateData.PlanControl.values;
+  }
+  if (updateData.DriveTrain) {
+    driveTrainModel.value = updateData.DriveTrain.modelId;
+    driveTrainModel.value = updateData.DriveTrain.values;
+  }
+  visibleChangeDialog.value = true;
+  console.log('show dialog');
+
   modeChange.value = 'Update';
+};
+
+const updateDynamicModel = async () => {
+  const dataUpdate = getValueModelInForm();
+  try {
+    await additionApi.updateDynamicModel(additionVersionId.value, dataUpdate.id, {
+      model: dataUpdate.model,
+      modelDynamicType: dataUpdate.modelDynamicType,
+    });
+    toast.add({ severity: 'success', summary: 'Update successfully', life: 3000 });
+    visibleChangeDialog.value = false;
+    await getDynamicModelList();
+    clearModelOption();
+  } catch (error) {
+    console.log('getGlobalDynamicModelDefinitionByType: error ', error);
+    toast.add({ severity: 'error', summary: 'Create', detail: error.data.detail, life: 3000 });
+  }
 };
 const confirmDelete = (data) => {
   confirm.require({
