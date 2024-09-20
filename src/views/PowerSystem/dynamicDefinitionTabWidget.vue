@@ -514,7 +514,8 @@ const tableData = computed(() => {
 // CRUD
 const createVisibleDialog = ref(false);
 const createData = ref();
-
+const editData = ref();
+const modeChange = ref();
 const modelDefinitionTypeForm = computed(() => {
   const data = {};
   for (const type in modelDefinitionType.value) {
@@ -538,6 +539,7 @@ const handleCreate = async () => {
   };
   createVisibleDialog.value = true;
   await getdefinitionTypeOption();
+  modeChange.value = 'Create';
 };
 const createDynamicModel = async () => {
   try {
@@ -745,7 +747,14 @@ watch(driveTrainModel, (newId) => {
   }
 });
 
-const handleEdit = (data) => {};
+const handleEdit = (data) => {
+  const editData = JSON.parse(JSON.stringify(data));
+  editData.isTraditionalModel = Boolean(data.modelDynamicType);
+  editData.model = modelDefinitionTypeForm.value;
+  createData.value = editData;
+  createVisibleDialog.value = true;
+  modeChange.value = 'Update';
+};
 const confirmDelete = (data) => {
   confirm.require({
     group: 'deleteConfirm',

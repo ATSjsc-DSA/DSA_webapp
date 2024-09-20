@@ -8,6 +8,7 @@
     :sortOrder="1"
     rowHover
     scrollable
+    showGridlines
     :loading="loading"
   >
     <Column field="generalInfo.emsUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">

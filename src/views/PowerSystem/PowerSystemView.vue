@@ -1,6 +1,4 @@
 <template>
-  isDefinitionGenerator: {{ isDefinitionGenerator }}
-
   <div class="card layout-content min-h-full">
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
@@ -39,9 +37,9 @@
       <!-- tab Power System table  -->
 
       <TabPanel>
-        <Splitter style="height: 74vh">
+        <Splitter style="height: 53rem">
           <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
-            <Card style="height: 100%">
+            <Card style="height: 52.8rem">
               <template #title>
                 <div class="flex flex-wrap justify-content-between align-items-center gap-2">
                   <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
@@ -57,7 +55,12 @@
                 </div>
               </template>
               <template #content>
-                <DataView v-if="showDefinitionList" :value="definitionList" class="w-full">
+                <DataView
+                  v-if="showDefinitionList"
+                  :value="definitionList"
+                  class="w-full"
+                  style="height: 46rem; overflow-y: auto; overflow-x: hidden; margin-right: -1rem"
+                >
                   <template #list="slotProps">
                     <div class="grid grid-nogutter">
                       <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -84,7 +87,8 @@
                   v-model:expandedTreeKeys="expandedTreeKeys"
                   :value="treePs"
                   loadingMode="icon"
-                  class="w-full md:w-[30rem] h-[40vh]"
+                  class="w-full md:w-[30rem]"
+                  style="height: 46rem; overflow: auto"
                   selectionMode="single"
                   @node-expand="onNodeExpand"
                   @node-select="onNodeSelect"
@@ -117,8 +121,8 @@
                   <template v-if="showDefinitionList">
                     <Divider layout="vertical" />
                     <!-- filter -->
-                    <div class="flex gap-2 justify-content-start flex-wrap 2xl:flex-nowrap">
-                      <FloatLabel class="w-8rem 2xl:w-16rem">
+                    <div class="flex gap-2 justify-content-start flex-wrap 2xl:flex-nowrap psView-Filter">
+                      <FloatLabel class="">
                         <label for="filter-area">Area</label>
                         <Dropdown
                           v-model="areaSelected"
@@ -155,7 +159,7 @@
                         </Dropdown>
                       </FloatLabel>
 
-                      <FloatLabel class="w-8rem 2xl:w-16rem">
+                      <FloatLabel class="">
                         <label for="filter-zone">Zone</label>
                         <Dropdown
                           v-model="zoneSelected"
@@ -192,7 +196,7 @@
                         </Dropdown>
                       </FloatLabel>
 
-                      <FloatLabel class="w-8rem 2xl:w-16rem">
+                      <FloatLabel class="">
                         <label for="filter-owner">Owner</label>
                         <Dropdown
                           v-model="ownerSelected"
@@ -231,7 +235,7 @@
 
                       <Divider type="solid" layout="vertical" />
 
-                      <FloatLabel class="w-10rem 2xl:w-16rem">
+                      <FloatLabel class="">
                         <label for="filter-sub">Substation</label>
                         <Dropdown
                           v-model="subSelected"
@@ -316,7 +320,7 @@
 
               <!-- ps table - table data  -->
               <template #content>
-                <div class="flex flex-column h-full">
+                <div class="flex flex-column" style="height: 43rem">
                   <LoadingContainer v-show="isLoadingContainer" />
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                     <TabPanel header="">
@@ -364,7 +368,7 @@
 
               <!-- ps table - Paginator -->
               <template #footer>
-                <div v-if="tabMenuPSActive > 4" class="flex justify-content-end align-items-center">
+                <div v-if="tabMenuPSActive < 4" class="flex justify-content-end align-items-center">
                   <Paginator
                     v-if="psDataListLength > psPageRowNumber"
                     v-model:first="offset"
@@ -1125,6 +1129,12 @@ const toggleMenuConfig = (event) => {
 }
 
 .p-dropdown-item {
-  min-height: 25px;
+  min-height: 2rem;
+}
+.p-dropdown-panel {
+  width: 16rem;
+}
+tr {
+  height: 3.7rem;
 }
 </style>

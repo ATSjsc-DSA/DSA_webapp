@@ -7,6 +7,7 @@
     :lazy="true"
     :sortOrder="1"
     rowHover
+    showGridlines
     scrollable
     :loading="loading"
   >
