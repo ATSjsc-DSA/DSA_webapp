@@ -136,15 +136,16 @@
       <div class="flex align-items-center gap-3 mb-5">
         <label for="globalDynamicModelDefinitionId" class="font-semibold w-12rem"> Power System </label>
 
-        <Dropdown
-          v-model="dataChange.powerSystemDataId"
-          :options="psData"
+        <AutoComplete
+          v-if="modeChange === 'Create'"
+          v-model="dataChange.powerSystemData"
+          optionLabel="name"
           optionValue="_id"
-          optionLabel="generalInfo.name"
-          placeholder="Select a Power System"
-          class="flex-grow-1"
-          :disabled="modeChange === 'Update'"
+          class="flex-grow-1 psAutoComplete"
+          :suggestions="psSuggestions"
+          @complete="searchPsQueryFilter"
         />
+        <InputText v-else :value="dataChange.powerSystemDataName" class="flex-grow-1" disabled />
       </div>
 
       <div class="flex align-items-center gap-3 mb-5">
@@ -405,7 +406,7 @@
         v-if="modeChange === 'Create'"
         type="button"
         label="Save"
-        :disabled="!dataChange.powerSystemDataId"
+        :disabled="!dataChange.powerSystemData"
         @click="createDynamicModel()"
       ></Button>
       <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateDynamicModel()"></Button>
@@ -430,30 +431,27 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
+import AutoComplete from 'primevue/autocomplete';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
 import additionApi from './additionApi';
+import api from './api';
+
 const toast = useToast();
-const additionVersionId = ref('5eb7cf5a86d9755df3a6c593');
+const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 const props = defineProps({
-  psData: {
-    type: Array,
-    required: true,
-  },
+  projectVersionId: { type: String, required: true },
+  definitionId: { type: String, required: true },
 });
 
-// const emit = defineEmits(['getData']);
-
-const isLoadingData = ref(false);
-const modelDefinitionType = ref(globalDynamicModelApi.TypeGlobalDynamicModelDefinition);
 onMounted(async () => {
   await getDynamicDefinitionList();
 
@@ -470,6 +468,10 @@ onMounted(async () => {
   renewableDriveTrainOpts.value = await getGlobalDynamicModelDefinitionByType('DriveTrain');
 });
 
+const psData = ref([]);
+const isLoadingData = ref(false);
+const modelDefinitionType = ref(globalDynamicModelApi.TypeGlobalDynamicModelDefinition);
+
 // addition
 const pageRowNumber = ref(10);
 const totalRecords = ref(0);
@@ -484,7 +486,7 @@ const onPageChange = async (event) => {
 const getDynamicModelList = async () => {
   isLoadingData.value = true;
   try {
-    const res = await additionApi.getDynamicModelList(additionVersionId.value, currentPage.value);
+    const res = await additionApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
     dynamicModelList.value = res.data.items;
     totalRecords.value = res.data.total;
   } catch (error) {
@@ -545,6 +547,19 @@ const tableData = computed(() => {
 });
 
 // CRUD
+
+const psSuggestions = ref();
+const searchPsQueryFilter = async (event) => {
+  const query = event.query.trim();
+  try {
+    const res = await api.searchPs(props.projectVersionId, props.definitionId, query);
+    psSuggestions.value = res.data;
+    return res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
+
 const visibleChangeDialog = ref(false);
 const dataChange = ref();
 const modeChange = ref();
@@ -552,7 +567,7 @@ const modeChange = ref();
 const handleCreate = async () => {
   clearModelOption();
   dataChange.value = {
-    powerSystemDataId: '',
+    powerSystemData: '',
     isTraditionalModel: true,
   };
   visibleChangeDialog.value = true;
@@ -571,7 +586,7 @@ const clearModelOption = () => {
 };
 const createDynamicModel = async () => {
   try {
-    await additionApi.createDynamicModel(additionVersionId.value, getValueModelInForm());
+    await additionApi.createDynamicModel(additionprojectVersionId.value, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getDynamicModelList();
@@ -583,7 +598,8 @@ const createDynamicModel = async () => {
 const getValueModelInForm = () => {
   const data = {
     id: dataChange.value.id,
-    powerSystemDataId: dataChange.value.powerSystemDataId,
+    powerSystemDataId:
+      modeChange.value === 'Create' ? dataChange.value.powerSystemData._id : dataChange.value.powerSystemDataId,
     modelDynamicType: dataChange.value.isTraditionalModel ? 0 : 1,
     model: [],
   };
@@ -771,15 +787,13 @@ const handleUpdate = (data) => {
     driveTrainModel.value = updateData.DriveTrain.values;
   }
   visibleChangeDialog.value = true;
-  console.log('show dialog');
-
   modeChange.value = 'Update';
 };
 
 const updateDynamicModel = async () => {
   const dataUpdate = getValueModelInForm();
   try {
-    await additionApi.updateDynamicModel(additionVersionId.value, dataUpdate.id, {
+    await additionApi.updateDynamicModel(additionprojectVersionId.value, dataUpdate.id, {
       model: dataUpdate.model,
       modelDynamicType: dataUpdate.modelDynamicType,
     });
@@ -811,7 +825,7 @@ const confirmDelete = (data) => {
 
 const deleteDynamicModel = async (dynamicModel_id) => {
   try {
-    await additionApi.deleteDynamicModel(additionVersionId.value, dynamicModel_id);
+    await additionApi.deleteDynamicModel(additionprojectVersionId.value, dynamicModel_id);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     getDynamicModelList();
   } catch (error) {
@@ -834,5 +848,10 @@ const deleteDynamicModel = async (dynamicModel_id) => {
 }
 #psDynamicTable .frozen-column.frozen-right-column {
   right: 0;
+}
+
+.psAutoComplete button {
+  background-color: var(--gray-400);
+  border-color: var(--gray-400);
 }
 </style>

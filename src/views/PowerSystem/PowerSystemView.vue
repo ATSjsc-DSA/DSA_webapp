@@ -354,7 +354,11 @@
                       />
                     </TabPanel>
                     <TabPanel id="Dynamic" :disabled="!isDefinitionGenerator">
-                      <dynamicDefinitionTabWidget v-if="isDefinitionGenerator" :ps-data="psData" />
+                      <dynamicDefinitionTabWidget
+                        v-if="isDefinitionGenerator"
+                        :projectVersionId="projectVersionId"
+                        :definitionId="definitionSelected._id"
+                      />
                     </TabPanel>
                   </TabView>
                 </div>
@@ -507,7 +511,6 @@ import hierarchicalListWidget from './hierarchicalListWidget.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
-import { values } from 'lodash';
 const commonStore = useCommonStore();
 const { projectData, editVersionData } = storeToRefs(commonStore);
 
@@ -535,19 +538,17 @@ const loadAllData = async () => {
 };
 
 // get PS data
-const showDefinitionList = ref(false);
+const showDefinitionList = ref(true);
 const psData = ref([]);
 const psDataListLength = ref();
 const psCurrentPage = ref(1);
 const psPageRowNumber = ref(10);
 const isLoadingPsData = ref(false);
 const offset = computed(() => psPageRowNumber.value * psCurrentPage.value - 1);
-const isAddNew = ref(false);
 
 const onPagePsDataChange = async (event) => {
   isLoadingPsData.value = true;
   psCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
-  console.log('onPagePsDataChange, reloadPsData');
   await reloadPsData();
   isLoadingPsData.value = false;
 };
@@ -558,7 +559,6 @@ const reloadPsData = async () => {
     psDataListLength.value = resData.total;
   }
   if (!showDefinitionList.value && pseId.value) {
-    console.log('reloadPsData - setPsDataWithTree');
     await setPsDataWithTree();
   }
 };
@@ -570,7 +570,6 @@ const definitionData = ref({});
 const isDefinitionGenerator = ref(false);
 
 watch(isDefinitionGenerator, (newStatus) => {
-  console.log(newStatus, tabMenuPSActive.value, newStatus && tabMenuPSActive.value === 4);
   const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
   if (!newStatus && isDynamicTab) {
     tabMenuPSActive.value = 0;

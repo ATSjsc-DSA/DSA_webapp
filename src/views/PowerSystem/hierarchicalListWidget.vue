@@ -18,8 +18,7 @@
       v-model="psdSelected"
       optionLabel="name"
       optionValue="_id"
-      class="w-full"
-      dropdown
+      class="w-full psAutoComplete"
       :suggestions="psFilterSuggestions"
       :disabled="definitionSelected === 'can_not_filter'"
       @complete="searchPsQueryFilter"
@@ -46,7 +45,7 @@
     :value="treeData"
     loadingMode="icon"
     class="w-full md:w-[30rem]"
-    style="height: 28rem; overflow: auto"
+    style="height: 30rem; overflow: auto"
     selectionMode="single"
     @node-expand="onNodeExpand"
     @node-select="onNodeSelect"
@@ -54,21 +53,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, onUnmounted, version } from 'vue';
+import { ref, watch } from 'vue';
 
 import Tree from 'primevue/tree';
 import Dropdown from 'primevue/dropdown';
 import AutoComplete from 'primevue/autocomplete';
 
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
-
 import api from './api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
-
-import { useCommonStore } from '@/store';
-const commonStore = useCommonStore();
-const { projectData, editVersionData } = storeToRefs(commonStore);
 
 const toast = useToast();
 const props = defineProps({
@@ -190,5 +182,9 @@ const onNodeSelect = (node) => {
 <style>
 .p-autocomplete-input {
   width: 100%;
+}
+.psAutoComplete button {
+  background-color: var(--gray-400);
+  border-color: var(--gray-400);
 }
 </style>
