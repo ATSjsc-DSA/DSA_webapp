@@ -133,7 +133,7 @@
       </div>
     </template>
     <div style="height: 50rem">
-      <div class="flex align-items-center gap-3 mb-3">
+      <div class="flex align-items-center gap-3 mb-5">
         <label for="globalDynamicModelDefinitionId" class="font-semibold w-12rem"> Power System </label>
 
         <Dropdown
@@ -142,18 +142,17 @@
           optionValue="_id"
           optionLabel="generalInfo.name"
           placeholder="Select a Power System"
-          class="w-20rem"
+          class="flex-grow-1"
           :disabled="modeChange === 'Update'"
         />
       </div>
-      <span class="p-text-secondary block my-3">Dynamic Model information</span>
 
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="type" class="font-semibold w-12rem"> Type</label>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="type" class="font-semibold w-12rem">Dynamic Model Type</label>
         <Button
           :severity="dataChange.isTraditionalModel ? 'info' : 'primary'"
           :label="dataChange.isTraditionalModel ? 'Traditional' : 'Renewable'"
-          class="w-20rem"
+          class="flex-grow-1"
           @click="dataChange.isTraditionalModel = !dataChange.isTraditionalModel"
         />
       </div>
@@ -170,7 +169,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="traditionalGeneratorOpts.length === 0"
               @change="generatorModelChange()"
@@ -183,7 +182,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="generatorTable[col]" class="w-14rem" />
+                  <InputText v-model="generatorTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -200,7 +199,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="traditionalExcitationOpts.length === 0"
               @change="excitationModelChange()"
@@ -213,7 +212,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="excitationTable[col]" class="w-14rem" />
+                  <InputText v-model="excitationTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -229,7 +228,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="traditionalGovernorOpts.length === 0"
               @change="governorModelChange()"
@@ -242,7 +241,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="governorTable[col]" class="w-14rem" />
+                  <InputText v-model="governorTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -258,7 +257,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="traditionalStabilizerOpts.length === 0"
               @change="stabilizerModelChange()"
@@ -271,7 +270,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="stabilizerTable[col]" class="w-14rem" />
+                  <InputText v-model="stabilizerTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -291,7 +290,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="renewableGenericOpts.length === 0"
               @change="genericModelChange"
@@ -304,7 +303,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="genericTable[col]" class="w-14rem" />
+                  <InputText v-model="genericTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -320,7 +319,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="renewableRenewableOpts.length === 0"
               @change="renewableModelChange"
@@ -333,7 +332,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="renewableTable[col]" class="w-14rem" />
+                  <InputText v-model="renewableTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -349,7 +348,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="renewablePlanControlOpts.length === 0"
               @change="planControlModelChange"
@@ -362,7 +361,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="planControlTable[col]" class="w-14rem" />
+                  <InputText v-model="planControlTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
@@ -378,7 +377,7 @@
               optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
-              class="w-20rem"
+              class="flex-grow-1"
               showClear
               :disabled="renewableDriveTrainOpts.length === 0"
               @change="driveTrainModelChange"
@@ -391,7 +390,7 @@
                   <div class="w-12rem">
                     {{ col }}
                   </div>
-                  <InputText v-model="driveTrainTable[col]" class="w-14rem" />
+                  <InputText v-model="driveTrainTable[col]" class="flex-grow-1" />
                 </div>
               </div>
             </div>
