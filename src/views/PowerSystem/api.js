@@ -29,8 +29,17 @@ export default class api {
 
   // tree - powersystem edit
 
-  static async getChildOnPs(parentId, versionId) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/child/${parentId}`);
+  // static async getChildOnPs(parentId, versionId) {
+  //   return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/child/${parentId}`);
+  // }
+  static async getChildOnPs(versionId, data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/child`, data);
+  }
+  static async searchPs(versionId, psdDefinition_id, query, exceptionArr = []) {
+    return post(
+      `/powersystem/${projectData.value._id}/search/powersystemedit/${versionId}/${psdDefinition_id}?query=${query}`,
+      exceptionArr,
+    );
   }
 
   static async getPsDataWithTree(psedId, versionId, page = 1, parentId = undefined) {
@@ -98,6 +107,4 @@ export default class api {
   static async openVersion(versionId) {
     return put(`/powersystem/${projectData.value._id}/powersystemversion/${versionId}`);
   }
-
-
 }

@@ -80,18 +80,11 @@
                     </div>
                   </template>
                 </DataView>
-
-                <Tree
+                <hierarchicalListWidget
                   v-else
-                  v-model:selectionKeys="nodeSelected"
-                  v-model:expandedTreeKeys="expandedTreeKeys"
-                  :value="treePs"
-                  loadingMode="icon"
-                  class="w-full md:w-[30rem]"
-                  style="height: 46rem; overflow: auto"
-                  selectionMode="single"
-                  @node-expand="onNodeExpand"
-                  @node-select="onNodeSelect"
+                  :version-id="projectVersionId"
+                  :definition-filter="treeDefinitionFilterOpts"
+                  @onNodeSelect="onNodeSelect"
                 />
               </template>
             </Card>
@@ -509,10 +502,12 @@ import generalTabWidget from './generalTabWidget.vue';
 import engineInfoTabWidget from './engineInfoTabWidget.vue';
 import scadaInfoTabWidget from './scadaInfoTabWidget.vue';
 import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
+import hierarchicalListWidget from './hierarchicalListWidget.vue';
 
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
+import { values } from 'lodash';
 const commonStore = useCommonStore();
 const { projectData, editVersionData } = storeToRefs(commonStore);
 
@@ -540,7 +535,7 @@ const loadAllData = async () => {
 };
 
 // get PS data
-const showDefinitionList = ref(true);
+const showDefinitionList = ref(false);
 const psData = ref([]);
 const psDataListLength = ref();
 const psCurrentPage = ref(1);
@@ -552,6 +547,7 @@ const isAddNew = ref(false);
 const onPagePsDataChange = async (event) => {
   isLoadingPsData.value = true;
   psCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  console.log('onPagePsDataChange, reloadPsData');
   await reloadPsData();
   isLoadingPsData.value = false;
 };
@@ -561,16 +557,12 @@ const reloadPsData = async () => {
     psData.value = resData.items;
     psDataListLength.value = resData.total;
   }
-  if (!showDefinitionList.value && nodeSelected.value) {
+  if (!showDefinitionList.value && pseId.value) {
+    console.log('reloadPsData - setPsDataWithTree');
     await setPsDataWithTree();
   }
 };
 
-watch(showDefinitionList, (newStatus) => {
-  if (newStatus === false && isAddNew.value) {
-    // treePs.value = getLeaf(projectData.value);
-  }
-});
 //  -- Flat List - definition list
 const definitionList = ref([]);
 const definitionSelected = ref({});
@@ -828,62 +820,23 @@ const handleFilterClick = async () => {
 };
 
 //  tree - powersystem edit
-const treePs = ref([
-  {
-    key: projectData.value._id,
-    _id: projectData.value._id,
-    label: projectData.value.name,
-    parentId: projectData.value._id,
-    leaf: false,
-    loading: false,
-    hasChilded: true,
-    engineClassId: '',
-  },
-]);
+const treedefinitionFilter = ref(['Substation', 'Area', 'Zone', 'Owner', 'kV']);
+const treeDefinitionFilterOpts = computed(() => {
+  const opts = definitionList.value.filter((item) => treedefinitionFilter.value.includes(item.name));
+  opts.push({
+    name: 'kV',
+    _id: 'can_not_filter',
+  });
+  return opts;
+});
+
 const nodeSelected = ref();
-const parentNodeSelected = ref();
 const pseId = ref();
+const parentNodeSelected = ref();
 
-const onNodeExpand = async (node) => {
-  if (!node.children) {
-    node.loading = true;
-    node.children = await getLeaf(node._id);
-    if (node.children || node.children.length == 0) {
-      node.leaf = true;
-    }
-    node.loading = false;
-  }
-};
-
-const getLeaf = async (parentId) => {
-  try {
-    const childData = await api.getChildOnPs(parentId, projectVersionId.value);
-    const data = [];
-    for (let index = 0; index < childData.data.length; index++) {
-      data.push({
-        key: parentId + childData.data[index]._id,
-        _id: childData.data[index]._id,
-        label: childData.data[index].name,
-        parentId: parentId,
-        loading: false,
-        leaf: !childData.data[index].childed,
-        hasChilded: childData.data[index].childed,
-        engineClassId: childData.data[index].engineClassId,
-      });
-    }
-    return data;
-  } catch (error) {
-    console.log('getFirstChildOnPSTree: error ', error);
-    toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
-  }
-};
 const onNodeSelect = (node) => {
-  if (node.label === projectData.value.name) {
-    nodeSelected.value = undefined;
-    return;
-  }
   isDefinitionGenerator.value = node.label === 'Generator';
-
+  nodeSelected.value = node;
   isLoadingContainer.value = true;
   pseId.value = node._id;
   psCurrentPage.value = 1;
