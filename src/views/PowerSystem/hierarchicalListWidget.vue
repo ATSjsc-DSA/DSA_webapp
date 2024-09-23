@@ -45,18 +45,21 @@
     @node-expand="onNodeExpand"
     @node-select="onNodeSelect"
   />
-
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 import Tree from 'primevue/tree';
 import Dropdown from 'primevue/dropdown';
 import AutoComplete from 'primevue/autocomplete';
 
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+
 import api from './api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
+const toast = useToast();
 
 const props = defineProps({
   versionId: { type: String, required: true },
@@ -71,6 +74,11 @@ onMounted(() => {
     searchPsQueryFilter();
     getTree();
   }
+});
+
+onUnmounted(() => {
+  clearInterval(treeDrawInterval.value);
+  treeDrawInterval.value = undefined;
 });
 watch(
   () => props.definitionFilter,
@@ -112,31 +120,52 @@ const isLoadingTree = ref(false);
 const treeData = ref([]);
 const getTree = async () => {
   isLoadingTree.value = true;
+  clearInterval(treeDrawInterval.value);
+  treeDrawInterval.value = undefined;
+  treeData.value = [];
   const psdId = psdSelected.value ? psdSelected.value._id : undefined;
   try {
     const childData = await api.getChildOnPs(props.versionId, {
       definition_id: definitionSelected.value,
       psd_id: psdId,
     });
-    const data = [];
-    for (let index = 0; index < childData.data.length; index++) {
-      data.push({
-        key: psdId + childData.data[index]._id,
-        _id: childData.data[index]._id,
-        label: childData.data[index].name,
-        parentId: psdId,
-        loading: false,
-        leaf: !childData.data[index].childed,
-        hasChilded: childData.data[index].childed,
-        engineClassId: childData.data[index].engineClassId,
-      });
-    }
-
-    treeData.value = data;
+    treeRawData.value = childData.data;
+    treeDrawInterval.value = setInterval(() => {
+      drawLeaf();
+    }, 1000);
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
+    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
   isLoadingTree.value = false;
+};
+
+const treeRawData = ref();
+const treeDrawInterval = ref();
+
+const drawLeaf = () => {
+  if (treeRawData.value.length === 0) {
+    clearInterval(treeDrawInterval.value);
+    treeDrawInterval.value = undefined;
+  }
+  const treeLength = treeData.value.length;
+  const data = [];
+  const lengthGet = treeRawData.value.length > 20 ? 20 : treeRawData.value.length;
+  for (let index = 0; index < lengthGet; index++) {
+    data.push({
+      key: treeLength + index + treeRawData.value[index]._id,
+      _id: treeRawData.value[index]._id,
+      label: treeRawData.value[index].name,
+      parentId: '',
+      loading: false,
+      leaf: !treeRawData.value[index].childed,
+      hasChilded: treeRawData.value[index].childed,
+      engineClassId: treeRawData.value[index].engineClassId,
+    });
+  }
+  treeData.value = treeData.value.concat(data);
+  console.log(treeData.value);
+  treeRawData.value = treeRawData.value.slice(100, treeRawData.value.length - 1);
 };
 
 const nodeSelected = ref();
@@ -152,6 +181,8 @@ const onNodeExpand = async (node) => {
   }
 };
 
+// const tree;
+
 const getLeaf = async (node = {}) => {
   try {
     const payload = {
@@ -164,6 +195,7 @@ const getLeaf = async (node = {}) => {
     const childData = await api.getChildOnPs(props.versionId, payload);
 
     const data = [];
+
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
         key: node._id + childData.data[index]._id,
@@ -179,6 +211,7 @@ const getLeaf = async (node = {}) => {
     return data;
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
+    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 const onNodeSelect = (node) => {
