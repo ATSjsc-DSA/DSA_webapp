@@ -80,12 +80,13 @@
                     </div>
                   </template>
                 </DataView>
-                <hierarchicalListWidget
-                  v-else
-                  :version-id="projectVersionId"
-                  :definition-filter="treeDefinitionFilterOpts"
-                  @onNodeSelect="onNodeSelect"
-                />
+                <keep-alive v-else>
+                  <hierarchicalListWidget
+                    :version-id="projectVersionId"
+                    :definition-filter="treeDefinitionFilterOpts"
+                    @onNodeSelect="onNodeSelect"
+                  />
+                </keep-alive>
               </template>
             </Card>
           </SplitterPanel>

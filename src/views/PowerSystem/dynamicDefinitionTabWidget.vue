@@ -141,6 +141,8 @@
           v-model="dataChange.powerSystemData"
           optionLabel="name"
           optionValue="_id"
+          dropdown
+          dropdownMode="current"
           class="flex-grow-1 psAutoComplete"
           placeholder="Type Something to search ..."
           :suggestions="psSuggestions"

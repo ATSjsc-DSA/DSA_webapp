@@ -18,6 +18,8 @@
       v-model="psdSelected"
       optionLabel="name"
       optionValue="_id"
+      dropdown
+      dropdownMode="current"
       class="w-full psAutoComplete"
       :suggestions="psFilterSuggestions"
       :disabled="definitionSelected === 'can_not_filter'"
@@ -26,15 +28,8 @@
     />
   </div>
   <div class="flex justify-content-center align-items-center w-full mt-3">
-    <Button
-      icon="pi pi-filter"
-      class=""
-      label="Get List"
-      severity="primary"
-      @click="getTree"
-    />
+    <Button icon="pi pi-filter" class="" label="Get List" severity="primary" @click="getTree" />
   </div>
-
   <Divider />
   <div v-if="isLoadingTree" class="block relative w-full mt-3 h-12rem">
     <LoadingContainer v-show="isLoadingTree" />
@@ -50,10 +45,11 @@
     @node-expand="onNodeExpand"
     @node-select="onNodeSelect"
   />
+
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 import Tree from 'primevue/tree';
 import Dropdown from 'primevue/dropdown';
@@ -61,7 +57,6 @@ import AutoComplete from 'primevue/autocomplete';
 
 import api from './api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
-import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
   versionId: { type: String, required: true },
@@ -69,6 +64,14 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['onNodeSelect']);
+onMounted(() => {
+  if (props.definitionFilter.filter((item) => item.name === 'Substation').length > 0) {
+    definitionSelected.value = props.definitionFilter.filter((item) => item.name === 'Substation')[0]._id;
+
+    searchPsQueryFilter();
+    getTree();
+  }
+});
 watch(
   () => props.definitionFilter,
   (newData) => {
@@ -91,7 +94,7 @@ const psdSelected = ref();
 const psFilterSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
   if (definitionSelected.value) {
-    const query = event.query.trim();
+    const query = event ? event.query.trim() : '';
     try {
       const res = await api.searchPs(props.versionId, definitionSelected.value, query);
       psFilterSuggestions.value = res.data;
@@ -109,24 +112,26 @@ const isLoadingTree = ref(false);
 const treeData = ref([]);
 const getTree = async () => {
   isLoadingTree.value = true;
+  const psdId = psdSelected.value ? psdSelected.value._id : undefined;
   try {
     const childData = await api.getChildOnPs(props.versionId, {
       definition_id: definitionSelected.value,
-      psd_id: psdSelected.value._id,
+      psd_id: psdId,
     });
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
-        key: psdSelected.value._id + childData.data[index]._id,
+        key: psdId + childData.data[index]._id,
         _id: childData.data[index]._id,
         label: childData.data[index].name,
-        parentId: psdSelected.value._id,
+        parentId: psdId,
         loading: false,
         leaf: !childData.data[index].childed,
         hasChilded: childData.data[index].childed,
         engineClassId: childData.data[index].engineClassId,
       });
     }
+
     treeData.value = data;
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
@@ -149,11 +154,15 @@ const onNodeExpand = async (node) => {
 
 const getLeaf = async (node = {}) => {
   try {
-    const childData = await api.getChildOnPs(props.versionId, {
-      definition_id: definitionSelected.value,
+    const payload = {
       parent_id: node._id,
-      ancestor_id: node.parentId,
-    });
+    };
+    if (node.engineClassId === 'middleParent') {
+      payload.ancestor_id = node.parentId;
+    }
+
+    const childData = await api.getChildOnPs(props.versionId, payload);
+
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {
       data.push({
@@ -173,7 +182,6 @@ const getLeaf = async (node = {}) => {
   }
 };
 const onNodeSelect = (node) => {
-  console.log('node selected', node);
   emit('onNodeSelect', node);
 };
 </script>
