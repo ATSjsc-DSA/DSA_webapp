@@ -18,9 +18,7 @@
       v-model="psdSelected"
       optionLabel="name"
       optionValue="_id"
-      dropdown
-      dropdownMode="current"
-      class="w-full psAutoComplete"
+      completeOnFocus
       :suggestions="psFilterSuggestions"
       :disabled="definitionSelected === 'can_not_filter'"
       placeholder="Type Something to search ..."
@@ -164,7 +162,6 @@ const drawLeaf = () => {
     });
   }
   treeData.value = treeData.value.concat(data);
-  console.log(treeData.value);
   treeRawData.value = treeRawData.value.slice(100, treeRawData.value.length - 1);
 };
 
