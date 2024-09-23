@@ -850,8 +850,11 @@ const onNodeSelect = (node) => {
 
 const setPsDataWithTree = async (getHeader = false, hasChilded = false, engineClassId = '') => {
   let parentId;
-
-  if (!hasChilded && engineClassId !== 'ElmLne') {
+  console.log(engineClassId);
+  // if (!hasChilded && engineClassId !== 'ElmLne' && engineClassId !== 'ElmTr3') {
+  //   parentId = parentNodeSelected.value;
+  // }
+  if (engineClassId === 'middleParent') {
     parentId = parentNodeSelected.value;
   }
   try {

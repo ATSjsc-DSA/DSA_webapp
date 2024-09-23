@@ -31,7 +31,6 @@
       class=""
       label="Get List"
       severity="primary"
-      :disabled="!psdSelected || !definitionSelected"
       @click="getTree"
     />
   </div>
@@ -62,6 +61,7 @@ import AutoComplete from 'primevue/autocomplete';
 
 import api from './api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
+import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
   versionId: { type: String, required: true },
