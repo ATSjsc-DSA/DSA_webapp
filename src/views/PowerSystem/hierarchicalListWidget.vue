@@ -21,6 +21,7 @@
       class="w-full psAutoComplete"
       :suggestions="psFilterSuggestions"
       :disabled="definitionSelected === 'can_not_filter'"
+      placeholder="Type Something to search ..."
       @complete="searchPsQueryFilter"
     />
   </div>
@@ -62,7 +63,6 @@ import AutoComplete from 'primevue/autocomplete';
 import api from './api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 
-const toast = useToast();
 const props = defineProps({
   versionId: { type: String, required: true },
   definitionFilter: { type: Array, default: () => [] },
@@ -130,7 +130,6 @@ const getTree = async () => {
     treeData.value = data;
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
-    toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
   }
   isLoadingTree.value = false;
 };
@@ -171,7 +170,6 @@ const getLeaf = async (node = {}) => {
     return data;
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
-    toast.add({ severity: 'error', summary: 'Child On Power System Edit', detail: error.data.detail, life: 3000 });
   }
 };
 const onNodeSelect = (node) => {

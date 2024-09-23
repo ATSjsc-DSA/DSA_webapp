@@ -142,6 +142,7 @@
           optionLabel="name"
           optionValue="_id"
           class="flex-grow-1 psAutoComplete"
+          placeholder="Type Something to search ..."
           :suggestions="psSuggestions"
           @complete="searchPsQueryFilter"
         />

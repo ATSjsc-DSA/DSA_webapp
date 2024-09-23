@@ -575,6 +575,10 @@ watch(isDefinitionGenerator, (newStatus) => {
     tabMenuPSActive.value = 0;
   }
 });
+watch(showDefinitionList, () => {
+  tabMenuPSActive.value = 0;
+});
+
 const setDefinitionList = async () => {
   try {
     const res = await api.getDefinitionList();
