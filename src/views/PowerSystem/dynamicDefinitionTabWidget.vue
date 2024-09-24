@@ -133,8 +133,15 @@
       </div>
     </template>
     <div style="height: 50rem">
-      <div class="flex align-items-center gap-3 mb-5">
-        <label for="globalDynamicModelDefinitionId" class="font-semibold w-12rem"> Power System </label>
+      <div class="flex align-items-start gap-3 mb-5">
+        <div class="w-12rem">
+          <label for="globalDynamicModelDefinitionId" class="font-semibold"> Power System </label>
+          <div class="mt-1">
+            <small>
+              {{ props.nodeSelected ? `(${props.nodeSelected.parentName})` : '' }}
+            </small>
+          </div>
+        </div>
 
         <AutoComplete
           v-if="modeChange === 'Create'"
@@ -159,7 +166,6 @@
           @click="dataChange.isTraditionalModel = !dataChange.isTraditionalModel"
         />
       </div>
-
       <!-- ---------- Traditional----- -->
       <TabView v-if="dataChange.isTraditionalModel">
         <TabPanel header="Generator">
@@ -433,7 +439,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
@@ -450,9 +456,19 @@ const toast = useToast();
 const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 const props = defineProps({
+  isShowingDefinitionList: { type: Boolean },
+  nodeSelected: { type: Object },
+
   projectVersionId: { type: String, required: true },
   definitionId: { type: String, required: true },
 });
+
+watch(
+  () => props.isShowingDefinitionList,
+  (newData) => {
+    getDynamicModelList();
+  },
+);
 
 onMounted(async () => {
   await getDynamicDefinitionList();
@@ -470,7 +486,6 @@ onMounted(async () => {
   renewableDriveTrainOpts.value = await getGlobalDynamicModelDefinitionByType('DriveTrain');
 });
 
-const psData = ref([]);
 const isLoadingData = ref(false);
 const modelDefinitionType = ref(globalDynamicModelApi.TypeGlobalDynamicModelDefinition);
 
@@ -488,9 +503,25 @@ const onPageChange = async (event) => {
 const getDynamicModelList = async () => {
   isLoadingData.value = true;
   try {
-    const res = await additionApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
-    dynamicModelList.value = res.data.items;
-    totalRecords.value = res.data.total;
+    let resData = {
+      items: [],
+      total: 0,
+    };
+    if (props.isShowingDefinitionList) {
+      const res = await additionApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
+      resData = res.data;
+    } else {
+      if (props.nodeSelected) {
+        const res = await additionApi.getDynamicModelListWithTree(
+          additionprojectVersionId.value,
+          props.nodeSelected.parentId,
+          currentPage.value,
+        );
+        resData = res.data;
+      }
+    }
+    dynamicModelList.value = resData.items;
+    totalRecords.value = resData.total;
   } catch (error) {
     dynamicModelList.value = [];
     console.log('getDynamicModelList: error ', error);
@@ -551,6 +582,7 @@ const tableData = computed(() => {
 // CRUD
 
 const psSuggestions = ref();
+
 const searchPsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {

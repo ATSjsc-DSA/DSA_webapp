@@ -42,21 +42,21 @@
             <Card style="height: 52.8rem">
               <template #title>
                 <div class="flex flex-wrap justify-content-between align-items-center gap-2">
-                  <div>{{ showDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
+                  <div>{{ isShowingDefinitionList ? 'Flat List' : 'Hierarchical List' }}</div>
                   <div class="flex flex-wrap justify-content-between align-items-center gap-2">
                     <Button
-                      :icon="showDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
+                      :icon="isShowingDefinitionList ? 'pi pi-sitemap' : 'pi pi-align-left'"
                       severity="secondary"
                       aria-label="show List PSD As Tree"
-                      :title="showDefinitionList ? 'Show as menu' : 'Show as list'"
-                      @click="showDefinitionList = !showDefinitionList"
+                      :title="isShowingDefinitionList ? 'Show as menu' : 'Show as list'"
+                      @click="isShowingDefinitionList = !isShowingDefinitionList"
                     />
                   </div>
                 </div>
               </template>
               <template #content>
                 <DataView
-                  v-if="showDefinitionList"
+                  v-if="isShowingDefinitionList"
                   :value="definitionList"
                   class="w-full"
                   style="height: 46rem; overflow-y: auto; overflow-x: hidden; margin-right: -1rem"
@@ -80,13 +80,12 @@
                     </div>
                   </template>
                 </DataView>
-                <keep-alive v-else>
-                  <hierarchicalListWidget
-                    :version-id="projectVersionId"
-                    :definition-filter="treeDefinitionFilterOpts"
-                    @onNodeSelect="onNodeSelect"
-                  />
-                </keep-alive>
+                <hierarchicalListWidget
+                  v-else
+                  :version-id="projectVersionId"
+                  :definition-filter="treeDefinitionFilterOpts"
+                  @onNodeSelect="onNodeSelect"
+                />
               </template>
             </Card>
           </SplitterPanel>
@@ -111,7 +110,7 @@
                     </div>
                   </div>
 
-                  <template v-if="showDefinitionList">
+                  <template v-if="isShowingDefinitionList">
                     <Divider layout="vertical" />
                     <!-- filter -->
                     <div class="flex gap-2 justify-content-start flex-wrap 2xl:flex-nowrap psView-Filter">
@@ -359,6 +358,8 @@
                         v-if="isDefinitionGenerator"
                         :projectVersionId="projectVersionId"
                         :definitionId="definitionSelected._id"
+                        :isShowingDefinitionList="isShowingDefinitionList"
+                        :nodeSelected="nodeSelected"
                       />
                     </TabPanel>
                   </TabView>
@@ -539,7 +540,7 @@ const loadAllData = async () => {
 };
 
 // get PS data
-const showDefinitionList = ref(true);
+const isShowingDefinitionList = ref(true);
 const psData = ref([]);
 const psDataListLength = ref();
 const psCurrentPage = ref(1);
@@ -554,12 +555,12 @@ const onPagePsDataChange = async (event) => {
   isLoadingPsData.value = false;
 };
 const reloadPsData = async () => {
-  if (showDefinitionList.value && definitionSelected.value.name) {
+  if (isShowingDefinitionList.value && definitionSelected.value.name) {
     const resData = await getPsDataWithDefinitionFilter(definitionSelected.value.name, psCurrentPage.value);
     psData.value = resData.items;
     psDataListLength.value = resData.total;
   }
-  if (!showDefinitionList.value && pseId.value) {
+  if (!isShowingDefinitionList.value && pseId.value) {
     await setPsDataWithTree();
   }
 };
@@ -576,7 +577,7 @@ watch(isDefinitionGenerator, (newStatus) => {
     tabMenuPSActive.value = 0;
   }
 });
-watch(showDefinitionList, () => {
+watch(isShowingDefinitionList, () => {
   tabMenuPSActive.value = 0;
 });
 
@@ -836,7 +837,7 @@ const treeDefinitionFilterOpts = computed(() => {
 
 const nodeSelected = ref();
 const pseId = ref();
-const parentNodeSelected = ref();
+const parentNodeSelected = ref('');
 
 const onNodeSelect = (node) => {
   isDefinitionGenerator.value = node.label === 'Generator';
@@ -935,10 +936,10 @@ const psCreate = ref();
 const handleCreatePS = () => {
   let parentId = projectData.value._id;
   const powerSystemDefinitionId = definitionSelected.value._id ? definitionSelected.value._id : '';
-  if (showDefinitionList.value && definitionSelected.value.name) {
+  if (isShowingDefinitionList.value && definitionSelected.value.name) {
     parentId = definitionData.value.parrentId;
   }
-  if (!showDefinitionList.value && nodeSelected.value) {
+  if (!isShowingDefinitionList.value && nodeSelected.value) {
     parentId = parentNodeSelected.value;
   }
   psCreate.value = {
@@ -1060,7 +1061,7 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'Create',
           icon: 'pi pi-plus',
-          disabled: !showDefinitionList.value || !definitionSelected.value._id,
+          disabled: !isShowingDefinitionList.value || !definitionSelected.value._id,
           command: () => {
             handleCreatePS();
           },

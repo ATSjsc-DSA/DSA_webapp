@@ -52,7 +52,6 @@ import Tree from 'primevue/tree';
 import Dropdown from 'primevue/dropdown';
 import AutoComplete from 'primevue/autocomplete';
 
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
 import api from './api';
@@ -128,14 +127,17 @@ const getTree = async () => {
       psd_id: psdId,
     });
     treeRawData.value = childData.data;
+    drawLeaf();
     treeDrawInterval.value = setInterval(() => {
       drawLeaf();
-    }, 1000);
+    }, 500);
   } catch (error) {
     console.log('getFirstChildOnPSTree: error ', error);
     toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
-  isLoadingTree.value = false;
+  setTimeout(() => {
+    isLoadingTree.value = false;
+  }, 500);
 };
 
 const treeRawData = ref();
@@ -155,6 +157,7 @@ const drawLeaf = () => {
       _id: treeRawData.value[index]._id,
       label: treeRawData.value[index].name,
       parentId: '',
+      parentName: '',
       loading: false,
       leaf: !treeRawData.value[index].childed,
       hasChilded: treeRawData.value[index].childed,
@@ -199,6 +202,7 @@ const getLeaf = async (node = {}) => {
         _id: childData.data[index]._id,
         label: childData.data[index].name,
         parentId: node._id,
+        parentName: node.label,
         loading: false,
         leaf: !childData.data[index].childed,
         hasChilded: childData.data[index].childed,
