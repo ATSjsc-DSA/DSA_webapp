@@ -29,7 +29,7 @@
     <Button icon="pi pi-filter" class="" label="Get List" severity="primary" @click="getTree" />
   </div>
   <Divider />
-  <div v-if="isLoadingTree" class="block relative w-full mt-3 h-12rem">
+  <div v-if="isLoadingTree" class="block relative w-full mt-3 h-12rem" style="z-index: 1">
     <LoadingContainer v-show="isLoadingTree" />
   </div>
   <Tree
@@ -54,7 +54,7 @@ import AutoComplete from 'primevue/autocomplete';
 
 import { useToast } from 'primevue/usetoast';
 
-import api from './api';
+import { api } from './api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 const toast = useToast();
 
@@ -65,10 +65,8 @@ const props = defineProps({
 
 const emit = defineEmits(['onNodeSelect']);
 onMounted(() => {
-  if (props.definitionFilter.filter((item) => item.name === 'Substation').length > 0) {
-    definitionSelected.value = props.definitionFilter.filter((item) => item.name === 'Substation')[0]._id;
-
-    searchPsQueryFilter();
+  if (props.definitionFilter.filter((item) => item.name === 'Station').length > 0) {
+    definitionSelected.value = props.definitionFilter.filter((item) => item.name === 'Station')[0]._id;
     getTree();
   }
 });
@@ -80,8 +78,9 @@ onUnmounted(() => {
 watch(
   () => props.definitionFilter,
   (newData) => {
-    if (newData.filter((item) => item.name === 'Substation').length > 0) {
-      definitionSelected.value = newData.filter((item) => item.name === 'Substation')[0]._id;
+    if (newData.filter((item) => item.name === 'Station').length > 0) {
+      definitionSelected.value = newData.filter((item) => item.name === 'Station')[0]._id;
+      getTree();
     }
   },
 );
@@ -174,7 +173,7 @@ const onNodeExpand = async (node) => {
   if (!node.children) {
     node.loading = true;
     node.children = await getLeaf(node);
-    if (node.children || node.children.length == 0) {
+    if (!(node.children && node.children.length > 0)) {
       node.leaf = true;
     }
     node.loading = false;

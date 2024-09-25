@@ -450,7 +450,7 @@ const confirm = useConfirm();
 
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
 import additionApi from './additionApi';
-import api from './api';
+import { api } from './api';
 
 const toast = useToast();
 const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
@@ -586,7 +586,7 @@ const psSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await api.searchPs(props.projectVersionId, props.definitionId, query);
+    const res = await api.PsTree.searchPs(props.projectVersionId, props.definitionId, query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

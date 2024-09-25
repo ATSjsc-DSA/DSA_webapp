@@ -26,7 +26,7 @@
             <Column header="Name" field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="Ems Name" field="generalInfo.emsName" />
-            <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
+            <!-- <Column header="emsUniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="Operation Name" field="generalInfo.operationName" />
             <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
             <Column header="Software Name" field="generalInfo.softwareName" />
@@ -39,14 +39,14 @@
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
             <div class="font-bold">
-              {{ slotProps.data.generalInfo.emsUniqueId }}
+              {{ slotProps.data.generalInfo.uniqueId }}
             </div>
           </template>
         </Column>
         <Column header="Name" field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="Ems Name" field="generalInfo.emsName" />
-        <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
+        <!-- <Column header="emsUniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="Operation Name" field="generalInfo.operationName" />
         <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
         <Column header="Software Name" field="generalInfo.softwareName" />
@@ -87,7 +87,7 @@
             <Column header="Name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="Ems Name" />
-            <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
+            <!-- <Column header="emsUniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="Operation Name" />
             <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
             <Column header="Software Name" />
@@ -133,7 +133,7 @@
             </div>
           </template>
         </Column>
-        <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
+        <!-- <Column header="emsUniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="Operation Name" field="generalInfo.operationName">
           <template #body="slotProps">
             <div v-if="!slotProps.data.changes.generalInfo || !slotProps.data.changes.generalInfo.operationName">
@@ -230,7 +230,7 @@
             <Column header="Name" field="generalInfo.name" />
             <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="Ems Name" field="generalInfo.emsName" />
-            <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
+            <!-- <Column header="emsUniqueId" field="generalInfo.uniqueId" /> -->
             <Column header="Operation Name" field="generalInfo.operationName" />
             <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
             <Column header="Software Name" field="generalInfo.softwareName" />
@@ -243,14 +243,14 @@
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
             <div class="font-bold">
-              {{ slotProps.data.generalInfo.emsUniqueId }}
+              {{ slotProps.data.generalInfo.uniqueId }}
             </div>
           </template>
         </Column>
         <Column header="Name" field="generalInfo.name" />
         <!-- <Column header="uniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="Ems Name" field="generalInfo.emsName" />
-        <!-- <Column header="emsUniqueId" field="generalInfo.emsUniqueId" /> -->
+        <!-- <Column header="emsUniqueId" field="generalInfo.uniqueId" /> -->
         <Column header="Operation Name" field="generalInfo.operationName" />
         <!-- <Column header="operationUniqueId" field="generalInfo.operationUniqueId" /> -->
         <Column header="Software Name" field="generalInfo.softwareName" />

@@ -7,23 +7,21 @@
     :lazy="true"
     :sortOrder="1"
     rowHover
-    scrollable
     showGridlines
+    scrollable
     :loading="loading"
   >
-    <Column field="generalInfo.emsUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+    <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
         <div class="font-bold w-6rem">
-          {{ slotProps.data.generalInfo.emsUniqueId }}
+          {{ slotProps.data.generalInfo.uniqueId }}
         </div>
       </template>
     </Column>
-    <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
-    <Column field="generalInfo.emsName" header="Ems Name" style="text-wrap: nowrap"></Column>
-    <Column field="generalInfo.operationName" header="Operation Name" style="text-wrap: nowrap"></Column>
-    <Column field="generalInfo.softwareName" header="Software Name" style="text-wrap: nowrap"></Column>
-
-    <Column frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+    <Column field="scadaInfo.skey" header="Skey" style="text-wrap: nowrap"></Column>
+    <Column field="scadaInfo.scadaName" header="Scada Name" style="text-wrap: nowrap"></Column>
+    <Column field="scadaInfo.scadaUniqueId" header="Scada Unique Id" style="text-wrap: nowrap"> </Column>
+    <Column frozen alignFrozen="right" style="text-wrap: nowrap; width: 1%; min-width: 5rem" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />
@@ -41,33 +39,28 @@
         <span class="font-bold white-space-nowrap">Update Power Systwem</span>
       </div>
     </template>
-    <span class="p-text-secondary block mb-5">General information.</span>
-
+    <span class="p-text-secondary block mb-5">Scada information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
       <InputText
         id="areaname"
-        v-model="pseEdit.generalInfo.emsUniqueId"
+        v-model="pseEdit.generalInfo.uniqueId"
         disabled
         class="flex-auto"
         autocomplete="off"
       />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
+      <label for="skey" class="font-semibold w-12rem"> Skey</label>
+      <InputText id="skey" v-model="pseEdit.scadaInfo.skey" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.emsName" class="flex-auto" autocomplete="off" />
+      <label for="scadaName" class="font-semibold w-12rem"> Ems Name</label>
+      <InputText id="scadaName" v-model="pseEdit.scadaInfo.scadaName" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.operationName" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.softwareName" class="flex-auto" autocomplete="off" />
+      <label for="scadaUniqueId" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText id="scadaUniqueId" v-model="pseEdit.scadaInfo.scadaUniqueId" class="flex-auto" autocomplete="off" />
     </div>
 
     <template #footer>
@@ -83,44 +76,34 @@
         <span class="font-bold white-space-nowrap">Delete Power Systwem</span>
       </div>
     </template>
-    <span class="p-text-secondary block mb-5">General information.</span>
-
+    <span class="p-text-secondary block mb-5">Scada information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
       <InputText
         id="areaname"
-        v-model="pseDelete.generalInfo.emsUniqueId"
+        v-model="pseDelete.generalInfo.uniqueId"
         disabled
         class="flex-auto"
         autocomplete="off"
       />
     </div>
-    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-      <label for="areaname" class="font-semibold w-12rem"> Name</label>
-      <InputText id="areaname" v-model="pseDelete.generalInfo.name" class="flex-auto" disabled autocomplete="off" />
+
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="skey" class="font-semibold w-12rem"> Skey</label>
+      <InputText id="skey" v-model="pseDelete.scadaInfo.skey" class="flex-auto" autocomplete="off" disabled />
     </div>
-    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-      <label for="areaname" class="font-semibold w-12rem"> Ems Name</label>
-      <InputText id="areaname" v-model="pseDelete.generalInfo.emsName" class="flex-auto" disabled autocomplete="off" />
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="scadaName" class="font-semibold w-12rem"> Ems Name</label>
+      <InputText id="scadaName" v-model="pseDelete.scadaInfo.scadaName" class="flex-auto" autocomplete="off" disabled />
     </div>
-    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-      <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="scadaUniqueId" class="font-semibold w-12rem"> Ems UniqueId</label>
       <InputText
-        id="areaname"
-        v-model="pseDelete.generalInfo.operationName"
+        id="scadaUniqueId"
+        v-model="pseDelete.scadaInfo.scadaUniqueId"
         class="flex-auto"
-        disabled
         autocomplete="off"
-      />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-      <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
-      <InputText
-        id="areaname"
-        v-model="pseDelete.generalInfo.softwareName"
-        class="flex-auto"
         disabled
-        autocomplete="off"
       />
     </div>
 
@@ -144,7 +127,6 @@ const props = defineProps({
     default: false,
   },
 });
-
 const emit = defineEmits(['editData', 'deleteData']);
 
 // Edit

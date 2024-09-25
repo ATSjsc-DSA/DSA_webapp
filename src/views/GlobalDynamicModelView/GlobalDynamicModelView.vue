@@ -1,13 +1,26 @@
 <template>
-  <div class="card layout-content w-full h-full">
+  <div class="card layout-content m-4">
     <Toast />
-
     <!-- this is for test  -->
-
+    <div class="flex justify-content-between align-items-center flex-wrap 2xl:flex-nowrap">
+      <div class="flex justify-content-start align-items-center gap-2">
+        <Button label="Global Dynamic Model Definition" class="" :text="tabActice !== 0" @click="tabActice = 0" />
+        <Button label="Global Dynamic Model Mapping" class="" :text="tabActice !== 1" @click="tabActice = 1" />
+      </div>
+      <button
+        v-tooltip.bottom="'Global Definition'"
+        class="p-link layout-topbar-button"
+        type="text"
+        @click="onGlobalDefinitionView()"
+      >
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+    <Divider />
     <!-- end test  -->
 
-    <TabView>
-      <TabPanel header=" Global Dynamic Model Definition">
+    <TabView id="tab-view" v-model:activeIndex="tabActice" class="flex-grow-1">
+      <TabPanel>
         <DataTable :value="dynamicDefinition" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
           <template #header>
             <div class="flex justify-content-end gap-3">
@@ -121,7 +134,7 @@
         </DataTable>
       </TabPanel>
 
-      <TabPanel header=" Global Dynamic Model Mapping">
+      <TabPanel>
         <DataTable :value="dynamicMapping" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
           <template #header>
             <div class="flex justify-content-end gap-3">
@@ -317,19 +330,19 @@
   <!-- upload file  -->
   <Dialog
     v-model:visible="uploadDialogGlobalDynamicDefinition"
-    @hide="onHide"
     :style="{ width: '50rem' }"
     header="Upload Dynamic Model Definition File"
     :modal="true"
+    @hide="onHide"
   >
     <uploadFileConfig @uploadFile="uploadGlobalDynamicModelFile"></uploadFileConfig>
   </Dialog>
   <Dialog
     v-model:visible="uploadDialogGlobalDynamicMapping"
-    @hide="onHide"
     :style="{ width: '50rem' }"
     header="Upload Dynamic Model Mapping File"
     :modal="true"
+    @hide="onHide"
   >
     <uploadFileConfig @uploadFile="uploadGlobalDynamicModelMappingFile"></uploadFileConfig>
   </Dialog>
@@ -344,6 +357,7 @@ import { useToast } from 'primevue/usetoast';
 import Dropdown from 'primevue/dropdown';
 import ConfirmDialog from 'primevue/confirmdialog';
 import uploadFileConfig from '../../components/uploadFileConfig.vue';
+import router from '@/router';
 
 import { useRoute } from 'vue-router';
 const route = useRoute();
@@ -357,6 +371,7 @@ onMounted(async () => {
   await getDynamicDefinitionList();
   await getDynamicMappingList();
 });
+const tabActice = ref(0);
 
 watch(
   () => route.params.id,
@@ -707,10 +722,17 @@ const handleExportMappingFile = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+const onGlobalDefinitionView = () => {
+  router.push({ name: 'Global Definition' });
+};
 </script>
 
 <style>
 .p-chips ul {
   width: 100%;
+}
+#tab-view ul.p-tabview-nav {
+  display: none !important;
 }
 </style>

@@ -31,14 +31,14 @@ const items = ref([
       { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
     ],
   },
-  {
-    label: 'Global Definition',
-    icon: 'pi pi-fw pi-server',
-    to: '/globaldefinition',
-    command: () => {
-      router.push('/globaldefinition');
-    },
-  },
+  // {
+  //   label: 'Global Definition',
+  //   icon: 'pi pi-fw pi-server',
+  //   to: '/globaldefinition',
+  //   command: () => {
+  //     router.push('/globaldefinition');
+  //   },
+  // },
 ]);
 
 const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;

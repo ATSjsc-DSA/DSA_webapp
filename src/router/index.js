@@ -149,8 +149,6 @@ router.beforeEach(async (to, from) => {
   } else {
     useCommonStore().setLoading(true);
   }
-
-  // next();
 });
 
 router.afterEach((to, from) => {
@@ -158,6 +156,9 @@ router.afterEach((to, from) => {
     useCommonStore().setLoading(false);
   }, 800);
   // useCommonStore().setLoading(false);
+});
+router.onError((error) => {
+  console.error('Navigation Error:', error);
 });
 
 export default router;

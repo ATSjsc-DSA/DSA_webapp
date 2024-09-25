@@ -10,18 +10,18 @@ console.log('projectId', projectData.value._id);
 console.log('psm_active', psm_active.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
-export default class api {
+export class api {
   // flat list - definition list
   static async getDefinitionList(data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition`, data);
+    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`, data);
   }
 
   static async getDefinitionData(definitionId) {
     return get(`/powersystem/${projectData.value._id}/powersystemdefinition/${definitionId}`);
   }
 
-  static async getPsDataWithDefinition(definitionId, versionId, page = 1, data = {}) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/definition/${definitionId}`, {
+  static async getPsDataWithDefinition(definitionId, projectVersionId, page = 1, data = {}) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/definition/${definitionId}`, {
       ...data,
       page: page,
     });
@@ -29,33 +29,33 @@ export default class api {
 
   // tree - powersystem edit
 
-  // static async getChildOnPs(parentId, versionId) {
-  //   return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/child/${parentId}`);
+  // static async getChildOnPs(parentId, projectVersionId) {
+  //   return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child/${parentId}`);
   // }
-  static async getChildOnPs(versionId, data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/child`, data);
+  static async getChildOnPs(projectVersionId, data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
   }
-  static async searchPs(versionId, psdDefinition_id, query, exceptionArr = []) {
+  static async searchPs(projectVersionId, psdDefinition_id, query, exceptionArr = []) {
     return post(
-      `/powersystem/${projectData.value._id}/search/powersystemedit/${versionId}/${psdDefinition_id}?query=${query}`,
+      `/powersystem/${projectData.value._id}/search/powersystemedit/${projectVersionId}/${psdDefinition_id}?query=${query}`,
       exceptionArr,
     );
   }
 
-  static async getPsDataWithTree(psedId, versionId, page = 1, parentId = undefined) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/${psedId}`, {
+  static async getPsDataWithTree(psId, projectVersionId, page = 1, parentId = undefined) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`, {
       page: page,
       parentId: parentId,
     });
   }
 
   // CRUD
-  static async createPS(data, versionId) {
+  static async createPS(data, projectVersionId) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}`, data);
+    return post(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}`, data);
   }
 
-  static async editPSE(data, versionId) {
+  static async editPSE(data, projectVersionId) {
     const updateData = {
       generalInfo: {
         name: data.generalInfo.name,
@@ -77,10 +77,10 @@ export default class api {
         scadaUniqueId: data.scadaInfo.scadaUniqueId,
       },
     };
-    return put(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/${data._id}`, updateData);
+    return put(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${data._id}`, updateData);
   }
-  static async deletePSE(psde_id, versionId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${versionId}/${psde_id}`);
+  static async deletePSE(psde_id, projectVersionId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psde_id}`);
   }
 
   // compare
@@ -104,7 +104,131 @@ export default class api {
       page_size: 10,
     });
   }
-  static async openVersion(versionId) {
-    return put(`/powersystem/${projectData.value._id}/powersystemversion/${versionId}`);
+
+  static async openVersion(projectVersionId) {
+    return put(`/powersystem/${projectData.value._id}/powersystemversion/${projectVersionId}`);
+  }
+}
+
+export class DefinitionList {
+  static async getParameterDefinitionList(data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`, data);
+  }
+  static async getEmsList(data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/ems`, data);
+  }
+
+  static async getDefinitionData(definitionId) {
+    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/${definitionId}`);
+  }
+}
+
+export class PsTree {
+  static async getChild(projectVersionId, data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
+  }
+  static async searchPsByPatternName(projectVersionId, definitionId, query, exceptionArr = []) {
+    return post(
+      `/powersystem/${projectData.value._id}/search/powersystemedit/${projectVersionId}/${definitionId}?query=${query}`,
+      exceptionArr,
+    );
+  }
+}
+
+export class PowerSystemParameter {
+  static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/definition/${definitionId}`, {
+      ...data,
+      page: page,
+    });
+  }
+
+  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`, {
+      page: page,
+      parentId: parentId,
+    });
+  }
+
+  // CRUD
+  static async create(data, projectVersionId) {
+    data.projectId = projectData.value._id;
+    return post(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}`, data);
+  }
+
+  static async update(data, projectVersionId) {
+    const updateData = {
+      generalInfo: {
+        name: data.generalInfo.name,
+        uniqueId: data.generalInfo.uniqueId,
+        operationName: data.generalInfo.operationName,
+        operationUniqueId: data.generalInfo.operationUniqueId,
+      },
+      engineInfo: {
+        values: data.engineInfo.values,
+      },
+
+      scadaInfo: {
+        skey: data.scadaInfo.skey,
+        scadaName: data.scadaInfo.scadaName,
+        scadaUniqueId: data.scadaInfo.scadaUniqueId,
+      },
+    };
+    return put(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${data._id}`, updateData);
+  }
+
+  static async delete(psId, projectVersionId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`);
+  }
+}
+
+export class PowerSystemEms {
+  static async getDataByDefinition(definitionId, projectVersionId, page = 1, data = {}) {
+    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/definition/${definitionId}`, {
+      ...data,
+      page: page,
+    });
+  }
+
+  static async getPsDataByTree(psId, projectVersionId, page = 1, parentId = undefined) {
+    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`, {
+      page: page,
+      parentId: parentId,
+    });
+  }
+
+  // CRUD
+  static async create(data, projectVersionId) {
+    data.projectId = projectData.value._id;
+    return post(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}`, data);
+  }
+
+  static async update(data, projectVersionId) {
+    const updateData = {
+      generalInfo: {
+        name: data.generalInfo.name,
+        uniqueId: data.generalInfo.uniqueId,
+        emsName: data.generalInfo.emsName,
+        operationName: data.generalInfo.operationName,
+        operationUniqueId: data.generalInfo.operationUniqueId,
+        softwareName: data.generalInfo.softwareName,
+        softwareUniqueId: data.generalInfo.softwareUniqueId,
+      },
+      engineInfo: {
+        powerSystemDefinitionId: data.engineInfo.powerSystemDefinitionId,
+        values: data.engineInfo.values,
+      },
+
+      scadaInfo: {
+        skey: data.scadaInfo.skey,
+        scadaName: data.scadaInfo.scadaName,
+        scadaUniqueId: data.scadaInfo.scadaUniqueId,
+      },
+    };
+    return put(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${data._id}`, updateData);
+  }
+
+  static async delete(psId, projectVersionId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`);
   }
 }

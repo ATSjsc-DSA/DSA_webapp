@@ -11,22 +11,17 @@
     showGridlines
     :loading="loading"
   >
-    <Column field="generalInfo.emsUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+    <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
         <div class="font-bold w-6rem">
-          {{ slotProps.data.generalInfo.emsUniqueId }}
+          {{ slotProps.data.generalInfo.uniqueId }}
         </div>
       </template>
     </Column>
-    <template v-for="col of columnList" :key="col.field">
-      <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)" style="text-wrap: nowrap">
-        <template #body="slotProps">
-          <div class="flex justify-content-between align-items-center">
-            {{ slotProps.data.engineInfo.values[engineIndex][col.index] }}
-          </div>
-        </template>
-      </Column>
-    </template>
+    <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
+    <Column field="generalInfo.operationName" header="Operation Name" style="text-wrap: nowrap"></Column>
+    <Column field="generalInfo.softwareName" header="Software Name" style="text-wrap: nowrap"></Column>
+
     <Column frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
@@ -45,29 +40,25 @@
         <span class="font-bold white-space-nowrap">Update Power Systwem</span>
       </div>
     </template>
-    <span class="p-text-secondary block mb-5">Energy information - {{ valueIndex }}.</span>
+    <span class="p-text-secondary block mb-5">General information.</span>
+
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText
-        id="areaname"
-        v-model="pseEdit.generalInfo.emsUniqueId"
-        disabled
-        class="flex-auto"
-        autocomplete="off"
-      />
+      <InputText id="areaname" v-model="pseEdit.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.operationName" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
+      <InputText id="areaname" v-model="pseEdit.generalInfo.softwareName" class="flex-auto" autocomplete="off" />
     </div>
 
-    <template v-for="col of columnList" :key="col.field">
-      <div v-if="col.visible" class="flex align-items-center gap-3 mb-3">
-        <label :for="col" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(col.header) }}</label>
-        <InputText
-          :id="col"
-          v-model="pseEdit.engineInfo.values[engineIndex][col.index]"
-          class="flex-auto"
-          autocomplete="off"
-        />
-      </div>
-    </template>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="editVisibleDialog = false"></Button>
       <Button type="button" label="Submit" @click="editPSE()"></Button>
@@ -81,18 +72,37 @@
         <span class="font-bold white-space-nowrap">Delete Power Systwem</span>
       </div>
     </template>
-    <span class="p-text-secondary block mb-5">Energy information - {{ valueIndex }}.</span>
-    <template v-for="col of columnList" :key="col.field">
-      <div v-if="col.visible" class="flex align-items-center gap-3 mb-3">
-        <label :for="col" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(col.header) }}</label>
-        <InputText
-          :id="col"
-          v-model="pseDelete.engineInfo.values[engineIndex][col.index]"
-          class="flex-auto"
-          autocomplete="off"
-        />
-      </div>
-    </template>
+    <span class="p-text-secondary block mb-5">General information.</span>
+
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Name</label>
+      <InputText id="areaname" v-model="pseDelete.generalInfo.name" class="flex-auto" disabled autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Operation Name</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.operationName"
+        class="flex-auto"
+        disabled
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
+      <label for="areaname" class="font-semibold w-12rem"> Software Name</label>
+      <InputText
+        id="areaname"
+        v-model="pseDelete.generalInfo.softwareName"
+        class="flex-auto"
+        disabled
+        autocomplete="off"
+      />
+    </div>
+
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="deleteVisibleDialog = false"></Button>
       <Button type="button" label="Submit" severity="danger" @click="deletePSE()"></Button>
@@ -101,45 +111,20 @@
 </template>
 
 <script setup>
-import { ref, computed, compile } from 'vue';
-import { VALUE_DATA_NAME } from './api'; // <= import it
+import { ref } from 'vue';
 
 const props = defineProps({
   data: {
     type: Array,
     required: true,
   },
-  headerData: {
-    type: Object,
-    required: true,
-  },
   loading: {
     type: Boolean,
     default: false,
   },
-  valueIndex: {
-    type: String,
-    default: 'EMS',
-    validator(value) {
-      return VALUE_DATA_NAME.includes(value);
-    },
-  },
 });
-const emit = defineEmits(['editData', 'deleteData']);
 
-const engineIndex = computed(() => VALUE_DATA_NAME.indexOf(props.valueIndex));
-const columnList = computed(() => {
-  if (props.headerData.inputAttributes) {
-    const dataHeader = props.headerData.inputAttributes[engineIndex.value];
-    const cols = [];
-    for (let ind = 0; ind < dataHeader.length; ind++) {
-      const data = dataHeader[ind];
-      cols.push({ index: ind, header: data.name, visible: data.display });
-    }
-    return cols;
-  }
-  return [];
-});
+const emit = defineEmits(['editData', 'deleteData']);
 
 // Edit
 const editVisibleDialog = ref(false);
@@ -166,11 +151,4 @@ const deletePSE = async () => {
   emit('deleteData', pseDelete.value._id);
   deleteVisibleDialog.value = false;
 };
-
-function capitalizeFirstLetter(string) {
-  return string
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
 </script>
