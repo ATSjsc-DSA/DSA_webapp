@@ -15,8 +15,16 @@
       @page="onPageChange"
     >
       <template #header>
-        <div class="flex justify-content-end gap-3">
-          <Button type="button" label="Create" icon="pi pi-plus" @click="createVisibleDialog = true" text />
+        <div class="flex justify-content-between">
+          <Button
+            type="button"
+            label="Create Model"
+            icon="pi pi-plus"
+            size="small"
+            text
+            @click="createVisibleDialog = true"
+          />
+          <Button v-tooltip.bottom="'Logout'" severity="secondary" icon="pi pi-sign-out" text @click="onLogout()" />
         </div>
       </template>
 
@@ -49,7 +57,7 @@
             <Button icon="pi pi-pencil" severity="info" text rounded @click="handleEdit(data)" />
             <Button v-tooltip.bottom="'Active'" icon="pi pi-caret-right" text rounded @click="handleActive(data)" />
             <router-link :to="`/globaldefinition/${data._id}`" rel="globaldefinition">
-              <Button  icon="pi pi-wrench" severity="warning"  text rounded />
+              <Button icon="pi pi-wrench" severity="warning" text rounded />
             </router-link>
             <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDelete(data)" />
           </div>
@@ -136,6 +144,7 @@ import { ref, onMounted } from 'vue';
 import chartComposable from '@/combosables/chartData';
 
 import InputSwitch from 'primevue/inputswitch';
+import router from '@/router';
 
 import api from './api';
 import Toast from 'primevue/toast';
@@ -197,7 +206,7 @@ const handleEdit = (data) => {
   editVisibleDialog.value = true;
 };
 
-const handleActive =async (data) => {
+const handleActive = async (data) => {
   try {
     const res = await api.activeGlobaldefinition(data._id);
     getGlobaldefinitionList();
@@ -239,5 +248,11 @@ const deleteGlobaldefinition = async () => {
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const onLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  router.push('/login');
 };
 </script>

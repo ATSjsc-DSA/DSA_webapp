@@ -13,8 +13,9 @@ const username = ref('');
 const password = ref('');
 const checked = ref(false);
 const loadding = ref(false);
+
 const login = async () => {
-  loadding.value = true;
+  // loadding.value = true;
   try {
     const res = await user_api.login(username.value, password.value);
     localStorage.setItem('token', res.data.access_token);
@@ -22,11 +23,12 @@ const login = async () => {
     const user = await user_api.getUserActive();
     localStorage.setItem('user', user.data.username);
     localStorage.setItem('role', user.data.role);
-    const { redirect } = router.currentRoute.value.query;
-    if (redirect) {
-      router.push(redirect);
+    if (user.data.role === 'admin') {
+      router.push({ name: 'Project' });
+    } else if (user.data.role === 'owner') {
+      router.push({ name: 'Global Definition' });
     } else {
-      router.push('/Project');
+      router.push('/');
     }
     setTimeout(() => {
       loadding.value = false;

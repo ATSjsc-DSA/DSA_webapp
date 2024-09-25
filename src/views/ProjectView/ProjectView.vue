@@ -112,6 +112,7 @@
       <label for="areaname" class="font-semibold w-6rem"> Description</label>
       <InputText id="areaname" v-model="projectEdit.description" class="flex-auto" autocomplete="off" />
     </div>
+    <template #empty> No Data </template>
 
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="editVisibleDialog = false"></Button>
@@ -245,6 +246,7 @@ const deleteProject = async (event, projectId) => {
 };
 const runProject = (project) => {
   projectData.value = project;
+  console.log('project', project);
   localStorage.setItem('projectData', JSON.stringify(projectData.value));
   router.push('/powersystem');
 };
