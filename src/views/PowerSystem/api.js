@@ -183,14 +183,14 @@ export class PowerSystemParameter {
 }
 
 export class PowerSystemEms {
-  static async getDataByDefinition(definitionId, projectVersionId, page = 1, data = {}) {
+  static async getDataWithDefinition(definitionId, projectVersionId, page = 1, data = {}) {
     return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/definition/${definitionId}`, {
       ...data,
       page: page,
     });
   }
 
-  static async getPsDataByTree(psId, projectVersionId, page = 1, parentId = undefined) {
+  static async getPsDataWithTree(psId, projectVersionId, page = 1, parentId = undefined) {
     return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`, {
       page: page,
       parentId: parentId,

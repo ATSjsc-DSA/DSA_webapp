@@ -1,7 +1,6 @@
 <template>
   <DataTable
     :value="data"
-    :totalRecords="data.length"
     dataKey="_id"
     tableStyle="min-width: 50rem"
     :lazy="true"
@@ -42,13 +41,7 @@
     <span class="p-text-secondary block mb-5">Scada information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText
-        id="areaname"
-        v-model="pseEdit.generalInfo.uniqueId"
-        disabled
-        class="flex-auto"
-        autocomplete="off"
-      />
+      <InputText id="areaname" v-model="pseEdit.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="skey" class="font-semibold w-12rem"> Skey</label>
@@ -79,13 +72,7 @@
     <span class="p-text-secondary block mb-5">Scada information.</span>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText
-        id="areaname"
-        v-model="pseDelete.generalInfo.uniqueId"
-        disabled
-        class="flex-auto"
-        autocomplete="off"
-      />
+      <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
 
     <div class="flex align-items-center gap-3 mb-3">

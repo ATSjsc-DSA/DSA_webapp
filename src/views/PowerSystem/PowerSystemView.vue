@@ -109,182 +109,6 @@
                     </div>
                   </div>
 
-                  <template v-if="isShowingDefinitionList">
-                    <Divider layout="vertical" />
-                    <!-- filter -->
-                    <div class="flex gap-2 justify-content-start flex-wrap 2xl:flex-nowrap psView-Filter">
-                      <FloatLabel class="">
-                        <label for="filter-area">Area</label>
-                        <Dropdown
-                          v-model="areaSelected"
-                          :options="areaList"
-                          showClear
-                          :virtualScrollerOptions="{
-                            lazy: areaList.length > 0,
-                            onLazyLoad: onLazyLoadArea,
-                            itemSize: pageRowNumber,
-                            loading: isLoadingAreaFilter,
-                            delay: 250,
-                            showLoader: true,
-                          }"
-                          :disabled="!canUseDefinitionFilter"
-                          class="w-full"
-                        >
-                          <template #value="slotProps">
-                            <div class="flex align-items-center">
-                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Area</div>
-                            </div>
-                          </template>
-                          <template v-slot:option="slotProps">
-                            <div v-if="slotProps.option" class="flex align-items-center">
-                              <div class="py-6">{{ slotProps.option.label }}</div>
-                            </div>
-                          </template>
-
-                          <template v-slot:loader="{ options }">
-                            <div class="flex align-items-center p-1" style="height: 30px">
-                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                            </div>
-                          </template>
-                        </Dropdown>
-                      </FloatLabel>
-
-                      <FloatLabel class="">
-                        <label for="filter-zone">Zone</label>
-                        <Dropdown
-                          v-model="zoneSelected"
-                          :options="zoneList"
-                          showClear
-                          :virtualScrollerOptions="{
-                            lazy: zoneList.length > 0,
-                            onLazyLoad: onLazyLoadZone,
-                            itemSize: pageRowNumber,
-                            loading: isLoadingZoneFilter,
-                            delay: 250,
-                            showLoader: true,
-                          }"
-                          :disabled="!canUseDefinitionFilter"
-                          class="w-full"
-                        >
-                          <template #value="slotProps">
-                            <div class="flex align-items-center">
-                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Zone</div>
-                            </div>
-                          </template>
-                          <template v-slot:option="slotProps">
-                            <div v-if="slotProps.option" class="flex align-items-center">
-                              <div class="py-6">{{ slotProps.option.label }}</div>
-                            </div>
-                          </template>
-
-                          <template v-slot:loader="{ options }">
-                            <div class="flex align-items-center p-1" style="height: 30px">
-                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                            </div>
-                          </template>
-                        </Dropdown>
-                      </FloatLabel>
-
-                      <FloatLabel class="">
-                        <label for="filter-owner">Owner</label>
-                        <Dropdown
-                          v-model="ownerSelected"
-                          showClear
-                          :options="ownerList"
-                          :virtualScrollerOptions="{
-                            lazy: ownerList.length > 0,
-                            onLazyLoad: onLazyLoadOwner,
-                            itemSize: pageRowNumber,
-                            loading: isLoadingOwnerFilter,
-                            delay: 250,
-                            showLoader: true,
-                          }"
-                          :disabled="!canUseDefinitionFilter"
-                          class="w-full"
-                        >
-                          <template #value="slotProps">
-                            <div class="flex align-items-center">
-                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>Owner</div>
-                            </div>
-                          </template>
-                          <template v-slot:option="slotProps">
-                            <div v-if="slotProps.option" class="flex align-items-center">
-                              <div class="py-6">{{ slotProps.option.label }}</div>
-                            </div>
-                          </template>
-
-                          <template v-slot:loader="{ options }">
-                            <div class="flex align-items-center p-1" style="height: 30px">
-                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                            </div>
-                          </template>
-                        </Dropdown>
-                      </FloatLabel>
-
-                      <Divider type="solid" layout="vertical" />
-
-                      <FloatLabel class="">
-                        <label for="filter-sub">Substation</label>
-                        <Dropdown
-                          v-model="subSelected"
-                          :options="subList"
-                          showClear
-                          :virtualScrollerOptions="{
-                            lazy: subList.length > 0,
-                            onLazyLoad: onLazyLoadSubstation,
-                            itemSize: pageRowNumber,
-                            loading: isLoadingSubsFilter,
-                            delay: 250,
-                            showLoader: true,
-                          }"
-                          :disabled="
-                            !canUseDefinitionFilter ||
-                            subList.length === 0 ||
-                            definitionSelected.name === 'SubstationType'
-                          "
-                          class="w-full"
-                        >
-                          <template #value="slotProps">
-                            <div class="flex align-items-center">
-                              <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-                              <div v-else>SubstationType</div>
-                            </div>
-                          </template>
-                          <template v-slot:option="slotProps">
-                            <div v-if="slotProps.option" class="flex align-items-center">
-                              <div class="py-6">{{ slotProps.option.label }}</div>
-                            </div>
-                          </template>
-
-                          <template v-slot:loader="{ options }">
-                            <div class="flex align-items-center p-1" style="height: 30px">
-                              <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-                            </div>
-                          </template>
-                        </Dropdown>
-                      </FloatLabel>
-                      <div class="flex gap-2">
-                        <Button
-                          severity="warning"
-                          icon="pi pi-times"
-                          style="width: 32px"
-                          :disabled="!(areaSelected || zoneSelected || ownerSelected || subSelected)"
-                          @click="clearFilterSelected"
-                        />
-                        <Button
-                          severity="primary"
-                          icon="pi pi-filter"
-                          style="width: 32px"
-                          :disabled="!definitionSelected || !canUseDefinitionFilter"
-                          @click="handleFilterClick"
-                        />
-                      </div>
-                    </div>
-                    <!-- <Divider layout="vertical" /> -->
-                  </template>
                   <!-- menu import/export -->
                   <div>
                     <Button
@@ -309,11 +133,21 @@
                     </Menu>
                   </div>
                 </div>
+                <!-- filter -->
+                <flatListFilterWidget
+                  v-if="showflatListFilterWidget"
+                  class="pt-6 px-3"
+                  :canUseDefinitionFilter="canUseDefinitionFilter"
+                  :canUseDefinitionStationFilter="definitionSelected.name !== 'Station'"
+                  :definitionList="definitionList"
+                  :projectVersionId="projectVersionId"
+                  @handleFilter="handleFlatListFilterClick"
+                />
               </template>
 
               <!-- ps table - table data  -->
               <template #content>
-                <div class="flex flex-column" style="height: 43rem">
+                <div class="flex flex-column" style="height: 38rem">
                   <LoadingContainer v-show="isLoadingContainer" />
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                     <!-- ['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic'] -->
@@ -503,6 +337,8 @@ import { useToast } from 'primevue/usetoast';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
 
+import flatListFilterWidget from './flatListFilterWidget.vue';
+
 import generalTabWidget from './parameterTableTabWidget/generalTabWidget.vue';
 import scadaInfoTabWidget from './parameterTableTabWidget/scadaInfoTabWidget.vue';
 import engineInfoTabWidget from './parameterTableTabWidget/engineInfoTabWidget.vue';
@@ -532,14 +368,13 @@ onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
 const tabMenuPSList = ref(['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic']);
-const isShowingDefinitionList = ref(false);
+const isShowingDefinitionList = ref(true);
 
 const loadAllData = async () => {
   await getDefinitionList();
   // await getVersionData();
   // await getComparePSD();
   tabMenuPSActive.value = 0;
-  await resetFilterList();
 };
 
 // get PS data
@@ -558,16 +393,35 @@ const onPagePsParameterChange = async (event) => {
 };
 const reloadPsData = async () => {
   if (isShowingDefinitionList.value && definitionSelected.value.name) {
-    const resData = await getPsParameterWithDefinitionFilter(
-      definitionSelected.value.name,
-      psParameterCurrentPage.value,
-    );
-    psParameterData.value = resData.items;
-    psParameterTotal.value = resData.total;
+    await getPsParametertWithDefinition(psParameterCurrentPage.value);
   }
   if (!isShowingDefinitionList.value && pseId.value) {
     await getPsDataWithTree();
   }
+};
+
+const getPsParametertWithDefinition = async (page = 1) => {
+  let filter = {};
+  if (canUseDefinitionFilter.value) {
+    filter = JSON.parse(JSON.stringify(flatListFilter.value));
+    // --without Station
+    if (definitionSelected.value.name === 'Station') {
+      delete filter.sub;
+      console.log('');
+    }
+  } else {
+    // -- only station
+    filter = { sub: flatListFilter.value.sub };
+  }
+  const res = await api.PowerSystemParameter.getPsDataWithDefinition(
+    definitionSelected.value._id,
+    projectVersionId.value,
+    filter,
+    page,
+  );
+
+  psParameterData.value = res.data.items;
+  psParameterTotal.value = res.data.total;
 };
 
 //  -- Flat List - definition list
@@ -601,14 +455,8 @@ const handleDefinitionRowClick = async (definition) => {
   definitionSelected.value = definition;
   await setDefinitionData(definitionSelected.value._id);
   psParameterCurrentPage.value = 1;
-  const resData = await getPsParameterWithDefinitionFilter(definitionSelected.value.name, psParameterCurrentPage.value);
-  psParameterData.value = resData.items;
-  psParameterTotal.value = resData.total;
+  await getPsParametertWithDefinition(psParameterCurrentPage.value);
   isLoadingContainer.value = false;
-  areaSelected.value = undefined;
-  zoneSelected.value = undefined;
-  ownerSelected.value = undefined;
-  subSelected.value = undefined;
   isDefinitionGenerator.value = definition.name === 'Generator';
 };
 
@@ -624,223 +472,30 @@ const setDefinitionData = async (id) => {
 };
 
 // Flat List - filter
-const definitionNoFilterList = ref(['Area', 'Zone', 'Owner']);
+const definitionCanNotUseFilter = ref(['Area', 'Zone', 'Owner', 'SubstationType', 'Substation_kVBase']);
 const canUseDefinitionFilter = computed(() => {
-  if (definitionSelected.value._id) {
-    return !definitionNoFilterList.value.includes(definitionSelected.value.name);
+  if (definitionSelected.value.name) {
+    return !definitionCanNotUseFilter.value.includes(definitionSelected.value.name);
   }
   return false;
 });
-const areaSelected = ref();
-const areaList = ref([]);
-const isLoadingAreaFilter = ref(false);
-const definitionArea = ref();
 
-const zoneSelected = ref();
-const zoneList = ref([]);
-const isLoadingZoneFilter = ref(false);
-const definitionZone = ref();
-
-const ownerSelected = ref();
-const ownerList = ref([]);
-const isLoadingOwnerFilter = ref(false);
-const definitionOwner = ref();
-
-const subSelected = ref();
-const subList = ref([]);
-const isLoadingSubsFilter = ref(false);
-const definitionSub = ref();
-
-const resetFilterList = async () => {
-  definitionArea.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'area')[0];
-  if (definitionArea.value) {
-    const areaFilterLength = await api.api.getPsDataWithDefinition(
-      definitionArea.value._id,
-      projectVersionId.value,
-      1,
-      {},
-    );
-    areaList.value = Array.from({ length: areaFilterLength.data.total || 0 });
-  } else {
-    areaList.value = [];
+const showflatListFilterWidget = computed(() => {
+  if (
+    tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic' ||
+    tabMenuPSList.value[tabMenuPSActive.value] === 'EMS'
+  ) {
+    return false;
   }
-
-  definitionZone.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'zone')[0];
-  if (definitionZone.value) {
-    const zoneFilterLength = await api.api.getPsDataWithDefinition(
-      definitionZone.value._id,
-      projectVersionId.value,
-      1,
-      {},
-    );
-    zoneList.value = Array.from({ length: zoneFilterLength.data.total || 0 });
-  } else {
-    zoneList.value = [];
-  }
-  definitionOwner.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'owner')[0];
-
-  if (definitionArea.value) {
-    const ownerFilterLength = await api.api.getPsDataWithDefinition(
-      definitionOwner.value._id,
-      projectVersionId.value,
-      1,
-      {},
-    );
-    ownerList.value = Array.from({ length: ownerFilterLength.data.total || 0 });
-  } else {
-    ownerList.value = [];
-  }
-
-  definitionSub.value = definitionList.value.filter((item) => item.name.toLowerCase() === 'substationtype')[0];
-
-  if (definitionArea.value) {
-    updateSubstationFilterLength();
-  }
-};
-
-const onLazyLoadArea = async (event) => {
-  isLoadingAreaFilter.value = true;
-  const { first, last } = event;
-  const _items = [...areaList.value];
-  for (let row = first; row < last; row += 10) {
-    const page = Math.floor(row / 10) + 1;
-
-    const resData = await api.api.getPsDataWithDefinition(definitionArea.value._id, projectVersionId.value, page, {});
-    if (!resData.data.items) {
-      break;
-    }
-    for (let i = 0; i < resData.data.items.length; i++) {
-      if (!resData.data.items[i].generalInfo) {
-        break;
-      }
-      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
-    }
-  }
-  areaList.value = _items;
-  isLoadingAreaFilter.value = false;
-};
-
-const onLazyLoadZone = async (event) => {
-  isLoadingZoneFilter.value = true;
-  const { first, last } = event;
-  const _items = [...zoneList.value];
-  for (let row = first; row < last; row += 10) {
-    const page = Math.floor(row / 10) + 1;
-    const resData = await api.api.getPsDataWithDefinition(definitionZone.value._id, projectVersionId.value, page, {});
-    if (!resData.data.items) {
-      break;
-    }
-    for (let i = 0; i < resData.data.items.length; i++) {
-      if (!resData.data.items[i].generalInfo) {
-        break;
-      }
-      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
-    }
-  }
-  zoneList.value = _items;
-  isLoadingZoneFilter.value = false;
-};
-
-const onLazyLoadOwner = async (event) => {
-  isLoadingOwnerFilter.value = true;
-  const { first, last } = event;
-  const _items = [...ownerList.value];
-  for (let row = first; row < last; row += 10) {
-    const page = Math.floor(row / 10) + 1;
-    const resData = await api.api.getPsDataWithDefinition(definitionOwner.value._id, projectVersionId.value, page, {});
-    if (!resData.data.items) {
-      break;
-    }
-    for (let i = 0; i < resData.data.items.length; i++) {
-      if (!resData.data.items[i].generalInfo) {
-        break;
-      }
-      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
-    }
-  }
-  ownerList.value = _items;
-  isLoadingOwnerFilter.value = false;
-};
-
-watch(areaSelected, () => {
-  updateSubstationFilterLength();
+  return isShowingDefinitionList.value;
 });
+const flatListFilter = ref({});
 
-watch(zoneSelected, () => {
-  updateSubstationFilterLength();
-});
-
-watch(ownerSelected, () => {
-  updateSubstationFilterLength();
-});
-
-const updateSubstationFilterLength = async () => {
-  subSelected.value = undefined;
-  const subsFilterLength = await getPsParameterWithDefinitionFilter('SubstationType', 1);
-  subList.value = Array.from({ length: subsFilterLength.total || 0 });
-};
-
-const onLazyLoadSubstation = async (event) => {
-  isLoadingSubsFilter.value = true;
-  const { first, last } = event;
-  const _items = [...subList.value];
-  for (let row = first; row < last; row += 10) {
-    const page = Math.floor(row / 10) + 1;
-    const res = await getPsParameterWithDefinitionFilter('SubstationType', page);
-    if (!res.items) {
-      break;
-    }
-    for (let i = 0; i < res.items.length; i++) {
-      if (!res.items[i].generalInfo) {
-        break;
-      }
-      _items[row + i] = { label: res.items[i].generalInfo.name, _id: res.items[i]._id };
-    }
-  }
-  subList.value = _items;
-  isLoadingSubsFilter.value = false;
-};
-
-const getPsParameterWithDefinitionFilter = async (nameFilter, page = 1) => {
-  try {
-    const definition = definitionList.value.filter((item) => item.name.toLowerCase() === nameFilter.toLowerCase())[0];
-    let data = {};
-
-    if (canUseDefinitionFilter.value) {
-      data = {
-        area: areaSelected.value ? areaSelected.value._id : undefined,
-        zone: zoneSelected.value ? zoneSelected.value._id : undefined,
-        owner: ownerSelected.value ? ownerSelected.value._id : undefined,
-        sub: subSelected.value ? subSelected.value._id : undefined,
-      };
-      if (nameFilter === 'SubstationType') {
-        data.sub = undefined;
-      }
-    }
-    const res = await api.PowerSystemParameter.getPsDataWithDefinition(
-      definition._id,
-      projectVersionId.value,
-      data,
-      page,
-    );
-    return res.data;
-  } catch (error) {
-    console.log('getDefinitionFilterData: error ', error);
-    return {};
-  }
-};
-const clearFilterSelected = () => {
-  areaSelected.value = undefined;
-  zoneSelected.value = undefined;
-  ownerSelected.value = undefined;
-  subSelected.value = undefined;
-};
-
-const handleFilterClick = async () => {
+const handleFlatListFilterClick = async (newFilter) => {
+  console.log('handleFlatListFilterClick', newFilter);
+  flatListFilter.value = newFilter;
   isLoadingPsParameterData.value = true;
-  const resData = await getPsParameterWithDefinitionFilter(definitionSelected.value.name, 1);
-  psParameterData.value = resData.items;
-  psParameterTotal.value = resData.total;
+  await getPsParametertWithDefinition();
   isLoadingPsParameterData.value = false;
 };
 
@@ -1117,6 +772,6 @@ const toggleMenuConfig = (event) => {
   width: 16rem;
 }
 tr {
-  height: 3.7rem;
+  height: 3.3rem;
 }
 </style>

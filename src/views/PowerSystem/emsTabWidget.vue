@@ -3,7 +3,8 @@
   emsFilter:{{ emsFilter }}--
   <br />
   filterSelected:{{ filterSelected }}--
-
+  <br />
+  psData:{{ psData }}
   <DataTable
     :value="psData"
     dataKey="_id"
@@ -18,8 +19,12 @@
     <template #header>
       <div class="flex justify-content-start gap-5">
         <div v-for="filter in emsFilter" :key="filter._id" class="flex align-items-center">
-          <Checkbox v-model="filterSelected" inputId="filter._id" :name="filter._id" :value="filter._id" />
-          <label for="ingredient2" class="ml-2"> {{ filter.name }} </label>
+          <RadioButton v-model="filterSelected" :inputId="filter.key" name="dynamic" :value="filter.key" />
+          <label :for="filter.key" class="ml-2">{{ filter.name }}</label>
+        </div>
+        <div class="flex gap-2">
+          <Button severity="warning" text icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
+          <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="getPsData" />
         </div>
       </div>
     </template>
@@ -29,11 +34,11 @@
 <script setup>
 import { ref, onMounted, watch, computed, onUnmounted, version } from 'vue';
 
-import Checkbox from 'primevue/checkbox';
+import RadioButton from 'primevue/radiobutton';
 
 import { useToast } from 'primevue/usetoast';
 
-import { DefinitionList } from './api';
+import { DefinitionList, PowerSystemEms } from './api';
 
 const toast = useToast();
 
@@ -46,25 +51,38 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-  await getEmsDefinitionList();
+  isLoading.value = true;
+  await getPsData();
+  isLoading.value = false;
 });
 
 // filter
-const emsFilter = ref([]);
-const filterSelected = ref([]);
-
-const getEmsDefinitionList = async () => {
-  try {
-    const res = await DefinitionList.getEmsList({});
-    emsFilter.value = res.data;
-    filterSelected.value = emsFilter.value.map((item) => item._id);
-  } catch (error) {
-    console.log('getEmsDefinitionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
-  }
-};
+const emsFilter = ref([
+  { name: 'Station', key: 'station' },
+  { name: 'Bus', key: 'bus' },
+  { name: 'Branch', key: 'Branch' },
+  { name: 'Generator', key: 'generator' },
+  { name: 'Load', key: 'load' },
+  { name: 'Breaker', key: 'breaker' },
+  { name: 'Shunt', key: 'shunt' },
+]);
+const filterSelected = ref();
 
 // -- PS data
 const isLoading = ref(false);
 const psData = ref([]);
+
+const currentPage = ref(1);
+const pageRowNumber = ref(10);
+
+const clearFilterSelected = () => {
+  filterSelected.value = undefined;
+  getPsData();
+};
+
+const getPsData = async () => {
+  if (props.isShowingDefinitionList) {
+    const res = PowerSystemEms.getDataWithDefinition(props.definitionId, props.projectVersionId, currentPage.value);
+  }
+};
 </script>

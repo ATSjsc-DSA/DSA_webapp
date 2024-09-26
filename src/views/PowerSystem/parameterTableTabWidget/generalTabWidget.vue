@@ -1,7 +1,6 @@
 <template>
   <DataTable
     :value="data"
-    :totalRecords="data.length"
     dataKey="_id"
     tableStyle="min-width: 50rem"
     :lazy="true"
