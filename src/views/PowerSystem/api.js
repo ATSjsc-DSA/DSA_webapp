@@ -111,11 +111,11 @@ export class api {
 }
 
 export class DefinitionList {
-  static async getParameterDefinitionList(data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`, data);
+  static async getParameterDefinitionList() {
+    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`);
   }
-  static async getEmsList(data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/ems`, data);
+  static async getEmsList() {
+    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/ems`);
   }
 
   static async getDefinitionData(definitionId) {
@@ -183,7 +183,7 @@ export class PowerSystemParameter {
 }
 
 export class PowerSystemEms {
-  static async getDataWithDefinition(definitionId, projectVersionId, page = 1, data = {}) {
+  static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
     return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/definition/${definitionId}`, {
       ...data,
       page: page,

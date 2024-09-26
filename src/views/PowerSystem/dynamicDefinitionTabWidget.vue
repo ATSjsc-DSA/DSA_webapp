@@ -456,7 +456,7 @@ const toast = useToast();
 const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 const props = defineProps({
-  isShowingDefinitionList: { type: Boolean },
+  showDefinitionFlatList: { type: Boolean },
   nodeSelected: { type: Object },
 
   projectVersionId: { type: String, required: true },
@@ -464,7 +464,7 @@ const props = defineProps({
 });
 
 watch(
-  () => props.isShowingDefinitionList,
+  () => props.showDefinitionFlatList,
   (newData) => {
     getDynamicModelList();
   },
@@ -507,7 +507,7 @@ const getDynamicModelList = async () => {
       items: [],
       total: 0,
     };
-    if (props.isShowingDefinitionList) {
+    if (props.showDefinitionFlatList) {
       const res = await additionApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
       resData = res.data;
     } else {

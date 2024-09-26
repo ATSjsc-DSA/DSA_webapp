@@ -1,7 +1,6 @@
 <template>
   <div class="card layout-content m-4">
     <Toast />
-    <!-- this is for test  -->
     <div class="flex justify-content-between align-items-center flex-wrap 2xl:flex-nowrap">
       <div class="flex justify-content-start align-items-center gap-2">
         <Button label="Global Dynamic Model Definition" class="" :text="tabActice !== 0" @click="tabActice = 0" />
@@ -17,7 +16,6 @@
       </button>
     </div>
     <Divider />
-    <!-- end test  -->
 
     <TabView id="tab-view" v-model:activeIndex="tabActice" class="flex-grow-1">
       <TabPanel>
