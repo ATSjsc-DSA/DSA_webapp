@@ -38,7 +38,7 @@
   </DataTable>
 
   <!-- Edit dialog data -->
-  <Dialog v-model:visible="editVisibleDialog" :style="{ width: '28rem' }" header="Edit " :modal="true">
+  <Dialog v-model:visible="editVisibleDialog" :style="{ width: '32rem' }" header="Edit " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Update Power Systwem</span>
@@ -63,17 +63,28 @@
   </Dialog>
 
   <!-- Delete dialog data -->
-  <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '28rem' }" header="Delete " :modal="true">
+  <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '32rem' }" header="Delete " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Delete Power Systwem</span>
       </div>
     </template>
     <span class="p-text-secondary block mb-5">Energy information.</span>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
+    </div>
+
     <template v-for="col of columnList" :key="col.field">
       <div v-if="col.visible" class="flex align-items-center gap-3 mb-3">
         <label :for="col" class="font-semibold w-12rem"> {{ capitalizeFirstLetter(col.header) }}</label>
-        <InputText :id="col" v-model="pseDelete.engineInfo.values[col.index]" class="flex-auto" autocomplete="off" />
+        <InputText
+          :id="col"
+          v-model="pseDelete.engineInfo.values[col.index]"
+          class="flex-auto"
+          disabled=""
+          autocomplete="off"
+        />
       </div>
     </template>
     <template #footer>

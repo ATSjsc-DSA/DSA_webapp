@@ -221,6 +221,8 @@
                           :emsData="psEmsData"
                           :loading="isLoadingPsEmsData"
                           :headerData="emsDefinitionData"
+                          @update="updatePsEms"
+                          @delete="deletePsEms"
                         />
                       </div>
                       <!-- ps table - Paginator -->
@@ -364,15 +366,19 @@
       </template>
       <span class="p-text-secondary block mb-5">General information.</span>
 
-      <div v-for="(val, name) in psCreate.generalInfo" :key="name" class="flex align-items-center gap-3 mb-3">
+      <div
+        v-for="(val, name) in parameterCreateForm.generalInfo"
+        :key="name"
+        class="flex align-items-center gap-3 mb-3"
+      >
         <label :for="name" class="font-semibold w-10rem"> {{ capitalizeFirstLetter(name) }} </label>
-        <InputText :id="name" v-model="psCreate.generalInfo[name]" class="flex-auto" autocomplete="off" />
+        <InputText :id="name" v-model="parameterCreateForm.generalInfo[name]" class="flex-auto" autocomplete="off" />
       </div>
 
       <span class="p-text-secondary block my-5">Scada information.</span>
-      <div v-for="(val, name) in psCreate.scadaInfo" :key="name" class="flex align-items-center gap-3 mb-3">
+      <div v-for="(val, name) in parameterCreateForm.scadaInfo" :key="name" class="flex align-items-center gap-3 mb-3">
         <label :for="name" class="font-semibold w-10rem"> {{ capitalizeFirstLetter(name) }}</label>
-        <InputText :id="name" v-model="psCreate.scadaInfo[name]" class="flex-auto" autocomplete="off" />
+        <InputText :id="name" v-model="parameterCreateForm.scadaInfo[name]" class="flex-auto" autocomplete="off" />
       </div>
       <template #footer>
         <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
@@ -423,12 +429,6 @@ const projectVersionId = ref('66decf1dcff005199529524b');
 
 onMounted(async () => {
   await loadAllData();
-
-  // this is for test
-  // await handleDefinitionRowClick(definitionList.value[0]);
-  // tabMenuPSActive.value = 2;
-
-  // end test
 });
 
 onUnmounted(() => {});
@@ -819,8 +819,7 @@ const createNewVersion = async () => {
 
 // create ps data
 const createVisibleDialog = ref(false);
-
-const psCreate = ref();
+const parameterCreateForm = ref();
 
 const handleCreatePS = () => {
   let nodeParentId = projectData.value._id;
@@ -831,7 +830,7 @@ const handleCreatePS = () => {
   if (!showDefinitionFlatList.value && nodeSelected.value) {
     nodeParentId = nodeSelected.value.parentId;
   }
-  psCreate.value = {
+  parameterCreateForm.value = {
     _id: '',
     generalInfo: {
       name: '',
@@ -855,7 +854,7 @@ const handleCreatePS = () => {
 };
 const createPSParameter = async () => {
   try {
-    await api.PowerSystemParameter.create(psCreate.value, projectVersionId.value);
+    await api.PowerSystemParameter.create(parameterCreateForm.value, projectVersionId.value);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     reloadPsParameter();
@@ -876,6 +875,17 @@ const updatePsParameter = async (pseUpdate) => {
   }
 };
 
+const updatePsEms = async (pseUpdate) => {
+  try {
+    await api.PowerSystemEms.update(pseUpdate, projectVersionId.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    // reloadData();
+  } catch (error) {
+    console.log('editPS: error ', error);
+    toast.add({ severity: 'error', summary: 'Updated EMS', detail: error.data.detail, life: 3000 });
+  }
+};
+
 // Delete
 const deletePSParameter = async (pseId) => {
   try {
@@ -885,6 +895,17 @@ const deletePSParameter = async (pseId) => {
   } catch (error) {
     console.log('deletePSE: error ', error);
     toast.add({ severity: 'error', summary: 'Delete Power System', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const deletePsEms = async (pseId) => {
+  try {
+    await api.PowerSystemEms.delete(pseId, projectVersionId.value);
+    toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
+    reloadPsEms();
+  } catch (error) {
+    console.log('deletePSE: error ', error);
+    toast.add({ severity: 'error', summary: 'Delete EMS', detail: error.data.detail, life: 3000 });
   }
 };
 

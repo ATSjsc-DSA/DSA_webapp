@@ -185,24 +185,9 @@ export class PowerSystemEms {
 
   static async update(data, projectVersionId) {
     const updateData = {
-      generalInfo: {
-        name: data.generalInfo.name,
-        uniqueId: data.generalInfo.uniqueId,
-        emsName: data.generalInfo.emsName,
-        operationName: data.generalInfo.operationName,
-        operationUniqueId: data.generalInfo.operationUniqueId,
-        softwareName: data.generalInfo.softwareName,
-        softwareUniqueId: data.generalInfo.softwareUniqueId,
-      },
       engineInfo: {
         powerSystemDefinitionId: data.engineInfo.powerSystemDefinitionId,
         values: data.engineInfo.values,
-      },
-
-      scadaInfo: {
-        skey: data.scadaInfo.skey,
-        scadaName: data.scadaInfo.scadaName,
-        scadaUniqueId: data.scadaInfo.scadaUniqueId,
       },
     };
     return put(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${data._id}`, updateData);

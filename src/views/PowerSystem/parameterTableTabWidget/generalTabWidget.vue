@@ -33,7 +33,7 @@
   </DataTable>
 
   <!-- Edit dialog data -->
-  <Dialog v-model:visible="editVisibleDialog" :style="{ width: '28rem' }" header="Edit " :modal="true">
+  <Dialog v-model:visible="editVisibleDialog" :style="{ width: '32rem' }" header="Edit " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Update Power Systwem</span>
@@ -65,7 +65,7 @@
   </Dialog>
 
   <!-- Delete dialog data -->
-  <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '28rem' }" header="Delete " :modal="true">
+  <Dialog v-model:visible="deleteVisibleDialog" :style="{ width: '32rem' }" header="Delete " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Delete Power Systwem</span>
