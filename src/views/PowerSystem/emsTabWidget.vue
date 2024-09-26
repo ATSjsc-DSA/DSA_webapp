@@ -10,9 +10,9 @@
     showGridlines
     :loading="loading"
   >
-    <Column field="generalInfo.uniqueId" frozen header="Unique Id" >
+    <Column field="generalInfo.uniqueId" frozen header="Unique Id">
       <template #body="slotProps">
-        <div class="font-bold">
+        <div class="font-bold w-6rem">
           {{ slotProps.data.generalInfo.uniqueId }}
         </div>
       </template>

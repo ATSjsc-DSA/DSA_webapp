@@ -38,7 +38,7 @@
         </ColumnGroup>
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
-            <div class="font-bold">
+            <div class="font-bold w-6rem">
               {{ slotProps.data.generalInfo.uniqueId }}
             </div>
           </template>
@@ -99,7 +99,7 @@
         </ColumnGroup>
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
-            <div class="font-bold">
+            <div class="font-bold w-6rem">
               {{ slotProps.data.emsUniqueId }}
             </div>
           </template>
@@ -242,7 +242,7 @@
         </ColumnGroup>
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
-            <div class="font-bold">
+            <div class="font-bold w-6rem">
               {{ slotProps.data.generalInfo.uniqueId }}
             </div>
           </template>

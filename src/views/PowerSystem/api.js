@@ -11,27 +11,7 @@ console.log('psm_active', psm_active.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class api {
-  // flat list - definition list
-  static async getDefinitionList(data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`, data);
-  }
-
-  static async getDefinitionData(definitionId) {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/${definitionId}`);
-  }
-
-  static async getPsDataWithDefinition(definitionId, projectVersionId, page = 1, data = {}) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/definition/${definitionId}`, {
-      ...data,
-      page: page,
-    });
-  }
-
   // tree - powersystem edit
-
-  // static async getChildOnPs(parentId, projectVersionId) {
-  //   return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child/${parentId}`);
-  // }
   static async getChildOnPs(projectVersionId, data) {
     return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
   }
@@ -190,7 +170,7 @@ export class PowerSystemEms {
     });
   }
 
-  static async getPsDataWithTree(psId, projectVersionId, page = 1, parentId = undefined) {
+  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, page = 1) {
     return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`, {
       page: page,
       parentId: parentId,

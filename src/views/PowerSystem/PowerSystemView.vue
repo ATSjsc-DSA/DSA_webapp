@@ -169,7 +169,7 @@
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                     <!-- ['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic'] -->
                     <TabPanel>
-                      <div style="height: 38rem">
+                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
                         <generalTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
@@ -192,7 +192,7 @@
                       </div>
                     </TabPanel>
                     <TabPanel>
-                      <div style="height: 38rem">
+                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
                         <engineInfoTabWidget
                           :data="psParameterData"
                           :headerData="parameterDefinitionData"
@@ -216,7 +216,7 @@
                       </div>
                     </TabPanel>
                     <TabPanel>
-                      <div style="height: 38rem">
+                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
                         <emsTabWidget
                           :emsData="psEmsData"
                           :loading="isLoadingPsEmsData"
@@ -241,7 +241,7 @@
                     </TabPanel>
                     <TabPanel> Tôi là PSSE </TabPanel>
                     <TabPanel>
-                      <div style="height: 38rem">
+                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
                         <scadaInfoTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
@@ -249,7 +249,6 @@
                           @deleteData="deletePSParameter"
                         />
                       </div>
-
                       <!-- ps table - Paginator -->
                       <div class="flex justify-content-end align-items-center">
                         <Paginator
@@ -264,6 +263,7 @@
                         <div class="mr-3">Total: {{ psParameterTotal }}</div>
                       </div>
                     </TabPanel>
+
                     <TabPanel :disabled="!isDefinitionGenerator">
                       <dynamicDefinitionTabWidget
                         v-if="isDefinitionGenerator"
@@ -411,7 +411,7 @@ import hierarchicalListWidget from './hierarchicalListWidget.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import { useCommonStore } from '@/store';
-import { Background } from '@vue-flow/background';
+
 const commonStore = useCommonStore();
 const { projectData, editVersionData } = storeToRefs(commonStore);
 
@@ -425,7 +425,6 @@ onMounted(async () => {
   await loadAllData();
 
   // this is for test
-  // showDefinitionFlatList.value = true;
   // await handleDefinitionRowClick(definitionList.value[0]);
   // tabMenuPSActive.value = 2;
 
@@ -586,7 +585,6 @@ const treeDefinitionFilterOpts = computed(() => {
 
 const nodeSelected = ref();
 const pseId = ref();
-const parentNodeSelected = ref('');
 
 const onNodeSelect = async (node) => {
   isDefinitionGenerator.value = node.label === 'Generator';
@@ -594,7 +592,6 @@ const onNodeSelect = async (node) => {
   isLoadingContainer.value = true;
   pseId.value = node._id;
   psParameterCurrentPage.value = 1;
-  parentNodeSelected.value = node.parentId;
   await getPsParameterWithTree(true);
   await getPsEmsWithTree(true);
 
@@ -653,15 +650,15 @@ const getPsParametertWithDefinition = async (page = 1) => {
 };
 
 const getPsParameterWithTree = async (getHeader = false) => {
-  let parentId;
+  let nodeParentId;
   if (nodeSelected.value.engineClassId === 'middleParent') {
-    parentId = parentNodeSelected.value;
+    nodeParentId = nodeSelected.value.parentId;
   }
   try {
     const res = await api.PowerSystemParameter.getPsDataWithTree(
       pseId.value,
       projectVersionId.value,
-      parentId,
+      nodeParentId,
       psParameterCurrentPage.value,
     );
     psParameterData.value = res.data.items;
@@ -690,11 +687,8 @@ const psEmsTotal = ref();
 const psEmsCurrentPage = ref(1);
 const isLoadingPsEmsData = ref(false);
 const psEmsPaginatorOffset = computed(() => pageRowNumber.value * psEmsCurrentPage.value - 1);
-const syncEmsPaginatorWithParameter = ref(true);
 
 watch(emsFilterSelected, async () => {
-  syncEmsPaginatorWithParameter.value = Boolean(emsFilterSelected.value._id);
-
   isLoadingPsEmsData.value = true;
   psEmsCurrentPage.value = 1;
   await reloadPsEms(true);
@@ -706,16 +700,13 @@ const onPagePsEmsChange = async (event) => {
   psEmsCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
   await reloadPsEms();
   isLoadingPsEmsData.value = false;
-  if (syncEmsPaginatorWithParameter.value && psParameterCurrentPage.value != psEmsCurrentPage.value) {
-    psParameterCurrentPage.value = psEmsCurrentPage.value;
-  }
 };
 const reloadPsEms = async (getHeader = false) => {
   if (showDefinitionFlatList.value && definitionSelected.value.name) {
     await getPsEmstWithDefinition(psParameterCurrentPage.value, getHeader);
   }
   if (!showDefinitionFlatList.value && pseId.value) {
-    await getPsEmsWithTree();
+    await getPsEmsWithTree(getHeader);
   }
 };
 
@@ -750,15 +741,16 @@ const getPsEmstWithDefinition = async (page = 1, getHeader = false) => {
 };
 
 const getPsEmsWithTree = async (getHeader = false) => {
-  let parentId;
+  let nodeParentId;
+
   if (nodeSelected.value.engineClassId === 'middleParent') {
-    parentId = parentNodeSelected.value;
+    nodeParentId = nodeSelected.value.parentId;
   }
   try {
     const res = await api.PowerSystemEms.getPsDataWithTree(
       pseId.value,
       projectVersionId.value,
-      parentId,
+      nodeParentId,
       psEmsCurrentPage.value,
     );
     psEmsData.value = res.data.items;
@@ -766,11 +758,7 @@ const getPsEmsWithTree = async (getHeader = false) => {
 
     if (getHeader && res.data.items.length > 0) {
       const firstRow = res.data.items[0];
-      definitionSelected.value = {
-        _id: firstRow.engineInfo.powerSystemDefinitionId,
-      };
-
-      await getParameterDefinitionData(definitionSelected.value._id);
+      await getEmsDefinitionData(firstRow.engineInfo.powerSystemDefinitionId);
     }
   } catch (error) {
     psEmsData.value = [];
@@ -835,19 +823,19 @@ const createVisibleDialog = ref(false);
 const psCreate = ref();
 
 const handleCreatePS = () => {
-  let parentId = projectData.value._id;
+  let nodeParentId = projectData.value._id;
   const powerSystemDefinitionId = definitionSelected.value._id ? definitionSelected.value._id : '';
   if (showDefinitionFlatList.value && definitionSelected.value.name) {
-    parentId = parameterDefinitionData.value.parrentId;
+    nodeParentId = parameterDefinitionData.value.parrentId;
   }
   if (!showDefinitionFlatList.value && nodeSelected.value) {
-    parentId = parentNodeSelected.value;
+    nodeParentId = nodeSelected.value.parentId;
   }
   psCreate.value = {
     _id: '',
     generalInfo: {
       name: '',
-      parrentId: parentId,
+      parrentId: nodeParentId,
       uniqueId: '',
       operationName: '',
       operationUniqueId: '',
