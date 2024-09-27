@@ -170,10 +170,11 @@ export class PowerSystemEms {
     });
   }
 
-  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, page = 1) {
+  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, ems_definition_id, page = 1) {
     return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`, {
       page: page,
       parentId: parentId,
+      ems_definition_id: ems_definition_id,
     });
   }
 

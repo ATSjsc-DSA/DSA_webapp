@@ -751,6 +751,7 @@ const getPsEmsWithTree = async (getHeader = false) => {
       pseId.value,
       projectVersionId.value,
       nodeParentId,
+      emsFilterSelected.value._id,
       psEmsCurrentPage.value,
     );
     psEmsData.value = res.data.items;
