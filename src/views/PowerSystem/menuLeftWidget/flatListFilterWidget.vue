@@ -86,7 +86,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import FloatLabel from 'primevue/floatlabel';
 import Dropdown from 'primevue/dropdown';
 
-import { PowerSystemParameter } from './api';
+import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 const props = defineProps({
   canUseDefinitionFilter: { type: Boolean },
@@ -185,7 +185,7 @@ const resetFilterList = async () => {
 };
 
 const getSizeFilter = async (definitionId, dataFilter = {}) => {
-  const res = await PowerSystemParameter.getPsDataWithDefinition(definitionId, props.projectVersionId, dataFilter, 1);
+  const res = await PowerSystemParameterApi.getPsDataWithDefinition(definitionId, props.projectVersionId, dataFilter, 1);
   return res.data.total || 0;
 };
 
@@ -196,7 +196,7 @@ const onLazyLoadFilterWithoutStation = async (event) => {
   const _items = [...filterList[filterClick.value].options];
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
-    const resData = await PowerSystemParameter.getPsDataWithDefinition(
+    const resData = await PowerSystemParameterApi.getPsDataWithDefinition(
       filterList[filterClick.value].definitionId,
       props.projectVersionId,
       {},
@@ -238,7 +238,7 @@ const onLazyLoadStation = async (event) => {
   const _items = [...stationOptions.value];
   for (let row = first; row < last; row += 10) {
     const page = Math.floor(row / 10) + 1;
-    const resData = await PowerSystemParameter.getPsDataWithDefinition(
+    const resData = await PowerSystemParameterApi.getPsDataWithDefinition(
       stationDefinitionId.value,
       props.projectVersionId,
       {},

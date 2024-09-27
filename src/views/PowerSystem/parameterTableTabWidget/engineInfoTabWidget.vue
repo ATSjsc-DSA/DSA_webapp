@@ -95,8 +95,7 @@
 </template>
 
 <script setup>
-import { ref, computed, compile } from 'vue';
-import { VALUE_DATA_NAME } from '../api'; // <= import it
+import { ref, computed } from 'vue';
 
 const props = defineProps({
   data: {

@@ -184,6 +184,7 @@
               @change="generatorModelChange()"
             />
           </div>
+
           <template v-if="generatorModel">
             <div class="grid mt-3">
               <div v-for="(val, col) in generatorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
@@ -450,7 +451,7 @@ const confirm = useConfirm();
 
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
 import additionApi from './additionApi';
-import { api } from './api';
+import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
 const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
@@ -586,7 +587,7 @@ const psSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await api.PsTree.searchPs(props.projectVersionId, props.definitionId, query);
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, props.definitionId, query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

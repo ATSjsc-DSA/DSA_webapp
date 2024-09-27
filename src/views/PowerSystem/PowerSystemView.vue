@@ -1,5 +1,9 @@
 <template>
   <div class="card layout-content min-h-full">
+    <!-- <div class="w-full flex gap-6 justify-content-end align-items-center">
+      <Button label="Show" @click="createVisibleDialog = true" />
+    </div> -->
+
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
     <div class="flex gap-2 justify-content-between align-items-center">
@@ -37,9 +41,9 @@
       <!-- tab Power System table  -->
 
       <TabPanel>
-        <Splitter style="height: 53rem">
+        <Splitter style="height: 50rem">
           <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
-            <Card style="height: 52.8rem">
+            <Card style="height: 49.8rem">
               <template #title>
                 <div class="flex flex-wrap justify-content-between align-items-center gap-2">
                   <div>{{ showDefinitionFlatList ? 'Flat List' : 'Hierarchical List' }}</div>
@@ -65,7 +69,7 @@
                   v-else
                   :value="definitionList"
                   class="w-full"
-                  style="height: 46rem; overflow-y: auto; overflow-x: hidden; margin-right: -1rem"
+                  style="height: 43rem; overflow-y: auto; overflow-x: hidden; margin-right: -1rem"
                 >
                   <template #list="slotProps">
                     <div class="grid grid-nogutter">
@@ -127,6 +131,7 @@
                   </div>
 
                   <!-- menu import/export -->
+
                   <div>
                     <Button
                       severity="secondary"
@@ -169,7 +174,12 @@
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                     <!-- ['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic'] -->
                     <TabPanel>
-                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
+                      <div
+                        :style="{
+                          height: showDefinitionFlatList ? '35rem' : '37rem',
+                          marginTop: showDefinitionFlatList ? '0' : '3rem',
+                        }"
+                      >
                         <generalTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
@@ -192,7 +202,12 @@
                       </div>
                     </TabPanel>
                     <TabPanel>
-                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
+                      <div
+                        :style="{
+                          height: showDefinitionFlatList ? '35rem' : '37rem',
+                          marginTop: showDefinitionFlatList ? '0' : '3rem',
+                        }"
+                      >
                         <engineInfoTabWidget
                           :data="psParameterData"
                           :headerData="parameterDefinitionData"
@@ -216,7 +231,12 @@
                       </div>
                     </TabPanel>
                     <TabPanel>
-                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
+                      <div
+                        :style="{
+                          height: showDefinitionFlatList ? '35rem' : '37rem',
+                          marginTop: showDefinitionFlatList ? '0' : '3rem',
+                        }"
+                      >
                         <emsTabWidget
                           :emsData="psEmsData"
                           :loading="isLoadingPsEmsData"
@@ -227,7 +247,12 @@
                       </div>
                       <!-- ps table - Paginator -->
                       <div class="flex justify-content-between align-items-center">
-                        <div class="w-10rem">{{ emsFilterSelected.name.replace('Ems', '') }}</div>
+                        <Tag
+                          class="w-10rem px-3 py-1"
+                          style="font-size: 1rem"
+                          severity="secondary"
+                          :value="emsFilterSelected.name.replace('Ems', '')"
+                        ></Tag>
 
                         <Paginator
                           v-if="psEmsTotal > pageRowNumber"
@@ -243,7 +268,12 @@
                     </TabPanel>
                     <TabPanel> Tôi là PSSE </TabPanel>
                     <TabPanel>
-                      <div :style="{ height: showDefinitionFlatList ? '38rem' : '43rem' }">
+                      <div
+                        :style="{
+                          height: showDefinitionFlatList ? '35rem' : '37rem',
+                          marginTop: showDefinitionFlatList ? '0' : '3rem',
+                        }"
+                      >
                         <scadaInfoTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
@@ -358,7 +388,7 @@
     </Dialog>
 
     <!-- create ps data dialog  -->
-    <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
+    <!-- <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
       <template #header>
         <div class="inline-flex align-items-center justify-content-center gap-2">
           <span class="font-bold white-space-nowrap">Power Systwem</span>
@@ -384,14 +414,21 @@
         <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
         <Button type="button" label="Submit" @click="createPSParameter()"></Button>
       </template>
-    </Dialog>
+    </Dialog> -->
   </div>
+
+  <createPsDialog
+    :visible="createVisibleDialog"
+    :projectVersionId="projectVersionId"
+    :definitionList="definitionList"
+    @unvisible="createVisibleDialog = false"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted, watch, computed, onUnmounted, version } from 'vue';
 
-import * as api from './api';
+import * as api from '@/views/PowerSystem/api';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 
@@ -403,16 +440,17 @@ import { useToast } from 'primevue/usetoast';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
 
-import flatListFilterWidget from './flatListFilterWidget.vue';
+import flatListFilterWidget from './menuLeftWidget/flatListFilterWidget.vue';
+import hierarchicalListWidget from './menuLeftWidget/hierarchicalListWidget.vue';
 
 import generalTabWidget from './parameterTableTabWidget/generalTabWidget.vue';
 import scadaInfoTabWidget from './parameterTableTabWidget/scadaInfoTabWidget.vue';
 import engineInfoTabWidget from './parameterTableTabWidget/engineInfoTabWidget.vue';
 
 import emsTabWidget from './emsTabWidget.vue';
-
 import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
-import hierarchicalListWidget from './hierarchicalListWidget.vue';
+
+import createPsDialog from './createPsDialog.vue';
 
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
@@ -463,7 +501,7 @@ watch(showDefinitionFlatList, () => {
 
 const getDefinitionList = async () => {
   try {
-    const res = await api.DefinitionList.getParameterDefinitionList();
+    const res = await api.DefinitionListApi.getParameterDefinitionList();
     definitionList.value = res.data;
   } catch (error) {
     console.log('getDefinitionList: error ', error);
@@ -487,7 +525,7 @@ const handleDefinitionRowClick = async (definition) => {
 
 const getParameterDefinitionData = async (id) => {
   try {
-    const res = await api.DefinitionList.getDefinitionData(id);
+    const res = await api.DefinitionListApi.getDefinitionData(id);
     parameterDefinitionData.value = res.data;
   } catch (error) {
     parameterDefinitionData.value = {};
@@ -500,7 +538,7 @@ const emsDefinitionData = ref({});
 
 const getEmsDefinitionData = async (id) => {
   try {
-    const res = await api.DefinitionList.getDefinitionData(id);
+    const res = await api.DefinitionListApi.getDefinitionData(id);
     emsDefinitionData.value = res.data;
   } catch (error) {
     emsDefinitionData.value = {};
@@ -546,7 +584,7 @@ const emsFilter = ref([]);
 const emsFilterSelected = ref({ name: 'all', _id: undefined });
 const getEmsfilterOptions = async () => {
   try {
-    const res = await api.DefinitionList.getEmsList();
+    const res = await api.DefinitionListApi.getEmsList();
     const filterOpts = [
       {
         label: 'None',
@@ -613,9 +651,6 @@ const onPagePsParameterChange = async (event) => {
   psParameterCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
   await reloadPsParameter();
   isLoadingPsParameterData.value = false;
-  if (syncEmsPaginatorWithParameter.value && psEmsCurrentPage.value != psParameterCurrentPage.value) {
-    psEmsCurrentPage.value = psParameterCurrentPage.value;
-  }
 };
 const reloadPsParameter = async () => {
   if (showDefinitionFlatList.value && definitionSelected.value.name) {
@@ -638,7 +673,7 @@ const getPsParametertWithDefinition = async (page = 1) => {
     // -- only station
     filter = { sub: flatListFilter.value.sub };
   }
-  const res = await api.PowerSystemParameter.getPsDataWithDefinition(
+  const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(
     definitionSelected.value._id,
     projectVersionId.value,
     filter,
@@ -655,7 +690,7 @@ const getPsParameterWithTree = async (getHeader = false) => {
     nodeParentId = nodeSelected.value.parentId;
   }
   try {
-    const res = await api.PowerSystemParameter.getPsDataWithTree(
+    const res = await api.PowerSystemParameterApi.getPsDataWithTree(
       pseId.value,
       projectVersionId.value,
       nodeParentId,
@@ -725,7 +760,7 @@ const getPsEmstWithDefinition = async (page = 1, getHeader = false) => {
   if (emsFilterSelected.value._id) {
     filter['ems_definition_id'] = emsFilterSelected.value._id;
   }
-  const res = await api.PowerSystemEms.getPsDataWithDefinition(
+  const res = await api.PowerSystemEmsApi.getPsDataWithDefinition(
     definitionSelected.value._id,
     projectVersionId.value,
     filter,
@@ -747,7 +782,7 @@ const getPsEmsWithTree = async (getHeader = false) => {
     nodeParentId = nodeSelected.value.parentId;
   }
   try {
-    const res = await api.PowerSystemEms.getPsDataWithTree(
+    const res = await api.PowerSystemEmsApi.getPsDataWithTree(
       pseId.value,
       projectVersionId.value,
       nodeParentId,
@@ -819,10 +854,49 @@ const createNewVersion = async () => {
 };
 
 // create ps data
+
+// this is for dev
+
+// end dev
 const createVisibleDialog = ref(false);
 const parameterCreateForm = ref();
 
-const handleCreatePS = () => {
+const menuImportExport = ref();
+const itemsMenuImportExport = computed(() => {
+  return [
+    {
+      label: 'Import/Export',
+      items: [
+        {
+          label: 'Export',
+          icon: 'pi pi-download',
+          disabled: true,
+          command: () => {},
+        },
+        {
+          label: 'Import',
+          icon: 'pi pi-upload',
+          disabled: true,
+          command: () => {},
+        },
+        {
+          label: 'Power System',
+          icon: 'pi pi-plus',
+          disabled: definitionList.value.length === 0,
+          command: () => {
+            createVisibleDialog.value = true;
+          },
+        },
+      ],
+    },
+  ];
+});
+
+const toggleMenuConfig = (event) => {
+  menuImportExport.value.toggle(event);
+};
+
+const handleCreatePsParameter = () => {
   let nodeParentId = projectData.value._id;
   const powerSystemDefinitionId = definitionSelected.value._id ? definitionSelected.value._id : '';
   if (showDefinitionFlatList.value && definitionSelected.value.name) {
@@ -855,7 +929,7 @@ const handleCreatePS = () => {
 };
 const createPSParameter = async () => {
   try {
-    await api.PowerSystemParameter.create(parameterCreateForm.value, projectVersionId.value);
+    await api.PowerSystemParameterApi.create(parameterCreateForm.value, projectVersionId.value);
     createVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     reloadPsParameter();
@@ -864,10 +938,11 @@ const createPSParameter = async () => {
     toast.add({ severity: 'error', summary: 'Create Power System', detail: error.data.detail, life: 3000 });
   }
 };
+
 // Edit
 const updatePsParameter = async (pseUpdate) => {
   try {
-    await api.PowerSystemParameter.update(pseUpdate, projectVersionId.value);
+    await api.PowerSystemParameterApi.update(pseUpdate, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     // reloadData();
   } catch (error) {
@@ -878,7 +953,7 @@ const updatePsParameter = async (pseUpdate) => {
 
 const updatePsEms = async (pseUpdate) => {
   try {
-    await api.PowerSystemEms.update(pseUpdate, projectVersionId.value);
+    await api.PowerSystemEmsApi.update(pseUpdate, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     // reloadData();
   } catch (error) {
@@ -890,7 +965,7 @@ const updatePsEms = async (pseUpdate) => {
 // Delete
 const deletePSParameter = async (pseId) => {
   try {
-    await api.PowerSystemParameter.delete(pseId, projectVersionId.value);
+    await api.PowerSystemParameterApi.delete(pseId, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     reloadPsParameter();
   } catch (error) {
@@ -901,7 +976,7 @@ const deletePSParameter = async (pseId) => {
 
 const deletePsEms = async (pseId) => {
   try {
-    await api.PowerSystemEms.delete(pseId, projectVersionId.value);
+    await api.PowerSystemEmsApi.delete(pseId, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     reloadPsEms();
   } catch (error) {
@@ -945,42 +1020,6 @@ const getVersionData = async (page = 1) => {
     toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
   }
 };
-
-// menu import/export
-const menuImportExport = ref();
-const itemsMenuImportExport = computed(() => {
-  return [
-    {
-      label: 'Import/Export',
-      items: [
-        {
-          label: 'Export',
-          icon: 'pi pi-download',
-          disabled: true,
-          command: () => {},
-        },
-        {
-          label: 'Import',
-          icon: 'pi pi-upload',
-          disabled: true,
-          command: () => {},
-        },
-        {
-          label: 'Create',
-          icon: 'pi pi-plus',
-          disabled: !showDefinitionFlatList.value || !definitionSelected.value._id,
-          command: () => {
-            handleCreatePS();
-          },
-        },
-      ],
-    },
-  ];
-});
-
-const toggleMenuConfig = (event) => {
-  menuImportExport.value.toggle(event);
-};
 </script>
 
 <style>
@@ -1007,6 +1046,6 @@ const toggleMenuConfig = (event) => {
   width: 16rem;
 }
 tr {
-  height: 3.3rem;
+  height: 3.1rem;
 }
 </style>

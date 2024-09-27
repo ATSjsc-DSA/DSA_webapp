@@ -12,56 +12,6 @@ export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class api {
   // tree - powersystem edit
-  static async getChildOnPs(projectVersionId, data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
-  }
-  static async searchPs(projectVersionId, psdDefinition_id, query, exceptionArr = []) {
-    return post(
-      `/powersystem/${projectData.value._id}/search/powersystemedit/${projectVersionId}/${psdDefinition_id}?query=${query}`,
-      exceptionArr,
-    );
-  }
-
-  static async getPsDataWithTree(psId, projectVersionId, page = 1, parentId = undefined) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`, {
-      page: page,
-      parentId: parentId,
-    });
-  }
-
-  // CRUD
-  static async createPS(data, projectVersionId) {
-    data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}`, data);
-  }
-
-  static async editPSE(data, projectVersionId) {
-    const updateData = {
-      generalInfo: {
-        name: data.generalInfo.name,
-        uniqueId: data.generalInfo.uniqueId,
-        emsName: data.generalInfo.emsName,
-        operationName: data.generalInfo.operationName,
-        operationUniqueId: data.generalInfo.operationUniqueId,
-        softwareName: data.generalInfo.softwareName,
-        softwareUniqueId: data.generalInfo.softwareUniqueId,
-      },
-      engineInfo: {
-        powerSystemDefinitionId: data.engineInfo.powerSystemDefinitionId,
-        values: data.engineInfo.values,
-      },
-
-      scadaInfo: {
-        skey: data.scadaInfo.skey,
-        scadaName: data.scadaInfo.scadaName,
-        scadaUniqueId: data.scadaInfo.scadaUniqueId,
-      },
-    };
-    return put(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${data._id}`, updateData);
-  }
-  static async deletePSE(psde_id, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psde_id}`);
-  }
 
   // compare
 
@@ -90,7 +40,7 @@ export class api {
   }
 }
 
-export class DefinitionList {
+export class DefinitionListApi {
   static async getParameterDefinitionList() {
     return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`);
   }
@@ -103,19 +53,13 @@ export class DefinitionList {
   }
 }
 
-export class PsTree {
+export class PsTreeApi {
   static async getChild(projectVersionId, data) {
     return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
   }
-  static async searchPsByPatternName(projectVersionId, definitionId, query, exceptionArr = []) {
-    return post(
-      `/powersystem/${projectData.value._id}/search/powersystemedit/${projectVersionId}/${definitionId}?query=${query}`,
-      exceptionArr,
-    );
-  }
 }
 
-export class PowerSystemParameter {
+export class PowerSystemParameterApi {
   static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
     return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/definition/${definitionId}`, {
       ...data,
@@ -129,7 +73,16 @@ export class PowerSystemParameter {
       parentId: parentId,
     });
   }
-
+  static async searchPs(projectVersionId, psdDefinition_id, query, exceptionArr = []) {
+    let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
+    if (psdDefinition_id) {
+      url += `?psdDefinition_id=${psdDefinition_id}`;
+    }
+    if (query) {
+      url += psdDefinition_id ? '&' : '?' + `query=${query}`;
+    }
+    return post(url, exceptionArr);
+  }
   // CRUD
   static async create(data, projectVersionId) {
     data.projectId = projectData.value._id;
@@ -162,7 +115,7 @@ export class PowerSystemParameter {
   }
 }
 
-export class PowerSystemEms {
+export class PowerSystemEmsApi {
   static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
     return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/definition/${definitionId}`, {
       ...data,
@@ -177,7 +130,16 @@ export class PowerSystemEms {
       ems_definition_id: ems_definition_id,
     });
   }
-
+  static async searchPs(projectVersionId, psdDefinition_id = '', query = '', exceptionArr = []) {
+    let url = `/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/search`;
+    if (psdDefinition_id) {
+      url += `?psdDefinition_id=${psdDefinition_id}`;
+    }
+    if (query) {
+      url += psdDefinition_id ? '&' : '?' + `query=${query}`;
+    }
+    return post(url, exceptionArr);
+  }
   // CRUD
   static async create(data, projectVersionId) {
     data.projectId = projectData.value._id;

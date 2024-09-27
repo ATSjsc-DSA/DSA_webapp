@@ -33,7 +33,7 @@ import chartComposable from '@/combosables/chartData';
 import ConfirmPopup from 'primevue/confirmpopup';
 import Paginator from 'primevue/paginator';
 
-import { api } from './api';
+import { api } from '@/views/PowerSystem/api';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();

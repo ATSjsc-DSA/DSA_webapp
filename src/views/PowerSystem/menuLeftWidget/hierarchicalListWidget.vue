@@ -38,7 +38,7 @@
     :value="treeData"
     loadingMode="icon"
     class="w-full md:w-[30rem]"
-    style="height: 30rem; overflow: auto"
+    style="height: 28rem; overflow: auto"
     selectionMode="single"
     @node-expand="onNodeExpand"
     @node-select="onNodeSelect"
@@ -54,7 +54,7 @@ import AutoComplete from 'primevue/autocomplete';
 
 import { useToast } from 'primevue/usetoast';
 
-import { api } from './api';
+import { PowerSystemParameterApi, PsTreeApi } from '@/views/PowerSystem/api';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 const toast = useToast();
 
@@ -100,7 +100,7 @@ const searchPsQueryFilter = async (event) => {
   if (definitionSelected.value) {
     const query = event ? event.query.trim() : '';
     try {
-      const res = await api.searchPs(props.versionId, definitionSelected.value, query);
+      const res = await PowerSystemParameterApi.searchPs(props.versionId, definitionSelected.value, query);
       psFilterSuggestions.value = res.data;
       return res.data;
     } catch (error) {
@@ -121,7 +121,7 @@ const getTree = async () => {
   treeData.value = [];
   const psdId = psdSelected.value ? psdSelected.value._id : undefined;
   try {
-    const childData = await api.getChildOnPs(props.versionId, {
+    const childData = await PsTreeApi.getChild(props.versionId, {
       definition_id: definitionSelected.value,
       psd_id: psdId,
     });
@@ -191,7 +191,7 @@ const getLeaf = async (node = {}) => {
       payload.ancestor_id = node.parentId;
     }
 
-    const childData = await api.getChildOnPs(props.versionId, payload);
+    const childData = await PsTreeApi.getChild(props.versionId, payload);
 
     const data = [];
 
