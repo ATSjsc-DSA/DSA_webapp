@@ -161,6 +161,7 @@ const drawLeaf = () => {
       leaf: !treeRawData.value[index].childed,
       hasChilded: treeRawData.value[index].childed,
       engineClassId: treeRawData.value[index].engineClassId,
+      engineLabel: treeRawData.value[index].engineLabel,
     });
   }
   treeData.value = treeData.value.concat(data);
@@ -206,6 +207,7 @@ const getLeaf = async (node = {}) => {
         leaf: !childData.data[index].childed,
         hasChilded: childData.data[index].childed,
         engineClassId: childData.data[index].engineClassId,
+        engineLabel: childData.data[index].engineLabel,
       });
     }
     return data;

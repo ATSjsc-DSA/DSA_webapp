@@ -179,6 +179,7 @@
                         <generalTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
+                          :sublineData="sublineData"
                           @editData="updatePsParameter"
                           @deleteData="deletePSParameter"
                         />
@@ -605,9 +606,28 @@ const onNodeSelect = async (node) => {
   await getPsParameterWithTree(true);
   await getPsEmsWithTree(true);
 
+  if (node.engineLabel === 'Sub_Line') {
+    await getSublineData();
+  }
   isLoadingContainer.value = false;
 };
 
+const sublineData = ref();
+const sublineTotal = ref();
+const sublineCurrentPage = ref(1);
+const getSublineData = async () => {
+  try {
+    const res = await api.SubLineApi.getData(nodeSelected.value._id, projectVersionId.value, sublineCurrentPage.value);
+    sublineData.value = res.data.items;
+    sublineTotal.value = res.data.total;
+  } catch (error) {
+    console.log('getSublineData: error ', error);
+    sublineData.value = undefined;
+    sublineTotal.value = 0;
+
+    toast.add({ severity: 'error', summary: 'Subline', detail: error.data.detail, life: 3000 });
+  }
+};
 // get PS data
 
 const psParameterData = ref([]);

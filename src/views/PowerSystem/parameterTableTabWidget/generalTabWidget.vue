@@ -12,7 +12,7 @@
   >
     <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
-         <div class="font-bold" style="min-width: 6rem">
+        <div class="font-bold" style="min-width: 6rem">
           {{ slotProps.data.generalInfo.uniqueId }}
         </div>
       </template>
@@ -30,6 +30,39 @@
       </template>
     </Column>
     <template #empty> No Data </template>
+  </DataTable>
+
+  <DataTable
+    v-if="sublineData"
+    :value="sublineData"
+    dataKey="_id"
+    tableStyle="min-width: 50rem"
+    :lazy="true"
+    :sortOrder="1"
+    rowHover
+    scrollable
+    showGridlines
+    scrollHeight="20rem"
+    :loading="loading"
+  >
+    <template #header>
+      <div class="py-3 text-lg font-bold">Subline</div>
+    </template>
+    <Column field="name" header="Name" style="text-wrap: nowrap"></Column>
+    <Column field="poleOrder" header="Order" style="text-wrap: nowrap"></Column>
+    <Column field="Longitude" header="Longitude" style="text-wrap: nowrap"></Column>
+    <Column field="Latitude" header="Latitude" style="text-wrap: nowrap"></Column>
+
+    <Column frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+      <template #body="slotProps">
+        <div class="flex justify-content-between">
+          <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditSubline(slotProps.data)" />
+          <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDeleteSubline(slotProps.data)" />
+        </div>
+      </template>
+    </Column>
+    <template #empty> No Data </template>
+    <template #footer> </template>
   </DataTable>
 
   <!-- Edit dialog data -->
@@ -121,6 +154,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  sublineData: {
+    type: Array,
+    required: true,
+  },
 });
 
 const emit = defineEmits(['editData', 'deleteData']);
@@ -150,4 +187,8 @@ const deletePSE = async () => {
   emit('deleteData', pseDelete.value._id);
   deleteVisibleDialog.value = false;
 };
+
+const handleEditSubline=()=>{}
+const handleDeleteSubline=()=>{}
+
 </script>

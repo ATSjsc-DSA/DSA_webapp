@@ -160,3 +160,11 @@ export class PowerSystemEmsApi {
     return _delete(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`);
   }
 }
+
+export class SubLineApi {
+  static async getData(psId, projectVersionId, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${psId}`, {
+      page: page,
+    });
+  }
+}
