@@ -1,9 +1,5 @@
 <template>
   <div class="card layout-content min-h-full">
-    <!-- <div class="w-full flex gap-6 justify-content-end align-items-center">
-      <Button label="Show" @click="createVisibleDialog = true" />
-    </div> -->
-
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
     <div class="flex gap-2 justify-content-between align-items-center">
@@ -386,42 +382,18 @@
         ></Button>
       </template>
     </Dialog>
-
-    <!-- create ps data dialog  -->
-    <!-- <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
-      <template #header>
-        <div class="inline-flex align-items-center justify-content-center gap-2">
-          <span class="font-bold white-space-nowrap">Power Systwem</span>
-        </div>
-      </template>
-      <span class="p-text-secondary block mb-5">General information.</span>
-
-      <div
-        v-for="(val, name) in parameterCreateForm.generalInfo"
-        :key="name"
-        class="flex align-items-center gap-3 mb-3"
-      >
-        <label :for="name" class="font-semibold w-10rem"> {{ capitalizeFirstLetter(name) }} </label>
-        <InputText :id="name" v-model="parameterCreateForm.generalInfo[name]" class="flex-auto" autocomplete="off" />
-      </div>
-
-      <span class="p-text-secondary block my-5">Scada information.</span>
-      <div v-for="(val, name) in parameterCreateForm.scadaInfo" :key="name" class="flex align-items-center gap-3 mb-3">
-        <label :for="name" class="font-semibold w-10rem"> {{ capitalizeFirstLetter(name) }}</label>
-        <InputText :id="name" v-model="parameterCreateForm.scadaInfo[name]" class="flex-auto" autocomplete="off" />
-      </div>
-      <template #footer>
-        <Button type="button" label="Cancel" severity="secondary" @click="createVisibleDialog = false"></Button>
-        <Button type="button" label="Submit" @click="createPSParameter()"></Button>
-      </template>
-    </Dialog> -->
   </div>
 
   <createPsDialog
     :visible="createVisibleDialog"
     :projectVersionId="projectVersionId"
-    :definitionList="definitionList"
+    :parameterFilter="definitionList"
+    :emsFilter="emsFilter"
+    :nodeSelected="nodeSelected"
+    :definitionSelected="definitionSelected"
     @unvisible="createVisibleDialog = false"
+    @reloadPsParameter="reloadPsParameter"
+    @reloadPsEms="reloadPsEms"
   />
 </template>
 
@@ -853,11 +825,6 @@ const createNewVersion = async () => {
   }
 };
 
-// create ps data
-
-// this is for dev
-
-// end dev
 const createVisibleDialog = ref(false);
 const parameterCreateForm = ref();
 
@@ -894,49 +861,6 @@ const itemsMenuImportExport = computed(() => {
 
 const toggleMenuConfig = (event) => {
   menuImportExport.value.toggle(event);
-};
-
-const handleCreatePsParameter = () => {
-  let nodeParentId = projectData.value._id;
-  const powerSystemDefinitionId = definitionSelected.value._id ? definitionSelected.value._id : '';
-  if (showDefinitionFlatList.value && definitionSelected.value.name) {
-    nodeParentId = parameterDefinitionData.value.parrentId;
-  }
-  if (!showDefinitionFlatList.value && nodeSelected.value) {
-    nodeParentId = nodeSelected.value.parentId;
-  }
-  parameterCreateForm.value = {
-    _id: '',
-    generalInfo: {
-      name: '',
-      parrentId: nodeParentId,
-      uniqueId: '',
-      operationName: '',
-      operationUniqueId: '',
-    },
-    engineInfo: {
-      powerSystemDefinitionId: powerSystemDefinitionId,
-      values: [''],
-    },
-    scadaInfo: {
-      skey: '',
-      scadaName: '',
-      scadaUniqueId: '',
-    },
-  };
-
-  createVisibleDialog.value = true;
-};
-const createPSParameter = async () => {
-  try {
-    await api.PowerSystemParameterApi.create(parameterCreateForm.value, projectVersionId.value);
-    createVisibleDialog.value = false;
-    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    reloadPsParameter();
-  } catch (error) {
-    console.log('createPS: error ', error);
-    toast.add({ severity: 'error', summary: 'Create Power System', detail: error.data.detail, life: 3000 });
-  }
 };
 
 // Edit
