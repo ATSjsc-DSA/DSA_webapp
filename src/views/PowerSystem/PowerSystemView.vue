@@ -586,11 +586,20 @@ const getEmsfilterOptions = async () => {
 //  tree - powersystem edit
 const treedefinitionFilter = ref(['Station', 'Area', 'Zone', 'Owner', 'kV']);
 const treeDefinitionFilterOpts = computed(() => {
-  const opts = definitionList.value.filter((item) => treedefinitionFilter.value.includes(item.name));
-  opts.push({
-    name: 'kV',
-    _id: 'can_not_filter',
+  const opts = definitionList.value.filter((item) => {
+    // Kiểm tra nếu item.name là 'Substation_kVBase' hoặc có trong treedefinitionFilter
+    if (item.name === 'Substation_kVBase') {
+      return treedefinitionFilter.value.includes('kV');
+    }
+    return treedefinitionFilter.value.includes(item.name);
   });
+
+  // Thêm đối tượng đặc biệt 'kV'
+  // opts.push({
+  //   name: 'kV',
+  //   _id: 'can_not_filter',
+  // });
+
   return opts;
 });
 
@@ -620,6 +629,7 @@ const getSublineData = async () => {
     const res = await api.SubLineApi.getData(nodeSelected.value._id, projectVersionId.value, sublineCurrentPage.value);
     sublineData.value = res.data.items;
     sublineTotal.value = res.data.total;
+    console.log(sublineData.value, 'sublineData');
   } catch (error) {
     console.log('getSublineData: error ', error);
     sublineData.value = undefined;
