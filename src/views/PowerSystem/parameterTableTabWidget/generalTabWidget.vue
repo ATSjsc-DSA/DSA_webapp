@@ -31,74 +31,6 @@
     </Column>
     <template #empty> No Data </template>
   </DataTable>
-  <div class="mt-5">
-    <DataTable
-      v-if="sublineData"
-      :value="sublineData"
-      dataKey="_id"
-      tableStyle="min-width: 50rem"
-      :lazy="true"
-      :sortOrder="1"
-      rowHover
-      scrollable
-      showGridlines
-      scrollHeight="20rem"
-      :loading="loading"
-    >
-      <template #header>
-        <div class="flex justify-content-between">
-          <Chip class="py-0 pl-0 pr-3">
-            <span class="bg-indigo-50 border-circle w-2rem h-2rem flex align-items-center justify-content-center"
-              ><i class="pi pi-map-marker" style="color: slateblue"></i
-            ></span>
-            <span class="ml-2 font-medium">Pole</span>
-          </Chip>
-          <Button icon="pi pi-plus" severity="success" text rounded @click="handleCreatePole" />
-        </div>
-      </template>
-      <Column field="name" header="Name" style="text-wrap: nowrap"></Column>
-      <Column field="poleOrder" header="Order" style="text-wrap: nowrap"></Column>
-      <Column field="Longitude" header="Longitude" style="text-wrap: nowrap"></Column>
-      <Column field="Latitude" header="Latitude" style="text-wrap: nowrap"></Column>
-
-      <Column frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
-        <template #body="slotProps">
-          <div class="flex justify-content-between">
-            <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditSubline(slotProps.data)" />
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="handleDeleteSubline(slotProps.data)" />
-          </div>
-        </template>
-      </Column>
-      <template #empty> No Data </template>
-      <!-- <template #footer> </template> -->
-    </DataTable>
-  </div>
-  <!-- pole dialog -->
-  <Dialog v-model:visible="poleVisibleDialog" :style="{ width: '32rem' }" header="Add Pole" :modal="true">
-    <template #header>
-      <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Add Pole</span>
-      </div>
-    </template>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Powersystem</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Longitude</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Latitude</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
-    </div>
-  </Dialog>
-
-  <!-- Edit dialog data -->
 
   <!-- Edit dialog data -->
   <Dialog v-model:visible="editVisibleDialog" :style="{ width: '32rem' }" header="Edit " :modal="true">
@@ -196,24 +128,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['editData', 'deleteData']);
-//pole dialog
-const poleVisibleDialog = ref(false);
-const poleEdit = ref({});
-const handleEditPole = (poleData) => {
-  poleEdit.value = poleData;
-  poleVisibleDialog.value = true;
-};
-
-const handleCreatePole = () => {
-  poleEdit.value = {
-    powersystemId: '',
-    name: '',
-    poleOrder: 0,
-    Longitude: 0,
-    Latitude: 0,
-  };
-  poleVisibleDialog.value = true;
-};
 
 // Edit
 const editVisibleDialog = ref(false);
@@ -240,7 +154,4 @@ const deletePSE = async () => {
   emit('deleteData', pseDelete.value._id);
   deleteVisibleDialog.value = false;
 };
-
-const handleEditSubline = () => {};
-const handleDeleteSubline = () => {};
 </script>

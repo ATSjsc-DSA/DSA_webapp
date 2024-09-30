@@ -170,33 +170,89 @@
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
                     <!-- ['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic'] -->
                     <TabPanel>
-                      <div
-                        :style="{
-                          height: showDefinitionFlatList ? '35rem' : '37rem',
-                          marginTop: showDefinitionFlatList ? '0' : '3rem',
-                        }"
-                      >
-                        <generalTabWidget
-                          :data="psParameterData"
-                          :loading="isLoadingPsParameterData"
-                          :sublineData="sublineData"
-                          @editData="updatePsParameter"
-                          @deleteData="deletePSParameter"
-                        />
-                      </div>
-                      <!-- ps table - Paginator -->
-                      <div class="flex justify-content-end align-items-center">
-                        <Paginator
-                          v-if="psParameterTotal > pageRowNumber"
-                          v-model:first="psParameterPaginatorOffset"
-                          class="flex-grow-1"
-                          :rows="pageRowNumber"
-                          :totalRecords="psParameterTotal"
-                          :page="psParameterCurrentPage"
-                          @page="onPagePsParameterChange"
-                        ></Paginator>
-                        <div class="mr-3">Total: {{ psParameterTotal }}</div>
-                      </div>
+                      <template v-if="isSublineNode && !showDefinitionFlatList">
+                        <TabView>
+                          <TabPanel header="Parameter">
+                            <div style="height: 37rem">
+                              <generalTabWidget
+                                :data="psParameterData"
+                                :loading="isLoadingPsParameterData"
+                                :sublineData="sublineData"
+                                @editData="updatePsParameter"
+                                @deleteData="deletePSParameter"
+                              />
+                            </div>
+                            <!-- ps table - Paginator -->
+                            <div class="flex justify-content-end align-items-center">
+                              <Paginator
+                                v-if="psParameterTotal > pageRowNumber"
+                                v-model:first="psParameterPaginatorOffset"
+                                class="flex-grow-1"
+                                :rows="pageRowNumber"
+                                :totalRecords="psParameterTotal"
+                                :page="psParameterCurrentPage"
+                                @page="onPsParameterPageChange"
+                              ></Paginator>
+                              <div class="mr-3">Total: {{ psParameterTotal }}</div>
+                            </div>
+                          </TabPanel>
+                          <TabPanel header="Pole">
+                            <div style="height: 36rem">
+                              <poleTableWidget
+                                :data="sublineData"
+                                :nodeSelected="nodeSelected"
+                                :projectVersionId="projectVersionId"
+                                :currentPage="sublineCurrentPage"
+                                :loading="isLoadingsubline"
+                                @reloadData="getSublineData"
+                              />
+                            </div>
+                            <!-- ps table - pole - Paginator -->
+                            <div class="flex justify-content-end align-items-center">
+                              <Paginator
+                                v-if="sublineTotal > pageRowNumber"
+                                v-model:first="sublinePaginatorOffset"
+                                class="flex-grow-1"
+                                :rows="pageRowNumber"
+                                :totalRecords="sublineTotal"
+                                :page="sublineCurrentPage"
+                                @page="onSublinePageChange"
+                              ></Paginator>
+                              <div class="mr-3">Total: {{ sublineTotal }}</div>
+                            </div>
+                          </TabPanel>
+                        </TabView>
+                      </template>
+
+                      <template v-else>
+                        <div
+                          :style="{
+                            height: showDefinitionFlatList ? '35rem' : '37rem',
+                            marginTop: showDefinitionFlatList ? '0' : '3rem',
+                          }"
+                        >
+                          <generalTabWidget
+                            :data="psParameterData"
+                            :loading="isLoadingPsParameterData"
+                            :sublineData="sublineData"
+                            @editData="updatePsParameter"
+                            @deleteData="deletePSParameter"
+                          />
+                        </div>
+                        <!-- ps table - Paginator -->
+                        <div class="flex justify-content-end align-items-center">
+                          <Paginator
+                            v-if="psParameterTotal > pageRowNumber"
+                            v-model:first="psParameterPaginatorOffset"
+                            class="flex-grow-1"
+                            :rows="pageRowNumber"
+                            :totalRecords="psParameterTotal"
+                            :page="psParameterCurrentPage"
+                            @page="onPsParameterPageChange"
+                          ></Paginator>
+                          <div class="mr-3">Total: {{ psParameterTotal }}</div>
+                        </div>
+                      </template>
                     </TabPanel>
                     <TabPanel>
                       <div
@@ -222,7 +278,7 @@
                           :rows="pageRowNumber"
                           :totalRecords="psParameterTotal"
                           :page="psParameterCurrentPage"
-                          @page="onPagePsParameterChange"
+                          @page="onPsParameterPageChange"
                         ></Paginator>
                         <div class="mr-3">Total: {{ psParameterTotal }}</div>
                       </div>
@@ -287,7 +343,7 @@
                           :rows="pageRowNumber"
                           :totalRecords="psParameterTotal"
                           :page="psParameterCurrentPage"
-                          @page="onPagePsParameterChange"
+                          @page="onPsParameterPageChange"
                         ></Paginator>
                         <div class="mr-3">Total: {{ psParameterTotal }}</div>
                       </div>
@@ -396,6 +452,45 @@
     @reloadPsParameter="reloadPsParameter"
     @reloadPsEms="reloadPsEms"
   />
+
+  <!-- pole dialog -->
+  <Dialog v-model:visible="createPoleVisibleDialog" :style="{ width: '36rem' }" header="Add Pole" :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Add Pole</span>
+      </div>
+    </template>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="powersystemName" class="font-semibold w-12rem"> Power System</label>
+      <InputText
+        id="powersystemName"
+        v-model="createPoleData.powersystemName"
+        disabled
+        class="flex-auto"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="name" class="font-semibold w-12rem"> Name</label>
+      <InputText id="name" v-model="createPoleData.name" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="poleOrder" class="font-semibold w-12rem"> Order</label>
+      <InputNumber id="poleOrder" v-model="createPoleData.poleOrder" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="Longitude" class="font-semibold w-12rem"> Longitude</label>
+      <InputNumber id="Longitude" v-model="createPoleData.Longitude" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="Latitude" class="font-semibold w-12rem"> Latitude</label>
+      <InputNumber id="Latitude" v-model="createPoleData.Latitude" class="flex-auto" autocomplete="off" />
+    </div>
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createPoleVisibleDialog = false"></Button>
+      <Button type="button" label="Save" severity="primary" @click="createPole()"></Button>
+    </template>
+  </Dialog>
 </template>
 
 <script setup>
@@ -419,6 +514,7 @@ import hierarchicalListWidget from './menuLeftWidget/hierarchicalListWidget.vue'
 import generalTabWidget from './parameterTableTabWidget/generalTabWidget.vue';
 import scadaInfoTabWidget from './parameterTableTabWidget/scadaInfoTabWidget.vue';
 import engineInfoTabWidget from './parameterTableTabWidget/engineInfoTabWidget.vue';
+import poleTableWidget from './parameterTableTabWidget/poleTableWidget.vue';
 
 import emsTabWidget from './emsTabWidget.vue';
 import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
@@ -560,7 +656,7 @@ const getEmsfilterOptions = async () => {
     const res = await api.DefinitionListApi.getEmsList();
     const filterOpts = [
       {
-        label: 'None',
+        label: 'All',
         _id: undefined,
         command: () => {
           emsFilterSelected.value = { name: 'All', _id: undefined };
@@ -584,26 +680,37 @@ const getEmsfilterOptions = async () => {
 };
 
 //  tree - powersystem edit
-const treedefinitionFilter = ref(['Station', 'Area', 'Zone', 'Owner', 'kV']);
+const treedefinitionFilter = ref(['Station', 'Area', 'Zone', 'Owner', 'Substation_kVBase', 'SubstationType']);
 const treeDefinitionFilterOpts = computed(() => {
-  const opts = definitionList.value.filter((item) => {
-    // Kiểm tra nếu item.name là 'Substation_kVBase' hoặc có trong treedefinitionFilter
-    if (item.name === 'Substation_kVBase') {
-      return treedefinitionFilter.value.includes('kV');
+  const opts = [];
+  for (let index = 0; index < definitionList.value.length; index++) {
+    const item = definitionList.value[index];
+    if (treedefinitionFilter.value.indexOf(item.name) !== -1) {
+      if (item.name === 'Substation_kVBase') {
+        opts.push({
+          name: 'kV',
+          _id: item._id,
+        });
+      } else if (item.name === 'SubstationType') {
+        opts.push({
+          name: 'Type',
+          _id: item._id,
+        });
+      } else {
+        opts.push({
+          name: item.name,
+          _id: item._id,
+        });
+      }
     }
-    return treedefinitionFilter.value.includes(item.name);
-  });
-
-  // Thêm đối tượng đặc biệt 'kV'
-  // opts.push({
-  //   name: 'kV',
-  //   _id: 'can_not_filter',
-  // });
+  }
 
   return opts;
 });
 
 const nodeSelected = ref();
+const isSublineNode = ref(false);
+
 const pseId = ref();
 
 const onNodeSelect = async (node) => {
@@ -614,22 +721,32 @@ const onNodeSelect = async (node) => {
   psParameterCurrentPage.value = 1;
   await getPsParameterWithTree(true);
   await getPsEmsWithTree(true);
-
-  if (node.engineLabel === 'Sub_Line') {
-    await getSublineData();
-  }
+  isSublineNode.value = node.engineLabel === 'Sub_Line';
   isLoadingContainer.value = false;
 };
 
+watch(isSublineNode, async (newStatus) => {
+  if (newStatus) {
+    await getSublineData();
+  }
+});
 const sublineData = ref();
+const isLoadingsubline = ref(false);
 const sublineTotal = ref();
 const sublineCurrentPage = ref(1);
+const sublinePaginatorOffset = computed(() => pageRowNumber.value * sublineCurrentPage.value - 1);
+
+const onSublinePageChange = async (event) => {
+  isLoadingsubline.value = true;
+  sublineCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  await getSublineData();
+  isLoadingsubline.value = false;
+};
 const getSublineData = async () => {
   try {
     const res = await api.SubLineApi.getData(nodeSelected.value._id, projectVersionId.value, sublineCurrentPage.value);
     sublineData.value = res.data.items;
     sublineTotal.value = res.data.total;
-    console.log(sublineData.value, 'sublineData');
   } catch (error) {
     console.log('getSublineData: error ', error);
     sublineData.value = undefined;
@@ -648,7 +765,7 @@ const isLoadingPsParameterData = ref(false);
 const psParameterPaginatorOffset = computed(() => pageRowNumber.value * psParameterCurrentPage.value - 1);
 
 // Parameter
-const onPagePsParameterChange = async (event) => {
+const onPsParameterPageChange = async (event) => {
   isLoadingPsParameterData.value = true;
   psParameterCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
   await reloadPsParameter();
@@ -729,6 +846,8 @@ watch(emsFilterSelected, async () => {
   isLoadingPsEmsData.value = true;
   psEmsCurrentPage.value = 1;
   await reloadPsEms(true);
+  tabMenuPSActive.value = tabMenuPSList.value.indexOf('EMS');
+
   isLoadingPsEmsData.value = false;
 });
 
@@ -856,6 +975,7 @@ const createNewVersion = async () => {
 };
 
 const createVisibleDialog = ref(false);
+const createPoleVisibleDialog = ref(false);
 const parameterCreateForm = ref();
 
 const menuImportExport = ref();
@@ -876,12 +996,33 @@ const itemsMenuImportExport = computed(() => {
           disabled: true,
           command: () => {},
         },
+      ],
+    },
+    {
+      label: 'Create',
+      items: [
         {
-          label: 'Power System',
+          label: 'Parameter',
           icon: 'pi pi-plus',
           disabled: definitionList.value.length === 0,
           command: () => {
             createVisibleDialog.value = true;
+          },
+        },
+        {
+          label: 'CMS',
+          icon: 'pi pi-plus',
+          disabled: definitionList.value.length === 0,
+          command: () => {
+            createVisibleDialog.value = true;
+          },
+        },
+        {
+          label: 'Pole',
+          icon: 'pi pi-plus',
+          disabled: !isSublineNode.value,
+          command: () => {
+            handleCreatePole();
           },
         },
       ],
@@ -891,6 +1032,37 @@ const itemsMenuImportExport = computed(() => {
 
 const toggleMenuConfig = (event) => {
   menuImportExport.value.toggle(event);
+};
+
+// create
+
+const createPoleData = ref({});
+
+const handleCreatePole = () => {
+  createPoleData.value = {
+    powersystemId: nodeSelected.value._id,
+    powersystemName: nodeSelected.value.label,
+    name: '',
+    poleOrder: 0,
+    Longitude: 0,
+    Latitude: 0,
+    currentPowerSystemVersionId: projectVersionId.value,
+  };
+  createPoleVisibleDialog.value = true;
+};
+
+const createPole = async () => {
+  try {
+    const createData = JSON.parse(JSON.stringify(createPoleData.value));
+    delete createData.powersystemName;
+    await api.SubLineApi.create(createPoleData.value, projectVersionId.value);
+    getSublineData();
+    createPoleVisibleDialog.value = false;
+    toast.add({ severity: 'success', summary: 'Pole', detail: 'Create Successfully', life: 3000 });
+  } catch (error) {
+    console.log('create pole error', error);
+    toast.add({ severity: 'error', summary: 'Create Power System - Pole', detail: error.data.detail, life: 3000 });
+  }
 };
 
 // Edit
@@ -977,8 +1149,8 @@ const getVersionData = async (page = 1) => {
 </script>
 
 <style>
-#ps-tab-view ul.p-tabview-nav,
-#on-top-tab-view ul.p-tabview-nav {
+#ps-tab-view > .p-tabview-nav-container > .p-tabview-nav-content > ul.p-tabview-nav,
+#on-top-tab-view > .p-tabview-nav-container > .p-tabview-nav-content > ul.p-tabview-nav {
   display: none !important;
 }
 

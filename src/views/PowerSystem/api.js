@@ -167,4 +167,18 @@ export class SubLineApi {
       page: page,
     });
   }
+  // CRUD
+  static async create(data, projectVersionId) {
+    data.projectId = projectData.value._id;
+    return post(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine`, data);
+  }
+
+  static async update(data, projectVersionId) {
+    data.projectId = projectData.value._id;
+    return put(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${data._id}`, data);
+  }
+
+  static async delete(psId, projectVersionId) {
+    return _delete(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${psId}`);
+  }
 }
