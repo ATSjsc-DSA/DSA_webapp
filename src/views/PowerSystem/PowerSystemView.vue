@@ -301,10 +301,11 @@
                       <!-- ps table - Paginator -->
                       <div class="flex justify-content-between align-items-center">
                         <Tag
+                          v-if="emsFilterSelected"
                           class="w-10rem px-3 py-1"
                           style="font-size: 1rem"
                           severity="secondary"
-                          :value="emsFilterSelected.name.replace('Ems', '')"
+                          :value="emsFilterSelected.label"
                         ></Tag>
 
                         <Paginator
@@ -549,7 +550,6 @@ const loadAllData = async () => {
   // await getVersionData();
   // await getComparePSD();
   tabMenuPSActive.value = 0;
-  await getEmsfilterOptions();
 };
 
 //  -- Flat List - definition list
@@ -590,6 +590,8 @@ const handleDefinitionRowClick = async (definition) => {
 
   isLoadingContainer.value = false;
   isDefinitionGenerator.value = definition.name === 'Generator';
+
+  await getEmsfilterOptions(definition.name);
 };
 
 const getParameterDefinitionData = async (id) => {
@@ -650,35 +652,65 @@ const flatListFilter = ref({});
 
 // ems - filter
 const emsFilter = ref([]);
-const emsFilterSelected = ref({ name: 'all', _id: undefined });
-const getEmsfilterOptions = async () => {
+const emsFilterSelected = ref();
+
+const emsFilterFollowDefinition = ref({
+  'Transformers 3Winding': ['EmsBranch', 'EmsTrans'],
+  'Transformers 2Winding': ['EmsBranch', 'EmsTrans'],
+  Winding: ['EmsBranch'],
+  'Series Impedances': ['EmsBranch'],
+  Line: ['EmsBranch'],
+  Generator: ['EmsGener'],
+  Shunt: ['EmsShunt'],
+  Load: ['EmsLoad'],
+  Station: ['EmsStation'],
+  Switch: ['EmsBreaker'],
+});
+const getEmsfilterOptions = async (definitionName = '') => {
   try {
     const res = await api.DefinitionListApi.getEmsList();
-    const filterOpts = [
-      {
-        label: 'All',
-        _id: undefined,
-        command: () => {
-          emsFilterSelected.value = { name: 'All', _id: undefined };
-        },
-      },
-    ];
-    for (const opts of res.data) {
-      filterOpts.push({
-        label: opts.name.replace('Ems', ''),
-        _id: opts._id,
-        command: () => {
-          emsFilterSelected.value = opts;
-        },
-      });
+    const opts = [];
+    const emsFilterName = emsFilterFollowDefinition.value[definitionName];
+    if (emsFilterName) {
+      for (const item of res.data) {
+        if (emsFilterName.indexOf(item.name) !== -1) {
+          opts.push({
+            label: item.name.replace('Ems', ''),
+            _id: item._id,
+            command: () => {
+              emsFilterSelected.value = item;
+            },
+          });
+        }
+      }
+    } else {
+      for (const item of res.data) {
+        opts.push({
+          label: item.name.replace('Ems', ''),
+          _id: item._id,
+
+          command: () => {
+            emsFilterSelected.value = item;
+          },
+        });
+      }
     }
-    emsFilter.value = filterOpts;
+
+    emsFilter.value = opts;
+    if (opts.length > 0) {
+      if (emsFilter.value.filter((item) => item.label === 'Station').length > 0) {
+        emsFilterSelected.value = emsFilter.value.filter((item) => item.label === 'Station')[0];
+      } else {
+        emsFilterSelected.value = opts[0];
+      }
+    }
   } catch (error) {
     console.log('getfilterOptions: error ', error);
     toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
   }
 };
 
+//  tree - powersy
 //  tree - powersystem edit
 const treedefinitionFilter = ref(['Station', 'Area', 'Zone', 'Owner', 'Substation_kVBase', 'SubstationType']);
 const treeDefinitionFilterOpts = computed(() => {
@@ -878,7 +910,7 @@ const getPsEmstWithDefinition = async (page = 1, getHeader = false) => {
     // -- only station
     filter = { sub: flatListFilter.value.sub };
   }
-  if (emsFilterSelected.value._id) {
+  if (emsFilterSelected.value) {
     filter['ems_definition_id'] = emsFilterSelected.value._id;
   }
   const res = await api.PowerSystemEmsApi.getPsDataWithDefinition(
@@ -907,7 +939,7 @@ const getPsEmsWithTree = async (getHeader = false) => {
       pseId.value,
       projectVersionId.value,
       nodeParentId,
-      emsFilterSelected.value._id,
+      emsFilterSelected.value ? emsFilterSelected.value._id : undefined,
       psEmsCurrentPage.value,
     );
     psEmsData.value = res.data.items;

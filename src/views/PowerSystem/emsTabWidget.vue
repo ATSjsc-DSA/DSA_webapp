@@ -12,7 +12,7 @@
   >
     <Column field="generalInfo.uniqueId" frozen header="Unique Id">
       <template #body="slotProps">
-         <div class="font-bold" style="min-width: 6rem">
+        <div class="font-bold" style="min-width: 6rem">
           {{ slotProps.data.generalInfo.uniqueId }}
         </div>
       </template>
