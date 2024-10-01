@@ -93,9 +93,7 @@ export class PowerSystemParameterApi {
     const updateData = {
       generalInfo: {
         name: data.generalInfo.name,
-        uniqueId: data.generalInfo.uniqueId,
         operationName: data.generalInfo.operationName,
-        operationUniqueId: data.generalInfo.operationUniqueId,
       },
       engineInfo: {
         values: data.engineInfo.values,
@@ -104,7 +102,6 @@ export class PowerSystemParameterApi {
       scadaInfo: {
         skey: data.scadaInfo.skey,
         scadaName: data.scadaInfo.scadaName,
-        scadaUniqueId: data.scadaInfo.scadaUniqueId,
       },
     };
     return put(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${data._id}`, updateData);
@@ -149,7 +146,6 @@ export class PowerSystemEmsApi {
   static async update(data, projectVersionId) {
     const updateData = {
       engineInfo: {
-        powerSystemDefinitionId: data.engineInfo.powerSystemDefinitionId,
         values: data.engineInfo.values,
       },
     };

@@ -138,7 +138,7 @@
           <label for="globalDynamicModelDefinitionId" class="font-semibold"> Power System </label>
           <div class="mt-1">
             <small>
-              {{ props.nodeSelected ? `(${props.nodeSelected.parentName})` : '' }}
+              {{ props.nodeSelected.parentName ? `(${props.nodeSelected.parentName})` : '' }}
             </small>
           </div>
         </div>
@@ -197,6 +197,7 @@
               </div>
             </div>
           </template>
+          {{ generatorTable }}
         </TabPanel>
 
         <TabPanel header="Excitation">
@@ -723,6 +724,7 @@ const getGlobalDynamicModelDefinitionByType = async (type) => {
 // Traditional: {
 
 const getDynamicModelTableOfType = (dynamicModel_id, values = []) => {
+  console.log('generatorModelChange', dynamicModel_id);
   const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(dynamicModel_id);
   const table = {};
   for (let i = 0; i < dynamicModelDefinition.values.length; i++) {

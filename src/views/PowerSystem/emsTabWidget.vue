@@ -49,7 +49,7 @@
     </template>
     <span class="p-text-secondary block mb-5">EMS information.</span>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <label for="areaname" class="font-semibold w-12rem"> Unique Id</label>
       <InputText id="areaname" v-model="pseEdit.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
 
@@ -74,7 +74,7 @@
     </template>
     <span class="p-text-secondary block mb-5">EMS information.</span>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <label for="areaname" class="font-semibold w-12rem"> Unique Id</label>
       <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
 
@@ -125,7 +125,7 @@ const columnList = computed(() => {
 const editVisibleDialog = ref(false);
 const pseEdit = ref({});
 const handleEditPSE = (pseData) => {
-  pseEdit.value = pseData;
+  pseEdit.value = JSON.parse(JSON.stringify(pseData));
   editVisibleDialog.value = true;
 };
 

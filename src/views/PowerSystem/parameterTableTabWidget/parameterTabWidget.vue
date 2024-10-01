@@ -19,7 +19,6 @@
     </Column>
     <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
     <Column field="generalInfo.operationName" header="Operation Name" style="text-wrap: nowrap"></Column>
-    <Column field="generalInfo.softwareName" header="Software Name" style="text-wrap: nowrap"></Column>
 
     <template v-for="col of columnList" :key="col.field">
       <Column v-if="col.visible" :header="capitalizeFirstLetter(col.header)" style="text-wrap: nowrap">
@@ -51,26 +50,19 @@
     <span class="p-text-secondary block mb-5">General information.</span>
 
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-16rem"> Ems UniqueId</label>
+      <label for="areaname" class="font-semibold w-16rem"> Unique Id</label>
       <InputText id="areaname" v-model="pseEdit.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-16rem"> Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.name" class="flex-auto" autocomplete="off" />
+      <InputText id="areaname" v-model="pseEdit.generalInfo.name" disabled class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="areaname" class="font-semibold w-16rem"> Operation Name</label>
       <InputText id="areaname" v-model="pseEdit.generalInfo.operationName" class="flex-auto" autocomplete="off" />
     </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-16rem"> Software Name</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.softwareName" class="flex-auto" autocomplete="off" />
-    </div>
-    <span class="p-text-secondary block mb-5">Energy information.</span>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-16rem"> Ems UniqueId</label>
-      <InputText id="areaname" v-model="pseEdit.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
-    </div>
+
+    <span class="p-text-secondary block my-5`">Energy information.</span>
 
     <template v-for="col of columnList" :key="col.field">
       <div v-if="col.visible" class="flex align-items-center gap-3 mb-3">
@@ -94,12 +86,12 @@
     <span class="p-text-secondary block mb-5">General information.</span>
 
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-16rem"> Ems UniqueId</label>
+      <label for="areaname" class="font-semibold w-16rem"> Unique Id</label>
       <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
       <label for="areaname" class="font-semibold w-16rem"> Name</label>
-      <InputText id="areaname" v-model="pseDelete.generalInfo.name" class="flex-auto" disabled autocomplete="off" />
+      <InputText id="areaname" v-model="pseDelete.generalInfo.name" disabled class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
       <label for="areaname" class="font-semibold w-16rem"> Operation Name</label>
@@ -111,22 +103,8 @@
         autocomplete="off"
       />
     </div>
-    <div class="flex align-items-center gap-3 mb-3 cursor-not-allowed">
-      <label for="areaname" class="font-semibold w-16rem"> Software Name</label>
-      <InputText
-        id="areaname"
-        v-model="pseDelete.generalInfo.softwareName"
-        class="flex-auto"
-        disabled
-        autocomplete="off"
-      />
-    </div>
 
-    <span class="p-text-secondary block mb-5">Energy information.</span>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-16rem"> Ems UniqueId</label>
-      <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
-    </div>
+    <span class="p-text-secondary block my-5">Energy information.</span>
 
     <template v-for="col of columnList" :key="col.field">
       <div v-if="col.visible" class="flex align-items-center gap-3 mb-3">
@@ -183,7 +161,7 @@ const columnList = computed(() => {
 const editVisibleDialog = ref(false);
 const pseEdit = ref({});
 const handleEditPSE = (pseData) => {
-  pseEdit.value = pseData;
+  pseEdit.value = JSON.parse(JSON.stringify(pseData));
   editVisibleDialog.value = true;
 };
 

@@ -106,7 +106,7 @@ const poleData = ref({});
 
 const handleEditPole = (data) => {
   changeMode.value = 'Update';
-  poleData.value = data;
+  poleData.value = JSON.parse(JSON.stringify(data));
   poleVisibleDialog.value = true;
 };
 

@@ -659,7 +659,9 @@ const getEmsfilterList = async (definitionName = '') => {
           item.name = opts.push({
             label: item.name.replace('Ems', ''),
             _id: item._id,
-            command: () => {
+            disabled: emsFilterName.length <= 1,
+            command: (event) => {
+              console.log(event, event);
               emsFilterSelected.value = {
                 label: item.name.replace('Ems', ''),
                 _id: item._id,
@@ -1093,7 +1095,7 @@ const updatePsParameter = async (pseUpdate) => {
   try {
     await api.PowerSystemParameterApi.update(pseUpdate, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    // reloadData();
+    await reloadPsParameter();
   } catch (error) {
     console.log('editPS: error ', error);
     toast.add({ severity: 'error', summary: 'Updated Power System', detail: error.data.detail, life: 3000 });
@@ -1104,7 +1106,7 @@ const updatePsEms = async (pseUpdate) => {
   try {
     await api.PowerSystemEmsApi.update(pseUpdate, projectVersionId.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    // reloadData();
+    await reloadPsEms();
   } catch (error) {
     console.log('editPS: error ', error);
     toast.add({ severity: 'error', summary: 'Updated EMS', detail: error.data.detail, life: 3000 });

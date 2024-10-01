@@ -12,7 +12,7 @@
   >
     <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
       <template #body="slotProps">
-         <div class="font-bold" style="min-width: 6rem">
+        <div class="font-bold" style="min-width: 6rem">
           {{ slotProps.data.generalInfo.uniqueId }}
         </div>
       </template>
@@ -40,7 +40,7 @@
     </template>
     <span class="p-text-secondary block mb-5">Scada information.</span>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <label for="areaname" class="font-semibold w-12rem"> Unique Id</label>
       <InputText id="areaname" v-model="pseEdit.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
@@ -50,10 +50,6 @@
     <div class="flex align-items-center gap-3 mb-3">
       <label for="scadaName" class="font-semibold w-12rem"> Ems Name</label>
       <InputText id="scadaName" v-model="pseEdit.scadaInfo.scadaName" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="scadaUniqueId" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText id="scadaUniqueId" v-model="pseEdit.scadaInfo.scadaUniqueId" class="flex-auto" autocomplete="off" />
     </div>
 
     <template #footer>
@@ -71,7 +67,7 @@
     </template>
     <span class="p-text-secondary block mb-5">Scada information.</span>
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="areaname" class="font-semibold w-12rem"> Ems UniqueId</label>
+      <label for="areaname" class="font-semibold w-12rem">Unique Id</label>
       <InputText id="areaname" v-model="pseDelete.generalInfo.uniqueId" disabled class="flex-auto" autocomplete="off" />
     </div>
 
@@ -82,16 +78,6 @@
     <div class="flex align-items-center gap-3 mb-3">
       <label for="scadaName" class="font-semibold w-12rem"> Ems Name</label>
       <InputText id="scadaName" v-model="pseDelete.scadaInfo.scadaName" class="flex-auto" autocomplete="off" disabled />
-    </div>
-    <div class="flex align-items-center gap-3 mb-3">
-      <label for="scadaUniqueId" class="font-semibold w-12rem"> Ems UniqueId</label>
-      <InputText
-        id="scadaUniqueId"
-        v-model="pseDelete.scadaInfo.scadaUniqueId"
-        class="flex-auto"
-        autocomplete="off"
-        disabled
-      />
     </div>
 
     <template #footer>
@@ -120,7 +106,7 @@ const emit = defineEmits(['editData', 'deleteData']);
 const editVisibleDialog = ref(false);
 const pseEdit = ref({});
 const handleEditPSE = (pseData) => {
-  pseEdit.value = pseData;
+  pseEdit.value = JSON.parse(JSON.stringify(pseData));
   editVisibleDialog.value = true;
 };
 
