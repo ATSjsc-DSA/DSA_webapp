@@ -167,17 +167,6 @@
 
               <!-- ps table - table data  -->
               <template #content>
-                <div class="flex gap-6">
-                  <div>
-                    emsFilterList:
-                    <pre>{{ emsFilterList }}</pre>
-                  </div>
-                  <div>
-                    emsFilterFollowDefinition
-                    <pre>{{ emsFilterFollowDefinition }}</pre>
-                  </div>
-                </div>
-
                 <div class="flex flex-column">
                   <LoadingContainer v-show="isLoadingContainer" />
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
@@ -187,10 +176,10 @@
                         <TabView>
                           <TabPanel header="Parameter">
                             <div style="height: 37rem">
-                              <generalTabWidget
+                              <parameterTabWidget
                                 :data="psParameterData"
+                                :headerData="parameterDefinitionData"
                                 :loading="isLoadingPsParameterData"
-                                :sublineData="sublineData"
                                 @editData="updatePsParameter"
                                 @deleteData="deletePSParameter"
                               />
@@ -244,10 +233,10 @@
                             marginTop: showDefinitionFlatList ? '0' : '3rem',
                           }"
                         >
-                          <generalTabWidget
+                          <parameterTabWidget
                             :data="psParameterData"
+                            :headerData="parameterDefinitionData"
                             :loading="isLoadingPsParameterData"
-                            :sublineData="sublineData"
                             @editData="updatePsParameter"
                             @deleteData="deletePSParameter"
                           />
@@ -267,35 +256,7 @@
                         </div>
                       </template>
                     </TabPanel>
-                    <TabPanel>
-                      <div
-                        :style="{
-                          height: showDefinitionFlatList ? '35rem' : '37rem',
-                          marginTop: showDefinitionFlatList ? '0' : '3rem',
-                        }"
-                      >
-                        <engineInfoTabWidget
-                          :data="psParameterData"
-                          :headerData="parameterDefinitionData"
-                          :loading="isLoadingPsParameterData"
-                          @editData="updatePsParameter"
-                          @deleteData="deletePSParameter"
-                        />
-                      </div>
-                      <!-- ps table - Paginator -->
-                      <div class="flex justify-content-end align-items-center">
-                        <Paginator
-                          v-if="psParameterTotal > pageRowNumber"
-                          v-model:first="psParameterPaginatorOffset"
-                          class="flex-grow-1"
-                          :rows="pageRowNumber"
-                          :totalRecords="psParameterTotal"
-                          :page="psParameterCurrentPage"
-                          @page="onPsParameterPageChange"
-                        ></Paginator>
-                        <div class="mr-3">Total: {{ psParameterTotal }}</div>
-                      </div>
-                    </TabPanel>
+
                     <TabPanel>
                       <div
                         :style="{
@@ -528,6 +489,7 @@ import hierarchicalListWidget from './menuLeftWidget/hierarchicalListWidget.vue'
 import generalTabWidget from './parameterTableTabWidget/generalTabWidget.vue';
 import scadaInfoTabWidget from './parameterTableTabWidget/scadaInfoTabWidget.vue';
 import engineInfoTabWidget from './parameterTableTabWidget/engineInfoTabWidget.vue';
+import parameterTabWidget from './parameterTableTabWidget/parameterTabWidget.vue';
 import poleTableWidget from './parameterTableTabWidget/poleTableWidget.vue';
 
 import emsTabWidget from './emsTabWidget.vue';
@@ -555,7 +517,7 @@ onMounted(async () => {
 onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
-const tabMenuPSList = ref(['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic']);
+const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic']);
 const showDefinitionFlatList = ref(false);
 
 const loadAllData = async () => {
@@ -686,6 +648,7 @@ const getEmsfilterList = async (definitionName = '') => {
     const opts = [];
     const emsFilterName = emsFilterFollowDefinition.value[definitionName];
     if (emsFilterName) {
+      // get with definition Name
       for (const item of res.data) {
         if (emsFilterName.indexOf(item.name) !== -1) {
           opts.push({
@@ -698,6 +661,7 @@ const getEmsfilterList = async (definitionName = '') => {
         }
       }
     } else {
+      // get all
       for (const item of res.data) {
         opts.push({
           label: item.name.replace('Ems', ''),
@@ -893,8 +857,6 @@ watch(emsFilterSelected, async () => {
   isLoadingPsEmsData.value = true;
   psEmsCurrentPage.value = 1;
   await reloadPsEms(true);
-  tabMenuPSActive.value = tabMenuPSList.value.indexOf('EMS');
-
   isLoadingPsEmsData.value = false;
 });
 
