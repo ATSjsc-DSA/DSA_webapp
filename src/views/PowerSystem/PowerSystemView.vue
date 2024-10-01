@@ -2,6 +2,7 @@
   <div class="card layout-content min-h-full">
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
+
     <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
@@ -59,6 +60,7 @@
                   v-if="!showDefinitionFlatList"
                   :version-id="projectVersionId"
                   :definition-filter="treeDefinitionFilterOpts"
+                  :emsFilterFollowDefinition="Object.keys(emsFilterFollowDefinition)"
                   @onNodeSelect="onNodeSelect"
                 />
                 <DataView
@@ -109,7 +111,7 @@
                         <SplitButton
                           v-else
                           label="EMS"
-                          :model="emsFilter"
+                          :model="emsFilterList"
                           :text="tabMenuPSActive !== index"
                           @click="tabMenuPSActive = index"
                         >
@@ -165,6 +167,17 @@
 
               <!-- ps table - table data  -->
               <template #content>
+                <div class="flex gap-6">
+                  <div>
+                    emsFilterList:
+                    <pre>{{ emsFilterList }}</pre>
+                  </div>
+                  <div>
+                    emsFilterFollowDefinition
+                    <pre>{{ emsFilterFollowDefinition }}</pre>
+                  </div>
+                </div>
+
                 <div class="flex flex-column">
                   <LoadingContainer v-show="isLoadingContainer" />
                   <TabView id="ps-tab-view" v-model:activeIndex="tabMenuPSActive">
@@ -446,7 +459,7 @@
     :visible="createVisibleDialog"
     :projectVersionId="projectVersionId"
     :parameterFilter="definitionList"
-    :emsFilter="emsFilter"
+    :emsFilter="emsFilterList"
     :nodeSelected="nodeSelected"
     :definitionSelected="definitionSelected"
     @unvisible="createVisibleDialog = false"
@@ -550,6 +563,7 @@ const loadAllData = async () => {
   // await getVersionData();
   // await getComparePSD();
   tabMenuPSActive.value = 0;
+  await getEmsfilterList();
 };
 
 //  -- Flat List - definition list
@@ -591,7 +605,7 @@ const handleDefinitionRowClick = async (definition) => {
   isLoadingContainer.value = false;
   isDefinitionGenerator.value = definition.name === 'Generator';
 
-  await getEmsfilterOptions(definition.name);
+  await getEmsfilterList(definition.name);
 };
 
 const getParameterDefinitionData = async (id) => {
@@ -651,7 +665,7 @@ const showflatListFilterWidget = computed(() => {
 const flatListFilter = ref({});
 
 // ems - filter
-const emsFilter = ref([]);
+const emsFilterList = ref([]);
 const emsFilterSelected = ref();
 
 const emsFilterFollowDefinition = ref({
@@ -666,7 +680,7 @@ const emsFilterFollowDefinition = ref({
   Station: ['EmsStation'],
   Switch: ['EmsBreaker'],
 });
-const getEmsfilterOptions = async (definitionName = '') => {
+const getEmsfilterList = async (definitionName = '') => {
   try {
     const res = await api.DefinitionListApi.getEmsList();
     const opts = [];
@@ -696,10 +710,10 @@ const getEmsfilterOptions = async (definitionName = '') => {
       }
     }
 
-    emsFilter.value = opts;
+    emsFilterList.value = opts;
     if (opts.length > 0) {
-      if (emsFilter.value.filter((item) => item.label === 'Station').length > 0) {
-        emsFilterSelected.value = emsFilter.value.filter((item) => item.label === 'Station')[0];
+      if (emsFilterList.value.filter((item) => item.label === 'Station').length > 0) {
+        emsFilterSelected.value = emsFilterList.value.filter((item) => item.label === 'Station')[0];
       } else {
         emsFilterSelected.value = opts[0];
       }
@@ -753,6 +767,7 @@ const onNodeSelect = async (node) => {
   psParameterCurrentPage.value = 1;
   await getPsParameterWithTree(true);
   await getPsEmsWithTree(true);
+  await getEmsfilterList(node.definitionName);
   isSublineNode.value = node.engineLabel === 'Sub_Line';
   isLoadingContainer.value = false;
 };

@@ -61,6 +61,7 @@ const toast = useToast();
 const props = defineProps({
   versionId: { type: String, required: true },
   definitionFilter: { type: Array, default: () => [] },
+  emsFilterFollowDefinition: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(['onNodeSelect']);
@@ -195,8 +196,11 @@ const getLeaf = async (node = {}) => {
     const childData = await PsTreeApi.getChild(props.versionId, payload);
 
     const data = [];
-
     for (let index = 0; index < childData.data.length; index++) {
+      let definition = node.definitionName;
+      if (props.emsFilterFollowDefinition.indexOf(childData.data[index].name) !== -1) {
+        definition = childData.data[index].name;
+      }
       data.push({
         key: node._id + childData.data[index]._id,
         _id: childData.data[index]._id,
@@ -205,9 +209,10 @@ const getLeaf = async (node = {}) => {
         parentName: node.label,
         loading: false,
         leaf: !childData.data[index].childed,
-        hasChilded: childData.data[index].childed,
-        engineClassId: childData.data[index].engineClassId,
-        engineLabel: childData.data[index].engineLabel,
+        hasChilded: childData.data[index].childed, // child & psTable
+        engineClassId: childData.data[index].engineClassId, // middleParent
+        engineLabel: childData.data[index].engineLabel, // for sub_line (pole)
+        definitionName: definition, // for ems filter
       });
     }
     return data;
