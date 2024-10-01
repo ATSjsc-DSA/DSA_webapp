@@ -486,9 +486,7 @@ import versionTabWidget from './versionTabWidget.vue';
 import flatListFilterWidget from './menuLeftWidget/flatListFilterWidget.vue';
 import hierarchicalListWidget from './menuLeftWidget/hierarchicalListWidget.vue';
 
-import generalTabWidget from './parameterTableTabWidget/generalTabWidget.vue';
 import scadaInfoTabWidget from './parameterTableTabWidget/scadaInfoTabWidget.vue';
-import engineInfoTabWidget from './parameterTableTabWidget/engineInfoTabWidget.vue';
 import parameterTabWidget from './parameterTableTabWidget/parameterTabWidget.vue';
 import poleTableWidget from './parameterTableTabWidget/poleTableWidget.vue';
 
