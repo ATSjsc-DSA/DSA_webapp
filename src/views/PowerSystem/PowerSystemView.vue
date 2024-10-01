@@ -281,7 +281,6 @@
                           severity="secondary"
                           :value="emsFilterSelected.label"
                         ></Tag>
-
                         <Paginator
                           v-if="psEmsTotal > pageRowNumber"
                           v-model:first="psEmsPaginatorOffset"
@@ -417,17 +416,24 @@
   </div>
 
   <createPsDialog
-    :visible="createVisibleDialog"
+    :visible="createPsVisibleDialog"
     :projectVersionId="projectVersionId"
     :parameterFilter="definitionList"
-    :emsFilter="emsFilterList"
     :nodeSelected="nodeSelected"
     :definitionSelected="definitionSelected"
-    @unvisible="createVisibleDialog = false"
+    @unvisible="createPsVisibleDialog = false"
     @reloadPsParameter="reloadPsParameter"
-    @reloadPsEms="reloadPsEms"
   />
 
+  <createEmsDialog
+    :visible="createEmsVisibleDialog"
+    :projectVersionId="projectVersionId"
+    :parameterFilter="definitionList"
+    :nodeSelected="nodeSelected"
+    :emsFilterSelected="emsFilterSelected"
+    @unvisible="createEmsVisibleDialog = false"
+    @reloadPsEms="reloadPsEms"
+  />
   <!-- pole dialog -->
   <Dialog v-model:visible="createPoleVisibleDialog" :style="{ width: '36rem' }" header="Add Pole" :modal="true">
     <template #header>
@@ -494,6 +500,7 @@ import emsTabWidget from './emsTabWidget.vue';
 import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
 
 import createPsDialog from './createPsDialog.vue';
+import createEmsDialog from './createEmsDialog.vue';
 
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
@@ -649,11 +656,15 @@ const getEmsfilterList = async (definitionName = '') => {
       // get with definition Name
       for (const item of res.data) {
         if (emsFilterName.indexOf(item.name) !== -1) {
-          opts.push({
+          item.name = opts.push({
             label: item.name.replace('Ems', ''),
             _id: item._id,
             command: () => {
-              emsFilterSelected.value = item;
+              emsFilterSelected.value = {
+                label: item.name.replace('Ems', ''),
+                _id: item._id,
+                name: item.name,
+              };
             },
           });
         }
@@ -666,7 +677,11 @@ const getEmsfilterList = async (definitionName = '') => {
           _id: item._id,
 
           command: () => {
-            emsFilterSelected.value = item;
+            emsFilterSelected.value = {
+              label: item.name.replace('Ems', ''),
+              _id: item._id,
+              name: item.name,
+            };
           },
         });
       }
@@ -981,9 +996,10 @@ const createNewVersion = async () => {
   }
 };
 
-const createVisibleDialog = ref(false);
+const createPsVisibleDialog = ref(false);
+const createEmsVisibleDialog = ref(false);
+
 const createPoleVisibleDialog = ref(false);
-const parameterCreateForm = ref();
 
 const menuImportExport = ref();
 const itemsMenuImportExport = computed(() => {
@@ -1013,15 +1029,15 @@ const itemsMenuImportExport = computed(() => {
           icon: 'pi pi-plus',
           disabled: definitionList.value.length === 0,
           command: () => {
-            createVisibleDialog.value = true;
+            createPsVisibleDialog.value = true;
           },
         },
         {
-          label: 'CMS',
+          label: 'EMS',
           icon: 'pi pi-plus',
           disabled: definitionList.value.length === 0,
           command: () => {
-            createVisibleDialog.value = true;
+            createPsVisibleDialog.value = true;
           },
         },
         {

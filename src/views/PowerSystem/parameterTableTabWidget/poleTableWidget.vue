@@ -144,8 +144,6 @@ const updatePole = async () => {
     await SubLineApi.update(
       {
         _id: poleData.value._id,
-        currentPowerSystemVersionId: poleData.value.currentPowerSystemVersionId,
-        powersystemId: poleData.value.powersystemId,
         name: poleData.value.name,
         poleOrder: poleData.value.poleOrder,
         Longitude: poleData.value.Longitude,
