@@ -28,6 +28,17 @@ export default class api {
   static async getGlobalDynamicModelDefinitionByType(type) {
     return get(`/common/globaldynamicmodeldefinition/${type}`);
   }
+
+  static async getGlobalDynamicModelDefinitionById(modelId) {
+    return get(`/common/globaldynamicmodeldefinition/${modelId}`);
+  }
+
+  static async searchGlobalDynamicModelDefinition(query = '') {
+    if (query) {
+      return post(`/common/globaldynamicmodeldefinition/search?query=${query}`, []);
+    }
+    return post(`/common/globaldynamicmodeldefinition/search`, []);
+  }
   static async createGlobalDynamicModelDefinitionList(data) {
     return post(`/common/globaldynamicmodeldefinition`, data);
   }

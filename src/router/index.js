@@ -152,6 +152,9 @@ router.beforeEach(async (to, from) => {
 });
 
 router.afterEach((to, from) => {
+  if (!to.path.includes('/' + window.location.href.split('/').slice(-1)[0])) {
+    Location.reload();
+  }
   setTimeout(() => {
     useCommonStore().setLoading(false);
   }, 800);

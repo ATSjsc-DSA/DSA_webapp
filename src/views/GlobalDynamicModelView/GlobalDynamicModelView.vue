@@ -19,7 +19,7 @@
 
     <TabView id="tab-view" v-model:activeIndex="tabActice" class="flex-grow-1">
       <TabPanel>
-        <DataTable :value="dynamicDefinition" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
+        <DataTable id="globalDynamicModelDefinition" :value="dynamicDefinition" :loading="isLoadingDynamicData">
           <template #header>
             <div class="flex justify-content-end gap-3">
               <Button
@@ -41,11 +41,11 @@
             </div>
           </template>
 
-          <Column field="name" header="Name" sortable></Column>
-          <Column field="modeltype" header="Type">
+          <Column field="name" header="Name" sortable style="width: 15rem"></Column>
+          <Column field="modelType" header="Type">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                <Tag :value="data.modeltype" :severity="getSeverityModelType(data.modeltype)" />
+                <Tag :value="data.modelType" :severity="getSeverityModelType(data.modelType)" />
               </div>
             </template>
           </Column>
@@ -130,10 +130,28 @@
             </template>
           </Column>
         </DataTable>
+        <div class="flex justify-content-end align-items-center mt-3">
+          <Paginator
+            v-if="definitionTotal > pageRowNumber"
+            v-model:first="definitionPaginatorOffset"
+            class="flex-grow-1"
+            :rows="pageRowNumber"
+            :totalRecords="definitionTotal"
+            :page="definitionCurrentPage"
+            @page="onDefinitionPageChange"
+          ></Paginator>
+          <div class="mr-3">Total: {{ definitionTotal }}</div>
+        </div>
       </TabPanel>
 
       <TabPanel>
-        <DataTable :value="dynamicMapping" tableStyle="min-width: 50rem" scrollable scrollHeight="80vh">
+        <DataTable
+          :value="mappingData"
+          tableStyle="min-width: 50rem"
+          scrollable
+          scrollHeight="50rem"
+          :loading="isLoadingmappingData"
+        >
           <template #header>
             <div class="flex justify-content-end gap-3">
               <Button
@@ -156,17 +174,17 @@
           </template>
           <Column field="name" header="Name" sortable></Column>
 
-          <Column field="globalDynamicModelDefinitionId" header=" Dynamic Definition">
+          <Column field="globalDynamicModelDefinitionName" header=" Dynamic Definition">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                <Chip :label="getNameDynamicDefinitionFromId(data.globalDynamicModelDefinitionId)"></Chip>
+                <Chip :label="data.globalDynamicModelDefinitionName"></Chip>
               </div>
             </template>
           </Column>
           <Column header="Values">
             <template #body="{ data }">
               <div class="flex justify-content-between">
-                {{ data.mapOrder.join(', ') }}
+                {{ data.mapOrder ? data.mapOrder.join(', ') : '' }}
               </div>
             </template>
           </Column>
@@ -201,6 +219,18 @@
             </template>
           </Column>
         </DataTable>
+        <div class="flex justify-content-end align-items-center mt-3">
+          <Paginator
+            v-if="mappingTotal > pageRowNumber"
+            v-model:first="mappingPaginatorOffset"
+            class="flex-grow-1"
+            :rows="pageRowNumber"
+            :totalRecords="mappingTotal"
+            :page="mappingCurrentPage"
+            @page="onMappingPageChange"
+          ></Paginator>
+          <div class="mr-3">Total: {{ mappingTotal }}</div>
+        </div>
       </TabPanel>
     </TabView>
   </div>
@@ -219,10 +249,10 @@
     </div>
 
     <div class="mt-3">
-      <label for="modeltype" class="font-semibold"> Type</label>
+      <label for="modelType" class="font-semibold"> Type</label>
 
       <Dropdown
-        v-model="definitionData.modeltype"
+        v-model="definitionData.modelType"
         :options="definitionTypeOptions"
         optionGroupLabel="label"
         optionGroupChildren="items"
@@ -253,12 +283,7 @@
     </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="definitionVisibleDialog = false"></Button>
-      <Button
-        type="button"
-        label="Save"
-        :disabled="!(definitionData.name && definitionData.modeltype)"
-        @click="handleChangeDefinition()"
-      ></Button>
+      <Button type="button" label="Save" @click="handleChangeDefinition()"></Button>
     </template>
   </Dialog>
 
@@ -272,36 +297,51 @@
 
     <div>
       <label for="Name" class="font-semibold"> Name</label>
-      <InputText id="Name" v-model="mappingData.name" class="w-full my-3" autocomplete="off" />
+      <InputText
+        id="Name"
+        v-model="mappingChangeData.name"
+        :disabled="modeChange === 'update'"
+        class="w-full my-3"
+        autocomplete="off"
+      />
     </div>
 
     <div class="mt-3">
       <label for="globalDynamicModelDefinitionId" class="font-semibold"> Global Dynamic Model Definition </label>
 
-      <Dropdown
-        v-model="mappingData.globalDynamicModelDefinitionId"
-        :options="globalDynamicModelDefinitionOpts"
-        optionValue="value"
-        optionLabel="name"
-        placeholder="Select a Model"
-        class="w-full my-3"
-      />
+      <div class="w-full my-3">
+        <AutoComplete
+          v-if="modeChange === 'create'"
+          id="globalDynamicModelDefinitionData"
+          v-model="mappingChangeData.globalDynamicModelDefinitionData"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="globalDynamicModelDefinitionDataAutocomplete"
+          :suggestions="globalDynamicDefinitionSuggestions"
+          @complete="searchGlobalDynamicModelDefinition"
+        />
+
+        <InputText
+          v-else
+          id="globalDynamicModelDefinitionName"
+          v-model="mappingChangeData.globalDynamicModelDefinitionName"
+          disabled
+          class="w-full my-3"
+          autocomplete="off"
+        />
+      </div>
     </div>
     <div class="mt-3">
       <label for="values" class="font-semibold"> Values</label>
-      <Chips id="values" v-model="mappingData.mapOrder" class="w-full mt-3" autocomplete="off" />
+      <Chips id="values" v-model="mappingChangeData.mapOrder" class="w-full mt-3" autocomplete="off" />
       <div class="p-1">
         <small>Press Enter to Add.</small>
       </div>
     </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="mappingVisibleDialog = false"></Button>
-      <Button
-        type="button"
-        label="Save"
-        :disabled="!(mappingData.name && mappingData.globalDynamicModelDefinitionId)"
-        @click="handleChangeMapping()"
-      ></Button>
+      <Button type="button" label="Save" @click="handleChangeMapping()"></Button>
     </template>
   </Dialog>
 
@@ -317,8 +357,8 @@
           <div v-if="nameModel === 'definition'">
             Type:
             <Tag
-              :value="slotProps.message.data.modeltype"
-              :severity="getSeverityModelType(slotProps.message.data.modeltype)"
+              :value="slotProps.message.data.modelType"
+              :severity="getSeverityModelType(slotProps.message.data.modelType)"
             />
           </div>
         </div>
@@ -347,7 +387,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import chartComposable from '@/combosables/chartData';
 import api from './api';
 import Toast from 'primevue/toast';
@@ -361,16 +401,21 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 import { useConfirm } from 'primevue/useconfirm';
+
 const confirm = useConfirm();
 const { convertDateTimeToString } = chartComposable();
 const toast = useToast();
 
 onMounted(async () => {
   await getDynamicDefinitionList();
-  await getDynamicMappingList();
+  // await getDynamicMappingList();
 });
 const tabActice = ref(0);
-
+watch(tabActice, async (newIndex) => {
+  if (newIndex === 1 && !mappingData.value) {
+    await getGlobalDynamicModelMappingList();
+  }
+});
 watch(
   () => route.params.id,
   (newId, oldId) => {
@@ -383,41 +428,28 @@ const pageRowNumber = ref(10);
 
 // dynamicDefinition
 const dynamicDefinition = ref();
-const isGroupedValueByFirstLetter = ref(false);
+const isLoadingDynamicData = ref(false);
+const definitionCurrentPage = ref(1);
+const definitionTotal = ref();
+const definitionPaginatorOffset = computed(() => pageRowNumber.value * definitionCurrentPage.value - 1);
+
+const onDefinitionPageChange = async (event) => {
+  definitionCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  await getDynamicDefinitionList();
+};
+
 const getDynamicDefinitionList = async () => {
+  isLoadingDynamicData.value = true;
   try {
-    const res = await api.getGlobalDynamicModelDefinitionList(1);
-    let data = res.data.items;
-    if (res.data.total > pageRowNumber.value) {
-      for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
-        const page = Math.floor(row / 10) + 1;
-        if (page === 1) {
-          continue;
-        }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList(page);
-        data = data.concat(resPgae.data.items);
-      }
-    }
-    dynamicDefinition.value = data;
+    const res = await api.getGlobalDynamicModelDefinitionList(definitionCurrentPage.value);
+    dynamicDefinition.value = res.data.items;
+    definitionTotal.value = res.data.total;
   } catch (error) {
+    dynamicDefinition.value = [];
+    definitionTotal.value = 0;
     console.error('setGlobaldefinitionList error', error);
   }
-};
-
-const getNameDynamicDefinitionFromId = (id) => {
-  const dynamicDefinitionData = dynamicDefinition.value.filter((val) => val._id === id)[0];
-  return dynamicDefinitionData ? dynamicDefinitionData.name : '';
-};
-
-const groupedByFirstLetter = (arr) => {
-  return arr.reduce((acc, word) => {
-    const firstLetter = word[0].toLowerCase();
-    if (!acc[firstLetter]) {
-      acc[firstLetter] = [];
-    }
-    acc[firstLetter].push(word);
-    return acc;
-  }, {});
+  isLoadingDynamicData.value = false;
 };
 
 // --- dynamicDefinition - CRUD ---
@@ -427,18 +459,18 @@ const definitionVisibleDialog = ref(false);
 const definitionData = ref();
 const modeChange = ref();
 
-const handleChangeDefinition = () => {
+const handleChangeDefinition = async () => {
   if (modeChange.value === 'create') {
-    createDynamicDefinition();
+    await createDynamicDefinition();
   }
   if (modeChange.value === 'update') {
-    updateDynamicDefinition();
+    await updateDynamicDefinition();
   }
 };
 const handleCreateDynamicDefinition = () => {
   definitionData.value = {
     name: '',
-    modeltype: '',
+    modelType: '',
     values: [],
   };
   definitionVisibleDialog.value = true;
@@ -460,9 +492,9 @@ const definitionTypeOptions = computed(() => [
 const createDynamicDefinition = async () => {
   try {
     const res = await api.createGlobalDynamicModelDefinitionList(definitionData.value);
-    dynamicDefinition.value.unshift(res.data);
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
     definitionVisibleDialog.value = false;
+    await getDynamicDefinitionList();
   } catch (error) {
     console.log('createDynamicDefinition error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -480,12 +512,12 @@ const updateDynamicDefinition = async () => {
   try {
     const res = await api.updateGlobalDynamicModelDefinition(definitionData.value._id, {
       name: definitionData.value.name,
-      modeltype: definitionData.value.modeltype,
+      modelType: definitionData.value.modelType,
       values: definitionData.value.values,
     });
     toast.add({ severity: 'success', summary: 'Update Successfully', detail: res.message, life: 3000 });
     definitionVisibleDialog.value = false;
-    getDynamicDefinitionList();
+    await getDynamicDefinitionList();
   } catch (error) {
     console.log('updateDynamicDefinition error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -519,7 +551,7 @@ const deleteDynamicDefinition = async (dynamicDefinition_id) => {
   try {
     const res = await api.deleteGlobalDynamicModelDefinition(dynamicDefinition_id);
     toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
-    getDynamicDefinitionList();
+    await getDynamicDefinitionList();
   } catch (error) {
     console.log('deleteDynamicDefinition error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -527,24 +559,45 @@ const deleteDynamicDefinition = async (dynamicDefinition_id) => {
 };
 
 // ------- dynamicMapping
-const dynamicMapping = ref();
-const getDynamicMappingList = async () => {
+
+const mappingData = ref();
+const isLoadingmappingData = ref(false);
+
+const mappingCurrentPage = ref(1);
+const mappingTotal = ref();
+const mappingPaginatorOffset = computed(() => pageRowNumber.value * mappingCurrentPage.value - 1);
+
+const onMappingPageChange = async (event) => {
+  mappingCurrentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  await getGlobalDynamicModelMappingList();
+};
+const getGlobalDynamicModelMappingList = async () => {
+  isLoadingmappingData.value = true;
+
   try {
-    const res = await api.getGlobalDynamicModelMappingList(1);
-    let data = res.data.items;
-    if (res.data.total > pageRowNumber.value) {
-      for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
-        const page = Math.floor(row / 10) + 1;
-        if (page === 1) {
-          continue;
-        }
-        const resPgae = await api.getGlobalDynamicModelDefinitionList(page);
-        data = data.concat(resPgae.data.items);
-      }
+    const res = await api.getGlobalDynamicModelMappingList(mappingCurrentPage.value);
+    mappingTotal.value = res.data.total;
+    for (let index = 0; index < res.data.items.length; index++) {
+      const items = res.data.items[index];
+      items.globalDynamicModelDefinitionName = await getGlobalDynamicModelDefinitionById(
+        items.globalDynamicModelDefinitionId,
+      );
     }
-    dynamicMapping.value = data;
+    mappingData.value = res.data.items;
   } catch (error) {
+    mappingData.value = [];
+    mappingTotal.value = 0;
     console.error('getDynamicMappingList error', error);
+  }
+  isLoadingmappingData.value = false;
+};
+
+const getGlobalDynamicModelDefinitionById = async (id) => {
+  try {
+    const res = await api.getGlobalDynamicModelDefinitionById(id);
+    return res.data.name;
+  } catch {
+    return 'No Model';
   }
 };
 
@@ -557,51 +610,47 @@ const getSeverityModelType = (type) => {
 
 // ------- CRUD -  dynamicMapping
 const mappingVisibleDialog = ref(false);
-const mappingData = ref();
+const mappingChangeData = ref();
 
-const handleChangeMapping = () => {
+const handleChangeMapping = async () => {
   if (modeChange.value === 'create') {
-    createDynamicMapping();
+    await createDynamicMapping();
   }
   if (modeChange.value === 'update') {
-    updateDynamicMapping();
+    await updateDynamicMapping();
   }
 };
 
-const globalDynamicModelDefinitionOpts = computed(() => {
-  const opts = [];
-  if (dynamicDefinition.value) {
-    for (let index = 0; index < dynamicDefinition.value.length; index++) {
-      const model = dynamicDefinition.value[index];
-      opts.push({
-        name: model.name,
-        value: model._id,
-      });
-    }
-  }
-
-  return opts;
-});
-
 const handleCreateDynamicMapping = () => {
-  mappingData.value = {
+  mappingChangeData.value = {
     name: '',
     globalDynamicModelDefinitionId: '',
     mapOrder: [],
+    globalDynamicModelDefinitionData: {},
   };
 
   mappingVisibleDialog.value = true;
   modeChange.value = 'create';
 };
 
+const globalDynamicDefinitionSuggestions = ref();
+const searchGlobalDynamicModelDefinition = async (event) => {
+  const query = event ? event.query.trim() : '';
+  try {
+    const res = await api.searchGlobalDynamicModelDefinition(query);
+    globalDynamicDefinitionSuggestions.value = res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
 const createDynamicMapping = async () => {
   try {
     const res = await api.createGlobalDynamicModelMappingList({
-      name: mappingData.value.name,
-      globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
-      mapOrder: mappingData.value.mapOrder,
+      name: mappingChangeData.value.name,
+      globalDynamicModelDefinitionId: mappingChangeData.value.globalDynamicModelDefinitionData._id,
+      mapOrder: mappingChangeData.value.mapOrder,
     });
-    dynamicMapping.value.unshift(res.data);
+    await getGlobalDynamicModelMappingList();
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
     mappingVisibleDialog.value = false;
   } catch (error) {
@@ -611,21 +660,20 @@ const createDynamicMapping = async () => {
 };
 
 const handleUpdateDynamicMapping = (data) => {
-  mappingData.value = JSON.parse(JSON.stringify(data));
+  mappingChangeData.value = JSON.parse(JSON.stringify(data));
 
   mappingVisibleDialog.value = true;
   modeChange.value = 'update';
 };
 const updateDynamicMapping = async () => {
   try {
-    const res = await api.updateGlobalDynamicModelMapping(mappingData.value._id, {
-      name: mappingData.value.name,
-      globalDynamicModelDefinitionId: mappingData.value.globalDynamicModelDefinitionId,
-      mapOrder: mappingData.value.mapOrder,
+    const res = await api.updateGlobalDynamicModelMapping(mappingChangeData.value._id, {
+      globalDynamicModelDefinitionId: mappingChangeData.value.globalDynamicModelDefinitionId,
+      mapOrder: mappingChangeData.value.mapOrder,
     });
     toast.add({ severity: 'success', summary: 'Update Successfully', detail: res.message, life: 3000 });
     mappingVisibleDialog.value = false;
-    getDynamicMappingList();
+    await getGlobalDynamicModelMappingList();
   } catch (error) {
     console.log('updateDynamicMapping error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -636,7 +684,7 @@ const deleteDynamicMapping = async (mapping_id) => {
   try {
     const res = await api.deleteGlobalDynamicModelMapping(mapping_id);
     toast.add({ severity: 'success', summary: 'Delete Successfully', detail: res.message, life: 3000 });
-    getDynamicMappingList();
+    getGlobalDynamicModelMappingList();
   } catch (error) {
     console.log('deleteDynamicMapping error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -732,5 +780,13 @@ const onGlobalDefinitionView = () => {
 }
 #tab-view ul.p-tabview-nav {
   display: none !important;
+}
+
+#globalDynamicModelDefinition tbody tr {
+  height: 3.1rem;
+}
+.globalDynamicModelDefinitionDataAutocomplete,
+.p-autocomplete-input {
+  width: 100%;
 }
 </style>
