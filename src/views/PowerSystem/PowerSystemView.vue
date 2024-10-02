@@ -113,6 +113,7 @@
                           label="EMS"
                           :model="emsFilterList"
                           :text="tabMenuPSActive !== index"
+                          :disabled="isSublineNode"
                           @click="tabMenuPSActive = index"
                         >
                           <template #item="slotProps">
@@ -173,8 +174,26 @@
                     <!-- ['General', 'Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic'] -->
                     <TabPanel>
                       <template v-if="isSublineNode && !showDefinitionFlatList">
-                        <TabView>
-                          <TabPanel header="Parameter">
+                        <div class="flex gap-2 justify-content-between align-items-center">
+                          <div>
+                            <Button
+                              label="Parameter"
+                              text
+                              :severity="tabParameterMenuActive === 0 ? 'primary' : 'secondary'"
+                              @click="tabParameterMenuActive = 0"
+                            />
+                            <Button
+                              label="Pole"
+                              text
+                              :severity="tabParameterMenuActive === 1 ? 'primary' : 'secondary'"
+                              @click="tabParameterMenuActive = 1"
+                            />
+                          </div>
+                          <Button icon="pi pi-plus" text class="mx-3" severity="primary" @click="handleCreatePole" />
+                        </div>
+
+                        <TabView id="parameter-pole-tab-view" v-model:activeIndex="tabParameterMenuActive">
+                          <TabPanel>
                             <div style="height: 37rem">
                               <parameterTabWidget
                                 :data="psParameterData"
@@ -198,7 +217,7 @@
                               <div class="mr-3">Total: {{ psParameterTotal }}</div>
                             </div>
                           </TabPanel>
-                          <TabPanel header="Pole">
+                          <TabPanel>
                             <div style="height: 36rem">
                               <poleTableWidget
                                 :data="sublineData"
@@ -737,14 +756,14 @@ const treeDefinitionFilterOpts = computed(() => {
 
 const nodeSelected = ref();
 const isSublineNode = ref(false);
-
-const pseId = ref();
+const tabParameterMenuActive = ref(0);
+const psIdSelected = ref();
 
 const onNodeSelect = async (node) => {
   isDefinitionGenerator.value = node.label === 'Generator';
   nodeSelected.value = node;
   isLoadingContainer.value = true;
-  pseId.value = node._id;
+  psIdSelected.value = node._id;
   psParameterCurrentPage.value = 1;
   await getPsParameterWithTree(true);
   await getPsEmsWithTree(true);
@@ -756,6 +775,9 @@ const onNodeSelect = async (node) => {
 watch(isSublineNode, async (newStatus) => {
   if (newStatus) {
     await getSublineData();
+    if (tabMenuPSList.value[tabMenuPSActive.value] === 'EMS') {
+      tabMenuPSActive.value = tabMenuPSList.value.indexOf('Parameter');
+    }
   }
 });
 const sublineData = ref();
@@ -803,7 +825,7 @@ const reloadPsParameter = async () => {
   if (showDefinitionFlatList.value && definitionSelected.value.name) {
     await getPsParametertWithDefinition(psParameterCurrentPage.value);
   }
-  if (!showDefinitionFlatList.value && pseId.value) {
+  if (!showDefinitionFlatList.value && psIdSelected.value) {
     await getPsParameterWithTree();
   }
 };
@@ -838,7 +860,7 @@ const getPsParameterWithTree = async (getHeader = false) => {
   }
   try {
     const res = await api.PowerSystemParameterApi.getPsDataWithTree(
-      pseId.value,
+      psIdSelected.value,
       projectVersionId.value,
       nodeParentId,
       psParameterCurrentPage.value,
@@ -887,7 +909,7 @@ const reloadPsEms = async (getHeader = false) => {
   if (showDefinitionFlatList.value && definitionSelected.value.name) {
     await getPsEmstWithDefinition(psParameterCurrentPage.value, getHeader);
   }
-  if (!showDefinitionFlatList.value && pseId.value) {
+  if (!showDefinitionFlatList.value && psIdSelected.value) {
     await getPsEmsWithTree(getHeader);
   }
 };
@@ -930,7 +952,7 @@ const getPsEmsWithTree = async (getHeader = false) => {
   }
   try {
     const res = await api.PowerSystemEmsApi.getPsDataWithTree(
-      pseId.value,
+      psIdSelected.value,
       projectVersionId.value,
       nodeParentId,
       emsFilterSelected.value ? emsFilterSelected.value._id : undefined,
@@ -1177,7 +1199,8 @@ const getVersionData = async (page = 1) => {
 
 <style>
 #ps-tab-view > .p-tabview-nav-container > .p-tabview-nav-content > ul.p-tabview-nav,
-#on-top-tab-view > .p-tabview-nav-container > .p-tabview-nav-content > ul.p-tabview-nav {
+#on-top-tab-view > .p-tabview-nav-container > .p-tabview-nav-content > ul.p-tabview-nav,
+#parameter-pole-tab-view > .p-tabview-nav-container > .p-tabview-nav-content > ul.p-tabview-nav {
   display: none !important;
 }
 
