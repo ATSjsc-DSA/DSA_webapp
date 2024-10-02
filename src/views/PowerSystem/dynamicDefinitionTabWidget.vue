@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 43rem; overflow: auto">
+  <div style="height: 40rem; overflow: auto">
     <DataTable
       id="psDynamicTable"
       :value="tableData"
@@ -9,7 +9,7 @@
       :sortOrder="1"
       rowHover
       scrollable
-      scrollHeight="38rem"
+      scrollHeight="34rem"
       showGridlines
       :loading="isLoadingData"
     >
@@ -89,24 +89,28 @@
       <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
 
       <!-- Traditional -->
-      <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
-      <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
-      <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
-      <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
+      <Column field="Generator.modelName" header="Generator" style="text-wrap: nowrap" />
+      <Column field="Excitation.modelName" header="Excitation" style="text-wrap: nowrap" />
+      <Column field="Governor.modelName" header="Governor" style="text-wrap: nowrap" />
+      <Column field="Stabilizer.modelName" header="Stabilizer" style="text-wrap: nowrap" />
       <!-- Renewable -->
-      <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
       <Column
-        field="Renewable.name"
+        field="Generic.modelName"
+        header="Generic"
+        style="text-wrap: nowrap; background-color: var(--surface-100)"
+      />
+      <Column
+        field="Renewable.modelName"
         header="Renewable"
         style="text-wrap: nowrap; background-color: var(--surface-100)"
       />
       <Column
-        field="PlanControl.name"
+        field="PlanControl.modelName"
         header="PlanControl"
         style="text-wrap: nowrap; background-color: var(--surface-100)"
       />
       <Column
-        field="DriveTrain.name"
+        field="DriveTrain.modelName"
         header="DriveTrain"
         style="text-wrap: nowrap; background-color: var(--surface-100)"
       />
@@ -121,7 +125,7 @@
       </Column>
     </DataTable>
   </div>
-  <Paginator :rows="pageRowNumber" :totalRecords="totalRecords" :page="currentPage" @page="onPageChange()"></Paginator>
+  <Paginator :rows="pageRowNumber" :totalRecords="totalRecords" :page="currentPage" @page="onPageChange"></Paginator>
 
   <Toast />
 
@@ -138,7 +142,7 @@
           <label for="globalDynamicModelDefinitionId" class="font-semibold"> Power System </label>
           <div class="mt-1">
             <small>
-              {{ props.nodeSelected.parentName ? `(${props.nodeSelected.parentName})` : '' }}
+              {{ nodeSelected && nodeSelected.parentName ? `(${nodeSelected.parentName})` : '' }}
             </small>
           </div>
         </div>
@@ -186,7 +190,7 @@
           </div>
 
           <template v-if="generatorModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(generatorTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in generatorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -196,8 +200,8 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
-          {{ generatorTable }}
         </TabPanel>
 
         <TabPanel header="Excitation">
@@ -217,7 +221,7 @@
             />
           </div>
           <template v-if="excitationModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(excitationTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in excitationTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -227,6 +231,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
         <TabPanel header="Governor">
@@ -246,7 +251,7 @@
             />
           </div>
           <template v-if="governorModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(governorTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in governorTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -256,6 +261,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
         <TabPanel header="Stabilizer">
@@ -275,7 +281,7 @@
             />
           </div>
           <template v-if="stabilizerModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(stabilizerTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in stabilizerTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -285,6 +291,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
       </TabView>
@@ -308,7 +315,7 @@
             />
           </div>
           <template v-if="genericModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(genericTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in genericTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -318,6 +325,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
         <TabPanel header="Renewable">
@@ -337,7 +345,7 @@
             />
           </div>
           <template v-if="renewableModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(renewableTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in renewableTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -347,6 +355,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
         <TabPanel header="Plan Control">
@@ -366,7 +375,7 @@
             />
           </div>
           <template v-if="planControlModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(planControlTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in planControlTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -376,6 +385,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
         <TabPanel header=" Drive Train">
@@ -395,7 +405,7 @@
             />
           </div>
           <template v-if="driveTrainModel">
-            <div class="grid mt-3">
+            <div v-if="Object.keys(driveTrainTable).length > 0" class="grid mt-3">
               <div v-for="(val, col) in driveTrainTable" :key="col" :field="col" :header="col" class="col-6 pl-3">
                 <div class="flex gap-1 align-items-center">
                   <div class="w-12rem">
@@ -405,6 +415,7 @@
                 </div>
               </div>
             </div>
+            <div v-else>This Global Dynamic Model Definition does not have values.</div>
           </template>
         </TabPanel>
       </TabView>
@@ -451,8 +462,7 @@ import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
-import additionApi from './additionApi';
-import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
+import { PowerSystemParameterApi, AdditionApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
 const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
@@ -467,31 +477,20 @@ const props = defineProps({
 
 watch(
   () => props.showDefinitionFlatList,
-  (newData) => {
-    getDynamicModelList();
+  async (newData) => {
+    await getTableData();
   },
 );
 
 onMounted(async () => {
-  await getDynamicDefinitionList();
-
-  await getDynamicModelList();
-  // Traditional
-  traditionalGeneratorOpts.value = await getGlobalDynamicModelDefinitionByType('Generator');
-  traditionalExcitationOpts.value = await getGlobalDynamicModelDefinitionByType('Excitation');
-  traditionalGovernorOpts.value = await getGlobalDynamicModelDefinitionByType('Governor');
-  traditionalStabilizerOpts.value = await getGlobalDynamicModelDefinitionByType('Stabilizer');
-  // Renewable
-  renewableGenericOpts.value = await getGlobalDynamicModelDefinitionByType('Generic');
-  renewableRenewableOpts.value = await getGlobalDynamicModelDefinitionByType('Renewable');
-  renewablePlanControlOpts.value = await getGlobalDynamicModelDefinitionByType('PlanControl');
-  renewableDriveTrainOpts.value = await getGlobalDynamicModelDefinitionByType('DriveTrain');
+  await getTableData();
+  // // Traditional
 });
 
 const isLoadingData = ref(false);
 const modelDefinitionType = ref(globalDynamicModelApi.TypeGlobalDynamicModelDefinition);
 
-// addition
+// Table Data
 const pageRowNumber = ref(10);
 const totalRecords = ref(0);
 const currentPage = ref(1);
@@ -499,22 +498,43 @@ const dynamicModelList = ref([]);
 
 const onPageChange = async (event) => {
   currentPage.value = event.page + 1;
+  await getTableData();
+};
+
+const tableData = ref([]);
+
+const getTableData = async () => {
+  isLoadingData.value = true;
   await getDynamicModelList();
+  const data = [];
+  for (let index = 0; index < dynamicModelList.value.length; index++) {
+    const items = dynamicModelList.value[index];
+    const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewable';
+    const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
+    for (const type of typeModelArr) {
+      const modelData = items.model.filter((model) => {
+        return model.modelType === type;
+      })[0];
+      items[type] = modelData || '';
+    }
+    data.push(items);
+  }
+  tableData.value = data;
+  isLoadingData.value = false;
 };
 
 const getDynamicModelList = async () => {
-  isLoadingData.value = true;
   try {
     let resData = {
       items: [],
       total: 0,
     };
     if (props.showDefinitionFlatList) {
-      const res = await additionApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
+      const res = await AdditionApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
       resData = res.data;
     } else {
       if (props.nodeSelected) {
-        const res = await additionApi.getDynamicModelListWithTree(
+        const res = await AdditionApi.getDynamicModelListWithTree(
           additionprojectVersionId.value,
           props.nodeSelected.parentId,
           currentPage.value,
@@ -527,60 +547,18 @@ const getDynamicModelList = async () => {
   } catch (error) {
     dynamicModelList.value = [];
     console.log('getDynamicModelList: error ', error);
-    toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
+    toast.add({ severity: 'error', summary: 'getDynamicModelList', detail: error.data.detail, life: 3000 });
   }
-  isLoadingData.value = false;
 };
 
-const dynamicDefinition = ref();
-const getDynamicDefinitionList = async () => {
+const getGlobalDynamicModelDefinitionById = async (id) => {
   try {
-    const res = await globalDynamicModelApi.getGlobalDynamicModelDefinitionList(1);
-    let data = res.data.items;
-    if (res.data.total > pageRowNumber.value) {
-      for (let row = 0; row < res.data.total; row += pageRowNumber.value) {
-        const page = Math.floor(row / 10) + 1;
-        if (page === 1) {
-          continue;
-        }
-        const resPgae = await globalDynamicModelApi.getGlobalDynamicModelDefinitionList(page);
-        data = data.concat(resPgae.data.items);
-      }
-    }
-    dynamicDefinition.value = data;
+    const res = await globalDynamicModelApi.getGlobalDynamicModelDefinitionById(id);
+    return res.data;
   } catch (error) {
-    dynamicDefinition.value = undefined;
-    console.error('getDynamicDefinitionList error', error);
+    return {};
   }
 };
-
-const getGlobalDynamicModelDefinitionById = (id) => dynamicDefinition.value.filter((item) => item._id === id)[0];
-const tableData = computed(() => {
-  const data = [];
-  for (let index = 0; index < dynamicModelList.value.length; index++) {
-    const items = dynamicModelList.value[index];
-    const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewable';
-    const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
-    for (const type of typeModelArr) {
-      const modelData = items.model.filter((model) => {
-        return model.modelType === type;
-      })[0];
-      if (modelData) {
-        const dynamicModeDefinitionData = getGlobalDynamicModelDefinitionById(modelData.modelId);
-        items[type] = {
-          name: dynamicModeDefinitionData.name,
-          modelId: modelData.modelId,
-          values: getDynamicModelTableOfType(modelData.modelId, modelData.values),
-        };
-      } else {
-        items[type] = '';
-      }
-    }
-    data.push(items);
-  }
-  return data;
-});
-
 // CRUD
 
 const psSuggestions = ref();
@@ -601,7 +579,10 @@ const dataChange = ref();
 const modeChange = ref();
 
 const handleCreate = async () => {
-  clearModelOption();
+  if (!traditionalGeneratorOpts.value) {
+    await getModelTypeOptions();
+  }
+  clearModelTypeSelected();
   dataChange.value = {
     powerSystemData: '',
     isTraditionalModel: true,
@@ -610,7 +591,7 @@ const handleCreate = async () => {
   modeChange.value = 'Create';
 };
 
-const clearModelOption = () => {
+const clearModelTypeSelected = () => {
   generatorModel.value = undefined;
   excitationModel.value = undefined;
   governorModel.value = undefined;
@@ -620,18 +601,31 @@ const clearModelOption = () => {
   planControlModel.value = undefined;
   driveTrainModel.value = undefined;
 };
+
+const getModelTypeOptions = async () => {
+  traditionalGeneratorOpts.value = await getGlobalDynamicModelDefinitionByType('Generator');
+  traditionalExcitationOpts.value = await getGlobalDynamicModelDefinitionByType('Excitation');
+  traditionalGovernorOpts.value = await getGlobalDynamicModelDefinitionByType('Governor');
+  traditionalStabilizerOpts.value = await getGlobalDynamicModelDefinitionByType('Stabilizer');
+  // Renewable
+  renewableGenericOpts.value = await getGlobalDynamicModelDefinitionByType('Generic');
+  renewableRenewableOpts.value = await getGlobalDynamicModelDefinitionByType('Renewable');
+  renewablePlanControlOpts.value = await getGlobalDynamicModelDefinitionByType('PlanControl');
+  renewableDriveTrainOpts.value = await getGlobalDynamicModelDefinitionByType('DriveTrain');
+};
 const createDynamicModel = async () => {
   try {
-    await additionApi.createDynamicModel(additionprojectVersionId.value, getValueModelInForm());
+    await AdditionApi.createDynamicModel(additionprojectVersionId.value, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     visibleChangeDialog.value = false;
-    await getDynamicModelList();
+    await getTableData();
   } catch (error) {
-    console.log('getGlobalDynamicModelDefinitionByType: error ', error);
+    console.log('createDynamicModel: error ', error);
     toast.add({ severity: 'error', summary: 'Create', detail: error.data.detail, life: 3000 });
   }
 };
 const getValueModelInForm = () => {
+  console.log(dataChange.value.powerSystemData);
   const data = {
     id: dataChange.value.id,
     powerSystemDataId:
@@ -717,15 +711,20 @@ const getGlobalDynamicModelDefinitionByType = async (type) => {
     return res.data;
   } catch (error) {
     console.log('getGlobalDynamicModelDefinitionByType: error ', error);
-    toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
+    toast.add({
+      severity: 'error',
+      summary: 'globaldynamicmodeldefinition/' + type,
+      detail: error.data.detail,
+      life: 3000,
+    });
   }
 };
 
 // Traditional: {
 
-const getDynamicModelTableOfType = (dynamicModel_id, values = []) => {
-  console.log('generatorModelChange', dynamicModel_id);
-  const dynamicModelDefinition = getGlobalDynamicModelDefinitionById(dynamicModel_id);
+const getDynamicModelTableOfType = async (dynamicModel_id, values = []) => {
+  // console.log('generatorModelChange', dynamicModel_id);
+  const dynamicModelDefinition = await getGlobalDynamicModelDefinitionById(dynamicModel_id);
   const table = {};
   for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
     table[dynamicModelDefinition.values[i]] = values[i] || '';
@@ -734,55 +733,58 @@ const getDynamicModelTableOfType = (dynamicModel_id, values = []) => {
 };
 
 const generatorModel = ref();
-const generatorTable = ref();
-const generatorModelChange = () => {
-  generatorTable.value = getDynamicModelTableOfType(generatorModel.value);
+const generatorTable = ref([]);
+const generatorModelChange = async () => {
+  generatorTable.value = await getDynamicModelTableOfType(generatorModel.value);
 };
 
 const excitationModel = ref();
-const excitationTable = ref();
-const excitationModelChange = () => {
-  excitationTable.value = getDynamicModelTableOfType(excitationModel.value);
+const excitationTable = ref([]);
+const excitationModelChange = async () => {
+  excitationTable.value = await getDynamicModelTableOfType(excitationModel.value);
 };
 
 const governorModel = ref();
-const governorTable = ref();
-const governorModelChange = () => {
-  governorTable.value = getDynamicModelTableOfType(governorModel.value);
+const governorTable = ref([]);
+const governorModelChange = async () => {
+  governorTable.value = await getDynamicModelTableOfType(governorModel.value);
 };
 
 const stabilizerModel = ref();
-const stabilizerTable = ref();
-const stabilizerModelChange = () => {
-  stabilizerTable.value = getDynamicModelTableOfType(stabilizerModel.value);
+const stabilizerTable = ref([]);
+const stabilizerModelChange = async () => {
+  stabilizerTable.value = await getDynamicModelTableOfType(stabilizerModel.value);
 };
 
 // Renewable: {
 const genericModel = ref();
-const genericTable = ref();
-const genericModelChange = () => {
-  genericTable.value = getDynamicModelTableOfType(genericModel.value);
+const genericTable = ref([]);
+const genericModelChange = async () => {
+  genericTable.value = await getDynamicModelTableOfType(genericModel.value);
 };
 
 const renewableModel = ref();
-const renewableTable = ref();
-const renewableModelChange = () => {
-  renewableTable.value = getDynamicModelTableOfType(renewableModel.value);
+const renewableTable = ref([]);
+const renewableModelChange = async () => {
+  renewableTable.value = await getDynamicModelTableOfType(renewableModel.value);
 };
 
 const planControlModel = ref();
-const planControlTable = ref();
-const planControlModelChange = () => {
-  planControlTable.value = getDynamicModelTableOfType(planControlModel.value);
+const planControlTable = ref([]);
+const planControlModelChange = async () => {
+  planControlTable.value = await getDynamicModelTableOfType(planControlModel.value);
 };
 
 const driveTrainModel = ref();
-const driveTrainTable = ref();
-const driveTrainModelChange = () => {
-  driveTrainTable.value = getDynamicModelTableOfType(driveTrainModel.value);
+const driveTrainTable = ref([]);
+const driveTrainModelChange = async () => {
+  driveTrainTable.value = await getDynamicModelTableOfType(driveTrainModel.value);
 };
 
-const handleUpdate = (data) => {
+const handleUpdate = async (data) => {
+  if (!traditionalGeneratorOpts.value) {
+    await getModelTypeOptions();
+  }
   const updateData = JSON.parse(JSON.stringify(data));
   updateData.isTraditionalModel = data.modelDynamicType === 0;
   dataChange.value = updateData;
@@ -830,14 +832,14 @@ const handleUpdate = (data) => {
 const updateDynamicModel = async () => {
   const dataUpdate = getValueModelInForm();
   try {
-    await additionApi.updateDynamicModel(additionprojectVersionId.value, dataUpdate.id, {
+    await AdditionApi.updateDynamicModel(additionprojectVersionId.value, dataUpdate.id, {
       model: dataUpdate.model,
       modelDynamicType: dataUpdate.modelDynamicType,
     });
     toast.add({ severity: 'success', summary: 'Update successfully', life: 3000 });
     visibleChangeDialog.value = false;
-    await getDynamicModelList();
-    clearModelOption();
+    await getTableData();
+    clearModelTypeSelected();
   } catch (error) {
     console.log('getGlobalDynamicModelDefinitionByType: error ', error);
     toast.add({ severity: 'error', summary: 'Create', detail: error.data.detail, life: 3000 });
@@ -862,9 +864,9 @@ const confirmDelete = (data) => {
 
 const deleteDynamicModel = async (dynamicModel_id) => {
   try {
-    await additionApi.deleteDynamicModel(additionprojectVersionId.value, dynamicModel_id);
+    await AdditionApi.deleteDynamicModel(additionprojectVersionId.value, dynamicModel_id);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
-    getDynamicModelList();
+    await getTableData();
   } catch (error) {
     console.log('deletePSE: error ', error);
     toast.add({ severity: 'error', summary: 'Delete Power System', detail: error.data.detail, life: 3000 });

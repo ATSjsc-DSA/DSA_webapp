@@ -656,14 +656,15 @@ const getEmsfilterList = async (definitionName = '') => {
       // get with definition Name
       for (const item of res.data) {
         if (emsFilterName.indexOf(item.name) !== -1) {
+          const name = item.name.replace('Ems', '');
           item.name = opts.push({
-            label: item.name.replace('Ems', ''),
+            label: name,
             _id: item._id,
             disabled: emsFilterName.length <= 1,
             command: (event) => {
               console.log(event, event);
               emsFilterSelected.value = {
-                label: item.name.replace('Ems', ''),
+                label: name,
                 _id: item._id,
                 name: item.name,
               };
@@ -674,13 +675,14 @@ const getEmsfilterList = async (definitionName = '') => {
     } else {
       // get all
       for (const item of res.data) {
+        const name = item.name.replace('Ems', '');
         opts.push({
-          label: item.name.replace('Ems', ''),
+          label: name,
           _id: item._id,
 
           command: () => {
             emsFilterSelected.value = {
-              label: item.name.replace('Ems', ''),
+              label: name,
               _id: item._id,
               name: item.name,
             };
@@ -698,7 +700,7 @@ const getEmsfilterList = async (definitionName = '') => {
       }
     }
   } catch (error) {
-    console.log('getfilterOptions: error ', error);
+    console.log('getEmsfilterList: error ', error);
     toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
   }
 };

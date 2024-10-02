@@ -174,7 +174,7 @@ const getEmsfilterList = async () => {
       await getEmsDefinitionData();
     }
   } catch (error) {
-    console.log('getfilterOptions: error ', error);
+    console.log('getEmsfilterList: error ', error);
     toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
   }
 };
