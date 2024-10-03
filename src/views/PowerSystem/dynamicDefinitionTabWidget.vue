@@ -1,130 +1,124 @@
 <template>
-  <div style="height: 40rem; overflow: auto">
-    <DataTable
-      id="psDynamicTable"
-      :value="tableData"
-      dataKey="_id"
-      tableStyle="min-width: 50rem;"
-      :lazy="true"
-      :sortOrder="1"
-      rowHover
-      scrollable
-      scrollHeight="34rem"
-      showGridlines
-      :loading="isLoadingData"
-    >
-      <template #header>
-        <div class="flex justify-content-end">
-          <Button
-            type="button"
-            label="Create Dynamic Model"
-            icon="pi pi-plus"
-            size="small"
-            text
-            @click="handleCreate()"
-          />
+  <DataTable
+    id="psDynamicTable"
+    :value="tableData"
+    dataKey="_id"
+    tableStyle="min-width: 50rem;"
+    :lazy="true"
+    :sortOrder="1"
+    rowHover
+    scrollable
+    scrollHeight="40rem"
+    showGridlines
+    :loading="isLoadingData"
+  >
+    <template #header>
+      <div class="flex justify-content-end">
+        <Button
+          type="button"
+          label="Create Dynamic Model"
+          icon="pi pi-plus"
+          size="small"
+          text
+          @click="handleCreate()"
+        />
+      </div>
+    </template>
+
+    <ColumnGroup type="header">
+      <Row>
+        <Column :rowspan="2">
+          <template #header>
+            <div class="flex align-items-center justify-content-center w-full">Unique Id</div>
+          </template>
+        </Column>
+        <Column :rowspan="2">
+          <template #header>
+            <div class="flex align-items-center justify-content-center w-full">Name</div>
+          </template>
+        </Column>
+        <Column :colspan="4">
+          <template #header>
+            <div class="flex align-items-center justify-content-center w-full">Traditional</div>
+          </template>
+        </Column>
+        <Column :colspan="4" style="background-color: var(--surface-100)">
+          <template #header>
+            <div class="flex align-items-center justify-content-center w-full">Renewable</div>
+          </template>
+        </Column>
+        <Column header="" :rowspan="2" />
+      </Row>
+      <Row>
+        <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
+        <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
+        <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
+        <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
+
+        <Column field="Generic.name" header="Generic" style="text-wrap: nowrap; background-color: var(--surface-100)" />
+        <Column
+          field="Renewable.name"
+          header="Renewable"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="PlanControl.name"
+          header="PlanControl"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="DriveTrain.name"
+          header="DriveTrain"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+      </Row>
+    </ColumnGroup>
+
+    <Column field="powerSystemDataUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+      <template #body="{ data }">
+        <div class="font-bold w-8rem text-center">
+          {{ data.powerSystemDataUniqueId }}
         </div>
       </template>
+    </Column>
+    <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
 
-      <ColumnGroup type="header">
-        <Row>
-          <Column :rowspan="2">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Unique Id</div>
-            </template>
-          </Column>
-          <Column :rowspan="2">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Name</div>
-            </template>
-          </Column>
-          <Column :colspan="4">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Traditional</div>
-            </template>
-          </Column>
-          <Column :colspan="4" style="background-color: var(--surface-100)">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Renewable</div>
-            </template>
-          </Column>
-          <Column header="" :rowspan="2" />
-        </Row>
-        <Row>
-          <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
-          <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
-          <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
-          <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
+    <!-- Traditional -->
+    <Column field="Generator.modelName" header="Generator" style="text-wrap: nowrap" />
+    <Column field="Excitation.modelName" header="Excitation" style="text-wrap: nowrap" />
+    <Column field="Governor.modelName" header="Governor" style="text-wrap: nowrap" />
+    <Column field="Stabilizer.modelName" header="Stabilizer" style="text-wrap: nowrap" />
+    <!-- Renewable -->
+    <Column
+      field="Generic.modelName"
+      header="Generic"
+      style="text-wrap: nowrap; background-color: var(--surface-100)"
+    />
+    <Column
+      field="Renewable.modelName"
+      header="Renewable"
+      style="text-wrap: nowrap; background-color: var(--surface-100)"
+    />
+    <Column
+      field="PlanControl.modelName"
+      header="PlanControl"
+      style="text-wrap: nowrap; background-color: var(--surface-100)"
+    />
+    <Column
+      field="DriveTrain.modelName"
+      header="DriveTrain"
+      style="text-wrap: nowrap; background-color: var(--surface-100)"
+    />
 
-          <Column
-            field="Generic.name"
-            header="Generic"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-          <Column
-            field="Renewable.name"
-            header="Renewable"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-          <Column
-            field="PlanControl.name"
-            header="PlanControl"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-          <Column
-            field="DriveTrain.name"
-            header="DriveTrain"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-        </Row>
-      </ColumnGroup>
-
-      <Column field="powerSystemDataUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
-        <template #body="{ data }">
-          <div class="font-bold w-8rem text-center">
-            {{ data.powerSystemDataUniqueId }}
-          </div>
-        </template>
-      </Column>
-      <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
-
-      <!-- Traditional -->
-      <Column field="Generator.modelName" header="Generator" style="text-wrap: nowrap" />
-      <Column field="Excitation.modelName" header="Excitation" style="text-wrap: nowrap" />
-      <Column field="Governor.modelName" header="Governor" style="text-wrap: nowrap" />
-      <Column field="Stabilizer.modelName" header="Stabilizer" style="text-wrap: nowrap" />
-      <!-- Renewable -->
-      <Column
-        field="Generic.modelName"
-        header="Generic"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-      <Column
-        field="Renewable.modelName"
-        header="Renewable"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-      <Column
-        field="PlanControl.modelName"
-        header="PlanControl"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-      <Column
-        field="DriveTrain.modelName"
-        header="DriveTrain"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-
-      <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
-        <template #body="{ data }">
-          <div class="flex justify-content-between">
-            <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
-  </div>
+    <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+      <template #body="{ data }">
+        <div class="flex justify-content-between">
+          <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
+          <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
+        </div>
+      </template>
+    </Column>
+  </DataTable>
   <Paginator :rows="pageRowNumber" :totalRecords="totalRecords" :page="currentPage" @page="onPageChange"></Paginator>
 
   <Toast />

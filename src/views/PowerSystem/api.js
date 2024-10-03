@@ -79,7 +79,7 @@ export class PowerSystemParameterApi {
       url += `?psdDefinition_id=${psdDefinition_id}`;
     }
     if (query) {
-      url += psdDefinition_id ? '&' : '?' + `query=${query}`;
+      url += (psdDefinition_id ? '&' : '?') + `query=${query}`;
     }
     return post(url, exceptionArr);
   }
@@ -133,7 +133,7 @@ export class PowerSystemEmsApi {
       url += `?psdDefinition_id=${psdDefinition_id}`;
     }
     if (query) {
-      url += psdDefinition_id ? '&' : '?' + `query=${query}`;
+      url += (psdDefinition_id ? '&' : '?') + `query=${query}`;
     }
     return post(url, exceptionArr);
   }

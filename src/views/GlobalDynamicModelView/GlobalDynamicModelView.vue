@@ -172,7 +172,6 @@
               <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicMapping" />
             </div>
           </template>
-          <Column field="name" header="Name" sortable></Column>
 
           <Column field="globalDynamicModelDefinitionName" header=" Dynamic Definition">
             <template #body="{ data }">
@@ -294,17 +293,6 @@
         <span class="font-bold white-space-nowrap">Global Dynamic Model Mapping</span>
       </div>
     </template>
-
-    <div>
-      <label for="Name" class="font-semibold"> Name</label>
-      <InputText
-        id="Name"
-        v-model="mappingChangeData.name"
-        :disabled="modeChange === 'update'"
-        class="w-full my-3"
-        autocomplete="off"
-      />
-    </div>
 
     <div class="mt-3">
       <label for="globalDynamicModelDefinitionId" class="font-semibold"> Global Dynamic Model Definition </label>
