@@ -105,7 +105,7 @@
                           :label="tab"
                           class=""
                           :text="tabMenuPSActive !== index"
-                          :disabled="tab === 'Dynamic' && !isDefinitionGenerator"
+                          :disabled="(tab === 'Dynamic' || tab === 'Dynamic Default') && !isDefinitionGenerator"
                           @click="tabMenuPSActive = index"
                         />
                         <SplitButton
@@ -351,6 +351,15 @@
                         :nodeSelected="nodeSelected"
                       />
                     </TabPanel>
+                    <TabPanel :disabled="!isDefinitionGenerator">
+                      <dynamicDefaultModelTabWidget
+                        v-if="isDefinitionGenerator"
+                        :projectVersionId="projectVersionId"
+                        :definitionId="definitionSelected._id"
+                        :showDefinitionFlatList="showDefinitionFlatList"
+                        :nodeSelected="nodeSelected"
+                      />
+                    </TabPanel>
                   </TabView>
                 </div>
               </template>
@@ -402,7 +411,6 @@
         </div>
       </TabPanel>
     </TabView>
-
     <!-- create new version dialog  -->
     <Dialog v-model:visible="createVersionVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
       <template #header>
@@ -517,6 +525,7 @@ import poleTableWidget from './parameterTableTabWidget/poleTableWidget.vue';
 
 import emsTabWidget from './emsTabWidget.vue';
 import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
+import dynamicDefaultModelTabWidget from './dynamicDefaultModelTabWidget.vue';
 
 import createPsDialog from './createPsDialog.vue';
 import createEmsDialog from './createEmsDialog.vue';
@@ -541,7 +550,7 @@ onMounted(async () => {
 onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
-const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic']);
+const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Dynamic Default']);
 const showDefinitionFlatList = ref(false);
 
 const loadAllData = async () => {
@@ -560,7 +569,9 @@ const isDefinitionGenerator = ref(false);
 
 watch(isDefinitionGenerator, (newStatus) => {
   const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
-  if (!newStatus && isDynamicTab) {
+  const isDynamicDefaultTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic Default';
+
+  if (!newStatus && (isDynamicTab || isDynamicDefaultTab)) {
     tabMenuPSActive.value = 0;
   }
 });
@@ -643,7 +654,10 @@ const canUseDefinitionFilter = computed(() => {
 });
 
 const showflatListFilterWidget = computed(() => {
-  if (tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic') {
+  const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
+  const isDynamicDefaultTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic Default';
+
+  if (isDynamicTab || isDynamicDefaultTab) {
     return false;
   }
   return showDefinitionFlatList.value;

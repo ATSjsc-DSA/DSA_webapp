@@ -180,7 +180,7 @@ export class SubLineApi {
   }
 }
 
-export class AdditionApi {
+export class DynamicModelApi {
   static async getDynamicModelList(additionVersion_id, page) {
     return get(`/addition/${projectData.value._id}/${additionVersion_id}/dynamicModel`, { page: page });
   }
@@ -197,5 +197,26 @@ export class AdditionApi {
   }
   static async deleteDynamicModel(versionId, dynamicModel_id) {
     return _delete(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`);
+  }
+}
+export class DynamicDefaultApi {
+  static async getDynamicDefaultList(additionVersion_id, page) {
+    return get(`/addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault`, { page: page });
+  }
+
+  static async getDynamicDefaultListWithTree(additionVersion_id, parent_id, page) {
+    return get(`/addition/${projectData.value._id}/${additionVersion_id}/${parent_id}/dynamicModelDefault`, {
+      page: page,
+    });
+  }
+  static async createDynamicDefault(additionVersion_id, data) {
+    return post(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault`, data);
+  }
+
+  static async updateDynamicDefault(additionVersion_id, dynamicModel_id, data) {
+    return put(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault/${dynamicModel_id}`, data);
+  }
+  static async deleteDynamicDefault(additionVersion_id, dynamicModel_id) {
+    return _delete(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault/${dynamicModel_id}`);
   }
 }

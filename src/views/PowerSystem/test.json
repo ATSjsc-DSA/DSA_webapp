@@ -1,0 +1,10 @@
+{
+  "name": "test",
+  "pMax": 0,
+  "pMin": 0,
+  "renewable": 1,
+  "model": [
+    { "modelType": "Generator", "modelId": "66fe0c3de4064a9fd58ac98e", "values": [] },
+    { "modelType": "Excitation", "modelId": "66fe0c3de4064a9fd58ac98f", "values": [] }
+  ]
+}

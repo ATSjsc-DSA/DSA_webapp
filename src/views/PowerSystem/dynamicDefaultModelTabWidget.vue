@@ -15,7 +15,7 @@
       size="small"
     >
       <template #header>
-        <div class="flex justify-content-end">
+        <div class="flex align-items-center justify-content-end">
           <Button type="button" icon="pi pi-plus" size="small" text @click="handleCreate()" />
         </div>
       </template>
@@ -24,12 +24,17 @@
         <Row>
           <Column :rowspan="2">
             <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Unique Id</div>
+              <div class="flex align-items-center justify-content-center w-full">Name</div>
             </template>
           </Column>
           <Column :rowspan="2">
             <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Name</div>
+              <div class="flex align-items-center justify-content-center w-full">pMax</div>
+            </template>
+          </Column>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">pMin</div>
             </template>
           </Column>
           <Column :colspan="4">
@@ -42,7 +47,7 @@
               <div class="flex align-items-center justify-content-center w-full">Renewable</div>
             </template>
           </Column>
-          <Column header="" :rowspan="2" />
+          <Column frozen header="" :rowspan="2" />
         </Row>
         <Row>
           <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
@@ -73,14 +78,15 @@
         </Row>
       </ColumnGroup>
 
-      <Column field="powerSystemDataUniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+      <Column field="name" frozen header="Name" style="text-wrap: nowrap">
         <template #body="{ data }">
-          <div class="font-bold w-8rem text-center">
-            {{ data.powerSystemDataUniqueId }}
+          <div class="font-bold min-w-8rem text-left">
+            {{ data.name }}
           </div>
         </template>
       </Column>
-      <Column field="powerSystemDataName" header="Name" style="text-wrap: nowrap" />
+      <Column field="pMax" header="pMax" style="text-wrap: nowrap" />
+      <Column field="pMin" header="pMin" style="text-wrap: nowrap" />
 
       <!-- Traditional -->
       <Column field="Generator.modelName" header="Generator" style="text-wrap: nowrap" />
@@ -132,48 +138,39 @@
   <Toast />
 
   <!-- create dialog data -->
+  <!-- create dialog data -->
   <Dialog v-model:visible="visibleChangeDialog" style="width: 64rem" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Dynamic Model</span>
+        <span class="font-bold white-space-nowrap">Dynamic Default Model</span>
       </div>
     </template>
     <div style="height: 50rem">
-      <div class="flex align-items-start gap-3 mb-5">
-        <div class="w-12rem">
-          <label for="globalDynamicModelDefinitionId" class="font-semibold"> Power System </label>
-          <div class="mt-1">
-            <small>
-              {{ nodeSelected && nodeSelected.parentName ? `(${nodeSelected.parentName})` : '' }}
-            </small>
-          </div>
-        </div>
-
-        <AutoComplete
-          v-if="modeChange === 'Create'"
-          v-model="dataChange.powerSystemData"
-          optionLabel="name"
-          optionValue="_id"
-          completeOnFocus
-          class="flex-grow-1 psAutoComplete"
-          placeholder="Type Something to search ..."
-          :suggestions="psSuggestions"
-          @complete="searchPsQueryFilter"
-        />
-        <InputText v-else :value="dataChange.powerSystemDataName" class="flex-grow-1" disabled />
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="name" class="font-semibold w-12rem">Name <sup class="text-red-500">*</sup></label>
+        <InputText id="name" v-model="dataChange.name" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="pMax" class="font-semibold w-12rem">pMax </label>
+        <InputNumber id="pMax" v-model="dataChange.pMax" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="pMin" class="font-semibold w-12rem">pMin </label>
+        <InputNumber id="pMin" v-model="dataChange.pMin" class="flex-auto" autocomplete="off" />
       </div>
 
       <div class="flex align-items-center gap-3 mb-5">
-        <label for="type" class="font-semibold w-12rem">Dynamic Model Type</label>
+        <label for="type" class="font-semibold w-12rem"> Model Type</label>
         <Button
-          :severity="dataChange.isTraditionalModel ? 'info' : 'primary'"
-          :label="dataChange.isTraditionalModel ? 'Traditional' : 'Renewable'"
+          :severity="dataChange.isRenewableModel ? 'info' : 'primary'"
+          :label="!dataChange.isRenewableModel ? 'Traditional' : 'Renewable'"
           class="flex-grow-1"
-          @click="dataChange.isTraditionalModel = !dataChange.isTraditionalModel"
+          @click="dataChange.isRenewableModel = !dataChange.isRenewableModel"
         />
       </div>
       <!-- ---------- Traditional----- -->
-      <TabView v-if="dataChange.isTraditionalModel">
+
+      <TabView v-if="!dataChange.isRenewableModel">
         <TabPanel header="Generator">
           <!-- Generator  -->
           <div class="flex align-items-center gap-3 mb-3">
@@ -429,14 +426,14 @@
         v-if="modeChange === 'Create'"
         type="button"
         label="Save"
-        :disabled="!dataChange.powerSystemData"
-        @click="createDynamicModel()"
+        :disabled="!dataChange.name"
+        @click="createDynamicDefaultModel()"
       ></Button>
       <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateDynamicModel()"></Button>
     </template>
   </Dialog>
 
-  <ConfirmDialog group="deleteConfirm">
+  <ConfirmDialog group="deleteDynamicDefaultConfirm">
     <template #message="slotProps">
       <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
         <div>
@@ -444,9 +441,8 @@
         </div>
         <div class="flex flex-column gap-3 p-3">
           <div>Do you want to delete this model ?</div>
-          <div>Unique Id: {{ slotProps.message.data.powerSystemDataUniqueId }}</div>
-          <div>Type: {{ slotProps.message.data.modelType }}</div>
-          <div>Model Name: {{ slotProps.message.data.modelName }}</div>
+          <div>Name: {{ slotProps.message.data.name }}</div>
+          <div>Type: {{ slotProps.message.data.isRenewableModel ? 'Traditional' : 'Renewable' }}</div>
         </div>
       </div>
     </template>
@@ -464,7 +460,7 @@ import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
-import { PowerSystemParameterApi, DynamicModelApi } from '@/views/PowerSystem/api';
+import { PowerSystemParameterApi, DynamicDefaultApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
 const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
@@ -507,12 +503,13 @@ const tableData = ref([]);
 
 const getTableData = async () => {
   isLoadingData.value = true;
-  await getDynamicModelList();
+  await getDynamicDefaultModelList();
   const data = [];
   for (let index = 0; index < dynamicModelList.value.length; index++) {
     const items = dynamicModelList.value[index];
-    const typeModel = items.modelDynamicType === 0 ? 'Traditional' : 'Renewable';
+    const typeModel = items.renewable === 0 ? 'Traditional' : 'Renewable';
     const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
+    console.log(index, items, typeModel, typeModelArr);
     for (const type of typeModelArr) {
       const modelData = items.model.filter((model) => {
         return model.modelType === type;
@@ -520,23 +517,24 @@ const getTableData = async () => {
       items[type] = modelData || '';
     }
     data.push(items);
+    console.log(items);
   }
   tableData.value = data;
   isLoadingData.value = false;
 };
 
-const getDynamicModelList = async () => {
+const getDynamicDefaultModelList = async () => {
   try {
     let resData = {
       items: [],
       total: 0,
     };
     if (props.showDefinitionFlatList) {
-      const res = await DynamicModelApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
+      const res = await DynamicDefaultApi.getDynamicDefaultList(additionprojectVersionId.value, currentPage.value);
       resData = res.data;
     } else {
       if (props.nodeSelected) {
-        const res = await DynamicModelApi.getDynamicModelListWithTree(
+        const res = await DynamicDefaultApi.getDynamicDefaultListWithTree(
           additionprojectVersionId.value,
           props.nodeSelected.parentId,
           currentPage.value,
@@ -563,19 +561,6 @@ const getGlobalDynamicModelDefinitionById = async (id) => {
 };
 // CRUD
 
-const psSuggestions = ref();
-
-const searchPsQueryFilter = async (event) => {
-  const query = event.query.trim();
-  try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, props.definitionId, query);
-    psSuggestions.value = res.data;
-    return res.data;
-  } catch (error) {
-    console.log('searchPsQueryFilter: error ', error);
-  }
-};
-
 const visibleChangeDialog = ref(false);
 const dataChange = ref();
 const modeChange = ref();
@@ -586,8 +571,10 @@ const handleCreate = async () => {
   }
   clearModelTypeSelected();
   dataChange.value = {
-    powerSystemData: '',
-    isTraditionalModel: true,
+    name: '',
+    pMax: 0,
+    pMin: 0,
+    isRenewableModel: true,
   };
   visibleChangeDialog.value = true;
   modeChange.value = 'Create';
@@ -615,9 +602,9 @@ const getModelTypeOptions = async () => {
   renewablePlanControlOpts.value = await getGlobalDynamicModelDefinitionByType('PlanControl');
   renewableDriveTrainOpts.value = await getGlobalDynamicModelDefinitionByType('DriveTrain');
 };
-const createDynamicModel = async () => {
+const createDynamicDefaultModel = async () => {
   try {
-    await DynamicModelApi.createDynamicModel(additionprojectVersionId.value, getValueModelInForm());
+    await DynamicDefaultApi.createDynamicDefault(additionprojectVersionId.value, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
@@ -630,12 +617,13 @@ const getValueModelInForm = () => {
   console.log(dataChange.value.powerSystemData);
   const data = {
     id: dataChange.value.id,
-    powerSystemDataId:
-      modeChange.value === 'Create' ? dataChange.value.powerSystemData._id : dataChange.value.powerSystemDataId,
-    modelDynamicType: dataChange.value.isTraditionalModel ? 0 : 1,
+    name: dataChange.value.name,
+    pMax: dataChange.value.pMax,
+    pMin: dataChange.value.pMin,
+    renewable: Number(dataChange.value.isRenewableModel),
     model: [],
   };
-  if (dataChange.value.isTraditionalModel) {
+  if (!dataChange.value.isRenewableModel) {
     if (generatorModel.value) {
       data.model.push({
         modelType: 'Generator',
@@ -788,7 +776,7 @@ const handleUpdate = async (data) => {
     await getModelTypeOptions();
   }
   const updateData = JSON.parse(JSON.stringify(data));
-  updateData.isTraditionalModel = data.modelDynamicType === 0;
+  updateData.isRenewableModel = data.renewable === 1;
   dataChange.value = updateData;
 
   // traditional
@@ -834,10 +822,7 @@ const handleUpdate = async (data) => {
 const updateDynamicModel = async () => {
   const dataUpdate = getValueModelInForm();
   try {
-    await DynamicModelApi.updateDynamicModel(additionprojectVersionId.value, dataUpdate.id, {
-      model: dataUpdate.model,
-      modelDynamicType: dataUpdate.modelDynamicType,
-    });
+    await DynamicDefaultApi.updateDynamicDefault(additionprojectVersionId.value, dataUpdate.id, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Update successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
@@ -849,7 +834,7 @@ const updateDynamicModel = async () => {
 };
 const confirmDelete = (data) => {
   confirm.require({
-    group: 'deleteConfirm',
+    group: 'deleteDynamicDefaultConfirm',
     data: data,
     header: 'Dynamic Model Definition',
     icon: 'pi pi-info-circle',
@@ -866,7 +851,7 @@ const confirmDelete = (data) => {
 
 const deleteDynamicModel = async (dynamicModel_id) => {
   try {
-    await DynamicModelApi.deleteDynamicModel(additionprojectVersionId.value, dynamicModel_id);
+    await DynamicDefaultApi.deleteDynamicDefault(additionprojectVersionId.value, dynamicModel_id);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     await getTableData();
   } catch (error) {
