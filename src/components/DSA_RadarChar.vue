@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUpdated, onUnmounted, triggerRef } from 'vue';
-import radarChart from './radarChart.vue';
+import radarChart from './station_graphics/stationGraphic.vue';
 import dsa_api from '@/api/dsa_api';
 import { intervalTime } from '@/Constants/';
 
