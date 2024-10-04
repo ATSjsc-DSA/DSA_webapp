@@ -4,7 +4,7 @@ import { computed, watch } from 'vue';
 import * as go from './gojs/release/go';
 import './gojs/extensions/Figures';
 import PortShiftingTool from './PortShiftingTool';
-import { AvoidsLinksRouter } from '../AvoidsLinksRouter';
+import { AvoidsLinksRouter } from './AvoidsLinksRouter';
 import * as api from './api';
 const { isDarkTheme } = useLayout();
 
