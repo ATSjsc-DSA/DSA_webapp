@@ -10,25 +10,54 @@ const { isDarkTheme } = useLayout();
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+
+class DemoForceDirectedLayout extends go.ForceDirectedLayout {
+  constructor(init) {
+    super();
+    if (init) Object.assign(this, init);
+  }
+
+  // Override the makeNetwork method to also initialize
+  // ForceDirectedVertex.isFixed from the corresponding Node.isSelected.
+  makeNetwork(coll) {
+    // call base method for standard behavior
+    const net = super.makeNetwork(coll);
+    net.vertexes.each((vertex) => {
+      const node = vertex.node;
+      if (node !== null) vertex.isFixed = node.isSelected;
+    });
+    return net;
+  }
+}
+
 const toast = useToast();
 
 const props = defineProps({
-  chartData: {
+  nodeSelected: {
     type: Object,
-    require: true,
-  },
-  parentWidth: {
-    type: Number,
-    default: 200,
   },
 });
 
 const emits = defineEmits(['refeshData']);
-const DataProps = computed(() => props.chartData);
-const chartData = ref();
+// const station_psd_id = ref('66fa1942aecd014d8cff42e8');
+const station_psd_id = computed(() => {
+  if (props.nodeSelected) {
+    return props.nodeSelected._id;
+  }
+});
 const modificationTime = ref();
-
 var myDiagram = ref(null);
+
+watch(
+  () => props.nodeSelected,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      setTimeout(() => {
+        load();
+      }, 500);
+    }
+  },
+);
 
 var red = 'orangered'; // 0 or false
 var green = 'forestgreen'; // 1 or true
@@ -40,17 +69,17 @@ var networkData = {
   nodeDataArray: [],
   linkDataArray: [],
 };
-const getDefinitionListInStation = async (station_psd_id) => {
+const getDefinitionListInStation = async () => {
   try {
     const res = await api.DefinitionListApi.getDefinitionListInStation(
       '66decf1dcff005199529524b',
-      '66ffc314bf646e4519eb1516',
+      station_psd_id.value,
     );
     station_definitions = res.data;
     console.log(station_definitions);
   } catch (error) {
     console.log('getDefinitionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 const getPsDataWithDefinition = async (definitionId) => {
@@ -58,13 +87,13 @@ const getPsDataWithDefinition = async (definitionId) => {
     const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(
       definitionId,
       '66decf1dcff005199529524b',
-      '66ffc314bf646e4519eb1516',
+      station_psd_id.value,
     );
     console.log(res.data);
     return res;
   } catch (error) {
     console.log('getDefinitionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -72,13 +101,13 @@ const getNodeDataWithDefinition = async () => {
   try {
     const res = await api.PowerSystemParameterApi.getNodeDataWithDefinition(
       '66decf1dcff005199529524b',
-      '66ffc314bf646e4519eb1516',
+      station_psd_id.value,
     );
     console.log(res.data);
     return res;
   } catch (error) {
     console.log('getDefinitionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -143,7 +172,8 @@ const getEquipmentInStation = async () => {
 };
 
 const init = async () => {
-  await getDefinitionListInStation('');
+  // Khởi tạo lại biểu đồ
+  await getDefinitionListInStation();
   await getEquipmentInStation();
   console.log('XXXX');
   const _this = this;
@@ -153,6 +183,7 @@ const init = async () => {
     'draggingTool.isGridSnapEnabled': true, // dragged nodes will snap to a grid of 10x10 cells
     'undoManager.isEnabled': true,
     'grid.visible': false,
+    layout: new DemoForceDirectedLayout(),
   });
   // install the PortShiftingTool as a "mouse move" tool
   myDiagram.toolManager.mouseMoveTools.insertAt(0, new PortShiftingTool.PortShiftingTool());
@@ -740,6 +771,13 @@ const load = () => {
 onMounted(async () => {
   init();
 });
+onUnmounted(() => {
+  // Hủy biểu đồ khi component bị unmounted
+  if (myDiagram) {
+    myDiagram.clear();
+    myDiagram.div = null;
+  }
+});
 watch(isDarkTheme, () => {});
 const refeshData = () => {
   emits('refeshData');
@@ -747,19 +785,18 @@ const refeshData = () => {
 </script>
 
 <template>
-  <div class="card flex justify-content-center h-full">
-    <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
+  <div class="flex justify-content-center h-full w-full">
     <div style="width: 100%; display: flex; justify-content: space-between">
       <div
         id="palette"
         style="width: 100px; height: 500px; margin-right: 2px; background-color: whitesmoke; border: solid 1px black"
       ></div>
       <div id="myDiagramDiv" style="flex-grow: 1; height: 500px; border: solid 1px black"></div>
-      <div id="buttons">
+      <!-- <div id="buttons">
         <button id="saveModel" @click="save()">Save</button>
         <button id="loadModel" @click="load()">Load</button>
-      </div>
-      <textarea id="mySavedModel" style="width: 20%; height: 200px">
+      </div> -->
+      <!-- <textarea id="mySavedModel" style="width: 20%; height: 200px">
         { "class": "GraphLinksModel",
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
@@ -785,7 +822,7 @@ const refeshData = () => {
 {"from":-1,"to":-10,"fromPort":"in2","toPort":"in1"}
 ]}
   </textarea
-      >
+      > -->
     </div>
   </div>
 </template>

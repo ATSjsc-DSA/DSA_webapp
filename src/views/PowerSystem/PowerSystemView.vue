@@ -105,7 +105,10 @@
                           :label="tab"
                           class=""
                           :text="tabMenuPSActive !== index"
-                          :disabled="(tab === 'Dynamic' || tab === 'Dynamic Default') && !isDefinitionGenerator"
+                          :disabled="
+                            ((tab === 'Dynamic' || tab === 'Dynamic Default') && !isDefinitionGenerator) ||
+                            (tab === 'Graphics' && !isStation)
+                          "
                           @click="tabMenuPSActive = index"
                         />
                         <SplitButton
@@ -360,6 +363,17 @@
                         :nodeSelected="nodeSelected"
                       />
                     </TabPanel>
+
+                    <TabPanel :disabled="isStation">
+                      <div
+                        :style="{
+                          height: showDefinitionFlatList ? '35rem' : '37rem',
+                          marginTop: showDefinitionFlatList ? '0' : '3rem',
+                        }"
+                      >
+                        <stationGraphic v-if="isStation" :nodeSelected="nodeSelected"></stationGraphic>
+                      </div>
+                    </TabPanel>
                   </TabView>
                 </div>
               </template>
@@ -532,6 +546,10 @@ import createEmsDialog from './createEmsDialog.vue';
 
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
+
+// graphic
+import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
+
 import { useCommonStore } from '@/store';
 
 const commonStore = useCommonStore();
@@ -550,7 +568,7 @@ onMounted(async () => {
 onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
-const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Dynamic Default']);
+const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Dynamic Default', 'Graphics']);
 const showDefinitionFlatList = ref(false);
 
 const loadAllData = async () => {
@@ -566,12 +584,20 @@ const definitionList = ref([]);
 const definitionSelected = ref({});
 const parameterDefinitionData = ref({});
 const isDefinitionGenerator = ref(false);
-
+const isStation = ref(false);
 watch(isDefinitionGenerator, (newStatus) => {
   const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
   const isDynamicDefaultTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic Default';
 
   if (!newStatus && (isDynamicTab || isDynamicDefaultTab)) {
+    tabMenuPSActive.value = 0;
+  }
+});
+
+watch(isStation, (newStatus) => {
+  const isGraphicsTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Graphics';
+
+  if (!newStatus && isGraphicsTab) {
     tabMenuPSActive.value = 0;
   }
 });
@@ -774,7 +800,10 @@ const tabParameterMenuActive = ref(0);
 const psIdSelected = ref();
 
 const onNodeSelect = async (node) => {
+  console.log(node, 'node');
   isDefinitionGenerator.value = node.label === 'Generator';
+  isStation.value = node.engineLabel === 'Station';
+  console.log(isStation.value, 'isStation');
   nodeSelected.value = node;
   isLoadingContainer.value = true;
   psIdSelected.value = node._id;

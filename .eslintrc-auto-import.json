@@ -84,6 +84,7 @@
     "TSA_F81Chart": true,
     "TSA_GTTTChart": true,
     "Dialog": true,
-    "TabView": true
+    "TabView": true,
+    "DataView": true
   }
 }
