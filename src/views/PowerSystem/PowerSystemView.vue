@@ -516,10 +516,64 @@
       <Button type="button" label="Save" severity="primary" @click="createPole()"></Button>
     </template>
   </Dialog>
+
+  <Dialog
+    v-model:visible="importVisibleDialog"
+    :style="{ width: '50rem' }"
+    header="Upload Power System File"
+    :modal="true"
+  >
+    <TabView id="import-tab-view">
+      <TabPanel header="EMS">
+        <uploadFileConfig @uploadFile="loadEmsFile" />
+        <div class="flex gap-2 justify-content-end align-items-center">
+          <Button type="button" label="Cancel" severity="secondary" @click="importVisibleDialog = false"></Button>
+          <Button
+            type="button"
+            label="Save"
+            severity="primary"
+            :disabled="!emsImportFormdata"
+            @click="importEmsFile"
+          ></Button>
+        </div>
+      </TabPanel>
+      <TabPanel header="Dynamic Model">
+        <uploadFileConfig @uploadFile="loadDynamicFile" />
+        <div class="flex gap-2 justify-content-end align-items-center">
+          <Button type="button" label="Cancel" severity="secondary" @click="importVisibleDialog = false"></Button>
+          <Button
+            type="button"
+            label="Save"
+            severity="primary"
+            :disabled="!dynamicImportFormdata"
+            @click="importDynamicFile"
+          ></Button>
+        </div>
+      </TabPanel>
+    </TabView>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="exportVisibleDialog"
+    :style="{ width: '50rem' }"
+    header="Export Power System File"
+    :modal="true"
+  >
+    <div class="flex gap-4 justify-content-start align-items-center py-3">
+      <Button type="button" label="EMS" icon="pi pi-download" severity="primary" @click="exportEmsFile"></Button>
+      <Button
+        type="button"
+        label="Dynamic Model"
+        icon="pi pi-download"
+        severity="primary"
+        @click="exportDynamicFile"
+      ></Button>
+    </div>
+  </Dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, onUnmounted, version } from 'vue';
+import { ref, onMounted, watch, computed, onUnmounted } from 'vue';
 
 import * as api from '@/views/PowerSystem/api';
 import TabView from 'primevue/tabview';
@@ -529,6 +583,8 @@ import SplitButton from 'primevue/splitbutton';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+
+import uploadFileConfig from '../../components/uploadFileConfig.vue';
 
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
@@ -1073,6 +1129,9 @@ const createEmsVisibleDialog = ref(false);
 
 const createPoleVisibleDialog = ref(false);
 
+const exportVisibleDialog = ref(false);
+const importVisibleDialog = ref(false);
+
 const menuImportExport = ref();
 const itemsMenuImportExport = computed(() => {
   return [
@@ -1082,14 +1141,16 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'Export',
           icon: 'pi pi-download',
-          disabled: true,
-          command: () => {},
+          command: () => {
+            exportVisibleDialog.value = true;
+          },
         },
         {
           label: 'Import',
           icon: 'pi pi-upload',
-          disabled: true,
-          command: () => {},
+          command: () => {
+            importVisibleDialog.value = true;
+          },
         },
       ],
     },
@@ -1129,6 +1190,53 @@ const toggleMenuConfig = (event) => {
   menuImportExport.value.toggle(event);
 };
 
+const emsImportFormdata = ref();
+const loadEmsFile = (formData, callback) => {
+  emsImportFormdata.value = formData;
+  console.log('load EMS file', formData);
+};
+
+const dynamicImportFormdata = ref();
+const loadDynamicFile = (formData, callback) => {
+  dynamicImportFormdata.value = formData;
+  console.log('load Dynamic file', formData);
+};
+
+function delayImportExport(ms = 3000) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const importEmsFile = async () => {
+  isLoadingProgress.value = true;
+  await delayImportExport();
+  toast.add({ severity: 'success', summary: 'EMS', detail: 'Import Successfully', life: 3000 });
+  importVisibleDialog.value = false;
+  isLoadingProgress.value = false;
+};
+
+const importDynamicFile = async () => {
+  isLoadingProgress.value = true;
+  await delayImportExport();
+  toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
+  importVisibleDialog.value = false;
+  isLoadingProgress.value = false;
+};
+
+const exportEmsFile = async () => {
+  isLoadingProgress.value = true;
+  await delayImportExport();
+  toast.add({ severity: 'success', summary: 'EMS Model', detail: 'Export Successfully', life: 3000 });
+  exportVisibleDialog.value = false;
+  isLoadingProgress.value = false;
+};
+
+const exportDynamicFile = async () => {
+  isLoadingProgress.value = true;
+  await delayImportExport();
+  toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Export Successfully', life: 3000 });
+  exportVisibleDialog.value = false;
+  isLoadingProgress.value = false;
+};
 // create
 
 const createPoleData = ref({});
