@@ -371,7 +371,10 @@
                           marginTop: showDefinitionFlatList ? '0' : '3rem',
                         }"
                       >
-                        <stationGraphic v-if="isStation" :nodeSelected="nodeSelected"></stationGraphic>
+                        <stationGraphic
+                          v-if="tabMenuPSActive === 6 && isStation"
+                          :nodeSelected="nodeSelected"
+                        ></stationGraphic>
                       </div>
                     </TabPanel>
                   </TabView>
