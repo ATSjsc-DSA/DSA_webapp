@@ -94,6 +94,11 @@ const router = createRouter({
           name: 'Configuration',
           component: () => import('@/views/ConfigurationView/ConfigurationView.vue'),
         },
+        {
+          path: '/user_config',
+          name: 'User Configuration',
+          component: () => import('@/views/UserConfigurationView/UserConfigurationView.vue'),
+        },
       ],
     },
     {

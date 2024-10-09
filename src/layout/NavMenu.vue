@@ -29,6 +29,8 @@ const items = ref([
       { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
       { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
       { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
+
+      { label: 'User Configuration', icon: 'pi pi-file-edit', to: '/user_config' },
     ],
   },
   // {
@@ -45,7 +47,7 @@ const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 </script>
 
 <template>
-  <Menubar :model="items" class="border-none">
+  <Menubar id="topbar-menu" :model="items" class="border-none text-nowrap">
     <template #item="{ item, props, hasSubmenu }">
       <router-link v-if="item.to" v-slot="{ href, navigate }" :to="item.to" custom>
         <a
@@ -79,5 +81,9 @@ const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 .active-route {
   font-weight: 700;
   color: var(--primary-color) !important;
+}
+
+#topbar-menu .p-menuitem-link {
+  white-space: nowrap;
 }
 </style>
