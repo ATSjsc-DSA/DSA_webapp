@@ -23,3 +23,21 @@ export class ApiApplication {
     return _delete(`/userconfig/applications/${application_id}`);
   }
 }
+
+export class ApiMonitor {
+  static async getList(projectVersionId, appId) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/monitors`);
+  }
+  static async createMonitor(projectVersionId, appId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/monitors`, data);
+  }
+  static async getMonitor(monitor_id) {
+    return get(`/userconfig/monitors/${monitor_id}`);
+  }
+  static async updateMonitor(monitor_id, data) {
+    return put(`/userconfig/monitors/${monitor_id}`, data);
+  }
+  static async delMonitor(monitor_id) {
+    return _delete(`/userconfig/monitors/${monitor_id}`);
+  }
+}
