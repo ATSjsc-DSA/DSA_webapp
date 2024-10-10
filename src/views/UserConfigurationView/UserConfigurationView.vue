@@ -98,6 +98,13 @@
                   </div>
                   <ContextMenu ref="dsaContextMenuRef" :model="dsaContextMenu" />
                 </template>
+
+                <template #VSA="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onVsaRightClick($event, slotProps.node)">
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="vsaContextMenuRef" :model="vsaContextMenu" />
+                </template>
               </Tree>
             </div>
           </template>
@@ -148,31 +155,12 @@
                   <Button type="button" label="Update" @click="updateDsa"></Button>
                 </div>
               </template>
-              <!-- this is for test  -->
-              <!-- 
-              <div class="flex gap-3">
-                <div>
-                  nodeSelected
-                  <pre>
-                    {{ nodeSelected }}
-                  </pre>
+              <template v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
+                <DsaVsaFormWidget v-model="vsaData" />
+                <div class="flex justify-content-end gap-3">
+                  <Button type="button" label="Update" @click="updateVsa"></Button>
                 </div>
-                <div>
-                  scadaData
-                  <pre>
-                    {{ scadaData }}
-                  </pre>
-                </div>
-                <div v-for="(row, index) in treeData" :key="index">
-                  {{ index }}
-                  <pre>
-                  {{ row }}
-                </pre
-                  >
-                  <hr />
-                </div>
-              </div> -->
-              <!-- end test  -->
+              </template>
             </ScrollPanel>
           </template>
         </Card>
@@ -259,6 +247,19 @@
       <Button type="button" label="Submit" :disabled="!newDsaData.name" @click="createDsa"></Button>
     </template>
   </Dialog>
+
+  <Dialog v-model:visible="createVsaVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Create new VSA Information</span>
+      </div>
+    </template>
+    <DsaVsaFormWidget v-model="newVsaData" />
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createVsaVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" :disabled="!newVsaData.name" @click="createVsa"></Button>
+    </template>
+  </Dialog>
 </template>
 
 <script setup>
@@ -281,6 +282,7 @@ import monitorPmuFormWidget from './formWidget/monitorPmuFormWidget.vue';
 
 import dsaFormWidget from './formWidget/dsaFormWidget.vue';
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
+import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -288,9 +290,6 @@ const isLoadingUserConfig = ref(false);
 
 onMounted(async () => {
   await getTreeData();
-  // this is for test
-  expandAll();
-  // end test
 });
 
 const projectVersionId = ref('66decf1dcff005199529524b');
@@ -519,8 +518,54 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
     _id: dsa._id,
     appId: appId,
     type: 'DSA',
+    children: await getVsaBranch(appId, dsa._id, key),
   };
 };
+
+const getVsaBranch = async (appId, dsaId, dsaKey = '') => {
+  const vsaList = await getVsaList(dsaId);
+  const leafData = [];
+  for (let index = 0; index < vsaList.length; index++) {
+    const vsa = vsaList[index];
+    leafData.push(getVsaLeaf(appId, dsaId, vsa, dsaKey + '_' + index));
+  }
+  return leafData;
+};
+
+const addNewVsaLeaf = (appId, dsaId, vsa) => {
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
+    if (dsaLeaf) {
+      dsaLeaf.children.push(getVsaLeaf(appId, dsaId, vsa, dsaLeaf.key + '_' + dsaLeaf.children.length));
+    }
+  }
+};
+
+const updateLabelVsaLeaf = (appId, dsaId, vsaId, newName) => {
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
+    if (dsaLeaf) {
+      const vsaLeaf = dsaLeaf.children.filter((item) => item._id === vsaId)[0];
+      if (vsaLeaf) {
+        vsaLeaf.label = newName;
+      }
+    }
+  }
+};
+
+const getVsaLeaf = (appId, dsaId, vsa, key = '') => {
+  return {
+    key: key,
+    label: vsa.name,
+    _id: vsa._id,
+    appId: appId,
+    dsaId: dsaId,
+    type: 'VSA',
+  };
+};
+
 // controll tree
 const expandedKeys = ref({});
 const nodeSelected = ref({});
@@ -562,6 +607,9 @@ const onNodeSelect = async (node) => {
   }
   if (node.type === 'DSA') {
     await getDsaData(node._id);
+  }
+  if (node.type === 'VSA') {
+    await getVsaData(node._id);
   }
 };
 
@@ -1042,10 +1090,10 @@ const onDsaRightClick = (event, node) => {
 
 const dsaContextMenu = computed(() => [
   {
-    label: 'Create DSA',
+    label: 'Create VSA Information',
     icon: 'pi pi-plus',
     command: () => {
-      createDsaVisibleDialog.value = true;
+      createVsaVisibleDialog.value = true;
     },
   },
   {
@@ -1057,6 +1105,23 @@ const dsaContextMenu = computed(() => [
     disabled: !dsaIdclick.value,
     command: (event) => {
       confirmDeleteDsa(event);
+    },
+  },
+]);
+
+const vsaIdclick = ref();
+const vsaContextMenuRef = ref();
+const onVsaRightClick = (event, node) => {
+  vsaIdclick.value = node._id;
+  vsaContextMenuRef.value.show(event);
+};
+
+const vsaContextMenu = ref([
+  {
+    label: 'Delete',
+    icon: 'pi pi-trash',
+    command: (event) => {
+      confirmDeleteVsa(event);
     },
   },
 ]);
@@ -1133,6 +1198,98 @@ const delDsa = async () => {
     await getTreeData();
   } catch (error) {
     console.log('delDsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+// ---DSA - VSA
+
+const createVsaVisibleDialog = ref(false);
+const vsaData = ref();
+const newVsaData = ref({
+  name: 'string',
+  active: true,
+  maxChange: 0,
+  stepChange: 0,
+  sourceId: '5eb7cf5a86d9755df3a6c593',
+  sinkId: '5eb7cf5a86d9755df3a6c593',
+
+  monitor: {
+    monitorSubSystemId: '5eb7cf5a86d9755df3a6c593',
+    signalP: true,
+    signalQ: true,
+    signalV: true,
+    active: true,
+  },
+  contingencyId: '5eb7cf5a86d9755df3a6c593',
+  remedialActionId: '5eb7cf5a86d9755df3a6c593',
+  digsilentSettingId: '5eb7cf5a86d9755df3a6c593',
+  fixSubSystemId: '5eb7cf5a86d9755df3a6c593',
+});
+
+const getVsaList = async (dsaId) => {
+  try {
+    const res = await ApiDsa.getVsaList(projectVersionId.value, dsaId);
+    return res.data;
+  } catch (error) {
+    console.log('getVsaList: error ', error);
+    return [];
+  }
+};
+
+const getVsaData = async (vsaId) => {
+  try {
+    const res = await ApiDsa.getVsa(vsaId);
+    vsaData.value = res.data;
+  } catch (error) {
+    console.log('getVsaData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createVsa = async () => {
+  try {
+    const res = await ApiDsa.createVsa(projectVersionId.value, dsaIdclick.value, newVsaData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    addNewVsaLeaf(appIdclick.value, dsaIdclick.value, res.data);
+    createVsaVisibleDialog.value = false;
+  } catch (error) {
+    console.log('createVsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updateVsa = async () => {
+  try {
+    const res = await ApiDsa.updateVsa(vsaData.value._id, vsaData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelVsaLeaf(nodeSelected.value.appId, nodeSelected.value.dsaId, nodeSelected.value._id, res.data.name);
+  } catch (error) {
+    console.log('updateVsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDeleteVsa = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Delete Monitor Vsa',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await delVsa();
+    },
+  });
+};
+const delVsa = async () => {
+  try {
+    await ApiDsa.delVsa(vsaIdclick.value);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
