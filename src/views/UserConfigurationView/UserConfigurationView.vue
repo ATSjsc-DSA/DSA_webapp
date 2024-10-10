@@ -32,7 +32,7 @@
             </div>
           </template>
           <template #content>
-            <div style="height: 48rem" aria-haspopup="true" @contextmenu="onProjectRightClick">
+            <div style="height: 48rem" aria-haspopup="true">
               <Tree
                 v-model:expandedKeys="expandedKeys"
                 selectionMode="single"
@@ -41,39 +41,56 @@
                 @node-select="onNodeSelect"
               >
                 <template #default="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onAppRightClick($event, slotProps.node.appId)">
+                  <div>
                     {{ slotProps.node.label }}
                   </div>
                 </template>
-
                 <template #Group="slotProps">
-                  <div
-                    class="font-semibold"
-                    aria-haspopup="true"
-                    @contextmenu="onAppRightClick($event, slotProps.node.appId)"
-                  >
+                  <div class="font-semibold" style="cursor: text">
                     {{ slotProps.node.label }}
                   </div>
+                </template>
+                <template #Project="slotProps">
+                  <div class="font-bold text-xl" aria-haspopup="true" @contextmenu="onProjectRightClick">
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="projectContextMenuRef" :model="projectContextMenu" />
                 </template>
                 <template #Application="slotProps">
                   <div
-                    class="font-bold"
+                    class="font-bold text-lg"
                     aria-haspopup="true"
-                    @contextmenu="onAppRightClick($event, slotProps.node.appId)"
+                    @contextmenu="onApplicationRightClick($event, slotProps.node.appId)"
                   >
                     {{ slotProps.node.label }}
                   </div>
+                  <ContextMenu ref="appContextMenuRef" :model="appContextMenu" />
                 </template>
+
+                <!-- --- Monitor --- -->
+
                 <template #Monitor="slotProps">
                   <div aria-haspopup="true" @contextmenu="onMonitorRightClick($event, slotProps.node)">
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="monitorContextMenuRef" :model="monitorContextMenu" />
                 </template>
+
+                <template #Scada="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onScadaRightClick($event, slotProps.node)">
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="scadaContextMenuRef" :model="scadaContextMenu" />
+                </template>
+
+                <template #PMU="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onPmuRightClick($event, slotProps.node)">
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="pmuContextMenuRef" :model="pmuContextMenu" />
+                </template>
               </Tree>
-              <ContextMenu ref="appContextMenuRef" :model="appContextMenu" />
             </div>
-            <ContextMenu ref="projectContextMenuRef" :model="projectContextMenu" />
           </template>
         </Card>
       </SplitterPanel>
@@ -92,7 +109,6 @@
                 <applicationFormWidget v-model="appData" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateApplication"></Button>
-                  <Button type="button" severity="danger" label="Delete" @click="confirmDeleteApp"></Button>
                 </div>
               </template>
 
@@ -100,7 +116,6 @@
                 <monitorFormWidget v-model="monitorData" :is-create-form="false" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateMonitor"></Button>
-                  <Button type="button" severity="danger" label="Delete" @click="confirmDeleteMonitor"></Button>
                 </div>
               </template>
 
@@ -108,7 +123,6 @@
                 <monitorScadaFormWidget v-model="scadaData" :is-create-form="false" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateScada"></Button>
-                  <Button type="button" severity="danger" label="Delete" @click="confirmDeleteScada"></Button>
                 </div>
               </template>
 
@@ -116,7 +130,6 @@
                 <monitorPmuFormWidget v-model="pmuData" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updatePmu"></Button>
-                  <Button type="button" severity="danger" label="Delete" @click="confirmDeletePmu"></Button>
                 </div>
               </template>
               <!-- this is for test  -->
@@ -218,7 +231,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -242,6 +255,9 @@ const isLoadingUserConfig = ref(false);
 
 onMounted(async () => {
   await getTreeData();
+  // this is for test
+  // expandAll();
+  // end test
 });
 
 const projectVersionId = ref('66decf1dcff005199529524b');
@@ -251,10 +267,17 @@ const treeData = ref();
 
 const getTreeData = async () => {
   await getAppList();
-  const tree = [];
+  const tree = [
+    {
+      key: 'root',
+      label: 'Project',
+      type: 'Project',
+      children: [],
+    },
+  ];
   for (let appIndex = 0; appIndex < appList.value.length; appIndex++) {
     const app = appList.value[appIndex];
-    tree.push(await getAppLeaf(app, appIndex));
+    tree[0].children.push(await getAppLeaf(app, appIndex));
   }
   treeData.value = tree;
 };
@@ -295,7 +318,7 @@ const getMonitorBranch = async (appId, appKey = '') => {
 };
 
 const addNewMonitorLeaf = async (appId, monitor) => {
-  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     appLeaf.children[0].children.push(
       await getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].length),
@@ -304,7 +327,7 @@ const addNewMonitorLeaf = async (appId, monitor) => {
 };
 
 const updateLabelMonitorLeaf = (appId, newName) => {
-  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorData.value._id)[0];
     if (monitorLeaf) {
@@ -347,7 +370,7 @@ const getScadaBranch = async (appId, monitorId, monitorKey = '') => {
 };
 
 const addNewScadaLeaf = (appId, monitorId, scada) => {
-  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
     if (monitorLeaf) {
@@ -359,7 +382,7 @@ const addNewScadaLeaf = (appId, monitorId, scada) => {
 };
 
 const updateLabelScadaLeaf = (appId, monitorId, scadaId, newName) => {
-  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
     if (monitorLeaf) {
@@ -393,7 +416,7 @@ const getPmuBranch = async (appId, monitorId, monitorKey = '') => {
 };
 
 const addNewPmuLeaf = (appId, monitorId, pmu) => {
-  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
     if (monitorLeaf) {
@@ -405,7 +428,7 @@ const addNewPmuLeaf = (appId, monitorId, pmu) => {
 };
 
 const updateLabelPmuLeaf = (appId, monitorId, pmuId, newName) => {
-  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
     if (monitorLeaf) {
@@ -522,7 +545,7 @@ const createApplication = async () => {
     const res = await ApiApplication.createApp(projectVersionId.value, newAppData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
-    treeData.value.push(await getAppLeaf(res.data, treeData.value.length));
+    treeData.value[0].children.push(await getAppLeaf(res.data, treeData.value[0].children.length));
   } catch (error) {
     console.log('createApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -535,7 +558,7 @@ const updateApplication = async () => {
       active: appData.value.active,
     });
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    treeData.value[nodeSelected.value.key].label = res.data.name;
+    treeData.value[0].children[nodeSelected.value.key].label = res.data.name;
   } catch (error) {
     console.log('updateApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -558,9 +581,9 @@ const confirmDeleteApp = async (event) => {
 };
 const deleteApplication = async () => {
   try {
-    await ApiApplication.delAppData(appData.value._id);
+    await ApiApplication.delAppData(appIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
-    treeData.value = treeData.value.filter((item) => item._id !== appData.value._id);
+    await getTreeData();
   } catch (error) {
     console.log('deleteApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -570,22 +593,12 @@ const deleteApplication = async () => {
 // ------- App Menu
 const appIdclick = ref();
 const appContextMenuRef = ref();
-const onAppRightClick = (event, appId) => {
+const onApplicationRightClick = (event, appId) => {
   appIdclick.value = appId;
   appContextMenuRef.value.show(event);
 };
 
 const appContextMenu = ref([
-  {
-    label: 'Create Application',
-    icon: 'pi pi-plus',
-    command: () => {
-      createApplicationVisibleDialog.value = true;
-    },
-  },
-  {
-    separator: true,
-  },
   {
     label: 'Create Monitor',
     icon: 'pi pi-plus',
@@ -594,10 +607,19 @@ const appContextMenu = ref([
     },
   },
   {
-    label: 'Create DSA Moudule',
+    label: 'Create DSA Module',
     icon: 'pi pi-plus',
-    command: () => {
-      createApplicationVisibleDialog.value = true;
+    command: () => {},
+  },
+
+  {
+    separator: true,
+  },
+  {
+    label: 'Delete Application',
+    icon: 'pi pi-trash',
+    command: (event) => {
+      confirmDeleteApp(event);
     },
   },
 ]);
@@ -672,9 +694,8 @@ const confirmDeleteMonitor = async (event) => {
 };
 const delMonitor = async () => {
   try {
-    await ApiMonitor.delMonitor(monitorData.value._id);
+    await ApiMonitor.delMonitor(monitorIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
-    monitorData.value = undefined;
     nodeSelected.value = {};
     await getTreeData();
   } catch (error) {
@@ -692,17 +713,7 @@ const onMonitorRightClick = (event, node) => {
   monitorContextMenuRef.value.show(event);
 };
 
-const monitorContextMenu = ref([
-  {
-    label: 'Create Monitor',
-    icon: 'pi pi-plus',
-    command: () => {
-      createMonitorVisibleDialog.value = true;
-    },
-  },
-  {
-    separator: true,
-  },
+const monitorContextMenu = computed(() => [
   {
     label: 'Create Scada',
     icon: 'pi pi-plus',
@@ -717,6 +728,51 @@ const monitorContextMenu = ref([
       createPmuVisibleDialog.value = true;
     },
   },
+  {
+    separator: true,
+  },
+  {
+    label: 'Delete Monitor',
+    icon: 'pi pi-trash',
+    disabled: !monitorIdclick.value,
+    command: (event) => {
+      confirmDeleteMonitor(event);
+    },
+  },
+]);
+
+const scadaIdClick = ref();
+const scadaContextMenuRef = ref();
+const onScadaRightClick = (event, node) => {
+  scadaIdClick.value = node._id;
+  scadaContextMenuRef.value.show(event);
+};
+
+const scadaContextMenu = ref([
+  {
+    label: 'Delete Scada',
+    icon: 'pi pi-trash',
+    command: (event) => {
+      confirmDeleteScada(event);
+    },
+  },
+]);
+
+const pmuIdclick = ref();
+const pmuContextMenuRef = ref();
+const onPmuRightClick = (event, node) => {
+  pmuIdclick.value = node._id;
+  pmuContextMenuRef.value.show(event);
+};
+
+const pmuContextMenu = ref([
+  {
+    label: 'Delete PMU',
+    icon: 'pi pi-trash',
+    command: (event) => {
+      confirmDeletePmu(event);
+    },
+  },
 ]);
 
 // ------- Monitor - Scada
@@ -725,8 +781,8 @@ const createScadaVisibleDialog = ref(false);
 const scadaData = ref();
 const newScadaData = ref({
   active: true,
-  kFactorCur: null,
-  kFactorPower: null,
+  kFactorCur: 0,
+  kFactorPower: 0,
   monitorScadaId: '',
   name: '',
 });
@@ -789,9 +845,8 @@ const confirmDeleteScada = async (event) => {
 };
 const delScada = async () => {
   try {
-    await ApiMonitor.delMonitorScada(scadaData.value._id);
+    await ApiMonitor.delMonitorScada(scadaIdClick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
-    scadaData.value = undefined;
     nodeSelected.value = {};
     await getTreeData();
   } catch (error) {
@@ -890,9 +945,8 @@ const confirmDeletePmu = async (event) => {
 };
 const delPmu = async () => {
   try {
-    await ApiMonitor.delMonitorPmu(pmuData.value._id);
+    await ApiMonitor.delMonitorPmu(pmuIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
-    pmuData.value = undefined;
     nodeSelected.value = {};
     await getTreeData();
   } catch (error) {
@@ -901,3 +955,9 @@ const delPmu = async () => {
   }
 };
 </script>
+
+<style>
+.p-treenode-label {
+  width: 100%;
+}
+</style>
