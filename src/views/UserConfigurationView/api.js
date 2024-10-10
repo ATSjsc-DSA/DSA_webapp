@@ -40,4 +40,21 @@ export class ApiMonitor {
   static async delMonitor(monitor_id) {
     return _delete(`/userconfig/monitors/${monitor_id}`);
   }
+
+  // Monitor Scada Config
+  static async getScadaList(projectVersionId, monitor_id) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitor_id}/monitor_scada_configs`);
+  }
+  static async createMonitorScada(projectVersionId, monitor_id, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitor_id}/monitor_scada_configs`, data);
+  }
+  static async getMonitorScada(monitor_scada_id) {
+    return get(`/userconfig/monitor_scada_configs/${monitor_scada_id}`);
+  }
+  static async updateMonitorScada(monitor_scada_id, data) {
+    return put(`/userconfig/monitor_scada_configs/${monitor_scada_id}`, data);
+  }
+  static async delMonitorScada(monitor_scada_id) {
+    return _delete(`/userconfig/monitor_scada_configs/${monitor_scada_id}`);
+  }
 }

@@ -46,6 +46,15 @@
                   </div>
                 </template>
 
+                <template #Group="slotProps">
+                  <div
+                    class="font-semibold"
+                    aria-haspopup="true"
+                    @contextmenu="onAppRightClick($event, slotProps.node.appId)"
+                  >
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
                 <template #Application="slotProps">
                   <div
                     class="font-bold"
@@ -55,25 +64,11 @@
                     {{ slotProps.node.label }}
                   </div>
                 </template>
-
-                <template #MonitorGroup="slotProps">
-                  <div
-                    class="font-semibold"
-                    aria-haspopup="true"
-                    @contextmenu="onAppRightClick($event, slotProps.node.appId)"
-                  >
+                <template #Monitor="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onMonitorRightClick($event, slotProps.node)">
                     {{ slotProps.node.label }}
                   </div>
-                </template>
-
-                <template #DsaGroup="slotProps">
-                  <div
-                    class="font-semibold"
-                    aria-haspopup="true"
-                    @contextmenu="onAppRightClick($event, slotProps.node.appId)"
-                  >
-                    {{ slotProps.node.label }}
-                  </div>
+                  <ContextMenu ref="monitorContextMenuRef" :model="monitorContextMenu" />
                 </template>
               </Tree>
               <ContextMenu ref="appContextMenuRef" :model="appContextMenu" />
@@ -101,7 +96,7 @@
                 </div>
               </template>
 
-              <template v-if="nodeSelected.type === 'Monitor' && monitorData !== undefine">
+              <template v-if="nodeSelected.type === 'Monitor' && monitorData !== undefined">
                 <monitorFormWidget v-model="monitorData" :is-create-form="false" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateMonitor"></Button>
@@ -109,22 +104,27 @@
                 </div>
               </template>
 
+              <template v-if="nodeSelected.type === 'Scada' && scadaData !== undefined">
+                <monitorScadaFormWidget v-model="scadaData" :is-create-form="false" />
+                <div class="flex justify-content-end gap-3">
+                  <Button type="button" label="Update" @click="updateScada"></Button>
+                  <Button type="button" severity="danger" label="Delete" @click="confirmDeleteScada"></Button>
+                </div>
+              </template>
               <!-- this is for test  -->
-
-              <!-- <div class="flex gap-3">
+              <!-- 
+              <div class="flex gap-3">
                 <div>
                   nodeSelected
                   <pre>
-    {{ nodeSelected }}
-  </pre
-                  >
+                    {{ nodeSelected }}
+                  </pre>
                 </div>
                 <div>
-                  monitorData
+                  scadaData
                   <pre>
-    {{ monitorData }}
-  </pre
-                  >
+                    {{ scadaData }}
+                  </pre>
                 </div>
                 <div v-for="(row, index) in treeData" :key="index">
                   {{ index }}
@@ -154,9 +154,7 @@
         <span class="font-bold white-space-nowrap">Create new Application</span>
       </div>
     </template>
-
     <applicationFormWidget v-model="newAppData" />
-
     <template #footer>
       <Button
         type="button"
@@ -164,7 +162,6 @@
         severity="secondary"
         @click="createApplicationVisibleDialog = false"
       ></Button>
-
       <Button type="button" label="Submit" :disabled="!newAppData.name" @click="createApplication"></Button>
     </template>
   </Dialog>
@@ -172,7 +169,7 @@
   <Dialog v-model:visible="createMonitorVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Create new Application</span>
+        <span class="font-bold white-space-nowrap">Create new Monitor</span>
       </div>
     </template>
 
@@ -180,6 +177,20 @@
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createMonitorVisibleDialog = false"></Button>
       <Button type="button" label="Submit" :disabled="!newMonitorData.name" @click="createMonitor"></Button>
+    </template>
+  </Dialog>
+
+  <Dialog v-model:visible="createScadaVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Create new Monitor Scada Configuration</span>
+      </div>
+    </template>
+
+    <monitorScadaFormWidget v-model="newScadaData" :project-version-id="projectVersionId" />
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createScadaVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" :disabled="!newScadaData.name" @click="createScada"></Button>
     </template>
   </Dialog>
 </template>
@@ -202,9 +213,9 @@ import ContextMenu from 'primevue/contextmenu';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
-import applicationFormWidget from './applicationFormWidget.vue';
-import monitorFormWidget from './monitorFormWidget.vue';
-
+import applicationFormWidget from './formWidget/applicationFormWidget.vue';
+import monitorFormWidget from './formWidget/monitorFormWidget.vue';
+import monitorScadaFormWidget from './formWidget/monitorScadaFormWidget.vue';
 import { ApiApplication, ApiMonitor } from '@/views/UserConfigurationView/api';
 
 const toast = useToast();
@@ -241,15 +252,15 @@ const getAppLeaf = async (app, key = '') => {
       {
         key: 'monitor_' + key,
         label: 'Monitor',
-        type: 'MonitorGroup',
+        type: 'Group',
         appId: app._id,
         children: await getMonitorBranch(app._id, key),
       },
       {
-        type: 'DsaGroup',
-        appId: app._id,
         key: 'dsa_' + key,
         label: 'DSA Module',
+        appId: app._id,
+        type: 'Group',
       },
     ],
   };
@@ -260,15 +271,17 @@ const getMonitorBranch = async (appId, appKey = '') => {
   const leafData = [];
   for (let index = 0; index < monitorList.length; index++) {
     const monitor = monitorList[index];
-    leafData.push(getMonitorLeaf(appId, monitor, appKey + '_' + index));
+    leafData.push(await getMonitorLeaf(appId, monitor, appKey + '_' + index));
   }
   return leafData;
 };
 
-const addNewMonitorLeaf = (appId, monitor) => {
+const addNewMonitorLeaf = async (appId, monitor) => {
   const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    appLeaf.children[0].children.push(getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].length));
+    appLeaf.children[0].children.push(
+      await getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].length),
+    );
   }
 };
 
@@ -282,7 +295,7 @@ const updateLabelMonitorLeaf = (appId, newName) => {
   }
 };
 
-const getMonitorLeaf = (appId, monitor, key = '') => {
+const getMonitorLeaf = async (appId, monitor, key = '') => {
   return {
     key: key,
     label: monitor.name,
@@ -293,7 +306,8 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
       {
         key: 'scada_' + key,
         label: 'Scada',
-        type: 'Scada',
+        type: 'ScadaGroup',
+        children: await getScadaBranch(appId, monitor._id, key),
       },
       {
         key: 'pml_' + key,
@@ -303,7 +317,51 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
     ],
   };
 };
+const getScadaBranch = async (appId, monitorId, monitorKey = '') => {
+  const scadaList = await getScadaList(monitorId);
+  const leafData = [];
+  for (let index = 0; index < scadaList.length; index++) {
+    const scada = scadaList[index];
+    leafData.push(getScadaLeaf(appId, monitorId, scada, monitorKey + '_' + index));
+  }
+  return leafData;
+};
 
+const addNewScadaLeaf = (appId, monitorId, scada) => {
+  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
+    if (monitorLeaf) {
+      monitorLeaf.children[0].children.push(
+        getScadaLeaf(appId, monitorId, scada, monitorLeaf.key + '_' + monitorLeaf.children[0].length),
+      );
+    }
+  }
+};
+
+const updateLabelScadaLeaf = (appId, monitorId, scadaId, newName) => {
+  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
+    if (monitorLeaf) {
+      const scadaLeaf = monitorLeaf.children[0].children.filter((item) => item._id === scadaId)[0];
+      if (scadaLeaf) {
+        scadaLeaf.label = newName;
+      }
+    }
+  }
+};
+
+const getScadaLeaf = (appId, monitorId, scada, key = '') => {
+  return {
+    key: key,
+    label: scada.name,
+    _id: scada._id,
+    appId: appId,
+    monitorId: monitorId,
+    type: 'Scada',
+  };
+};
 // controll tree
 const expandedKeys = ref({});
 const nodeSelected = ref({});
@@ -336,6 +394,9 @@ const onNodeSelect = async (node) => {
   }
   if (node.type === 'Monitor') {
     await getMonitorData(node._id);
+  }
+  if (node.type === 'Scada') {
+    await getScadaData(node._id);
   }
 };
 
@@ -509,7 +570,7 @@ const createMonitor = async () => {
     const res = await ApiMonitor.createMonitor(projectVersionId.value, appIdclick.value, newMonitorData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createMonitorVisibleDialog.value = false;
-    addNewMonitorLeaf(appIdclick.value, res.data);
+    await addNewMonitorLeaf(appIdclick.value, res.data);
   } catch (error) {
     console.log('createMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -550,6 +611,133 @@ const delMonitor = async () => {
     await getTreeData();
   } catch (error) {
     console.log('delMonitor: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// ------- Monitor Menu
+const monitorIdclick = ref();
+const monitorContextMenuRef = ref();
+const onMonitorRightClick = (event, node) => {
+  monitorIdclick.value = node._id;
+  appIdclick.value = node.appId;
+  monitorContextMenuRef.value.show(event);
+};
+
+const monitorContextMenu = ref([
+  {
+    label: 'Create Application',
+    icon: 'pi pi-plus',
+    command: () => {
+      createApplicationVisibleDialog.value = true;
+    },
+  },
+  {
+    label: 'Create Monitor',
+    icon: 'pi pi-plus',
+    command: () => {
+      createMonitorVisibleDialog.value = true;
+    },
+    items: [
+      {
+        label: 'Create Scada',
+        icon: 'pi pi-plus',
+        command: () => {
+          createScadaVisibleDialog.value = true;
+        },
+      },
+      {
+        label: 'Create PML',
+        icon: 'pi pi-plus',
+      },
+    ],
+  },
+  {
+    label: 'Create DSA Moudule',
+    icon: 'pi pi-plus',
+    command: () => {
+      createApplicationVisibleDialog.value = true;
+    },
+  },
+]);
+
+// ------- Monitor - Scada
+
+const createScadaVisibleDialog = ref(false);
+const scadaData = ref();
+const newScadaData = ref({
+  active: true,
+  kFactorCur: null,
+  kFactorPower: null,
+  monitorScadaId: '',
+  name: '',
+});
+
+const getScadaList = async (monitorId) => {
+  try {
+    const res = await ApiMonitor.getScadaList(projectVersionId.value, monitorId);
+    return res.data;
+  } catch (error) {
+    console.log('getScadaList: error ', error);
+    return [];
+  }
+};
+
+const getScadaData = async (scadaId) => {
+  try {
+    const res = await ApiMonitor.getMonitorScada(scadaId);
+    scadaData.value = res.data;
+  } catch (error) {
+    console.log('getScadaData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createScada = async () => {
+  try {
+    const res = await ApiMonitor.createMonitorScada(projectVersionId.value, monitorIdclick.value, newScadaData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    addNewScadaLeaf(appIdclick.value, monitorIdclick.value, res.data);
+    createScadaVisibleDialog.value = false;
+  } catch (error) {
+    console.log('createScada: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updateScada = async () => {
+  try {
+    const res = await ApiMonitor.updateMonitorScada(scadaData.value._id, scadaData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelScadaLeaf(nodeSelected.value.appId, nodeSelected.value.monitorId, nodeSelected.value._id, res.data.name);
+  } catch (error) {
+    console.log('updateScada: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDeleteScada = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Delete Monitor Scada',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await delScada();
+    },
+  });
+};
+const delScada = async () => {
+  try {
+    await ApiMonitor.delMonitorScada(scadaData.value._id);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    scadaData.value = undefined;
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delScada: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
