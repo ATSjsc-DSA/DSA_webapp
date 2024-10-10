@@ -89,6 +89,15 @@
                   </div>
                   <ContextMenu ref="pmuContextMenuRef" :model="pmuContextMenu" />
                 </template>
+
+                <!-- --- DSA --- -->
+
+                <template #DSA="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onDsaRightClick($event, slotProps.node)">
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="dsaContextMenuRef" :model="dsaContextMenu" />
+                </template>
               </Tree>
             </div>
           </template>
@@ -130,6 +139,13 @@
                 <monitorPmuFormWidget v-model="pmuData" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updatePmu"></Button>
+                </div>
+              </template>
+
+              <template v-if="nodeSelected.type === 'DSA' && dsaData !== undefined">
+                <dsaFormWidget v-model="dsaData" />
+                <div class="flex justify-content-end gap-3">
+                  <Button type="button" label="Update" @click="updateDsa"></Button>
                 </div>
               </template>
               <!-- this is for test  -->
@@ -187,6 +203,7 @@
     </template>
   </Dialog>
 
+  <!-- ------ Monitor - Dialog --  -->
   <Dialog v-model:visible="createMonitorVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
@@ -228,6 +245,20 @@
       <Button type="button" label="Submit" :disabled="!newPmuData.name" @click="createPmu"></Button>
     </template>
   </Dialog>
+
+  <!-- ------ DSA - Dialog --  -->
+  <Dialog v-model:visible="createDsaVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Create new DSA</span>
+      </div>
+    </template>
+    <dsaFormWidget v-model="newDsaData" />
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createDsaVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" :disabled="!newDsaData.name" @click="createDsa"></Button>
+    </template>
+  </Dialog>
 </template>
 
 <script setup>
@@ -247,6 +278,8 @@ import applicationFormWidget from './formWidget/applicationFormWidget.vue';
 import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 import monitorScadaFormWidget from './formWidget/monitorScadaFormWidget.vue';
 import monitorPmuFormWidget from './formWidget/monitorPmuFormWidget.vue';
+
+import dsaFormWidget from './formWidget/dsaFormWidget.vue';
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 
 const toast = useToast();
@@ -256,7 +289,7 @@ const isLoadingUserConfig = ref(false);
 onMounted(async () => {
   await getTreeData();
   // this is for test
-  // expandAll();
+  expandAll();
   // end test
 });
 
@@ -302,6 +335,7 @@ const getAppLeaf = async (app, key = '') => {
         label: 'DSA Module',
         appId: app._id,
         type: 'Group',
+        children: await getDsaBranch(app._id, key),
       },
     ],
   };
@@ -326,10 +360,10 @@ const addNewMonitorLeaf = async (appId, monitor) => {
   }
 };
 
-const updateLabelMonitorLeaf = (appId, newName) => {
+const updateLabelMonitorLeaf = (appId, monitorId, newName) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorData.value._id)[0];
+    const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
     if (monitorLeaf) {
       monitorLeaf.label = newName;
     }
@@ -450,6 +484,43 @@ const getPmuLeaf = (appId, monitorId, pmu, key = '') => {
     type: 'PMU',
   };
 };
+
+const getDsaBranch = async (appId, appKey = '') => {
+  const dsaList = await getDsaList(appId);
+  const leafData = [];
+  for (let index = 0; index < dsaList.length; index++) {
+    const dsa = dsaList[index];
+    leafData.push(await getDsaLeaf(appId, dsa, appKey + '_' + index));
+  }
+  return leafData;
+};
+
+const addNewDsaLeaf = async (appId, dsa) => {
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    appLeaf.children[1].children.push(await getDsaLeaf(appId, dsa, appLeaf.key + '_' + appLeaf.children[0].length));
+  }
+};
+
+const updateLabelDsaLeaf = (appId, dsaId, newName) => {
+  const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
+    if (dsaLeaf) {
+      dsaLeaf.label = newName;
+    }
+  }
+};
+
+const getDsaLeaf = async (appId, dsa, key = '') => {
+  return {
+    key: key,
+    label: dsa.name,
+    _id: dsa._id,
+    appId: appId,
+    type: 'DSA',
+  };
+};
 // controll tree
 const expandedKeys = ref({});
 const nodeSelected = ref({});
@@ -488,6 +559,9 @@ const onNodeSelect = async (node) => {
   }
   if (node.type === 'PMU') {
     await getPmuData(node._id);
+  }
+  if (node.type === 'DSA') {
+    await getDsaData(node._id);
   }
 };
 
@@ -609,14 +683,16 @@ const appContextMenu = ref([
   {
     label: 'Create DSA Module',
     icon: 'pi pi-plus',
-    command: () => {},
+    command: () => {
+      createDsaVisibleDialog.value = true;
+    },
   },
 
   {
     separator: true,
   },
   {
-    label: 'Delete Application',
+    label: 'Delete',
     icon: 'pi pi-trash',
     command: (event) => {
       confirmDeleteApp(event);
@@ -670,7 +746,7 @@ const updateMonitor = async () => {
   try {
     const res = await ApiMonitor.updateMonitor(monitorData.value._id, monitorData.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    updateLabelMonitorLeaf(nodeSelected.value.appId, res.data.name);
+    updateLabelMonitorLeaf(nodeSelected.value.appId, monitorData.value._id, res.data.name);
   } catch (error) {
     console.log('updateMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -732,7 +808,7 @@ const monitorContextMenu = computed(() => [
     separator: true,
   },
   {
-    label: 'Delete Monitor',
+    label: 'Delete',
     icon: 'pi pi-trash',
     disabled: !monitorIdclick.value,
     command: (event) => {
@@ -750,7 +826,7 @@ const onScadaRightClick = (event, node) => {
 
 const scadaContextMenu = ref([
   {
-    label: 'Delete Scada',
+    label: 'Delete',
     icon: 'pi pi-trash',
     command: (event) => {
       confirmDeleteScada(event);
@@ -767,7 +843,7 @@ const onPmuRightClick = (event, node) => {
 
 const pmuContextMenu = ref([
   {
-    label: 'Delete PMU',
+    label: 'Delete',
     icon: 'pi pi-trash',
     command: (event) => {
       confirmDeletePmu(event);
@@ -951,6 +1027,112 @@ const delPmu = async () => {
     await getTreeData();
   } catch (error) {
     console.log('delPmu: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// ------- DSA Menu
+const dsaIdclick = ref();
+const dsaContextMenuRef = ref();
+const onDsaRightClick = (event, node) => {
+  dsaIdclick.value = node._id;
+  appIdclick.value = node.appId;
+  dsaContextMenuRef.value.show(event);
+};
+
+const dsaContextMenu = computed(() => [
+  {
+    label: 'Create DSA',
+    icon: 'pi pi-plus',
+    command: () => {
+      createDsaVisibleDialog.value = true;
+    },
+  },
+  {
+    separator: true,
+  },
+  {
+    label: 'Delete',
+    icon: 'pi pi-trash',
+    disabled: !dsaIdclick.value,
+    command: (event) => {
+      confirmDeleteDsa(event);
+    },
+  },
+]);
+// ------- DSA
+
+const createDsaVisibleDialog = ref(false);
+const dsaData = ref();
+const newDsaData = ref({
+  name: '',
+  active: true,
+});
+
+const getDsaList = async (appId) => {
+  try {
+    const res = await ApiDsa.getList(projectVersionId.value, appId);
+    return res.data;
+  } catch (error) {
+    console.log('getDsaList: error ', error);
+    return [];
+  }
+};
+
+const getDsaData = async (dsaId) => {
+  try {
+    const res = await ApiDsa.getDsa(dsaId);
+    dsaData.value = res.data;
+  } catch (error) {
+    console.log('getDsaData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createDsa = async () => {
+  try {
+    const res = await ApiDsa.createDsa(projectVersionId.value, appIdclick.value, newDsaData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    createDsaVisibleDialog.value = false;
+    await addNewDsaLeaf(appIdclick.value, res.data);
+  } catch (error) {
+    console.log('createDsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updateDsa = async () => {
+  try {
+    const res = await ApiDsa.updateDsa(dsaData.value._id, dsaData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelDsaLeaf(nodeSelected.value.appId, dsaData.value._id, res.data.name);
+  } catch (error) {
+    console.log('updateDsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDeleteDsa = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Delete Dsa',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await delDsa();
+    },
+  });
+};
+const delDsa = async () => {
+  try {
+    await ApiDsa.delDsa(dsaIdclick.value);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delDsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
