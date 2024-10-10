@@ -57,4 +57,39 @@ export class ApiMonitor {
   static async delMonitorScada(monitor_scada_id) {
     return _delete(`/userconfig/monitor_scada_configs/${monitor_scada_id}`);
   }
+
+  // Monitor PMU Config
+  static async getPmuList(projectVersionId, monitor_id) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitor_id}/monitor_pmu_configs`);
+  }
+  static async createMonitorPmu(projectVersionId, monitor_id, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitor_id}/monitor_pmu_configs`, data);
+  }
+  static async getMonitorPmu(monitor_pmu_id) {
+    return get(`/userconfig/monitor_pmu_configs/${monitor_pmu_id}`);
+  }
+  static async updateMonitorPmu(monitor_pmu_id, data) {
+    return put(`/userconfig/monitor_pmu_configs/${monitor_pmu_id}`, data);
+  }
+  static async delMonitorPmu(monitor_pmu_id) {
+    return _delete(`/userconfig/monitor_pmu_configs/${monitor_pmu_id}`);
+  }
+}
+
+export class ApiDsa {
+  static async getList(projectVersionId, appId) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsa_modules`);
+  }
+  static async createDsa(projectVersionId, appId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsa_modules`, data);
+  }
+  static async getDsa(dsaId) {
+    return get(`/userconfig/dsa_modules/${dsaId}`);
+  }
+  static async updateDsa(dsaId, data) {
+    return put(`/userconfig/dsa_modules/${dsaId}`, data);
+  }
+  static async delDsa(dsaId) {
+    return _delete(`/userconfig/dsa_modules/${dsaId}`);
+  }
 }

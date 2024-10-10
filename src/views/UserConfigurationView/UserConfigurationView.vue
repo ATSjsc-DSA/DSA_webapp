@@ -87,7 +87,7 @@
             </div>
           </template>
           <template #content>
-            <div class="card" style="height: 50rem" aria-haspopup="true">
+            <ScrollPanel class="card" style="width: 100%; height: 50rem">
               <template v-if="nodeSelected.type === 'Application' && appData !== undefined">
                 <applicationFormWidget v-model="appData" />
                 <div class="flex justify-content-end gap-3">
@@ -109,6 +109,14 @@
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateScada"></Button>
                   <Button type="button" severity="danger" label="Delete" @click="confirmDeleteScada"></Button>
+                </div>
+              </template>
+
+              <template v-if="nodeSelected.type === 'PMU' && pmuData !== undefined">
+                <monitorPmuFormWidget v-model="pmuData" />
+                <div class="flex justify-content-end gap-3">
+                  <Button type="button" label="Update" @click="updatePmu"></Button>
+                  <Button type="button" severity="danger" label="Delete" @click="confirmDeletePmu"></Button>
                 </div>
               </template>
               <!-- this is for test  -->
@@ -136,7 +144,7 @@
                 </div>
               </div> -->
               <!-- end test  -->
-            </div>
+            </ScrollPanel>
           </template>
         </Card>
       </SplitterPanel>
@@ -193,6 +201,20 @@
       <Button type="button" label="Submit" :disabled="!newScadaData.name" @click="createScada"></Button>
     </template>
   </Dialog>
+
+  <Dialog v-model:visible="createPmuVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Create new Monitor PMU Configuration</span>
+      </div>
+    </template>
+
+    <monitorPmuFormWidget v-model="newPmuData" />
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createPmuVisibleDialog = false"></Button>
+      <Button type="button" label="Submit" :disabled="!newPmuData.name" @click="createPmu"></Button>
+    </template>
+  </Dialog>
 </template>
 
 <script setup>
@@ -201,22 +223,18 @@ import { reactive, ref, watch } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import InputSwitch from 'primevue/inputswitch';
-
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 
 import ContextMenu from 'primevue/contextmenu';
 
-import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
 import applicationFormWidget from './formWidget/applicationFormWidget.vue';
 import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 import monitorScadaFormWidget from './formWidget/monitorScadaFormWidget.vue';
-import { ApiApplication, ApiMonitor } from '@/views/UserConfigurationView/api';
+import monitorPmuFormWidget from './formWidget/monitorPmuFormWidget.vue';
+import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -306,13 +324,14 @@ const getMonitorLeaf = async (appId, monitor, key = '') => {
       {
         key: 'scada_' + key,
         label: 'Scada',
-        type: 'ScadaGroup',
+        type: 'Group',
         children: await getScadaBranch(appId, monitor._id, key),
       },
       {
         key: 'pml_' + key,
-        label: 'PML',
-        type: 'PML',
+        label: 'PMU',
+        type: 'Group',
+        children: await getPmuBranch(appId, monitor._id, key),
       },
     ],
   };
@@ -362,6 +381,52 @@ const getScadaLeaf = (appId, monitorId, scada, key = '') => {
     type: 'Scada',
   };
 };
+
+const getPmuBranch = async (appId, monitorId, monitorKey = '') => {
+  const pmuList = await getPmuList(monitorId);
+  const leafData = [];
+  for (let index = 0; index < pmuList.length; index++) {
+    const pmu = pmuList[index];
+    leafData.push(getPmuLeaf(appId, monitorId, pmu, monitorKey + '_' + index));
+  }
+  return leafData;
+};
+
+const addNewPmuLeaf = (appId, monitorId, pmu) => {
+  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
+    if (monitorLeaf) {
+      monitorLeaf.children[1].children.push(
+        getPmuLeaf(appId, monitorId, pmu, monitorLeaf.key + '_' + monitorLeaf.children[1].length),
+      );
+    }
+  }
+};
+
+const updateLabelPmuLeaf = (appId, monitorId, pmuId, newName) => {
+  const appLeaf = treeData.value.filter((item) => item._id === appId)[0];
+  if (appLeaf) {
+    const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
+    if (monitorLeaf) {
+      const scadaLeaf = monitorLeaf.children[1].children.filter((item) => item._id === pmuId)[0];
+      if (scadaLeaf) {
+        scadaLeaf.label = newName;
+      }
+    }
+  }
+};
+
+const getPmuLeaf = (appId, monitorId, pmu, key = '') => {
+  return {
+    key: key,
+    label: pmu.name,
+    _id: pmu._id,
+    appId: appId,
+    monitorId: monitorId,
+    type: 'PMU',
+  };
+};
 // controll tree
 const expandedKeys = ref({});
 const nodeSelected = ref({});
@@ -397,6 +462,9 @@ const onNodeSelect = async (node) => {
   }
   if (node.type === 'Scada') {
     await getScadaData(node._id);
+  }
+  if (node.type === 'PMU') {
+    await getPmuData(node._id);
   }
 };
 
@@ -626,37 +694,27 @@ const onMonitorRightClick = (event, node) => {
 
 const monitorContextMenu = ref([
   {
-    label: 'Create Application',
-    icon: 'pi pi-plus',
-    command: () => {
-      createApplicationVisibleDialog.value = true;
-    },
-  },
-  {
     label: 'Create Monitor',
     icon: 'pi pi-plus',
     command: () => {
       createMonitorVisibleDialog.value = true;
     },
-    items: [
-      {
-        label: 'Create Scada',
-        icon: 'pi pi-plus',
-        command: () => {
-          createScadaVisibleDialog.value = true;
-        },
-      },
-      {
-        label: 'Create PML',
-        icon: 'pi pi-plus',
-      },
-    ],
   },
   {
-    label: 'Create DSA Moudule',
+    separator: true,
+  },
+  {
+    label: 'Create Scada',
     icon: 'pi pi-plus',
     command: () => {
-      createApplicationVisibleDialog.value = true;
+      createScadaVisibleDialog.value = true;
+    },
+  },
+  {
+    label: 'Create PMU',
+    icon: 'pi pi-plus',
+    command: () => {
+      createPmuVisibleDialog.value = true;
     },
   },
 ]);
@@ -738,6 +796,107 @@ const delScada = async () => {
     await getTreeData();
   } catch (error) {
     console.log('delScada: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// ------- Monitor - PMU
+
+const createPmuVisibleDialog = ref(false);
+const pmuData = ref();
+const newPmuData = ref({
+  active: true,
+  current: {
+    anglePhaseA: '',
+    anglePhaseB: '',
+    anglePhaseC: '',
+    phaseA: '',
+    phaseB: '',
+    phaseC: '',
+    kFactorCur: 1,
+  },
+  pmuIp: '',
+  name: '',
+  power: {
+    activePower: '',
+    kFactorPower: 1,
+    reactivePower: '',
+  },
+  voltage: {
+    anglePhaseA: '',
+    anglePhaseB: '',
+    anglePhaseC: '',
+    phaseA: '',
+    phaseB: '',
+    phaseC: '',
+  },
+});
+
+const getPmuList = async (monitorId) => {
+  try {
+    const res = await ApiMonitor.getPmuList(projectVersionId.value, monitorId);
+    return res.data;
+  } catch (error) {
+    console.log('getPmuList: error ', error);
+    return [];
+  }
+};
+
+const getPmuData = async (pmuId) => {
+  try {
+    const res = await ApiMonitor.getMonitorPmu(pmuId);
+    pmuData.value = res.data;
+  } catch (error) {
+    console.log('getPmuData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createPmu = async () => {
+  try {
+    const res = await ApiMonitor.createMonitorPmu(projectVersionId.value, monitorIdclick.value, newPmuData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    addNewPmuLeaf(appIdclick.value, monitorIdclick.value, res.data);
+    createPmuVisibleDialog.value = false;
+  } catch (error) {
+    console.log('createPmu: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updatePmu = async () => {
+  try {
+    const res = await ApiMonitor.updateMonitorPmu(pmuData.value._id, pmuData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelPmuLeaf(nodeSelected.value.appId, nodeSelected.value.monitorId, nodeSelected.value._id, res.data.name);
+  } catch (error) {
+    console.log('updatePmu: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDeletePmu = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Delete Monitor Pmu',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await delPmu();
+    },
+  });
+};
+const delPmu = async () => {
+  try {
+    await ApiMonitor.delMonitorPmu(pmuData.value._id);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    pmuData.value = undefined;
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delPmu: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
