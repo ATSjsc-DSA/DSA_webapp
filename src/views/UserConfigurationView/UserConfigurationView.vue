@@ -45,11 +45,7 @@
                     {{ slotProps.node.label }}
                   </div>
                 </template>
-                <template #Group="slotProps">
-                  <div class="font-semibold" style="cursor: text">
-                    {{ slotProps.node.label }}
-                  </div>
-                </template>
+
                 <template #Project="slotProps">
                   <div class="font-bold text-xl" aria-haspopup="true" @contextmenu="onProjectRightClick">
                     {{ slotProps.node.label }}
@@ -68,7 +64,16 @@
                 </template>
 
                 <!-- --- Monitor --- -->
-
+                <template #MonitorGroup="slotProps">
+                  <div
+                    class="font-semibold"
+                    aria-haspopup="true"
+                    @contextmenu="onMonitorGroupRightClick($event, slotProps.node.appId)"
+                  >
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="monitorGroupContextMenuRef" :model="monitorGroupContextMenu" />
+                </template>
                 <template #Monitor="slotProps">
                   <div aria-haspopup="true" @contextmenu="onMonitorRightClick($event, slotProps.node)">
                     {{ slotProps.node.label }}
@@ -91,7 +96,16 @@
                 </template>
 
                 <!-- --- DSA --- -->
-
+                <template #DSAGroup="slotProps">
+                  <div
+                    class="font-semibold"
+                    aria-haspopup="true"
+                    @contextmenu="onDsaGroupRightClick($event, slotProps.node.appId)"
+                  >
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="dsaGroupContextMenuRef" :model="dsaGroupContextMenu" />
+                </template>
                 <template #DSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onDsaRightClick($event, slotProps.node)">
                     {{ slotProps.node.label }}
@@ -325,7 +339,7 @@ const getAppLeaf = async (app, key = '') => {
       {
         key: 'monitor_' + key,
         label: 'Monitor',
-        type: 'Group',
+        type: 'MonitorGroup',
         appId: app._id,
         children: await getMonitorBranch(app._id, key),
       },
@@ -333,7 +347,7 @@ const getAppLeaf = async (app, key = '') => {
         key: 'dsa_' + key,
         label: 'DSA Module',
         appId: app._id,
-        type: 'Group',
+        type: 'DSAGroup',
         children: await getDsaBranch(app._id, key),
       },
     ],
@@ -722,24 +736,6 @@ const onApplicationRightClick = (event, appId) => {
 
 const appContextMenu = ref([
   {
-    label: 'Create Monitor',
-    icon: 'pi pi-plus',
-    command: () => {
-      createMonitorVisibleDialog.value = true;
-    },
-  },
-  {
-    label: 'Create DSA Module',
-    icon: 'pi pi-plus',
-    command: () => {
-      createDsaVisibleDialog.value = true;
-    },
-  },
-
-  {
-    separator: true,
-  },
-  {
     label: 'Delete',
     icon: 'pi pi-trash',
     command: (event) => {
@@ -829,6 +825,25 @@ const delMonitor = async () => {
 };
 
 // ------- Monitor Menu
+
+const monitorGroupIdclick = ref();
+const monitorGroupContextMenuRef = ref();
+const onMonitorGroupRightClick = (event, node) => {
+  monitorGroupIdclick.value = node._id;
+  appIdclick.value = node.appId;
+  monitorGroupContextMenuRef.value.show(event);
+};
+
+const monitorGroupContextMenu = computed(() => [
+  {
+    label: 'Create Monitor',
+    icon: 'pi pi-plus',
+    command: () => {
+      createMonitorVisibleDialog.value = true;
+    },
+  },
+]);
+
 const monitorIdclick = ref();
 const monitorContextMenuRef = ref();
 const onMonitorRightClick = (event, node) => {
@@ -838,23 +853,6 @@ const onMonitorRightClick = (event, node) => {
 };
 
 const monitorContextMenu = computed(() => [
-  {
-    label: 'Create Scada',
-    icon: 'pi pi-plus',
-    command: () => {
-      createScadaVisibleDialog.value = true;
-    },
-  },
-  {
-    label: 'Create PMU',
-    icon: 'pi pi-plus',
-    command: () => {
-      createPmuVisibleDialog.value = true;
-    },
-  },
-  {
-    separator: true,
-  },
   {
     label: 'Delete',
     icon: 'pi pi-trash',
@@ -1080,6 +1078,24 @@ const delPmu = async () => {
 };
 
 // ------- DSA Menu
+const dsaGroupIdclick = ref();
+const dsaGroupContextMenuRef = ref();
+const onDsaGroupRightClick = (event, node) => {
+  dsaGroupIdclick.value = node._id;
+  appIdclick.value = node.appId;
+  dsaGroupContextMenuRef.value.show(event);
+};
+
+const dsaGroupContextMenu = computed(() => [
+  {
+    label: 'Create DSA Module',
+    icon: 'pi pi-plus',
+    command: () => {
+      createDsaVisibleDialog.value = true;
+    },
+  },
+]);
+
 const dsaIdclick = ref();
 const dsaContextMenuRef = ref();
 const onDsaRightClick = (event, node) => {
@@ -1089,16 +1105,6 @@ const onDsaRightClick = (event, node) => {
 };
 
 const dsaContextMenu = computed(() => [
-  {
-    label: 'Create VSA Information',
-    icon: 'pi pi-plus',
-    command: () => {
-      createVsaVisibleDialog.value = true;
-    },
-  },
-  {
-    separator: true,
-  },
   {
     label: 'Delete',
     icon: 'pi pi-trash',
