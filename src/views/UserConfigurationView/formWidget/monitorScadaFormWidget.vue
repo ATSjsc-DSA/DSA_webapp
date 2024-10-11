@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-column gap-2 mb-3">
     <label for="scadaName" class="font-semibold"> Name </label>
-    <InputText id="scadaName" v-model="data.name" class="flex-auto" autocomplete="off" />
+    <InputText id="scadaName" v-model="data.name" :disabled="!isCreateForm" class="flex-auto" autocomplete="off" />
   </div>
 
   <div class="flex align-items-center gap-3 mb-3">
@@ -29,17 +29,6 @@
       placeholder="Type Something to search ..."
       name="scadaMonitorPsSelected"
       @complete="searchScadaMonitorPsQueryFilter"
-    />
-  </div>
-
-  <div v-else class="flex flex-column gap-2 mb-3">
-    <label for="scadaMonitorPowerSytemId" class="font-semibold"> Scada Monitor </label>
-    <InputText
-      id="scadaMonitorPowerSytemId"
-      v-model="data.monitorScadaId"
-      disabled
-      class="flex-auto"
-      autocomplete="off"
     />
   </div>
 </template>
