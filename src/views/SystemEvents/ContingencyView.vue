@@ -67,11 +67,21 @@
           />
         </div>
         <div class="field">
-          <label for="name" class="font-semibold">List Contingency</label>
+          <label for="name" class="font-semibold">List Contingency 1</label>
           <AutoComplete
-            v-model="contingencyModelData.listPowerSystemId"
+            v-model="autoCompleteValue1"
             completeOnFocus
-            multiple
+            optionLabel="name"
+            :suggestions="items"
+            @complete="search"
+          />
+        </div>
+
+        <div class="field" v-if="contingencyModelData.contingencyType === 1">
+          <label for="name" class="font-semibold">List Contingency 2</label>
+          <AutoComplete
+            v-model="autoCompleteValue2"
+            completeOnFocus
             optionLabel="name"
             :suggestions="items"
             @complete="search"
@@ -98,11 +108,26 @@ onMounted(() => {
   getListContingency();
 });
 const visible = ref(false);
+
+const contingencyModelData = ref({
+  _id: '',
+  name: '',
+  contingencyType: 0,
+  listPowerSystemId: [],
+  active: true,
+});
+
+const autoCompleteValue1 = ref();
+const autoCompleteValue2 = ref();
+
+watchEffect(() => {
+  contingencyModelData.value.listPowerSystemId = [...autoCompleteValue1.value, ...autoCompleteValue2.value];
+});
+
 const listType = ref([
   { name: 'N-1', value: 0 },
   { name: 'N-2', value: 1 },
 ]);
-const contingencyModelData = ref();
 const dataDefault = {
   _id: '',
   name: '',
