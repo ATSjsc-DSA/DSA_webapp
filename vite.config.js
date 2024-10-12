@@ -10,11 +10,15 @@ import svgLoader from 'vite-svg-loader';
 
 export default ({ mode }) => {
   const { VITE_PORT, VITE_BASE_URL } = loadEnv(mode, process.cwd());
-
+  const env = loadEnv(mode, process.cwd());
   return defineConfig({
     base: VITE_BASE_URL,
     plugins: [
-      vue(),
+      vue({
+        script: {
+          defineModel: true,
+        },
+      }),
       svgLoader(),
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],

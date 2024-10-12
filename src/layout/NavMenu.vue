@@ -24,13 +24,34 @@ const items = ref([
     label: 'Configuration',
     items: [
       { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
-      { label: 'Configuration ', icon: 'pi pi-fw pi-file-edit', to: '/Configuration' },
+      // { label: 'Configuration ', icon: 'pi pi-fw pi-file-edit', to: '/Configuration' },
 
-      { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
+      // { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
       { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
       { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
 
       { label: 'User Configuration', icon: 'pi pi-file-edit', to: '/user_config' },
+      {
+        label: 'System Events',
+        icon: 'pi pi-fw pi-clone',
+        items: [
+          {
+            label: 'Disturbances',
+            to: '/SystemEvents/Disturbances',
+            // icon: 'pi pi-fw pi-cog',
+          },
+          {
+            label: 'Contingencies',
+            to: '/SystemEvents/Contingencies',
+            // icon: 'pi pi-fw pi-cog',
+          },
+          {
+            label: 'Subsystems',
+            to: '/SystemEvents/Subsystems',
+            // icon: 'pi pi-fw pi-cog',
+          },
+        ],
+      },
     ],
   },
   // {
@@ -85,5 +106,8 @@ const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 
 #topbar-menu .p-menuitem-link {
   white-space: nowrap;
+}
+.p-menuitem .p-submenu-list {
+  flex-direction: row; /* Đảm bảo menu xổ ngang */
 }
 </style>

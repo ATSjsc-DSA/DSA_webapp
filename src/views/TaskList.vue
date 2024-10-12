@@ -78,8 +78,6 @@
       <Column field="commandType" header="Command Type" filterMatchMode="equals" style="width: 10%">
         <template #body="{ data }">
           <Chip :label="getCommandType(data.commandType)" />
-
-          <!-- <Tag :value="getCommandType(data.commandType)" :severity="getCommandType(data.commandType)" /> -->
         </template>
       </Column>
 

@@ -10,6 +10,8 @@ export const useCommonStore = defineStore('common', () => {
   const psm_active = ref({});
   const psmList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
+  const versionId = ref('5eb7cf5a86d9755df3a6c593');
+
   const editVersionData = ref({});
   let intervalId = null;
 
@@ -77,5 +79,6 @@ export const useCommonStore = defineStore('common', () => {
     stopAutoUpdate,
     clearData,
     editVersionData,
+    versionId,
   };
 });

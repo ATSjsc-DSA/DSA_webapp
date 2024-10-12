@@ -99,6 +99,21 @@ const router = createRouter({
           name: 'User Configuration',
           component: () => import('@/views/UserConfigurationView/UserConfigurationView.vue'),
         },
+        {
+          path: '/SystemEvents/Disturbances',
+          name: 'Disturbances',
+          component: () => import('@/views/SystemEvents/DisturbancerView.vue'),
+        },
+        {
+          path: '/SystemEvents/Contingencies',
+          name: 'Contingency',
+          component: () => import('@/views/SystemEvents/ContingencyView.vue'),
+        },
+        {
+          path: '/SystemEvents/Subsystems',
+          name: 'Subsystems',
+          component: () => import('@/views/SystemEvents/SubsystemView.vue'),
+        },
       ],
     },
     {
