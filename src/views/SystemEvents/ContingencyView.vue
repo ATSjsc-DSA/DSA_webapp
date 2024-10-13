@@ -1,4 +1,6 @@
 <template>
+  <Toast />
+  <ConfirmPopup></ConfirmPopup>
   <div class="card">
     <DataTable
       :value="contingencies"
@@ -17,7 +19,7 @@
       <template #header>
         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
           <span class="text-xl text-900 font-bold">List Contingency</span>
-          <Button icon="pi pi-plus" rounded text raised @click="createThis()" />
+          <Button icon="pi pi-plus" rounded text raised @click="handlerCreateThis()" />
         </div>
       </template>
       <Column field="name" header="Name"></Column>
@@ -26,7 +28,7 @@
           <Chip :label="data.type === 0 ? 'N-1' : 'N-2'" />
         </template>
       </Column>
-      <Column field="listPowerSystemId" header="List Powersystem">
+      <Column field="listPowerSystemId" header="List Power System">
         <template #body="{ data }">
           <div>
             <span v-for="(item, index) in data.listPowerSystemId" :key="index">
@@ -48,7 +50,7 @@
     </DataTable>
     <!-- Dialog -->
 
-    <Dialog v-model:visible="visible" modal header="Edit Contingency" :style="{ width: '35rem' }">
+    <Dialog v-model:visible="visible" modal :header="headerDialog+ ' Contingency'" :style="{ width: '35rem' }">
       <span class="p-text-secondary block mb-5">{{ contingencyModelData.name }}</span>
       <div class="p-fluid">
         <div class="field">
@@ -67,7 +69,7 @@
           />
         </div>
         <div class="field">
-          <label for="name" class="font-semibold">List Contingency 1</label>
+          <label for="name" class="font-semibold">Power System 1</label>
           <AutoComplete
             v-model="autoCompleteValue1"
             completeOnFocus
@@ -78,7 +80,7 @@
         </div>
 
         <div class="field" v-if="contingencyModelData.contingencyType === 1">
-          <label for="name" class="font-semibold">List Contingency 2</label>
+          <label for="name" class="font-semibold">Power System 2</label>
           <AutoComplete
             v-model="autoCompleteValue2"
             completeOnFocus
@@ -94,20 +96,28 @@
 
         <div class="flex justify-content-end gap-2">
           <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-          <Button type="button" label="Save" @click="editThis()"></Button>
+          <Button type="button" label="Save" @click="headerDialog === 'Create'?createThis():editThis()"></Button>
         </div>
       </div>
     </Dialog>
   </div>
+
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ApiContingency, commonApi } from './api';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+import ConfirmPopup from 'primevue/confirmpopup';
+import { useConfirm } from "primevue/useconfirm";
+
 onMounted(() => {
   getListContingency();
 });
 const visible = ref(false);
+const toast = useToast();
+const confirm = useConfirm();
 
 const contingencyModelData = ref({
   _id: '',
@@ -116,12 +126,15 @@ const contingencyModelData = ref({
   listPowerSystemId: [],
   active: true,
 });
-
-const autoCompleteValue1 = ref();
-const autoCompleteValue2 = ref();
+const headerDialog = ref('Edit');
+const autoCompleteValue1 = ref({});
+const autoCompleteValue2 = ref({});
 
 watchEffect(() => {
-  contingencyModelData.value.listPowerSystemId = [...autoCompleteValue1.value, ...autoCompleteValue2.value];
+  contingencyModelData.value.listPowerSystemId = [
+    ...(autoCompleteValue1.value._id ? [autoCompleteValue1.value._id] : []),
+    ...(autoCompleteValue2.value._id ? [autoCompleteValue2.value._id] : [])
+  ];
 });
 
 const listType = ref([
@@ -165,6 +178,7 @@ const search = async (event) => {
 };
 
 const confirmDelete = async (event, data) => {
+  console.log();
   confirm.require({
     target: event.currentTarget,
     message: 'Do you want to delete this contingency?',
@@ -181,23 +195,53 @@ const confirmDelete = async (event, data) => {
     },
   });
 };
-const createThis = async () => {
+const handlerCreateThis = async () => {
   contingencyModelData.value = dataDefault;
   visible.value = true;
+  headerDialog.value = 'Create';
 };
-const deleteThis = async (data) => {};
+const createThis = async () => {
+  try {
+     await ApiContingency.createContingency(contingencyModelData.value);
+     getListContingency()
+     visible.value = false; 
+     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Create successfully', life: 3000 });
+
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
 const handlerEditThis = async (data) => {
   console.log(data);
   contingencyModelData.value = JSON.parse(JSON.stringify(data)); // Tạo bản sao của data
   visible.value = true;
+  headerDialog.value = 'Edit';
+  if (contingencyModelData.value.listPowerSystemId.length === 1) {
+  autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
+} else if (contingencyModelData.value.listPowerSystemId.length === 2) {
+  autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
+  autoCompleteValue2.value = contingencyModelData.value.listPowerSystemId[1];
+}
 };
 
 const editThis = async () => {
   try {
     const { _id, ...dataToUpdate } = contingencyModelData.value;
-    const res = await ApiContingency.updateContingencyData(_id, dataToUpdate);
-    contingencies.value = res.data.items;
-    totalList.value = res.data.total;
+    await ApiContingency.updateContingencyData(_id, dataToUpdate);
+    getListContingency()
+    visible.value = false;
+    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Update successfully', life: 3000 });
+
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const deleteThis  = async(data) => {
+  try {
+    await ApiContingency.deleteContingency(data._id)
+    getListContingency()
+    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Delete successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }

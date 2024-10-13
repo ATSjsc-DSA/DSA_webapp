@@ -31,7 +31,26 @@ export class ApiContingency {
   static async updateContingencyData(id, data) {
     return put(`/seedconfig/contingency/${id}`, data);
   }
-  static async delContingencyData(id) {
+  static async deleteContingency(id) {
     return _delete(`/seedconfig/contingency/${id}`);
+  }
+}
+
+export class ApiDisturbance {
+  static async getListDisturbance(param) {
+    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, param);
+  }
+
+  static async createDisturbance(data) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, data);
+  }
+  static async getDisturbanceData(id) {
+    return get(`/seedconfig/disturbance/${id}`);
+  }
+  static async updateDisturbanceData(id, data) {
+    return put(`/seedconfig/disturbance/${id}`, data);
+  }
+  static async deleteDisturbance(id) {
+    return _delete(`/seedconfig/disturbance/${id}`);
   }
 }
