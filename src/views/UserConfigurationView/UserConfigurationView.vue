@@ -266,6 +266,7 @@ const getTreeData = async () => {
       key: 'root',
       label: 'Project',
       type: 'Project',
+      icon: 'pi pi-server',
       children: [],
     },
   ];
@@ -283,11 +284,13 @@ const getAppLeaf = async (app, key = '') => {
     _id: app._id,
     appId: app._id,
     type: 'Application',
+    icon: 'pi pi-folder-open',
     children: [
       {
         key: 'monitor_' + key,
         label: 'Monitor',
         type: 'MonitorGroup',
+        icon: 'pi pi-list',
         appId: app._id,
         children: await getMonitorBranch(app._id, key),
       },
@@ -295,6 +298,7 @@ const getAppLeaf = async (app, key = '') => {
         key: 'dsa_' + key,
         label: 'DSA Module',
         appId: app._id,
+        icon: 'pi pi-th-large',
         type: 'DSAGroup',
         children: await getDsaBranch(app._id, key),
       },
@@ -318,6 +322,7 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
     label: monitor.name,
     _id: monitor._id,
     appId: appId,
+    icon: 'pi pi-file',
     type: 'Monitor',
   };
 };
@@ -373,6 +378,7 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
     _id: dsa._id,
     appId: appId,
     type: 'DSA',
+    icon: 'pi pi-clone',
     children: await getVsaBranch(appId, dsa._id, key),
   };
 };
@@ -496,10 +502,12 @@ const appData = ref({
   name: '',
   active: true,
   _id: '',
+  startTimestamp: 0
 });
 const newAppData = ref({
   name: '',
   active: true,
+  startTimestamp: 0
 });
 
 const getAppData = async (appId) => {
@@ -513,12 +521,16 @@ const getAppData = async (appId) => {
 };
 const createApplication = async () => {
   try {
-    const res = await ApiApplication.createApp(projectVersionId.value, newAppData.value);
+    const dataLoad = {
+      name: newAppData.value.name,
+      active: newAppData.value.active,
+      startTimestamp: newAppData.value.startTimestamp.getTime()
+    }
+    const res = await ApiApplication.createApp(projectVersionId.value, dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
     treeData.value[0].children.push(await getAppLeaf(res.data, treeData.value[0].children.length));
   } catch (error) {
-    console.log('createApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
@@ -711,7 +723,17 @@ const onDsaRightClick = (event, node) => {
   dsaContextMenuRef.value.show(event);
 };
 
+const createTaskDsaDialog = ref(false);
+
 const dsaContextMenu = computed(() => [
+  {
+    label: 'Create Task',
+    icon: 'pi pi-plus',
+    disabled: !dsaIdclick.value,
+    command: () => {
+      createTaskDsaDialog.value = true;
+    },
+  },
   {
     label: 'Delete',
     icon: 'pi pi-trash',
@@ -720,6 +742,7 @@ const dsaContextMenu = computed(() => [
       confirmDeleteDsa(event);
     },
   },
+  
 ]);
 
 const vsaIdclick = ref();
