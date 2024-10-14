@@ -3,7 +3,7 @@
     <AppProgressSpinner :showSpinner="progressSpinnerModal"></AppProgressSpinner>
     <BreadcrumbCommon :items="items"></BreadcrumbCommon>
 
-    <div class="card h-full">
+    <div class="card h-full w-full">
       <div class="flex flex-wrap justify-content-end gap-2">
         <!-- <Button severity="secondary" text icon="pi pi-download" label="Download Template" @click="downloadFile()" />
 
@@ -16,7 +16,7 @@
           :size="20"
           :minSize="10"
         >
-          <DataView :value="listDatatree" class="w-full">
+          <DataView :value="listDatatree" class="w-full h-full">
             <template #list="slotProps">
               <div class="grid grid-nogutter">
                 <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">

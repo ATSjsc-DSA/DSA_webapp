@@ -62,7 +62,7 @@ const chartComposable = () => {
   };
   const convertDateTimeToString = (t) => {
     if (t !== null) {
-      let dateTimeConvert = new Date(t * 1000);
+      let dateTimeConvert = new Date(t);
       let date = dateTimeConvert.toLocaleDateString();
       let options = { hour12: false };
       let time = dateTimeConvert.toLocaleTimeString('es-AR', options);

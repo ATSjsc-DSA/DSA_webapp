@@ -18,12 +18,12 @@ export class commonApi {
 }
 
 export class ApiContingency {
-  static async getListContingency(param) {
-    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/contingency`, param);
+  static async getListContingency(contingenciesActiveId, param) {
+    return get(`/seedconfig/${contingenciesActiveId}/contingency`, param);
   }
 
-  static async createContingency(data) {
-    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/contingency`, data);
+  static async createContingency(contingenciesActiveId, data) {
+    return post(`/seedconfig/${contingenciesActiveId}/contingency`, data);
   }
   static async getContingencyData(id) {
     return get(`/seedconfig/contingency/${id}`);
@@ -52,5 +52,24 @@ export class ApiDisturbance {
   }
   static async deleteDisturbance(id) {
     return _delete(`/seedconfig/disturbance/${id}`);
+  }
+}
+
+export class ApiContingencies {
+  static async getListContingencies() {
+    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/contingencies`);
+  }
+
+  static async createContingencies(data) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/contingencies`, data);
+  }
+  static async getContingenciesData(id) {
+    return get(`/seedconfig/contingencies/${id}`);
+  }
+  static async updateContingenciesData(id, data) {
+    return put(`/seedconfig/contingencies/${id}`, data);
+  }
+  static async deleteContingencies(id) {
+    return _delete(`/seedconfig/contingencies/${id}`);
   }
 }

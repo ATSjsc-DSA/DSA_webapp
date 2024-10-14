@@ -25,7 +25,7 @@
       <Column field="name" header="Name"></Column>
       <Column field="contingencyType" header="Type">
         <template #body="{ data }">
-          <Chip :label="data.type === 0 ? 'N-1' : 'N-2'" />
+          <Chip :label="data.contingencyType === 0 ? 'N-1' : 'N-2'" />
         </template>
       </Column>
       <Column field="listPowerSystemId" header="List Power System">
@@ -50,7 +50,7 @@
     </DataTable>
     <!-- Dialog -->
 
-    <Dialog v-model:visible="visible" modal :header="headerDialog+ ' Contingency'" :style="{ width: '35rem' }">
+    <Dialog v-model:visible="visible" modal :header="headerDialog + ' Contingency'" :style="{ width: '35rem' }">
       <span class="p-text-secondary block mb-5">{{ contingencyModelData.name }}</span>
       <div class="p-fluid">
         <div class="field">
@@ -96,12 +96,11 @@
 
         <div class="flex justify-content-end gap-2">
           <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-          <Button type="button" label="Save" @click="headerDialog === 'Create'?createThis():editThis()"></Button>
+          <Button type="button" label="Save" @click="headerDialog === 'Create' ? createThis() : editThis()"></Button>
         </div>
       </div>
     </Dialog>
   </div>
-
 </template>
 
 <script setup>
@@ -110,10 +109,22 @@ import { ApiContingency, commonApi } from './api';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
-import { useConfirm } from "primevue/useconfirm";
+import { useConfirm } from 'primevue/useconfirm';
 
-onMounted(() => {
-  getListContingency();
+const props = defineProps({
+  contingenciesActive: Object,
+});
+
+const contingenciesActiveId = computed(() => props.contingenciesActive._id);
+
+// onMounted(() => {
+//   getListContingency();
+// });
+
+watch(contingenciesActiveId, (newValue, oldValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    getListContingency();
+  }
 });
 const visible = ref(false);
 const toast = useToast();
@@ -133,7 +144,7 @@ const autoCompleteValue2 = ref({});
 watchEffect(() => {
   contingencyModelData.value.listPowerSystemId = [
     ...(autoCompleteValue1.value._id ? [autoCompleteValue1.value._id] : []),
-    ...(autoCompleteValue2.value._id ? [autoCompleteValue2.value._id] : [])
+    ...(autoCompleteValue2.value._id ? [autoCompleteValue2.value._id] : []),
   ];
 });
 
@@ -159,7 +170,7 @@ const onPageChange = (event) => {
 
 const getListContingency = async () => {
   try {
-    const res = await ApiContingency.getListContingency({ page: currentPage.value });
+    const res = await ApiContingency.getListContingency(contingenciesActiveId.value, { page: currentPage.value });
     contingencies.value = res.data.items;
     totalList.value = res.data.total;
   } catch (error) {
@@ -197,16 +208,17 @@ const confirmDelete = async (event, data) => {
 };
 const handlerCreateThis = async () => {
   contingencyModelData.value = dataDefault;
+  autoCompleteValue1.value = {};
+  autoCompleteValue2.value = {};
   visible.value = true;
   headerDialog.value = 'Create';
 };
 const createThis = async () => {
   try {
-     await ApiContingency.createContingency(contingencyModelData.value);
-     getListContingency()
-     visible.value = false; 
-     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Create successfully', life: 3000 });
-
+    await ApiContingency.createContingency(contingenciesActiveId.value, contingencyModelData.value);
+    getListContingency();
+    visible.value = false;
+    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Create successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
@@ -218,29 +230,28 @@ const handlerEditThis = async (data) => {
   visible.value = true;
   headerDialog.value = 'Edit';
   if (contingencyModelData.value.listPowerSystemId.length === 1) {
-  autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
-} else if (contingencyModelData.value.listPowerSystemId.length === 2) {
-  autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
-  autoCompleteValue2.value = contingencyModelData.value.listPowerSystemId[1];
-}
+    autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
+  } else if (contingencyModelData.value.listPowerSystemId.length === 2) {
+    autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
+    autoCompleteValue2.value = contingencyModelData.value.listPowerSystemId[1];
+  }
 };
 
 const editThis = async () => {
   try {
     const { _id, ...dataToUpdate } = contingencyModelData.value;
     await ApiContingency.updateContingencyData(_id, dataToUpdate);
-    getListContingency()
+    getListContingency();
     visible.value = false;
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Update successfully', life: 3000 });
-
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
-const deleteThis  = async(data) => {
+const deleteThis = async (data) => {
   try {
-    await ApiContingency.deleteContingency(data._id)
-    getListContingency()
+    await ApiContingency.deleteContingency(data._id);
+    getListContingency();
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Delete successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });

@@ -106,8 +106,8 @@ const router = createRouter({
         },
         {
           path: '/SystemEvents/Contingencies',
-          name: 'Contingency',
-          component: () => import('@/views/SystemEvents/ContingencyView.vue'),
+          name: 'Contingencies',
+          component: () => import('@/views/SystemEvents/ContingenciesView.vue'),
         },
         {
           path: '/SystemEvents/Subsystems',
