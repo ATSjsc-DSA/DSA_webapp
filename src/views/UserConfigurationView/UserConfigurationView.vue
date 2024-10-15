@@ -103,9 +103,16 @@
 
                 <template #VSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onVsaRightClick($event, slotProps.node)">
-                    {{ slotProps.node.label }}
+                    <Tag value="VSA" rounded /> {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="vsaContextMenuRef" :model="vsaContextMenu" />
+                </template>
+
+                <template #TSA="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onTsaRightClick($event, slotProps.node)">
+                    <Tag value="TSA" severity="secondary" rounded /> {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="tsaContextMenuRef" :model="tsaContextMenu" />
                 </template>
               </Tree>
             </div>
@@ -148,6 +155,12 @@
                 <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateVsa"></Button>
+                </div>
+              </template>
+              <template v-if="nodeSelected.type === 'TSA' && tsaData !== undefined">
+                <DsaTsaFormWidget v-model="tsaData" :is-create-form="false" />
+                <div class="flex justify-content-end gap-3">
+                  <Button type="button" label="Update" @click="updateTsa"></Button>
                 </div>
               </template>
             </ScrollPanel>
@@ -212,7 +225,7 @@
   <Dialog v-model:visible="createTaskDsaDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Create new VSA Information</span>
+        <span class="font-bold white-space-nowrap">Create new Task</span>
       </div>
     </template>
 
@@ -246,7 +259,7 @@
       <Divider />
     </div>
     <DsaVsaFormWidget v-if="newTaskData.type === 'VSA'" v-model="newVsaData" :is-create-form="true" />
-    <dsaTsaFormWidget v-if="newTaskData.type === 'TSA'" v-model="newTsaData" :is-create-form="true" />
+    <DsaTsaFormWidget v-if="newTaskData.type === 'TSA'" v-model="newTsaData" :is-create-form="true" />
 
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createTaskDsaDialog = false"></Button>
@@ -278,7 +291,7 @@ import monitorWidget from './monitorWidget.vue';
 import dsaFormWidget from './formWidget/dsaFormWidget.vue';
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
-import dsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
+import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -438,12 +451,12 @@ const getTaskBranch = async (appId, dsaId, dsaKey = '') => {
   return leafData;
 };
 
-const addNewTaskLeaf = (appId, dsaId, vsa, taskType = 'VSA') => {
+const addNewTaskLeaf = (appId, dsaId, taskData, taskType = 'VSA') => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
     if (dsaLeaf) {
-      dsaLeaf.children.push(getTaskLeaf(appId, dsaId, vsa, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length));
+      dsaLeaf.children.push(getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length));
     }
   }
 };
@@ -464,7 +477,7 @@ const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName) => {
 const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
   return {
     key: key,
-    label: data.name + ' - ' + taskType,
+    label: data.name,
     _id: data._id,
     appId: appId,
     dsaId: dsaId,
@@ -510,6 +523,9 @@ const onNodeSelect = async (node) => {
   }
   if (node.type === 'VSA') {
     await getVsaData(node._id);
+  }
+  if (node.type === 'TSA') {
+    await getTsaData(node._id);
   }
 };
 
@@ -805,6 +821,23 @@ const vsaContextMenu = ref([
     },
   },
 ]);
+
+const tsaIdclick = ref();
+const tsaContextMenuRef = ref();
+const onTsaRightClick = (event, node) => {
+  tsaIdclick.value = node._id;
+  tsaContextMenuRef.value.show(event);
+};
+
+const tsaContextMenu = ref([
+  {
+    label: 'Delete',
+    icon: 'pi pi-trash',
+    command: (event) => {
+      confirmDeleteTsa(event);
+    },
+  },
+]);
 // ------- DSA
 
 const createDsaVisibleDialog = ref(false);
@@ -1000,9 +1033,6 @@ const delVsa = async () => {
 
 const tsaData = ref();
 const newTsaData = ref({
-  projectId: '5eb7cf5a86d9755df3a6c593',
-  versionId: '5eb7cf5a86d9755df3a6c593',
-  dsaModuleId: '5eb7cf5a86d9755df3a6c593',
   name: 'string',
   sourceId: '5eb7cf5a86d9755df3a6c593',
   sinkId: '5eb7cf5a86d9755df3a6c593',
