@@ -622,6 +622,18 @@ const projectVersionId = ref('66decf1dcff005199529524b');
 
 onMounted(async () => {
   await loadAllData();
+
+  // this is for test
+
+  setTimeout(() => {
+    showDefinitionFlatList.value = true;
+    definitionSelected.value = {
+      _id: '66f268a6ded560e0e18eda19',
+      name: 'Winding',
+    };
+  }, 1000);
+
+  // end test
 });
 
 onUnmounted(() => {});

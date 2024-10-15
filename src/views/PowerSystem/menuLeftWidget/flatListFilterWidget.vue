@@ -1,79 +1,102 @@
 <template>
-  <div class="flex gap-2 justify-content-start flex-wrap 2xl:flex-nowrap psView-Filter">
-    <FloatLabel v-for="(filterData, filterName) in filterList" :key="filterName" class="flex-grow-1">
-      <label for="filter-area">{{ filterList[filterName].name }}</label>
-      <Dropdown
-        v-model="filterList[filterName].selected"
-        :options="filterData.options"
-        showClear
-        :virtualScrollerOptions="{
-          lazy: filterData.options.length > 0,
-          onLazyLoad: onLazyLoadFilterWithoutStation,
-          itemSize: pageRowNumber,
-          loading: filterData.isLoading,
-          delay: 250,
-          showLoader: true,
-        }"
+  <div class="flex gap-2 justify-content-start flex-wrap xl:flex-nowrap">
+    <FloatLabel>
+      <AutoComplete
+        v-model="areaFilter"
+        inputId="area"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class="flex-grow-1 psAutoComplete"
         :disabled="!canUseDefinitionFilter"
-        class="w-full"
-        @click="filterClick = filterName"
-      >
-        <template #value="slotProps">
-          <div class="flex align-items-center">
-            <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-            <div v-else>{{ filterList[filterName].name }}</div>
-          </div>
-        </template>
-        <template v-slot:option="slotProps">
-          <div v-if="slotProps.option" class="flex align-items-center">
-            <div class="py-6">{{ slotProps.option.label }}</div>
-          </div>
-        </template>
-
-        <template v-slot:loader="{ options }">
-          <div class="flex align-items-center p-1" style="height: 30px">
-            <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-          </div>
-        </template>
-      </Dropdown>
+        :suggestions="areaSuggestions"
+        name="areaFilter"
+        @complete="searchAreaQuery"
+      />
+      <label for="area" class="text-sm"> Area </label>
     </FloatLabel>
+
+    <FloatLabel>
+      <AutoComplete
+        v-model="zoneFilter"
+        inputId="Zone"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class="flex-grow-1 psAutoComplete"
+        :disabled="!canUseDefinitionFilter"
+        :suggestions="zoneSuggestions"
+        name="zoneFilter"
+        @complete="searchZoneQuery"
+      />
+      <label for="Zone" class="text-sm"> Zone </label>
+    </FloatLabel>
+
+    <FloatLabel>
+      <AutoComplete
+        v-model="ownerFilter"
+        inputId="Owner"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class="flex-grow-1 psAutoComplete"
+        :disabled="!canUseDefinitionFilter"
+        :suggestions="ownerSuggestions"
+        name="ownerFilter"
+        @complete="searchOwnerQuery"
+      />
+      <label for="Owner" class="text-sm"> Owner </label>
+    </FloatLabel>
+
+    <FloatLabel>
+      <AutoComplete
+        v-model="typeFilter"
+        inputId="Type"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class="flex-grow-1 psAutoComplete"
+        :disabled="!canUseDefinitionFilter"
+        :suggestions="typeSuggestions"
+        name="typeFilter"
+        @complete="searchTypeQuery"
+      />
+      <label for="Type" class="text-sm"> Type </label>
+    </FloatLabel>
+    <FloatLabel>
+      <AutoComplete
+        v-model="kvFilter"
+        inputId="kV"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class="flex-grow-1 psAutoComplete"
+        :disabled="!canUseDefinitionFilter"
+        :suggestions="kvSuggestions"
+        name="kvFilter"
+        @complete="searchkvQuery"
+      />
+      <label for="kV" class="text-sm"> kV </label>
+    </FloatLabel>
+
     <Divider layout="vertical" />
-    <FloatLabel class="flex-grow-1">
-      <label for="filter-area">Station</label>
-      <Dropdown
-        v-model="stationSelected"
-        :options="stationOptions"
-        showClear
-        :virtualScrollerOptions="{
-          lazy: stationOptions.length > 0,
-          onLazyLoad: onLazyLoadStation,
-          itemSize: pageRowNumber,
-          loading: stationIsLoading,
-          delay: 250,
-          showLoader: true,
-        }"
-        :disabled="!canUseDefinitionStationFilter"
-        class="w-full"
-      >
-        <template #value="slotProps">
-          <div class="flex align-items-center">
-            <div v-if="slotProps.value">{{ slotProps.value.label }}</div>
-            <div v-else>Station</div>
-          </div>
-        </template>
-        <template v-slot:option="slotProps">
-          <div v-if="slotProps.option" class="flex align-items-center">
-            <div class="py-6">{{ slotProps.option.label }}</div>
-          </div>
-        </template>
 
-        <template v-slot:loader="{ options }">
-          <div class="flex align-items-center p-1" style="height: 30px">
-            <Skeleton :width="options.even ? '60%' : '50%'" height="1.3rem" />
-          </div>
-        </template>
-      </Dropdown>
+    <FloatLabel>
+      <AutoComplete
+        v-model="stationFilter"
+        inputId="Station"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class="flex-grow-1 psAutoComplete"
+        :disabled="!canUseDefinitionStationFilter"
+        :suggestions="stationSuggestions"
+        name="stationFilter"
+        @complete="searchStationQuery"
+      />
+      <label for="Station" class="text-sm"> Station </label>
     </FloatLabel>
+
     <div class="flex gap-2">
       <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
       <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="handleFilterClick" />
@@ -81,10 +104,10 @@
   </div>
 </template>
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
+import AutoComplete from 'primevue/autocomplete';
 
 import FloatLabel from 'primevue/floatlabel';
-import Dropdown from 'primevue/dropdown';
 
 import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
@@ -98,186 +121,107 @@ const props = defineProps({
 
 const emits = defineEmits(['handleFilter']);
 
-onMounted(async () => {
-  if (props.definitionList && props.definitionList.length > 0) {
-    await resetFilterList();
-  }
-});
-
 watch(
   () => props.definitionList,
-  async () => {
+  () => {
     if (props.definitionList && props.definitionList.length > 0) {
-      await resetFilterList();
+      clearFilterSelected();
     }
   },
 );
-const filterClick = ref();
-const filterList = reactive({
-  area: {
-    name: 'Area',
-    definitionName: 'Area',
-    selected: '',
-    options: [],
-    isLoading: false,
-    definitionId: '',
-  },
-  zone: {
-    name: 'Zone',
-    definitionName: 'Zone',
-    selected: '',
-    options: [],
-    isLoading: false,
-    definitionId: '',
-  },
-  owner: {
-    name: 'Owner',
-    definitionName: 'Owner',
-    selected: '',
-    options: [],
-    isLoading: false,
-    definitionId: '',
-  },
-  type: {
-    name: 'Type',
-    definitionName: 'SubstationType',
-    selected: '',
-    options: [],
-    isLoading: false,
-    definitionId: '',
-  },
-  kV: {
-    name: 'kV',
-    definitionName: 'Substation_kVBase',
-    selected: '',
-    options: [],
-    isLoading: false,
-    definitionId: '',
-  },
+const areaFilter = ref();
+const areaSuggestions = ref([]);
+const areaDefinitionId = computed(() => {
+  const definitionData = props.definitionList.filter((item) => item.name === 'Area')[0];
+  return definitionData ? definitionData._id : '';
 });
-const filterSelectedWithoutStation = computed(() => {
-  const dataFilter = {};
-  for (const filterName in filterList) {
-    if (filterList[filterName].selected) {
-      dataFilter[filterName] = filterList[filterName].selected._id;
-    }
-  }
-  return dataFilter;
+const searchAreaQuery = async (event) => {
+  areaSuggestions.value = await searchPs(event, areaDefinitionId.value);
+};
+
+// --zone
+const zoneFilter = ref();
+const zoneSuggestions = ref([]);
+const zoneDefinitionId = computed(() => {
+  const definitionData = props.definitionList.filter((item) => item.name === 'Zone')[0];
+  return definitionData ? definitionData._id : '';
 });
-const stationSelected = ref();
-const stationOptions = ref([]);
-const stationIsLoading = ref(false);
-const stationDefinitionId = ref();
-
-const pageRowNumber = ref(10);
-
-const resetFilterList = async () => {
-  for (const filterName in filterList) {
-    const definitionData = props.definitionList.filter(
-      (item) => item.name === filterList[filterName].definitionName,
-    )[0];
-    const sizeFilter = definitionData ? await getSizeFilter(definitionData._id) : 0;
-    filterList[filterName].options = definitionData ? Array.from({ length: sizeFilter }) : [];
-    filterList[filterName].definitionId = definitionData ? definitionData._id : '';
-  }
-
-  await updateSizeStationFilter();
+const searchZoneQuery = async (event) => {
+  zoneSuggestions.value = await searchPs(event, zoneDefinitionId.value);
 };
 
-const getSizeFilter = async (definitionId, dataFilter = {}) => {
-  const res = await PowerSystemParameterApi.getPsDataWithDefinition(definitionId, props.projectVersionId, dataFilter, 1);
-  return res.data.total || 0;
-};
-
-const onLazyLoadFilterWithoutStation = async (event) => {
-  filterList[filterClick.value].isLoading = true;
-
-  const { first, last } = event;
-  const _items = [...filterList[filterClick.value].options];
-  for (let row = first; row < last; row += 10) {
-    const page = Math.floor(row / 10) + 1;
-    const resData = await PowerSystemParameterApi.getPsDataWithDefinition(
-      filterList[filterClick.value].definitionId,
-      props.projectVersionId,
-      {},
-      page,
-    );
-    if (!resData.data.items) {
-      break;
-    }
-    for (let i = 0; i < resData.data.items.length; i++) {
-      if (!resData.data.items[i].generalInfo) {
-        break;
-      }
-      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
-    }
-  }
-
-  filterList[filterClick.value].options = _items;
-  filterList[filterClick.value].isLoading = false;
-};
-
-// ---- Station ---------
-
-watch(filterSelectedWithoutStation, () => {
-  updateSizeStationFilter();
+// --owner
+const ownerFilter = ref();
+const ownerSuggestions = ref([]);
+const ownerDefinitionId = computed(() => {
+  const definitionData = props.definitionList.filter((item) => item.name === 'Owner')[0];
+  return definitionData ? definitionData._id : '';
 });
-const updateSizeStationFilter = async () => {
-  stationSelected.value = undefined;
-  const stationDefinition = props.definitionList.filter((item) => item.name === 'Station')[0];
-  const sizeFilterStation = stationDefinition
-    ? await getSizeFilter(stationDefinition._id, filterSelectedWithoutStation.value)
-    : 0;
-  stationOptions.value = stationDefinition ? Array.from({ length: sizeFilterStation }) : [];
-  stationDefinitionId.value = stationDefinition ? stationDefinition._id : '';
+const searchOwnerQuery = async (event) => {
+  ownerSuggestions.value = await searchPs(event, ownerDefinitionId.value);
 };
-const onLazyLoadStation = async (event) => {
-  stationIsLoading.value = true;
 
-  const { first, last } = event;
-  const _items = [...stationOptions.value];
-  for (let row = first; row < last; row += 10) {
-    const page = Math.floor(row / 10) + 1;
-    const resData = await PowerSystemParameterApi.getPsDataWithDefinition(
-      stationDefinitionId.value,
-      props.projectVersionId,
-      {},
-      page,
-    );
-    if (!resData.data.items) {
-      break;
-    }
-    for (let i = 0; i < resData.data.items.length; i++) {
-      if (!resData.data.items[i].generalInfo) {
-        break;
-      }
-      _items[row + i] = { label: resData.data.items[i].generalInfo.name, _id: resData.data.items[i]._id };
-    }
+// --type
+const typeFilter = ref();
+const typeSuggestions = ref([]);
+const typeDefinitionId = computed(() => {
+  const definitionData = props.definitionList.filter((item) => item.name === 'SubstationType')[0];
+  return definitionData ? definitionData._id : '';
+});
+const searchTypeQuery = async (event) => {
+  typeSuggestions.value = await searchPs(event, typeDefinitionId.value);
+};
+
+// --kv
+const kvFilter = ref();
+const kvSuggestions = ref([]);
+const kvDefinitionId = computed(() => {
+  const definitionData = props.definitionList.filter((item) => item.name === 'Substation_kVBase')[0];
+  return definitionData ? definitionData._id : '';
+});
+const searchkvQuery = async (event) => {
+  kvSuggestions.value = await searchPs(event, kvDefinitionId.value);
+};
+
+// --station
+const stationFilter = ref();
+const stationSuggestions = ref([]);
+const stationDefinitionId = computed(() => {
+  const definitionData = props.definitionList.filter((item) => item.name === 'Station')[0];
+  return definitionData ? definitionData._id : '';
+});
+const searchStationQuery = async (event) => {
+  stationSuggestions.value = await searchPs(event, stationDefinitionId.value);
+};
+
+const searchPs = async (event, definitionId) => {
+  const query = event.query.trim();
+  try {
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, definitionId, query);
+    return res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
   }
-
-  stationOptions.value = _items;
-  stationIsLoading.value = false;
 };
 
 const clearFilterSelected = () => {
-  for (const filterName in filterList) {
-    filterList[filterName].selected = undefined;
-  }
-  stationSelected.value = undefined;
+  areaFilter.value = undefined;
+  zoneFilter.value = undefined;
+  ownerFilter.value = undefined;
+  typeFilter.value = undefined;
+  kvFilter.value = undefined;
+  stationFilter.value = undefined;
 };
 const handleFilterClick = () => {
-  const filterValue = JSON.parse(JSON.stringify(filterSelectedWithoutStation.value));
-  if (stationSelected.value) {
-    filterValue['sub'] = stationSelected.value._id;
-  }
+  const filterValue = {
+    area: areaFilter.value ? areaFilter.value._id : null,
+    zone: zoneFilter.value ? zoneFilter.value._id : null,
+    owner: ownerFilter.value ? ownerFilter.value._id : null,
+    type: typeFilter.value ? typeFilter.value._id : null,
+    kv: kvFilter.value ? kvFilter.value._id : null,
+    sub: stationFilter.value ? stationFilter.value._id : null,
+  };
+
   emits('handleFilter', filterValue);
 };
 </script>
-<style>
-.p-dropdown-item {
-  min-height: 2rem;
-}
-.p-dropdown-panel {
-  width: 16rem;
-}
-</style>

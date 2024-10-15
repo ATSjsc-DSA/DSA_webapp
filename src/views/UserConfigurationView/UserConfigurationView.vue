@@ -431,10 +431,7 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
 };
 
 const getTaskBranch = async (appId, dsaId, dsaKey = '') => {
-  console.log('getTaskBranch');
   const vsaList = await getVsaList(dsaId);
-  console.log('getVsaList');
-
   const leafData = [];
   for (let index = 0; index < vsaList.length; index++) {
     const vsa = vsaList[index];
