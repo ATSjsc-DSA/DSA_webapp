@@ -145,7 +145,7 @@
                 </div>
               </template>
               <template v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
-                <DsaVsaFormWidget v-model="vsaData" />
+                <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
                 <div class="flex justify-content-end gap-3">
                   <Button type="button" label="Update" @click="updateVsa"></Button>
                 </div>
@@ -209,16 +209,48 @@
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="createVsaVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
+  <Dialog v-model:visible="createTaskDsaDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Create new VSA Information</span>
       </div>
     </template>
-    <DsaVsaFormWidget v-model="newVsaData" />
+
+    <div class="grid">
+      <div class="col-10">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="name" class="font-semibold"> Name </label>
+          <InputText id="name" v-model="newTaskData.name" class="flex-auto" autocomplete="off" />
+        </div>
+      </div>
+      <div class="col-2">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="active" class="font-semibold w-6rem"> Active</label>
+          <InputSwitch id="active" v-model="newTaskData.active" autocomplete="off" />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="dsaType" class="font-semibold"> Type</label>
+          <!-- <InputText id="sourceId" v-model="data.sourceId" class="flex-auto" autocomplete="off" /> -->
+
+          <Dropdown
+            v-model="newTaskData.type"
+            :options="typeDsaOpts"
+            option-label="label"
+            option-value="value"
+            placeholder="Select a Type"
+          />
+        </div>
+      </div>
+      <Divider />
+    </div>
+    <DsaVsaFormWidget v-if="newTaskData.type === 'VSA'" v-model="newVsaData" :is-create-form="true" />
+    <dsaTsaFormWidget v-if="newTaskData.type === 'TSA'" v-model="newTsaData" :is-create-form="true" />
+
     <template #footer>
-      <Button type="button" label="Cancel" severity="secondary" @click="createVsaVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" :disabled="!newVsaData.name" @click="createVsa"></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="createTaskDsaDialog = false"></Button>
+      <Button type="button" label="Submit" @click="handlecreateTask"></Button>
     </template>
   </Dialog>
 </template>
@@ -227,6 +259,7 @@
 import { onMounted, reactive, ref, watch } from 'vue';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import Dropdown from 'primevue/dropdown';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -245,6 +278,7 @@ import monitorWidget from './monitorWidget.vue';
 import dsaFormWidget from './formWidget/dsaFormWidget.vue';
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
+import dsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -379,31 +413,42 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
     appId: appId,
     type: 'DSA',
     icon: 'pi pi-clone',
-    children: await getVsaBranch(appId, dsa._id, key),
+    children: await getTaskBranch(appId, dsa._id, key),
   };
 };
 
-const getVsaBranch = async (appId, dsaId, dsaKey = '') => {
+const getTaskBranch = async (appId, dsaId, dsaKey = '') => {
+  console.log('getTaskBranch');
   const vsaList = await getVsaList(dsaId);
+  console.log('getVsaList');
+
   const leafData = [];
   for (let index = 0; index < vsaList.length; index++) {
     const vsa = vsaList[index];
-    leafData.push(getVsaLeaf(appId, dsaId, vsa, dsaKey + '_' + index));
+    leafData.push(getTaskLeaf(appId, dsaId, vsa, 'VSA', dsaKey + '_vsa_' + index));
   }
+  const tsaList = await getTsaList(dsaId);
+  console.log('getTsaList');
+
+  for (let index = 0; index < tsaList.length; index++) {
+    const tsa = tsaList[index];
+    leafData.push(getTaskLeaf(appId, dsaId, tsa, 'TSA', dsaKey + '_tsa_' + index));
+  }
+
   return leafData;
 };
 
-const addNewVsaLeaf = (appId, dsaId, vsa) => {
+const addNewTaskLeaf = (appId, dsaId, vsa, taskType = 'VSA') => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
     if (dsaLeaf) {
-      dsaLeaf.children.push(getVsaLeaf(appId, dsaId, vsa, dsaLeaf.key + '_' + dsaLeaf.children.length));
+      dsaLeaf.children.push(getTaskLeaf(appId, dsaId, vsa, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length));
     }
   }
 };
 
-const updateLabelVsaLeaf = (appId, dsaId, vsaId, newName) => {
+const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
@@ -416,14 +461,14 @@ const updateLabelVsaLeaf = (appId, dsaId, vsaId, newName) => {
   }
 };
 
-const getVsaLeaf = (appId, dsaId, vsa, key = '') => {
+const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
   return {
     key: key,
-    label: vsa.name,
-    _id: vsa._id,
+    label: data.name + ' - ' + taskType,
+    _id: data._id,
     appId: appId,
     dsaId: dsaId,
-    type: 'VSA',
+    type: taskType,
   };
 };
 
@@ -502,12 +547,12 @@ const appData = ref({
   name: '',
   active: true,
   _id: '',
-  startTimestamp: 0
+  startTimestamp: 0,
 });
 const newAppData = ref({
   name: '',
   active: true,
-  startTimestamp: 0
+  startTimestamp: 0,
 });
 
 const getAppData = async (appId) => {
@@ -524,8 +569,8 @@ const createApplication = async () => {
     const dataLoad = {
       name: newAppData.value.name,
       active: newAppData.value.active,
-      startTimestamp: newAppData.value.startTimestamp.getTime()
-    }
+      startTimestamp: newAppData.value.startTimestamp.getTime(),
+    };
     const res = await ApiApplication.createApp(projectVersionId.value, dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
@@ -742,7 +787,6 @@ const dsaContextMenu = computed(() => [
       confirmDeleteDsa(event);
     },
   },
-  
 ]);
 
 const vsaIdclick = ref();
@@ -837,9 +881,31 @@ const delDsa = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+const newTaskData = ref({
+  name: '',
+  active: true,
+  type: 'VSA',
+});
+const typeDsaOpts = ref([
+  { label: 'VSA', value: 'VSA' },
+  { label: 'TSA', value: 'TSA' },
+]);
+const handlecreateTask = async () => {
+  if (newTaskData.value.type === 'VSA') {
+    newVsaData.value.name = newTaskData.value.name;
+    newVsaData.value.active = newTaskData.value.active;
+    await createVsa();
+  }
+  if (newTaskData.value.type === 'TSA') {
+    newTsaData.value.name = newTaskData.value.name;
+    newTsaData.value.active = newTaskData.value.active;
+    await createTsa();
+  }
+};
+
 // ---DSA - VSA
 
-const createVsaVisibleDialog = ref(false);
 const vsaData = ref();
 const newVsaData = ref({
   name: 'string',
@@ -885,8 +951,8 @@ const createVsa = async () => {
   try {
     const res = await ApiDsa.createVsa(projectVersionId.value, dsaIdclick.value, newVsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    addNewVsaLeaf(appIdclick.value, dsaIdclick.value, res.data);
-    createVsaVisibleDialog.value = false;
+    addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'VSA');
+    createTaskDsaDialog.value = false;
   } catch (error) {
     console.log('createVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -896,7 +962,7 @@ const updateVsa = async () => {
   try {
     const res = await ApiDsa.updateVsa(vsaData.value._id, vsaData.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    updateLabelVsaLeaf(nodeSelected.value.appId, nodeSelected.value.dsaId, nodeSelected.value._id, res.data.name);
+    updateLabelTaskLeaf(nodeSelected.value.appId, nodeSelected.value.dsaId, nodeSelected.value._id, res.data.name);
   } catch (error) {
     console.log('updateVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -926,6 +992,116 @@ const delVsa = async () => {
     await getTreeData();
   } catch (error) {
     console.log('delVsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// ---DSA - Tsa
+
+const tsaData = ref();
+const newTsaData = ref({
+  projectId: '5eb7cf5a86d9755df3a6c593',
+  versionId: '5eb7cf5a86d9755df3a6c593',
+  dsaModuleId: '5eb7cf5a86d9755df3a6c593',
+  name: 'string',
+  sourceId: '5eb7cf5a86d9755df3a6c593',
+  sinkId: '5eb7cf5a86d9755df3a6c593',
+  maxChange: 0,
+  stepChange: 0,
+  monitor: {
+    monitorSubSystemId: '5eb7cf5a86d9755df3a6c593',
+    busConfig: {
+      voltage: 0,
+      freq: 0,
+      angle: 0,
+      active: true,
+    },
+    branchConfig: {
+      activePower: 0,
+      reActivePower: 0,
+      active: true,
+    },
+    genConfig: {
+      rotorAngle: 0,
+      electP: 0,
+      electQ: 0,
+      mechP: 0,
+      efd: 0,
+      active: true,
+    },
+    active: true,
+  },
+  disturbanceId: '5eb7cf5a86d9755df3a6c593',
+  remedialActionId: '5eb7cf5a86d9755df3a6c593',
+  digsilentSettingId: '5eb7cf5a86d9755df3a6c593',
+  fixSubSystemId: '5eb7cf5a86d9755df3a6c593',
+  active: true,
+});
+
+const getTsaList = async (dsaId) => {
+  try {
+    const res = await ApiDsa.getTsaList(projectVersionId.value, dsaId);
+    return res.data;
+  } catch (error) {
+    console.log('getTsaList: error ', error);
+    return [];
+  }
+};
+
+const getTsaData = async (tsaId) => {
+  try {
+    const res = await ApiDsa.getTsa(tsaId);
+    tsaData.value = res.data;
+  } catch (error) {
+    console.log('getTsaData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createTsa = async () => {
+  try {
+    const res = await ApiDsa.createTsa(projectVersionId.value, dsaIdclick.value, newTsaData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'TSA');
+    createTaskDsaDialog.value = false;
+  } catch (error) {
+    console.log('createTsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updateTsa = async () => {
+  try {
+    const res = await ApiDsa.updateTsa(tsaData.value._id, tsaData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelTaskLeaf(nodeSelected.value.appId, nodeSelected.value.dsaId, nodeSelected.value._id, res.data.name);
+  } catch (error) {
+    console.log('updateTsa: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDeleteTsa = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Delete Monitor Tsa',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await delTsa();
+    },
+  });
+};
+const delTsa = async () => {
+  try {
+    await ApiDsa.delTsa(tsaIdclick.value);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delTsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };

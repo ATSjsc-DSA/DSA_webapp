@@ -108,4 +108,21 @@ export class ApiDsa {
   static async delVsa(vsaId) {
     return _delete(`/userconfig/vsa_informations/${vsaId}`);
   }
+
+  // TSA Config
+  static async getTsaList(projectVersionId, dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsa_informations`);
+  }
+  static async createTsa(projectVersionId, dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsa_informations`, data);
+  }
+  static async getTsa(vsaId) {
+    return get(`/userconfig/tsa_informations/${vsaId}`);
+  }
+  static async updateTsa(vsaId, data) {
+    return put(`/userconfig/tsa_informations/${vsaId}`, data);
+  }
+  static async delTsa(vsaId) {
+    return _delete(`/userconfig/tsa_informations/${vsaId}`);
+  }
 }
