@@ -73,3 +73,25 @@ export class ApiContingencies {
     return _delete(`/seedconfig/contingencies/${id}`);
   }
 }
+
+export class ApiSubsystem {
+  static async getListSubsystem(param) {
+    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/subsystem`, param);
+  }
+  static async getListSubsystemOnlyName() {
+    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/subsystemonlyname`);
+  }
+
+  static async createSubsystem(data) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/subsystem`, data);
+  }
+  static async getSubsystemData(id) {
+    return get(`/seedconfig/subsystem/${id}`);
+  }
+  static async updateSubsystemData(id, data) {
+    return put(`/seedconfig/subsystem/${id}`, data);
+  }
+  static async deleteSubsystem(id) {
+    return _delete(`/seedconfig/subsystem/${id}`);
+  }
+}

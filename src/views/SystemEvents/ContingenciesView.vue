@@ -1,5 +1,6 @@
 <template>
   <div class="card h-full">
+    <ConfirmDialog group="dialog"></ConfirmDialog>
     <Splitter style="height: 100%">
       <SplitterPanel
         class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
@@ -20,15 +21,26 @@
               <div class="grid grid-nogutter">
                 <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
                   <div
-                    class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-3"
+                    class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-2"
                     :class="{
                       'border-top-1 surface-border': index !== 0,
                       'selected-item': selectedItem && selectedItem.name === item.name,
                     }"
                     @click="handleRowClick(item)"
                   >
-                    <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
-                      <i class="pi pi-folder text-yellow-400"></i>{{ item.name }}
+                    <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1 ml-2">
+                      <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
+                        <i class="pi pi-folder text-yellow-400"></i>{{ item.name }}
+                      </div>
+                      <Button
+                        class="item-button"
+                        icon="pi pi-trash"
+                        text
+                        size="small"
+                        rounded
+                        severity="danger"
+                        @click="(event) => confirmDeleteThis(item._id)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -84,8 +96,8 @@
 import { ref, onMounted } from 'vue';
 import { ApiContingencies, commonApi } from './api';
 import Toast from 'primevue/toast';
+import ConfirmDialog from 'primevue/confirmdialog';
 import { useToast } from 'primevue/usetoast';
-import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
 import ContingencyView from './ContingencyView.vue';
 const visible = ref(false);
@@ -153,17 +165,46 @@ const createThis = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+const confirmDeleteThis = (id) => {
+  confirm.require({
+    message: 'Do you want to delete this Contingencies?',
+    group: 'dialog',
+    header: 'Confirmation',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    accept: () => {
+      deleteThis(id);
+    },
+    reject: () => {},
+  });
+};
+
+const deleteThis = async (id) => {
+  try {
+    await ApiContingencies.deleteContingencies(id);
+    getListContingencies();
+    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Delete successfully', life: 3000 });
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
 </script>
 
 <style lang="scss" scoped>
 .item-data:hover {
   cursor: pointer;
-  transform: scale(1.05);
-  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   background-color: var(--surface-hover);
 }
 
 .selected-item {
   background-color: var(--highlight-bg) !important;
+}
+.item-button:hover {
+  transform: scale(1.3);
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <Toast />
-  <ConfirmPopup></ConfirmPopup>
+  <ConfirmPopup group="popup"></ConfirmPopup>
   <div class="card">
     <DataTable
       :value="contingencies"
@@ -44,7 +44,14 @@
       <Column :exportable="false" style="width: 8rem">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" rounded text class="mr-2" @click="handlerEditThis(slotProps.data)" />
-          <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete($event, slotProps.data)" />
+          <Button
+            icon="pi pi-trash"
+            rounded
+            text
+            severity="danger"
+            @click="confirmDelete($event, slotProps.data)"
+            ref="popupButton"
+          />
         </template>
       </Column>
     </DataTable>
@@ -114,6 +121,7 @@ import { useConfirm } from 'primevue/useconfirm';
 const props = defineProps({
   contingenciesActive: Object,
 });
+const popupButton = ref(null); // Để gắn popup vào nút
 
 const contingenciesActiveId = computed(() => props.contingenciesActive._id);
 
@@ -189,9 +197,9 @@ const search = async (event) => {
 };
 
 const confirmDelete = async (event, data) => {
-  console.log();
   confirm.require({
     target: event.currentTarget,
+    group: 'popup',
     message: 'Do you want to delete this contingency?',
     icon: 'pi pi-info-circle',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
@@ -201,9 +209,7 @@ const confirmDelete = async (event, data) => {
     accept: () => {
       deleteThis(data);
     },
-    reject: () => {
-      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-    },
+    reject: () => {},
   });
 };
 const handlerCreateThis = async () => {

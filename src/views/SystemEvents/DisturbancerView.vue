@@ -30,20 +30,9 @@
           </div>
         </template>
       </Column>
-      <Column field="disturbanceType" header="Type">
-        <template #body="{ data }">
-          <Chip :label="getDisturbanceType(data.disturbanceType)" />
-        </template>
-      </Column>
       <Column field="disturbanceEvenType" header="Event Type">
         <template #body="{ data }">
-          <Chip
-            :label="
-              data.disturbanceType === 0
-                ? getDisturbanceEventTypeSC(data.disturbanceEvenType)
-                : getDisturbanceEventTypeSwitch(data.disturbanceEvenType)
-            "
-          />
+          <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
         </template>
       </Column>
       <Column field="startTimestamp" header="Start Time" sortable style="width: 12%">
@@ -69,7 +58,6 @@
           <Chip :label="getEventValue(data.eventValue)" />
         </template>
       </Column>
-      <Column field="eventGroup" header="Event Group"></Column>
       <Column :exportable="false" style="width: 8rem">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" rounded text class="mr-2" @click="handlerEditThis(slotProps.data)" />
@@ -99,7 +87,7 @@
         <div class="field">
           <label for="email" class="font-semibold">Disturbance Type</label>
           <Dropdown
-            v-model="disturbanceModelData.disturbanceType"
+            v-model="disturbanceType"
             :options="listDisturbanceType"
             optionLabel="name"
             option-value="value"
@@ -111,9 +99,7 @@
           <label for="disturbanceEvenType" class="font-semibold">Disturbance Event Type</label>
           <Dropdown
             v-model="disturbanceModelData.disturbanceEvenType"
-            :options="
-              disturbanceModelData.disturbanceType === 0 ? listDisturbanceEventTypeSC : listDisturbanceEventTypeSwitch
-            "
+            :options="disturbanceType === 0 ? listDisturbanceEventTypeSC : listDisturbanceEventTypeSwitch"
             optionLabel="name"
             option-value="value"
             placeholder="Select a Event"
@@ -130,11 +116,6 @@
             placeholder="Select a Value"
             class="w-full"
           />
-        </div>
-
-        <div class="field">
-          <label for="eventGroup" class="font-semibold">Event Group</label>
-          <InputText id="eventGroup" class="flex-auto" autocomplete="off" v-model="disturbanceModelData.eventGroup" />
         </div>
 
         <div class="field">
@@ -173,16 +154,14 @@ onMounted(() => {
 const visible = ref(false);
 const toast = useToast();
 const confirm = useConfirm();
-
+const disturbanceType = ref(0);
 const disturbanceModelData = ref({
   _id: '',
   name: '',
   startTimestamp: 0,
   endTimestamp: 0,
   powerSystemId: '',
-  disturbanceType: 0,
   disturbanceEvenType: 0,
-  eventGroup: '',
   eventValue: 0,
 });
 const headerDialog = ref('Edit');
@@ -193,9 +172,7 @@ const dataDefault = {
   startTimestamp: 0,
   endTimestamp: 0,
   powerSystemId: '',
-  disturbanceType: 0,
   disturbanceEvenType: 0,
-  eventGroup: '',
   eventValue: 0,
 };
 
@@ -260,7 +237,7 @@ const listDisturbanceType = [
   { name: 'Switch', value: 1 },
 ];
 
-const getDisturbanceEventTypeSC = (value) => {
+const getDisturbanceEventType = (value) => {
   switch (value) {
     case 0:
       return 'Three Phase Short Circuit';
@@ -284,26 +261,6 @@ const getDisturbanceEventTypeSC = (value) => {
       return 'Three Phase Neutral To Ground';
     case 10:
       return 'Three Phase To Neutral';
-    default:
-      return 'Unknown';
-  }
-};
-const listDisturbanceEventTypeSC = [
-  { name: 'Three Phase Short Circuit', value: 0 },
-  { name: 'Two Phase Short Circuit', value: 1 },
-  { name: 'Single Phase To Ground Fault', value: 2 },
-  { name: 'Two Phase To Ground Fault', value: 3 },
-  { name: 'Clear Short Circuit', value: 4 },
-  { name: 'One Phase To Neutral', value: 5 },
-  { name: 'One Phase Neutral To Ground', value: 6 },
-  { name: 'Two Phase Neutral To Ground', value: 7 },
-  { name: 'Two Phase To Neutral', value: 8 },
-  { name: 'Three Phase Neutral To Ground', value: 9 },
-  { name: 'Three Phase To Neutral', value: 10 },
-];
-
-const getDisturbanceEventTypeSwitch = (value) => {
-  switch (value) {
     case 11:
       return 'All Phases';
     case 12:
@@ -322,6 +279,20 @@ const getDisturbanceEventTypeSwitch = (value) => {
       return 'Unknown';
   }
 };
+const listDisturbanceEventTypeSC = [
+  { name: 'Three Phase Short Circuit', value: 0 },
+  { name: 'Two Phase Short Circuit', value: 1 },
+  { name: 'Single Phase To Ground Fault', value: 2 },
+  { name: 'Two Phase To Ground Fault', value: 3 },
+  { name: 'Clear Short Circuit', value: 4 },
+  { name: 'One Phase To Neutral', value: 5 },
+  { name: 'One Phase Neutral To Ground', value: 6 },
+  { name: 'Two Phase Neutral To Ground', value: 7 },
+  { name: 'Two Phase To Neutral', value: 8 },
+  { name: 'Three Phase Neutral To Ground', value: 9 },
+  { name: 'Three Phase To Neutral', value: 10 },
+];
+
 const listDisturbanceEventTypeSwitch = [
   { name: 'All Phases', value: 11 },
   { name: 'Phase A', value: 12 },
