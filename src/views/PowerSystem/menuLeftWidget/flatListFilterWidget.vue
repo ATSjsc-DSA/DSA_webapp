@@ -1,6 +1,7 @@
 <template>
   <div class="flex gap-2 justify-content-start flex-wrap xl:flex-nowrap">
-    <FloatLabel>
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+      <label for="Area" class="text-sm"> Area </label>
       <AutoComplete
         v-model="areaFilter"
         inputId="area"
@@ -11,12 +12,13 @@
         :disabled="!canUseDefinitionFilter"
         :suggestions="areaSuggestions"
         name="areaFilter"
+        :multiple="multipleSelection"
         @complete="searchAreaQuery"
       />
-      <label for="area" class="text-sm"> Area </label>
-    </FloatLabel>
+    </div>
 
-    <FloatLabel>
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+      <label for="Zone" class="text-sm"> Zone </label>
       <AutoComplete
         v-model="zoneFilter"
         inputId="Zone"
@@ -27,12 +29,12 @@
         :disabled="!canUseDefinitionFilter"
         :suggestions="zoneSuggestions"
         name="zoneFilter"
+        :multiple="multipleSelection"
         @complete="searchZoneQuery"
       />
-      <label for="Zone" class="text-sm"> Zone </label>
-    </FloatLabel>
-
-    <FloatLabel>
+    </div>
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+      <label for="Owner" class="text-sm"> Owner </label>
       <AutoComplete
         v-model="ownerFilter"
         inputId="Owner"
@@ -43,12 +45,13 @@
         :disabled="!canUseDefinitionFilter"
         :suggestions="ownerSuggestions"
         name="ownerFilter"
+        :multiple="multipleSelection"
         @complete="searchOwnerQuery"
       />
-      <label for="Owner" class="text-sm"> Owner </label>
-    </FloatLabel>
+    </div>
 
-    <FloatLabel>
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+      <label for="Type" class="text-sm"> Type </label>
       <AutoComplete
         v-model="typeFilter"
         inputId="Type"
@@ -59,11 +62,12 @@
         :disabled="!canUseDefinitionFilter"
         :suggestions="typeSuggestions"
         name="typeFilter"
+        :multiple="multipleSelection"
         @complete="searchTypeQuery"
       />
-      <label for="Type" class="text-sm"> Type </label>
-    </FloatLabel>
-    <FloatLabel>
+    </div>
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+      <label for="kV" class="text-sm"> kV </label>
       <AutoComplete
         v-model="kvFilter"
         inputId="kV"
@@ -74,14 +78,15 @@
         :disabled="!canUseDefinitionFilter"
         :suggestions="kvSuggestions"
         name="kvFilter"
+        :multiple="multipleSelection"
         @complete="searchkvQuery"
       />
-      <label for="kV" class="text-sm"> kV </label>
-    </FloatLabel>
+    </div>
 
     <Divider layout="vertical" />
 
-    <FloatLabel>
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+      <label for="Station" class="text-sm"> Station </label>
       <AutoComplete
         v-model="stationFilter"
         inputId="Station"
@@ -92,12 +97,12 @@
         :disabled="!canUseDefinitionStationFilter"
         :suggestions="stationSuggestions"
         name="stationFilter"
+        :multiple="multipleSelection"
         @complete="searchStationQuery"
       />
-      <label for="Station" class="text-sm"> Station </label>
-    </FloatLabel>
+    </div>
 
-    <div class="flex gap-2">
+    <div class="flex gap-2 align-items-center">
       <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
       <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="handleFilterClick" />
     </div>
@@ -112,8 +117,9 @@ import FloatLabel from 'primevue/floatlabel';
 import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 const props = defineProps({
-  canUseDefinitionFilter: { type: Boolean },
-  canUseDefinitionStationFilter: { type: Boolean },
+  canUseDefinitionFilter: { type: Boolean, default: true },
+  canUseDefinitionStationFilter: { type: Boolean, default: true },
+  multipleSelection: { type: Boolean, default: false },
 
   definitionList: { type: Array, default: () => [] },
   projectVersionId: { type: String },
@@ -213,15 +219,24 @@ const clearFilterSelected = () => {
   stationFilter.value = undefined;
 };
 const handleFilterClick = () => {
-  const filterValue = {
-    area: areaFilter.value ? areaFilter.value._id : null,
-    zone: zoneFilter.value ? zoneFilter.value._id : null,
-    owner: ownerFilter.value ? ownerFilter.value._id : null,
-    type: typeFilter.value ? typeFilter.value._id : null,
-    kv: kvFilter.value ? kvFilter.value._id : null,
-    sub: stationFilter.value ? stationFilter.value._id : null,
-  };
-
-  emits('handleFilter', filterValue);
+  if (props.multipleSelection) {
+    emits('handleFilter', {
+      area: areaFilter.value ? areaFilter.value.map((item) => item._id) : null,
+      zone: zoneFilter.value ? zoneFilter.value.map((item) => item._id) : null,
+      owner: ownerFilter.value ? ownerFilter.value.map((item) => item._id) : null,
+      type: typeFilter.value ? typeFilter.value.map((item) => item._id) : null,
+      kv: kvFilter.value ? kvFilter.value.map((item) => item._id) : null,
+      sub: stationFilter.value ? stationFilter.value.map((item) => item._id) : null,
+    });
+  } else {
+    emits('handleFilter', {
+      area: areaFilter.value ? areaFilter.value._id : null,
+      zone: zoneFilter.value ? zoneFilter.value._id : null,
+      owner: ownerFilter.value ? ownerFilter.value._id : null,
+      type: typeFilter.value ? typeFilter.value._id : null,
+      kv: kvFilter.value ? kvFilter.value._id : null,
+      sub: stationFilter.value ? stationFilter.value._id : null,
+    });
+  }
 };
 </script>

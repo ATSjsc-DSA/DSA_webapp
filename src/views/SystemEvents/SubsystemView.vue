@@ -66,7 +66,16 @@
             </div>
           </TabPanel>
           <TabPanel header="List Power System">
-            {{ selectedItem }}
+            <div class="p-3">
+              <filterSubSystemView />
+            </div>
+            <div>
+              selectedItem
+              <pre>
+              {{ selectedItem }}
+            </pre
+              >
+            </div>
           </TabPanel>
         </TabView>
       </SplitterPanel>
@@ -100,6 +109,7 @@ import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
 import ContingencyView from './ContingencyView.vue';
+import filterSubSystemView from './filterSubSystemView.vue';
 const visible = ref(false);
 const toast = useToast();
 const confirm = useConfirm();
