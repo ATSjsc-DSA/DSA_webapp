@@ -32,39 +32,45 @@
 
   <div v-if="isCreateForm" class="flex flex-column gap-3 mb-3">
     <label for="psdSelected" class="font-semibold">Power System</label>
-    <AutoComplete
-      v-model="psdSelected"
-      optionLabel="name"
-      optionValue="_id"
-      completeOnFocus
-      class="w-full"
-      :suggestions="psFilterSuggestions"
-      placeholder="Type Something to search ..."
-      name="psdSelected"
-      @complete="searchPsQueryFilter"
-    />
+    <div class="field grid">
+      <AutoComplete
+        v-model="psdSelectedCreate"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class=" col-12 md:col-8"
+        :suggestions="psFilterSuggestions"
+        placeholder="Type Something to search ..."
+        name="psdSelected"
+        @complete="searchPsQueryFilter"
+      />
+      <Dropdown  v-model="selectedDefinition" :options="listDefinition"  optionLabel="name" optionValue="_id" class="col-12 md:col-4" />
+    </div>
   </div>
   <div v-else class="flex flex-column gap-2 mb-3">
-    <label for="ps" class="font-semibold"> Power System </label>
-    <InputText id="ps" v-model="data.powersystemId" disabled class="flex-auto" autocomplete="off" />
+    <label for="psdSelected" class="font-semibold">Power System</label>
+    <div class="field grid">
+      <AutoComplete
+        v-model="psdSelected"
+        optionLabel="name"
+        optionValue="_id"
+        completeOnFocus
+        class=" col-12 md:col-8"
+        :suggestions="psFilterSuggestions"
+        placeholder="Type Something to search ..."
+        name="psdSelected"
+        @complete="searchPsQueryFilter"
+      />
+      <Dropdown  v-model="selectedDefinition" :options="listDefinition"  optionLabel="name" optionValue="_id" class="col-12 md:col-4" />
+    </div>
   </div>
 
-  <div v-if="isCreateForm" class="flex flex-column gap-3 mb-3">
+  <div  class="flex flex-column gap-3 mb-3">
     <label for="scadaMonitorPsSelected" class="font-semibold">Scada Monitor</label>
-    <AutoComplete
-      v-model="scadaMonitorPsSelected"
-      optionLabel="name"
-      optionValue="_id"
-      completeOnFocus
-      class="w-full"
-      :suggestions="scadaMonitorPsFilterSuggestions"
-      placeholder="Type Something to search ..."
-      name="scadaMonitorPsSelected"
-      @complete="searchScadaMonitorPsQueryFilter"
-    />
+    <Dropdown v-model="data.scadaMonitorPowerSytemId" :options="listScadaMonitor" optionLabel="name"  optionValue="_id"  class="w-full" @focus="getScadaMonitor()" />
   </div>
 
-  <div v-else class="flex flex-column gap-2 mb-3">
+  <!-- <div v-else class="flex flex-column gap-2 mb-3">
     <label for="scadaMonitorPowerSytemId" class="font-semibold"> Scada Monitor </label>
     <InputText
       id="scadaMonitorPowerSytemId"
@@ -73,11 +79,11 @@
       class="flex-auto"
       autocomplete="off"
     />
-  </div>
+  </div> -->
 </template>
 
 <script setup>
-import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
+import { PowerSystemParameterApi, DefinitionListApi } from '@/views/PowerSystem/api';
 import AutoComplete from 'primevue/autocomplete';
 import Dropdown from 'primevue/dropdown';
 import { watch } from 'vue';
@@ -86,6 +92,9 @@ const data = defineModel();
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
   projectVersionId: { type: String, default: '' },
+  psdSelected: { type: Object, default: null },
+  listScadaMonitor: { type: Array, default: null },
+
 });
 
 const typeOpts = ref([
@@ -98,18 +107,42 @@ const typeOpts = ref([
 ]);
 
 const priorityOpts = ref([
-  { name: '1', code: 0 },
-  { name: '2', code: 1 },
-  { name: '3', code: 2 },
-  { name: '4', code: 3 },
+  { name: 'None', code: 0 },
+  { name: 'SCADA', code: 1 },
+  { name: 'PMU', code: 2 },
+  { name: 'BOTH', code: 3 },
 ]);
+onMounted( () => {
+  getDefiniton();
+});
 
-const psdSelected = ref();
+const listDefinition = ref()
+const selectedDefinition = ref()
+const getDefiniton = async() => {
+  try {
+    const res = await DefinitionListApi.getDefinitionSubsystem();
+    listDefinition.value = res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
+
+
+// Define the emit event
+const emit = defineEmits(['update:psdSelected']);
+
+// Computed property for two-way binding
+const psdSelected = computed({
+  get: () => props.psdSelected,
+  set: (value) => emit('update:psdSelected', value),
+})
+const psdSelectedCreate = ref()
 const psFilterSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
+  console.log(event, "event");
   const query = event ? event.query.trim() : '';
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, undefined, query);
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, selectedDefinition.value, query);
     psFilterSuggestions.value = res.data;
     return res.data;
   } catch (error) {
@@ -117,29 +150,26 @@ const searchPsQueryFilter = async (event) => {
   }
 };
 
-const scadaMonitorPsSelected = ref();
-const scadaMonitorPsFilterSuggestions = ref();
-const searchScadaMonitorPsQueryFilter = async (event) => {
-  const query = event ? event.query.trim() : '';
+const listScadaMonitor = ref(props.listScadaMonitor)
+watch(() => props.listScadaMonitor, (newVal) => {
+  listScadaMonitor.value = newVal;
+})
+const getScadaMonitor = async() => {
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, undefined, query);
-    scadaMonitorPsFilterSuggestions.value = res.data;
-    return res.data;
+    const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelectedCreate.value._id);
+    listScadaMonitor.value = res.data.data;
   } catch (error) {
-    console.log('searchPsQueryFilter: error ', error);
+    console.log('getScadaMonitor: error ', error);
   }
 };
 
-watch(psdSelected, (newVal) => {
+watch(psdSelectedCreate, (newVal) => {
   if (props.isCreateForm) {
     data.value.powersystemId = newVal._id;
   }
 });
-watch(scadaMonitorPsSelected, (newVal) => {
-  if (props.isCreateForm) {
-    data.value.scadaMonitorPowerSytemId = newVal._id;
-  }
-});
+
+
 </script>
 <style>
 .p-autocomplete-input {

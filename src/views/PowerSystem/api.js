@@ -51,6 +51,10 @@ export class DefinitionListApi {
   static async getDefinitionData(definitionId) {
     return get(`/powersystem/${projectData.value._id}/powersystemdefinition/${definitionId}`);
   }
+
+  static async getDefinitionSubsystem() {
+    return get(`/powersystem/powersystemdefinition/subsystem`);
+  }
 }
 
 export class PsTreeApi {
@@ -110,6 +114,14 @@ export class PowerSystemParameterApi {
   static async delete(psId, projectVersionId) {
     return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`);
   }
+
+  static async getPowersystemMonitor(psde_id) {
+    return get(`/powersystem/powersystemedit/monitor/${psde_id}`);
+  }
+
+  static async getPowersystemData(psde_id) {
+    return get(`/powersystem/powersystemedit/${psde_id}`);
+  }
 }
 
 export class PowerSystemEmsApi {
@@ -154,6 +166,9 @@ export class PowerSystemEmsApi {
 
   static async delete(psId, projectVersionId) {
     return _delete(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`);
+  }
+  static async getPowersystemEmsData(pss_id) {
+    return get(`/powersystem/powersystems/${pss_id}`);
   }
 }
 

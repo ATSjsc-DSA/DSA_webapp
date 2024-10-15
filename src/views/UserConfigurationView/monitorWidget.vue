@@ -1,7 +1,7 @@
 <template>
   <TabView>
     <TabPanel header="Common">
-      <monitorFormWidget v-model="monitorData" :is-create-form="false" />
+      <monitorFormWidget v-model="monitorData" :is-create-form="false" :projectVersionId="projectVersionId" v-model:psdSelected="psdSelected" :listScadaMonitor="listScadaMonitor" />
       <div class="flex justify-content-end gap-3">
         <Button type="button" label="Update" @click="updateMonitor"></Button>
       </div>
@@ -217,12 +217,15 @@ import { useConfirm } from 'primevue/useconfirm';
 import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 import monitorScadaFormWidget from './formWidget/monitorScadaFormWidget.vue';
 import monitorPmuFormWidget from './formWidget/monitorPmuFormWidget.vue';
+import { PowerSystemParameterApi, DefinitionListApi, PowerSystemEmsApi } from '@/views/PowerSystem/api';
 
 import { ApiMonitor } from '@/views/UserConfigurationView/api';
 import { onMounted } from 'vue';
+import { stringify } from 'uuid';
 
 const toast = useToast();
 const confirm = useConfirm();
+const projectVersionId = ref('66decf1dcff005199529524b');
 
 const props = defineProps({
   projectVersionId: {
@@ -244,11 +247,34 @@ onMounted(async () => {
 });
 
 const monitorData = ref({});
+const psdSelected = ref();
+const listScadaMonitor = ref();
+
+watch(
+  () => props.nodeMonitorSelected,
+  (newValue, oldValue) => {
+    console.log(newValue,"abc");
+    console.log(oldValue,"abc");
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      nextTick(async() => {
+        await getMonitorData();
+        await getScadaList();
+        await getPmuList();
+      });
+    }
+  },
+);
 
 const getMonitorData = async () => {
   try {
     const res = await ApiMonitor.getMonitor(props.nodeMonitorSelected._id);
+    const result = await PowerSystemParameterApi.getPowersystemMonitor(res.data.powersystemId);
     monitorData.value = res.data;
+    psdSelected.value = {
+      _id: result.data._id,
+      name: result.data.name,
+    };
+    listScadaMonitor.value = result.data.data;
   } catch (error) {
     console.log('getMonitorData: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
