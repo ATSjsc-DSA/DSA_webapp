@@ -58,14 +58,14 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
-          <Calendar v-model="newData.startTimestamp" showTime showIcon />
+          <Calendar v-model="newData.startTimestamp" showTime showIcon showSeconds />
         </div>
       </div>
 
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
-          <Calendar v-model="newData.endTimestamp" :minDate="newData.startTimestamp" showTime showIcon />
+          <Calendar v-model="newData.endTimestamp" :minDate="newData.startTimestamp" showTime showIcon showSeconds />
         </div>
       </div>
 
@@ -111,7 +111,7 @@
       <div class="col-8">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="areaname" class="font-semibold w-6rem"> Name</label>
-          <InputText id="areaname" v-model="updateData.name" disabled class="flex-auto" autocomplete="off" />
+          <InputText id="areaname" v-model="updateData.name" class="flex-auto" autocomplete="off" />
         </div>
       </div>
       <div class="col-4">
@@ -123,14 +123,14 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
-          <Calendar v-model="updateData.startTimestamp" showTime showIcon />
+          <Calendar v-model="updateData.startTimestamp" showTime showIcon showSeconds />
         </div>
       </div>
 
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
-          <Calendar v-model="updateData.endTimestamp" showTime showIcon />
+          <Calendar v-model="updateData.endTimestamp" showTime showIcon showSeconds />
         </div>
       </div>
 
@@ -173,10 +173,8 @@ import { onMounted, ref, watch } from 'vue';
 import InputSwitch from 'primevue/inputswitch';
 import Calendar from 'primevue/calendar';
 
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
-import ConfirmPopup from 'primevue/confirmpopup';
 const toast = useToast();
 const confirm = useConfirm();
 import { ApiDsa } from './api';

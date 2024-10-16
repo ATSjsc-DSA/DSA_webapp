@@ -10,7 +10,7 @@
       <div class="col-2">
         <div class="flex flex-column gap-2 mb-3 px-3">
           <label for="active" class="font-semibold"> Active</label>
-          <InputSwitch id="active" v-model="data.active" autocomplete="off" />
+          <InputSwitch id="active" class="mt-2" v-model="data.active" autocomplete="off" />
         </div>
       </div>
       <Divider />
@@ -78,6 +78,20 @@
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3 px-3">
+        <label for="fixSubSystemId" class="font-semibold"> Fix Sub System</label>
+        <!-- <InputText id="fixSubSystemId" v-model="data.fixSubSystemId" class="flex-auto" autocomplete="off" /> -->
+        <Dropdown
+          v-model="data.fixSubSystemId"
+          :options="listSubSystem"
+          optionValue="_id"
+          optionLabel="name"
+          placeholder="Select a Fix Sub System"
+          class="flex-grow-1"
+        />
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="flex flex-column gap-2 mb-3 px-3">
         <label for="remedialActionId" class="font-semibold"> Remedial Action</label>
         <InputText
           id="remedialActionId"
@@ -100,20 +114,6 @@
         />
       </div>
     </div>
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3 px-3">
-        <label for="fixSubSystemId" class="font-semibold"> Fix Sub System</label>
-        <!-- <InputText id="fixSubSystemId" v-model="data.fixSubSystemId" class="flex-auto" autocomplete="off" /> -->
-        <Dropdown
-          v-model="data.fixSubSystemId"
-          :options="listSubSystem"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Fix Sub System"
-          class="flex-grow-1"
-        />
-      </div>
-    </div>
   </div>
 
   <Divider />
@@ -123,12 +123,6 @@
     <div class="col-10">
       <div class="flex flex-column gap-2 mb-3 px-3">
         <label for="monitorSubSystemId" class="font-semibold"> Monitor Sub System</label>
-        <!-- <InputText
-          id="monitorSubSystemId"
-          v-model="data.monitor.monitorSubSystemId"
-          class="flex-auto"
-          autocomplete="off"
-        /> -->
         <Dropdown
           v-model="data.monitor.monitorSubSystemId"
           :options="listSubSystem"
@@ -143,7 +137,7 @@
     <div class="col-2">
       <div class="flex flex-column gap-2 mb-3 px-3">
         <label for="monitor-active" class="font-semibold"> Active</label>
-        <InputSwitch id="monitor-active" v-model="data.monitor.active" autocomplete="off" />
+        <InputSwitch id="monitor-active" class="mt-2" v-model="data.monitor.active" autocomplete="off" />
       </div>
     </div>
   </div>
@@ -159,7 +153,7 @@
       :binary="true"
     />
   </div>
-  <div class="p-3 grid">
+  <div v-if="data.monitor.busConfig.active" class="p-3 grid">
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3 px-3">
         <label for="busConfig-voltage" class="font-semibold"> Voltage</label>
@@ -207,7 +201,7 @@
       :binary="true"
     />
   </div>
-  <div class="p-3 grid">
+  <div v-if="data.monitor.branchConfig.active" class="p-3 grid">
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3 px-3">
         <label for="branchConfig-activePower" class="font-semibold"> Active Power</label>
@@ -244,7 +238,7 @@
       :binary="true"
     />
   </div>
-  <div class="p-3 grid">
+  <div v-if="data.monitor.genConfig.active" class="p-3 grid">
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3 px-3">
         <label for="genConfig-rotorAngle" class="font-semibold"> Rotor Angle</label>

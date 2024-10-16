@@ -5,7 +5,7 @@
   </div>
   <div class="flex flex-column gap-2 mb-3">
     <label for="appName" class="font-semibold"> Start Time </label>
-    <Calendar id="calendar-24h" v-model="appData.startTimestamp" showTime hourFormat="24" showSeconds />
+    <Calendar id="calendar-24h" v-model="appData.startTimestamp" showTime hourFormat="24" showSeconds showIcon />
   </div>
   <div class="flex align-items-center gap-3 mb-3">
     <label for="appActive" class="font-semibold w-6rem"> Active</label>
@@ -15,6 +15,7 @@
 
 <script setup>
 import InputSwitch from 'primevue/inputswitch';
+import Calendar from 'primevue/calendar';
 
 const appData = defineModel();
 </script>

@@ -69,7 +69,7 @@ const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 
 <template>
   <Menubar id="topbar-menu" :model="items" class="border-none text-nowrap">
-    <template #item="{ item, props, hasSubmenu }">
+    <template #item="{ item, props, hasSubmenu, root }">
       <router-link v-if="item.to" v-slot="{ href, navigate }" :to="item.to" custom>
         <a
           v-ripple
@@ -92,7 +92,10 @@ const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
       >
         <span :class="item.icon" />
         <span class="ml-2">{{ item.label }}</span>
-        <span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
+        <i
+          v-if="hasSubmenu"
+          :class="['pi pi-angle-down', { 'pi-angle-down ml-2': root, 'pi-angle-right ml-auto': !root }]"
+        ></i>
       </a>
     </template>
   </Menubar>

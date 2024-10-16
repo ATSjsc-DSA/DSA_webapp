@@ -10,7 +10,7 @@
       <div class="col-2">
         <div class="flex flex-column gap-2 mb-3">
           <label for="active" class="font-semibold w-6rem"> Active</label>
-          <InputSwitch id="active" v-model="data.active" autocomplete="off" />
+          <InputSwitch id="active" class="mt-2" v-model="data.active" autocomplete="off" />
         </div>
       </div>
       <Divider />
@@ -142,27 +142,29 @@
     <div class="col-2">
       <div class="flex flex-column gap-2 mb-3">
         <label for="monitor-active" class="font-semibold w-6rem"> Active</label>
-        <InputSwitch id="monitor-active" v-model="data.monitor.active" autocomplete="off" />
+        <InputSwitch id="monitor-active" class="mt-2" v-model="data.monitor.active" autocomplete="off" />
       </div>
     </div>
-    <div class="col-4">
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="monitor_signalP"> Signa lP</label>
-        <Checkbox v-model="data.monitor.signalP" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
+    <template v-if="data.monitor.active">
+      <div class="col-4">
+        <div class="flex align-items-center gap-3 mb-3">
+          <label for="monitor_signalP"> Signa lP</label>
+          <Checkbox v-model="data.monitor.signalP" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
+        </div>
       </div>
-    </div>
-    <div class="col-4">
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="monitor_signalQ"> Signa lQ </label>
-        <Checkbox v-model="data.monitor.signalQ" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
+      <div class="col-4">
+        <div class="flex align-items-center gap-3 mb-3">
+          <label for="monitor_signalQ"> Signa lQ </label>
+          <Checkbox v-model="data.monitor.signalQ" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
+        </div>
       </div>
-    </div>
-    <div class="col-4">
-      <div class="flex align-items-center gap-3 mb-3">
-        <label for="monitor_signalV" class="font-semibold"> Signa lV </label>
-        <Checkbox v-model="data.monitor.signalV" inputId="monitor_signalV" name="monitor_signalV" :binary="true" />
+      <div class="col-4">
+        <div class="flex align-items-center gap-3 mb-3">
+          <label for="monitor_signalV" class="font-semibold"> Signa lV </label>
+          <Checkbox v-model="data.monitor.signalV" inputId="monitor_signalV" name="monitor_signalV" :binary="true" />
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 

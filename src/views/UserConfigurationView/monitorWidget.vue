@@ -207,20 +207,15 @@
   </Dialog>
 </template>
 <script setup>
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-
-import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
-
 import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 import monitorScadaFormWidget from './formWidget/monitorScadaFormWidget.vue';
 import monitorPmuFormWidget from './formWidget/monitorPmuFormWidget.vue';
-import { PowerSystemParameterApi, DefinitionListApi, PowerSystemEmsApi } from '@/views/PowerSystem/api';
+import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 import { ApiMonitor } from '@/views/UserConfigurationView/api';
 import { onMounted } from 'vue';
-import { stringify } from 'uuid';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -241,7 +236,6 @@ const loadingScada = ref(false);
 const loadingPmu = ref(false);
 
 onMounted(async () => {
-  console.log('onMounted');
   await getMonitorData();
   getScadaList();
   getPmuList();

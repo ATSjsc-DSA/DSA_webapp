@@ -1,6 +1,5 @@
 <template>
   <div class="card layout-content min-h-full">
-    <ConfirmDialog />
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingUserConfig"></AppProgressSpinner>
 
@@ -303,7 +302,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import Dropdown from 'primevue/dropdown';
@@ -608,12 +607,13 @@ const appData = ref({
 const newAppData = ref({
   name: '',
   active: true,
-  startTimestamp: 0,
+  startTimestamp: new Date(),
 });
 
 const getAppData = async (appId) => {
   try {
     const res = await ApiApplication.getAppData(appId);
+    res.data.startTimestamp = new Date(res.data.startTimestamp);
     appData.value = res.data;
   } catch (error) {
     console.log('getAppData: error ', error);
@@ -640,6 +640,7 @@ const updateApplication = async () => {
     const res = await ApiApplication.updateAppData(appData.value._id, {
       name: appData.value.name,
       active: appData.value.active,
+      startTimestamp: appData.value.startTimestamp.getTime(),
     });
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     treeData.value[0].children[nodeSelected.value.key].label = res.data.name;
