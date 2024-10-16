@@ -1,7 +1,14 @@
 <template>
   <TabView>
     <TabPanel header="Common">
-      <monitorFormWidget v-model="monitorData" :is-create-form="false" :projectVersionId="projectVersionId" v-model:psdSelected="psdSelected" :listScadaMonitor="listScadaMonitor" />
+      <monitorFormWidget
+        v-model="monitorData"
+        :is-create-form="false"
+        :projectVersionId="projectVersionId"
+        v-model:psdSelected="psdSelected"
+        :listScadaMonitor="listScadaMonitor"
+        :definitionMonitor="definitionMonitor"
+      />
       <div class="flex justify-content-end gap-3">
         <Button type="button" label="Update" @click="updateMonitor"></Button>
       </div>
@@ -10,6 +17,7 @@
     <TabPanel header="Scada">
       <DataTable :value="scadaList" tableStyle="min-width: 50rem" rowHover scrollable showGridlines :loading="loading">
         <Column field="name" header="Name" />
+        <Column field="monitorScadaName" header="Monitor Scada Name" />
         <Column field="active" header="Active">
           <template #body="{ data }">
             <Tag :severity="data.active ? 'primary' : 'secondary'" :value="String(data.active)"></Tag>
@@ -148,22 +156,6 @@
     </TabPanel>
   </TabView>
 
-  <!-- Scada Dialog -->
-
-  <Dialog v-model:visible="createScadaVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
-    <template #header>
-      <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Create new Monitor Scada Configuration</span>
-      </div>
-    </template>
-
-    <monitorScadaFormWidget v-model="newScadaData" :project-version-id="projectVersionId" />
-    <template #footer>
-      <Button type="button" label="Cancel" severity="secondary" @click="createScadaVisibleDialog = false"></Button>
-      <Button type="button" label="Save" :disabled="!newScadaData.name" @click="createScada"></Button>
-    </template>
-  </Dialog>
-
   <Dialog v-model:visible="updataScadaVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
@@ -242,24 +234,23 @@ const emit = defineEmits(['updateLabelMonitorLeaf']);
 
 onMounted(async () => {
   await getMonitorData();
-  await getScadaList();
-  await getPmuList();
+  getScadaList();
+  getPmuList();
 });
 
 const monitorData = ref({});
 const psdSelected = ref();
 const listScadaMonitor = ref();
-
+const definitionMonitor = ref();
 watch(
   () => props.nodeMonitorSelected,
   (newValue, oldValue) => {
-    console.log(newValue,"abc");
-    console.log(oldValue,"abc");
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      nextTick(async() => {
+      nextTick(async () => {
         await getMonitorData();
-        await getScadaList();
-        await getPmuList();
+
+        getScadaList();
+        getPmuList();
       });
     }
   },
@@ -275,9 +266,9 @@ const getMonitorData = async () => {
       name: result.data.name,
     };
     listScadaMonitor.value = result.data.data;
+    definitionMonitor.value = result.data.definitionId;
   } catch (error) {
     console.log('getMonitorData: error ', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 const updateMonitor = async () => {
@@ -305,31 +296,6 @@ const getScadaList = async () => {
   }
 };
 
-const createScadaVisibleDialog = ref(false);
-const newScadaData = ref({
-  active: true,
-  kFactorCur: 0,
-  kFactorPower: 0,
-  monitorScadaId: '',
-  name: '',
-});
-
-const createScada = async () => {
-  try {
-    const res = await ApiMonitor.createMonitorScada(
-      props.projectVersionId,
-      props.nodeMonitorSelected._id,
-      newScadaData.value,
-    );
-    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    createScadaVisibleDialog.value = false;
-    scadaList.value.push(res.data);
-  } catch (error) {
-    console.log('createScada: error ', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
-
 const editScadaData = ref();
 const updataScadaVisibleDialog = ref(false);
 const handleUpdateScada = (data) => {
@@ -337,8 +303,9 @@ const handleUpdateScada = (data) => {
   updataScadaVisibleDialog.value = true;
 };
 const updateScada = async () => {
+  const { monitorScadaName, ...restOfScadaData } = editScadaData.value;
   try {
-    await ApiMonitor.updateMonitorScada(editScadaData.value._id, editScadaData.value);
+    await ApiMonitor.updateMonitorScada(editScadaData.value._id, restOfScadaData);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     updataScadaVisibleDialog.value = false;
     await getScadaList();

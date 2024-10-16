@@ -38,13 +38,19 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class=" col-12 md:col-8"
+        class="col-12 md:col-8"
         :suggestions="psFilterSuggestions"
         placeholder="Type Something to search ..."
         name="psdSelected"
         @complete="searchPsQueryFilter"
       />
-      <Dropdown  v-model="selectedDefinition" :options="listDefinition"  optionLabel="name" optionValue="_id" class="col-12 md:col-4" />
+      <Dropdown
+        v-model="selectedDefinition"
+        :options="listDefinition"
+        optionLabel="name"
+        optionValue="_id"
+        class="col-12 md:col-4"
+      />
     </div>
   </div>
   <div v-else class="flex flex-column gap-2 mb-3">
@@ -55,19 +61,32 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class=" col-12 md:col-8"
+        class="col-12 md:col-8"
         :suggestions="psFilterSuggestions"
         placeholder="Type Something to search ..."
         name="psdSelected"
         @complete="searchPsQueryFilter"
       />
-      <Dropdown  v-model="selectedDefinition" :options="listDefinition"  optionLabel="name" optionValue="_id" class="col-12 md:col-4" />
+      <Dropdown
+        v-model="selectedDefinition"
+        :options="listDefinition"
+        optionLabel="name"
+        optionValue="_id"
+        class="col-12 md:col-4"
+      />
     </div>
   </div>
 
-  <div  class="flex flex-column gap-3 mb-3">
+  <div class="flex flex-column gap-3 mb-3">
     <label for="scadaMonitorPsSelected" class="font-semibold">Scada Monitor</label>
-    <Dropdown v-model="data.scadaMonitorPowerSytemId" :options="listScadaMonitor" optionLabel="name"  optionValue="_id"  class="w-full" @focus="getScadaMonitor()" />
+    <Dropdown
+      v-model="data.scadaMonitorPowerSytemId"
+      :options="listScadaMonitor"
+      optionLabel="name"
+      optionValue="_id"
+      class="w-full"
+      @focus="getScadaMonitor()"
+    />
   </div>
 
   <!-- <div v-else class="flex flex-column gap-2 mb-3">
@@ -94,7 +113,7 @@ const props = defineProps({
   projectVersionId: { type: String, default: '' },
   psdSelected: { type: Object, default: null },
   listScadaMonitor: { type: Array, default: null },
-
+  definitionMonitor: { type: String, default: '' },
 });
 
 const typeOpts = ref([
@@ -112,13 +131,19 @@ const priorityOpts = ref([
   { name: 'PMU', code: 2 },
   { name: 'BOTH', code: 3 },
 ]);
-onMounted( () => {
+onMounted(() => {
   getDefiniton();
 });
 
-const listDefinition = ref()
-const selectedDefinition = ref()
-const getDefiniton = async() => {
+const listDefinition = ref();
+const selectedDefinition = ref(props.definitionMonitor);
+watch(
+  () => props.definitionMonitor,
+  (newVal) => {
+    selectedDefinition.value = newVal;
+  },
+);
+const getDefiniton = async () => {
   try {
     const res = await DefinitionListApi.getDefinitionSubsystem();
     listDefinition.value = res.data;
@@ -127,7 +152,6 @@ const getDefiniton = async() => {
   }
 };
 
-
 // Define the emit event
 const emit = defineEmits(['update:psdSelected']);
 
@@ -135,11 +159,11 @@ const emit = defineEmits(['update:psdSelected']);
 const psdSelected = computed({
   get: () => props.psdSelected,
   set: (value) => emit('update:psdSelected', value),
-})
-const psdSelectedCreate = ref()
+});
+const psdSelectedCreate = ref();
 const psFilterSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
-  console.log(event, "event");
+  console.log(event, 'event');
   const query = event ? event.query.trim() : '';
   try {
     const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, selectedDefinition.value, query);
@@ -150,11 +174,14 @@ const searchPsQueryFilter = async (event) => {
   }
 };
 
-const listScadaMonitor = ref(props.listScadaMonitor)
-watch(() => props.listScadaMonitor, (newVal) => {
-  listScadaMonitor.value = newVal;
-})
-const getScadaMonitor = async() => {
+const listScadaMonitor = ref(props.listScadaMonitor);
+watch(
+  () => props.listScadaMonitor,
+  (newVal) => {
+    listScadaMonitor.value = newVal;
+  },
+);
+const getScadaMonitor = async () => {
   try {
     const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelectedCreate.value._id);
     listScadaMonitor.value = res.data.data;
@@ -168,8 +195,11 @@ watch(psdSelectedCreate, (newVal) => {
     data.value.powersystemId = newVal._id;
   }
 });
-
-
+watch(listScadaMonitor, (newVal) => {
+  if (props.isCreateForm) {
+    data.value.listScadaMonitorId = newVal.map((item) => item._id);
+  }
+});
 </script>
 <style>
 .p-autocomplete-input {

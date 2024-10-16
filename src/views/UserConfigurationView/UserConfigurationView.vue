@@ -659,6 +659,7 @@ const newMonitorData = ref({
   powersystemId: '',
   priority: 1,
   scadaMonitorPowerSytemId: '',
+  listScadaMonitorId: [],
 });
 
 const getMonitorList = async (appId) => {
