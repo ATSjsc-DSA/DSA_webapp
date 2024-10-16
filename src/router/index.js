@@ -102,7 +102,7 @@ const router = createRouter({
         {
           path: '/SystemEvents/Disturbances',
           name: 'Disturbances',
-          component: () => import('@/views/SystemEvents/DisturbancerView.vue'),
+          component: () => import('@/views/SystemEvents/DisturbancesView.vue'),
         },
         {
           path: '/SystemEvents/Contingencies',

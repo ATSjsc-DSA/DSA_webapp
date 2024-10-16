@@ -18,7 +18,7 @@
     >
       <template #header>
         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="text-xl text-900 font-bold">List Contingency</span>
+          <span class="text-xl text-900 font-bold">List Disturbance</span>
           <Button icon="pi pi-plus" rounded text raised @click="handlerCreateThis()" />
         </div>
       </template>
@@ -35,7 +35,7 @@
           <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
         </template>
       </Column>
-      <Column field="startTimestamp" header="Start Time" sortable style="width: 12%">
+      <Column field="startTimestamp" header="Start Time" sortable style="width: 18%">
         <template #body="{ data }">
           <div class="flex align-items-center gap-2">
             <i class="pi pi-clock" style="color: burlywood"></i>
@@ -44,7 +44,7 @@
           </div>
         </template>
       </Column>
-      <Column field="endTimestamp" header="End Time" sortable style="width: 12%">
+      <Column field="endTimestamp" header="End Time" sortable style="width: 18%">
         <template #body="{ data }">
           <div class="flex align-items-center gap-2">
             <i class="pi pi-clock" style="color: yellow"></i>
@@ -75,14 +75,28 @@
           <InputText id="name" class="flex-auto" autocomplete="off" v-model="disturbanceModelData.name" />
         </div>
         <div class="field">
-          <label for="name" class="font-semibold">Power System</label>
-          <AutoComplete
-            v-model="autoCompleteValue"
-            completeOnFocus
-            optionLabel="name"
-            :suggestions="items"
-            @complete="search"
-          />
+          <div class="grid">
+            <div class="col-12 md:col-8">
+              <label for="name" class="font-semibold">Power System</label>
+              <AutoComplete
+                v-model="autoCompleteValue"
+                completeOnFocus
+                optionLabel="name"
+                :suggestions="items"
+                @complete="search"
+              />
+            </div>
+            <div class="col-12 md:col-4">
+              <label for="name" class="font-semibold">Definition</label>
+              <Dropdown
+                v-model="selectedDefinition"
+                :options="listDefinition"
+                optionLabel="name"
+                optionValue="_id"
+                class="w-full"
+              />
+            </div>
+          </div>
         </div>
         <div class="field">
           <label for="email" class="font-semibold">Disturbance Type</label>
@@ -139,6 +153,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ApiDisturbance, commonApi } from './api';
+import { DefinitionListApi } from '@/views/PowerSystem/api';
+
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
@@ -148,9 +164,24 @@ import Calendar from 'primevue/calendar';
 
 const { convertDateTimeToString } = chartComposable();
 
-onMounted(() => {
-  getListDisturbance();
+const props = defineProps({
+  itemActive: Object,
 });
+
+onMounted(() => {
+  getDefiniton();
+});
+
+const popupButton = ref(null); // Để gắn popup vào nút
+
+const itemActive = computed(() => props.itemActive._id);
+
+watch(itemActive, (newValue, oldValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    getListDisturbance();
+  }
+});
+
 const visible = ref(false);
 const toast = useToast();
 const confirm = useConfirm();
@@ -196,6 +227,17 @@ const items = ref([]);
 const disturbances = ref();
 const totalList = ref();
 const currentPage = ref(1);
+const listDefinition = ref();
+const selectedDefinition = ref();
+
+const getDefiniton = async () => {
+  try {
+    const res = await DefinitionListApi.getDefinitionSubsystem();
+    listDefinition.value = res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
 
 const onPageChange = (event) => {
   currentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
@@ -204,7 +246,7 @@ const onPageChange = (event) => {
 
 const getListDisturbance = async () => {
   try {
-    const res = await ApiDisturbance.getListDisturbance({ page: currentPage.value });
+    const res = await ApiDisturbance.getListDisturbance(itemActive.value, { page: currentPage.value });
     disturbances.value = res.data.items;
     totalList.value = res.data.total;
   } catch (error) {
@@ -215,7 +257,7 @@ const getListDisturbance = async () => {
 const search = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await commonApi.searchPowerSystemData('', query);
+    const res = await commonApi.searchPowerSystemData(selectedDefinition.value, query);
     items.value = res.data;
   } catch (error) {
     console.log('searchPsdQueryFilter: error ', error);
@@ -343,7 +385,7 @@ const handlerCreateThis = async () => {
 };
 const createThis = async () => {
   try {
-    await ApiDisturbance.createDisturbance(disturbanceModelData.value);
+    await ApiDisturbance.createDisturbance(itemActive.value, disturbanceModelData.value);
     getListDisturbance();
     visible.value = false;
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Create successfully', life: 3000 });

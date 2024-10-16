@@ -37,14 +37,11 @@ export class ApiContingency {
 }
 
 export class ApiDisturbance {
-  static async getListDisturbance(param) {
-    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, param);
+  static async getListDisturbance(disturbances_id, param) {
+    return get(`/seedconfig/${disturbances_id}/disturbance`, param);
   }
-  static async getListDisturbanceOnlyName() {
-    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbanceonlyname`, param);
-  }
-  static async createDisturbance(data) {
-    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, data);
+  static async createDisturbance(disturbances_id, data) {
+    return post(`/seedconfig/${disturbances_id}/disturbance`, data);
   }
   static async getDisturbanceData(id) {
     return get(`/seedconfig/disturbance/${id}`);
@@ -73,6 +70,25 @@ export class ApiContingencies {
   }
   static async deleteContingencies(id) {
     return _delete(`/seedconfig/contingencies/${id}`);
+  }
+}
+
+export class ApiDisturbances {
+  static async getListDisturbances() {
+    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbances`);
+  }
+
+  static async createDisturbances(data) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbances`, data);
+  }
+  static async getDisturbancesData(id) {
+    return get(`/seedconfig/disturbances/${id}`);
+  }
+  static async updateDisturbancesData(id, data) {
+    return put(`/seedconfig/disturbances/${id}`, data);
+  }
+  static async deleteDisturbances(id) {
+    return _delete(`/seedconfig/disturbances/${id}`);
   }
 }
 
