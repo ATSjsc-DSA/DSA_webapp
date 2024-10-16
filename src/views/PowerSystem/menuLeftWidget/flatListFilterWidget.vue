@@ -206,7 +206,7 @@ const searchPs = async (event, definitionId) => {
     const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, definitionId, query);
     return res.data;
   } catch (error) {
-    console.log('searchPsQueryFilter: error ', error);
+    console.error('searchPsQueryFilter: error ', error);
   }
 };
 
