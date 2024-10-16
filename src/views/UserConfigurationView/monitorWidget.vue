@@ -15,7 +15,14 @@
     </TabPanel>
 
     <TabPanel header="Scada">
-      <DataTable :value="scadaList" tableStyle="min-width: 50rem" rowHover scrollable showGridlines :loading="loading">
+      <DataTable
+        :value="scadaList"
+        tableStyle="min-width: 50rem"
+        rowHover
+        scrollable
+        showGridlines
+        :loading="loadingScada"
+      >
         <Column field="name" header="Name" />
         <Column field="monitorScadaName" header="Monitor Scada Name" />
         <Column field="active" header="Active">
@@ -52,7 +59,7 @@
         rowHover
         scrollable
         showGridlines
-        :loading="loading"
+        :loading="loadingPmu"
       >
         <!-- <template #header>
           <div class="flex align-items-center justify-content-end">
@@ -217,7 +224,6 @@ import { stringify } from 'uuid';
 
 const toast = useToast();
 const confirm = useConfirm();
-const projectVersionId = ref('66decf1dcff005199529524b');
 
 const props = defineProps({
   projectVersionId: {
@@ -231,8 +237,11 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['updateLabelMonitorLeaf']);
+const loadingScada = ref(false);
+const loadingPmu = ref(false);
 
 onMounted(async () => {
+  console.log('onMounted');
   await getMonitorData();
   getScadaList();
   getPmuList();
@@ -248,7 +257,6 @@ watch(
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
       nextTick(async () => {
         await getMonitorData();
-
         getScadaList();
         getPmuList();
       });
@@ -287,6 +295,7 @@ const updateMonitor = async () => {
 const scadaList = ref([]);
 
 const getScadaList = async () => {
+  loadingScada.value = true;
   try {
     const res = await ApiMonitor.getScadaList(props.projectVersionId, monitorData.value._id);
     scadaList.value = res.data;
@@ -294,6 +303,7 @@ const getScadaList = async () => {
     console.log('getScadaList: error ', error);
     scadaList.value = [];
   }
+  loadingScada.value = false;
 };
 
 const editScadaData = ref();
@@ -374,6 +384,7 @@ const newPmuData = ref({
   },
 });
 const getPmuList = async () => {
+  loadingPmu.value = true;
   try {
     const res = await ApiMonitor.getPmuList(props.projectVersionId, monitorData.value._id);
     pmuList.value = res.data;
@@ -381,6 +392,7 @@ const getPmuList = async () => {
     console.log('getPmuList: error ', error);
     pmuList.value = [];
   }
+  loadingPmu.value = false;
 };
 
 const createPmu = async () => {

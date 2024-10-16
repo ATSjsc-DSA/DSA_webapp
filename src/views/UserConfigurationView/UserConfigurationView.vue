@@ -37,15 +37,14 @@
             <div style="height: 48rem" aria-haspopup="true">
               <Tree
                 v-model:expandedKeys="expandedKeys"
+                v-model:selectionKeys="keySelected"
                 selectionMode="single"
                 :value="treeData"
                 class="w-full"
                 @node-select="onNodeSelect"
               >
                 <template #default="slotProps">
-                  <div>
-                    {{ slotProps.node.label }}
-                  </div>
+                  <div>{{ slotProps.node.label }}</div>
                 </template>
 
                 <template #Project="slotProps">
@@ -129,46 +128,76 @@
             </div>
           </template>
           <template #content>
-            <ScrollPanel class="card" style="width: 100%; height: 50rem">
-              <template v-if="nodeSelected.type === 'Application' && appData !== undefined">
-                <applicationFormWidget v-model="appData" />
-                <div class="flex justify-content-end gap-3">
-                  <Button type="button" label="Update" @click="updateApplication"></Button>
-                </div>
-              </template>
+            <LoadingContainer v-show="isLoadingContainer" class="relative" />
+            <ScrollPanel
+              v-if="nodeSelected.type === 'Application' && appData !== undefined"
+              class="card"
+              style="width: 100%; height: 50rem"
+            >
+              <applicationFormWidget v-model="appData" />
+              <div class="flex justify-content-end gap-3">
+                <Button type="button" label="Update" @click="updateApplication"></Button>
+              </div>
+            </ScrollPanel>
 
-              <template v-if="nodeSelected.type === 'Monitor' && monitorData !== undefined">
-                <monitorWidget
-                  :node-monitor-selected="nodeSelected"
-                  :project-version-id="projectVersionId"
-                  @update-label-monitor-leaf="updateLabelMonitorLeaf"
-                />
-              </template>
+            <ScrollPanel
+              v-if="nodeSelected.type === 'Monitor' && monitorData !== undefined"
+              class="card"
+              style="width: 100%; height: 50rem"
+            >
+              <monitorWidget
+                :node-monitor-selected="nodeSelected"
+                :project-version-id="projectVersionId"
+                @update-label-monitor-leaf="updateLabelMonitorLeaf"
+              />
+            </ScrollPanel>
 
-              <template v-if="nodeSelected.type === 'DSA' && dsaData !== undefined">
-                <dsaFormWidget v-model="dsaData" />
-                <div class="flex justify-content-end gap-3">
-                  <Button type="button" label="Update" @click="updateDsa"></Button>
-                </div>
-              </template>
-              <TabView v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
-                <TabPanel header="Common">
+            <ScrollPanel
+              v-if="nodeSelected.type === 'DSA' && dsaData !== undefined"
+              class="card"
+              style="width: 100%; height: 50rem"
+            >
+              <dsaFormWidget v-model="dsaData" />
+              <div class="flex justify-content-end gap-3">
+                <Button type="button" label="Update" @click="updateDsa"></Button>
+              </div>
+            </ScrollPanel>
+
+            <TabView v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
+              <TabPanel header="Common">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
                   <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
                   <div class="flex justify-content-end gap-3">
                     <Button type="button" label="Update" @click="updateVsa"></Button>
                   </div>
-                </TabPanel>
-                <TabPanel header="Dependency Plan">
-                  <dependencyWidget :dependency-id="vsaData._id" />
-                </TabPanel>
-              </TabView>
-              <template v-if="nodeSelected.type === 'TSA' && tsaData !== undefined">
-                <DsaTsaFormWidget v-model="tsaData" :is-create-form="false" />
-                <div class="flex justify-content-end gap-3">
-                  <Button type="button" label="Update" @click="updateTsa"></Button>
-                </div>
-              </template>
-            </ScrollPanel>
+                </ScrollPanel>
+              </TabPanel>
+              <TabPanel header="Dependency Plan">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
+                  <dependencyTableWidget :project-version-id="projectVersionId" :dependency-id="vsaData._id" />
+                </ScrollPanel>
+              </TabPanel>
+            </TabView>
+            <TabView v-if="nodeSelected.type === 'TSA' && tsaData !== undefined">
+              <TabPanel header="Common">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
+                  <DsaTsaFormWidget v-model="tsaData" :is-create-form="false" />
+                  <div class="flex justify-content-end gap-3">
+                    <Button type="button" label="Update" @click="updateTsa"></Button>
+                  </div>
+                </ScrollPanel>
+              </TabPanel>
+              <TabPanel header="Dependency Plan">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
+                  <dependencyTableWidget :project-version-id="projectVersionId" :dependency-id="tsaData._id" />
+                </ScrollPanel>
+              </TabPanel>
+              <TabPanel header="Disturbances">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
+                  <div>Tôi là disturbance Tab</div>
+                </ScrollPanel>
+              </TabPanel>
+            </TabView>
           </template>
         </Card>
       </SplitterPanel>
@@ -286,7 +315,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 
 import ContextMenu from 'primevue/contextmenu';
-
+import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
 import applicationFormWidget from './formWidget/applicationFormWidget.vue';
@@ -297,8 +326,7 @@ import dsaFormWidget from './formWidget/dsaFormWidget.vue';
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
-import dependencyWidget from './dependencyWidget.vue';
-
+import dependencyTableWidget from './dependencyTableWidget.vue';
 const toast = useToast();
 const confirm = useConfirm();
 const isLoadingUserConfig = ref(false);
@@ -310,7 +338,16 @@ onMounted(async () => {
 const projectVersionId = ref('66decf1dcff005199529524b');
 
 // treeData
-const treeData = ref();
+const treeData = ref([
+  {
+    key: 'root',
+    label: 'Project',
+    type: 'Project',
+    icon: 'pi pi-server',
+    children: [],
+  },
+]);
+const isLoadingContainer = ref(false);
 
 const getTreeData = async () => {
   await getAppList();
@@ -371,7 +408,7 @@ const getMonitorBranch = async (appId, appKey = '') => {
 
 const getMonitorLeaf = (appId, monitor, key = '') => {
   return {
-    key: key,
+    key: 'monitor_' + key,
     label: monitor.name,
     _id: monitor._id,
     appId: appId,
@@ -426,7 +463,7 @@ const updateLabelDsaLeaf = (appId, dsaId, newName) => {
 
 const getDsaLeaf = async (appId, dsa, key = '') => {
   return {
-    key: key,
+    key: 'dsa_' + key,
     label: dsa.name,
     _id: dsa._id,
     appId: appId,
@@ -477,7 +514,7 @@ const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName) => {
 
 const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
   return {
-    key: key,
+    key: 'task_' + key,
     label: data.name,
     _id: data._id,
     appId: appId,
@@ -489,7 +526,7 @@ const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
 // controll tree
 const expandedKeys = ref({});
 const nodeSelected = ref({});
-
+const keySelected = ref({});
 const expandAll = () => {
   for (const node of treeData.value) {
     expandNode(node);
@@ -513,6 +550,7 @@ const collapseAll = () => {
 
 const onNodeSelect = async (node) => {
   nodeSelected.value = node;
+  isLoadingContainer.value = true;
   if (node.type === 'Application') {
     await getAppData(node._id);
   }
@@ -528,6 +566,7 @@ const onNodeSelect = async (node) => {
   if (node.type === 'TSA') {
     await getTsaData(node._id);
   }
+  isLoadingContainer.value = false;
 };
 
 // --------- Application

@@ -90,7 +90,6 @@
       optionLabel="name"
       optionValue="_id"
       class="w-full"
-      @focus="getScadaMonitor()"
     />
   </div>
 
@@ -186,14 +185,6 @@ watch(
     listScadaMonitor.value = newVal;
   },
 );
-const getScadaMonitor = async () => {
-  try {
-    const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelectedCreate.value._id);
-    listScadaMonitor.value = res.data.data;
-  } catch (error) {
-    console.log('getScadaMonitor: error ', error);
-  }
-};
 
 watch(psdSelectedCreate, (newVal) => {
   if (props.isCreateForm) {

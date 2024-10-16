@@ -328,6 +328,7 @@ const getListSubSystem = async () => {
     const res = await ApiSubsystem.getListSubsystemOnlyName();
     listSubSystem.value = res.data;
   } catch (error) {
+    console.log('getListSubSystem: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
@@ -339,6 +340,7 @@ const getListDisturbance = async () => {
     const res = await ApiDisturbance.getListDisturbanceOnlyName();
     listDisturance.value = res.data;
   } catch (error) {
+    console.log('getListDisturbance: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
