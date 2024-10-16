@@ -40,89 +40,89 @@ export class ApiMonitor {
   static async delMonitor(monitorId) {
     return _delete(`/userconfig/monitors/${monitorId}`);
   }
-
   // Monitor Scada Config
   static async getScadaList(projectVersionId, monitorId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitor_scada_configs`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`);
   }
   static async createMonitorScada(projectVersionId, monitorId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitor_scada_configs`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`, data);
   }
   static async getMonitorScada(monitor_scada_id) {
-    return get(`/userconfig/monitor_scada_configs/${monitor_scada_id}`);
+    return get(`/userconfig/monitorscada/${monitor_scada_id}`);
   }
   static async updateMonitorScada(monitor_scada_id, data) {
-    return put(`/userconfig/monitor_scada_configs/${monitor_scada_id}`, data);
+    return put(`/userconfig/monitorscada/${monitor_scada_id}`, data);
   }
   static async delMonitorScada(monitor_scada_id) {
-    return _delete(`/userconfig/monitor_scada_configs/${monitor_scada_id}`);
+    return _delete(`/userconfig/monitorscada/${monitor_scada_id}`);
   }
 
   // Monitor PMU Config
   static async getPmuList(projectVersionId, monitorId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitor_pmu_configs`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`);
   }
   static async createMonitorPmu(projectVersionId, monitorId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitor_pmu_configs`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`, data);
   }
   static async getMonitorPmu(monitorPmuId) {
-    return get(`/userconfig/monitor_pmu_configs/${monitorPmuId}`);
+    return get(`/userconfig/monitorscada/${monitorPmuId}`);
   }
   static async updateMonitorPmu(monitorPmuId, data) {
-    return put(`/userconfig/monitor_pmu_configs/${monitorPmuId}`, data);
+    return put(`/userconfig/monitorscada/${monitorPmuId}`, data);
   }
   static async delMonitorPmu(monitorPmuId) {
-    return _delete(`/userconfig/monitor_pmu_configs/${monitorPmuId}`);
+    return _delete(`/userconfig/monitorscada/${monitorPmuId}`);
   }
 }
 
 export class ApiDsa {
   static async getList(projectVersionId, appId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsa_modules`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsamodules`);
   }
   static async createDsa(projectVersionId, appId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsa_modules`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsamodules`, data);
   }
   static async getDsa(dsaId) {
-    return get(`/userconfig/dsa_modules/${dsaId}`);
+    return get(`/userconfig/dsamodules/${dsaId}`);
   }
   static async updateDsa(dsaId, data) {
-    return put(`/userconfig/dsa_modules/${dsaId}`, data);
+    return put(`/userconfig/dsamodules/${dsaId}`, data);
   }
   static async delDsa(dsaId) {
-    return _delete(`/userconfig/dsa_modules/${dsaId}`);
+    return _delete(`/userconfig/dsamodules/${dsaId}`);
   }
+
   // VSA Config
   static async getVsaList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsa_informations`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`);
   }
   static async createVsa(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsa_informations`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`, data);
   }
   static async getVsa(vsaId) {
-    return get(`/userconfig/vsa_informations/${vsaId}`);
+    return get(`/userconfig/vsainformations/${vsaId}`);
   }
   static async updateVsa(vsaId, data) {
-    return put(`/userconfig/vsa_informations/${vsaId}`, data);
+    return put(`/userconfig/vsainformations/${vsaId}`, data);
   }
   static async delVsa(vsaId) {
-    return _delete(`/userconfig/vsa_informations/${vsaId}`);
+    return _delete(`/userconfig/vsainformations/${vsaId}`);
   }
 
   // TSA Config
   static async getTsaList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsa_informations`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`);
   }
   static async createTsa(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsa_informations`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`, data);
   }
   static async getTsa(vsaId) {
-    return get(`/userconfig/tsa_informations/${vsaId}`);
+    return get(`/userconfig/vsainformations/${vsaId}`);
   }
   static async updateTsa(vsaId, data) {
-    return put(`/userconfig/tsa_informations/${vsaId}`, data);
+    return put(`/userconfig/vsainformations/${vsaId}`, data);
   }
   static async delTsa(vsaId) {
-    return _delete(`/userconfig/tsa_informations/${vsaId}`);
+    return _delete(`/userconfig/vsainformations/${vsaId}`);
   }
 }

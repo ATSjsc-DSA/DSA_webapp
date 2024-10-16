@@ -151,12 +151,17 @@
                   <Button type="button" label="Update" @click="updateDsa"></Button>
                 </div>
               </template>
-              <template v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
-                <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
-                <div class="flex justify-content-end gap-3">
-                  <Button type="button" label="Update" @click="updateVsa"></Button>
-                </div>
-              </template>
+              <TabView v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
+                <TabPanel header="Common">
+                  <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
+                  <div class="flex justify-content-end gap-3">
+                    <Button type="button" label="Update" @click="updateVsa"></Button>
+                  </div>
+                </TabPanel>
+                <TabPanel header="Dependency Plan">
+                  <dependencyWidget :dependency-id="vsaData._id" />
+                </TabPanel>
+              </TabView>
               <template v-if="nodeSelected.type === 'TSA' && tsaData !== undefined">
                 <DsaTsaFormWidget v-model="tsaData" :is-create-form="false" />
                 <div class="flex justify-content-end gap-3">
@@ -292,6 +297,7 @@ import dsaFormWidget from './formWidget/dsaFormWidget.vue';
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
+import dependencyWidget from './dependencyWidget.vue';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -438,8 +444,6 @@ const getTaskBranch = async (appId, dsaId, dsaKey = '') => {
     leafData.push(getTaskLeaf(appId, dsaId, vsa, 'VSA', dsaKey + '_vsa_' + index));
   }
   const tsaList = await getTsaList(dsaId);
-  console.log('getTsaList');
-
   for (let index = 0; index < tsaList.length; index++) {
     const tsa = tsaList[index];
     leafData.push(getTaskLeaf(appId, dsaId, tsa, 'TSA', dsaKey + '_tsa_' + index));

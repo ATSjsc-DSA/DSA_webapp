@@ -1,7 +1,13 @@
 <template>
   <TabView>
     <TabPanel header="Common">
-      <monitorFormWidget v-model="monitorData" :is-create-form="false" :projectVersionId="projectVersionId" v-model:psdSelected="psdSelected" :listScadaMonitor="listScadaMonitor" />
+      <monitorFormWidget
+        v-model="monitorData"
+        :is-create-form="false"
+        :projectVersionId="projectVersionId"
+        :psdSelected="psdSelected"
+        :listScadaMonitor="listScadaMonitor"
+      />
       <div class="flex justify-content-end gap-3">
         <Button type="button" label="Update" @click="updateMonitor"></Button>
       </div>
@@ -253,10 +259,8 @@ const listScadaMonitor = ref();
 watch(
   () => props.nodeMonitorSelected,
   (newValue, oldValue) => {
-    console.log(newValue,"abc");
-    console.log(oldValue,"abc");
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      nextTick(async() => {
+      nextTick(async () => {
         await getMonitorData();
         await getScadaList();
         await getPmuList();
