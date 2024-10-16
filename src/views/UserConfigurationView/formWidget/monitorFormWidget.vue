@@ -18,7 +18,6 @@
 
   <div class="flex flex-column gap-2 mb-3">
     <label for="priority" class="font-semibold"> Priority </label>
-
     <Dropdown
       id="monitorType"
       v-model="data.priority"
@@ -30,53 +29,59 @@
     />
   </div>
 
-  <div v-if="isCreateForm" class="flex flex-column gap-3 mb-3">
-    <label for="psdSelected" class="font-semibold">Power System</label>
-    <div class="field grid">
+  <div v-if="isCreateForm" class="grid m-0">
+    <div class="col-12 md:col-8 flex flex-column gap-2 mb-3">
+      <label for="psdSelected" class="font-semibold">Power System</label>
       <AutoComplete
         v-model="psdSelectedCreate"
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="col-12 md:col-8"
+        class="w-full"
         :suggestions="psFilterSuggestions"
         placeholder="Type Something to search ..."
         name="psdSelected"
         @complete="searchPsQueryFilter"
       />
+    </div>
+    <div class="col-12 md:col-4 flex flex-column gap-2 mb-3">
+      <label for="psdSelected" class="font-semibold">Definition</label>
       <Dropdown
         v-model="selectedDefinition"
         :options="listDefinition"
         optionLabel="name"
         optionValue="_id"
-        class="col-12 md:col-4"
+        class="w-full"
       />
     </div>
   </div>
-  <div v-else class="flex flex-column gap-2 mb-3">
-    <label for="psdSelected" class="font-semibold">Power System</label>
-    <div class="field grid">
+
+  <div v-else class="grid m-0">
+    <div class="col-12 md:col-8 flex flex-column gap-2 mb-3">
+      <label for="psdSelected" class="font-semibold">Power System</label>
       <AutoComplete
         v-model="psdSelected"
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="col-12 md:col-8"
+        class="w-full"
         :suggestions="psFilterSuggestions"
         placeholder="Type Something to search ..."
         name="psdSelected"
         @complete="searchPsQueryFilter"
       />
+    </div>
+    <div class="col-12 md:col-4 flex flex-column gap-2 mb-3">
+      <label for="psdSelected" class="font-semibold">Definition</label>
       <Dropdown
         v-model="selectedDefinition"
         :options="listDefinition"
         optionLabel="name"
         optionValue="_id"
-        class="col-12 md:col-4"
+        class="w-full"
       />
     </div>
   </div>
-
   <div class="flex flex-column gap-3 mb-3">
     <label for="scadaMonitorPsSelected" class="font-semibold">Scada Monitor</label>
     <Dropdown

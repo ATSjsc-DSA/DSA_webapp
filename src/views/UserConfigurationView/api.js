@@ -59,19 +59,19 @@ export class ApiMonitor {
 
   // Monitor PMU Config
   static async getPmuList(projectVersionId, monitorId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorpmu`);
   }
   static async createMonitorPmu(projectVersionId, monitorId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorpmu`, data);
   }
   static async getMonitorPmu(monitorPmuId) {
-    return get(`/userconfig/monitorscada/${monitorPmuId}`);
+    return get(`/userconfig/monitorpmu/${monitorPmuId}`);
   }
   static async updateMonitorPmu(monitorPmuId, data) {
-    return put(`/userconfig/monitorscada/${monitorPmuId}`, data);
+    return put(`/userconfig/monitorpmu/${monitorPmuId}`, data);
   }
   static async delMonitorPmu(monitorPmuId) {
-    return _delete(`/userconfig/monitorscada/${monitorPmuId}`);
+    return _delete(`/userconfig/monitorpmu/${monitorPmuId}`);
   }
 }
 
