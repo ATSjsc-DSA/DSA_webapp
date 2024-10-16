@@ -128,6 +128,7 @@
             </div>
           </template>
           <template #content>
+            <LoadingContainer v-show="isLoadingContainer" class="relative" />
             <ScrollPanel
               v-if="nodeSelected.type === 'Application' && appData !== undefined"
               class="card"
@@ -314,7 +315,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 
 import ContextMenu from 'primevue/contextmenu';
-
+import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
 import applicationFormWidget from './formWidget/applicationFormWidget.vue';
@@ -337,7 +338,16 @@ onMounted(async () => {
 const projectVersionId = ref('66decf1dcff005199529524b');
 
 // treeData
-const treeData = ref();
+const treeData = ref([
+  {
+    key: 'root',
+    label: 'Project',
+    type: 'Project',
+    icon: 'pi pi-server',
+    children: [],
+  },
+]);
+const isLoadingContainer = ref(false);
 
 const getTreeData = async () => {
   await getAppList();
@@ -540,6 +550,7 @@ const collapseAll = () => {
 
 const onNodeSelect = async (node) => {
   nodeSelected.value = node;
+  isLoadingContainer.value = true;
   if (node.type === 'Application') {
     await getAppData(node._id);
   }
@@ -555,6 +566,7 @@ const onNodeSelect = async (node) => {
   if (node.type === 'TSA') {
     await getTsaData(node._id);
   }
+  isLoadingContainer.value = false;
 };
 
 // --------- Application
