@@ -41,7 +41,7 @@ export class ApiDisturbance {
     return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, param);
   }
   static async getListDisturbanceOnlyName() {
-    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbanceonlyname`, param);
+    return get(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbanceonlyname`);
   }
   static async createDisturbance(data) {
     return post(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, data);
