@@ -108,21 +108,37 @@ export class ApiDsa {
   static async delVsa(vsaId) {
     return _delete(`/userconfig/vsainformations/${vsaId}`);
   }
-
   // TSA Config
   static async getTsaList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`);
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsainformations`);
   }
   static async createTsa(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`, data);
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsainformations`, data);
   }
   static async getTsa(vsaId) {
-    return get(`/userconfig/vsainformations/${vsaId}`);
+    return get(`/userconfig/tsainformations/${vsaId}`);
   }
   static async updateTsa(vsaId, data) {
-    return put(`/userconfig/vsainformations/${vsaId}`, data);
+    return put(`/userconfig/tsainformations/${vsaId}`, data);
   }
   static async delTsa(vsaId) {
-    return _delete(`/userconfig/vsainformations/${vsaId}`);
+    return _delete(`/userconfig/tsainformations/${vsaId}`);
+  }
+
+  // module dependency
+  static async getDependencyList(projectVersionId, dependencyId) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency`);
+  }
+  static async createDependency(projectVersionId, dependencyId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency/`, data);
+  }
+  static async getDependency(dependencyId) {
+    return get(`/userconfig/moduledependency/${dependencyId}`);
+  }
+  static async updateDependency(dependencyId, data) {
+    return put(`/userconfig/moduledependency/${dependencyId}`, data);
+  }
+  static async delDependency(dependencyId) {
+    return _delete(`/userconfig/moduledependency/${dependencyId}`);
   }
 }
