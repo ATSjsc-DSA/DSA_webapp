@@ -42,10 +42,10 @@ export class api {
 
 export class DefinitionListApi {
   static async getParameterDefinitionList() {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/parameter`);
+    return get(`/powersystem/${projectData.value._id}/parameter/powersystemdefinition`);
   }
   static async getEmsList() {
-    return get(`/powersystem/${projectData.value._id}/powersystemdefinition/ems`);
+    return get(`/powersystem/${projectData.value._id}/ems/powersystemdefinition`);
   }
 
   static async getDefinitionData(definitionId) {
@@ -53,7 +53,7 @@ export class DefinitionListApi {
   }
 
   static async getDefinitionSubsystem() {
-    return get(`/powersystem/powersystemdefinition/subsystem`);
+    return get(`/powersystem/${projectData.value._id}/subsystem/powersystemdefinition`);
   }
 }
 

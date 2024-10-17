@@ -123,7 +123,7 @@ const props = defineProps({
   projectVersionId: { type: String, default: '' },
   psdSelected: { type: Object, default: null },
   listScadaMonitor: { type: Array, default: null },
-  definitionMonitor: { type: String, default: '' },
+  definitionMonitor: { type: String, default: null },
 });
 
 const typeOpts = ref([
@@ -176,7 +176,11 @@ const searchPsQueryFilter = async (event) => {
   console.log(event, 'event');
   const query = event ? event.query.trim() : '';
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [selectedDefinition.value], query);
+    const res = await PowerSystemParameterApi.searchPs(
+      props.projectVersionId,
+      selectedDefinition.value ? [selectedDefinition.value] : [],
+      query,
+    );
     psFilterSuggestions.value = res.data;
     return res.data;
   } catch (error) {
