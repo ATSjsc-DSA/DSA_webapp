@@ -1,7 +1,13 @@
 <template>
-  <div class="flex flex-column gap-2 mb-3">
-    <label for="monitorName" class="font-semibold"> Name </label>
-    <InputText id="monitorName" v-model="data.name" class="flex-auto" autocomplete="off" />
+  <div class="grid">
+    <div class="flex flex-column gap-2 mb-3 col-12 md:col-9">
+      <label for="monitorName" class="font-semibold"> Name </label>
+      <InputText id="monitorName" v-model="data.name" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex flex-column align-items-center gap-3 mb-3 col-12 md:col-3">
+      <label for="active"> Active</label>
+      <InputSwitch id="active" v-model="data.active" autocomplete="off" />
+    </div>
   </div>
   <div class="flex flex-column gap-2 mb-3">
     <label for="monitorType" class="font-semibold"> Type </label>

@@ -42,6 +42,15 @@
                 class="w-full"
                 @node-select="onNodeSelect"
               >
+                <template #nodeicon="slotProps">
+                  <i
+                    :class="[
+                      'mr-2', // Lớp cơ bản cho icon
+                      slotProps.node.icon, // Lớp icon từ dữ liệu node
+                      { 'text-green-600': slotProps.node.active }, // Áp dụng lớp màu xanh nếu active = true
+                    ]"
+                  ></i>
+                </template>
                 <template #default="slotProps">
                   <div>{{ slotProps.node.label }}</div>
                 </template>
@@ -344,6 +353,7 @@ const treeData = ref([
     type: 'Project',
     icon: 'pi pi-server',
     children: [],
+    active: true,
   },
 ]);
 const isLoadingContainer = ref(false);
@@ -357,6 +367,7 @@ const getTreeData = async () => {
       type: 'Project',
       icon: 'pi pi-server',
       children: [],
+      active: true,
     },
   ];
   for (let appIndex = 0; appIndex < appList.value.length; appIndex++) {
@@ -374,6 +385,7 @@ const getAppLeaf = async (app, key = '') => {
     appId: app._id,
     type: 'Application',
     icon: 'pi pi-folder-open',
+    active: app.active,
     children: [
       {
         key: 'monitor_' + key,
@@ -382,6 +394,7 @@ const getAppLeaf = async (app, key = '') => {
         icon: 'pi pi-list',
         appId: app._id,
         children: await getMonitorBranch(app._id, key),
+        active: app.active,
       },
       {
         key: 'dsa_' + key,
@@ -390,6 +403,7 @@ const getAppLeaf = async (app, key = '') => {
         icon: 'pi pi-th-large',
         type: 'DSAGroup',
         children: await getDsaBranch(app._id, key),
+        active: app.active,
       },
     ],
   };
@@ -413,6 +427,7 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
     appId: appId,
     icon: 'pi pi-file',
     type: 'Monitor',
+    active: monitor.active,
   };
 };
 
@@ -423,12 +438,13 @@ const addNewMonitorLeaf = (appId, monitor) => {
   }
 };
 
-const updateLabelMonitorLeaf = (appId, monitorId, newName) => {
+const updateLabelMonitorLeaf = (appId, monitorId, newName, active) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const monitorLeaf = appLeaf.children[0].children.filter((item) => item._id === monitorId)[0];
     if (monitorLeaf) {
       monitorLeaf.label = newName;
+      monitorLeaf.active = active;
     }
   }
 };
@@ -450,12 +466,13 @@ const addNewDsaLeaf = async (appId, dsa) => {
   }
 };
 
-const updateLabelDsaLeaf = (appId, dsaId, newName) => {
+const updateLabelDsaLeaf = (appId, dsaId, newName, active) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
     if (dsaLeaf) {
       dsaLeaf.label = newName;
+      dsaLeaf.active = active;
     }
   }
 };
@@ -469,6 +486,7 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
     type: 'DSA',
     icon: 'pi pi-clone',
     children: await getTaskBranch(appId, dsa._id, key),
+    active: dsa.active,
   };
 };
 
@@ -498,7 +516,7 @@ const addNewTaskLeaf = (appId, dsaId, taskData, taskType = 'VSA') => {
   }
 };
 
-const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName) => {
+const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName, active) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
@@ -506,6 +524,7 @@ const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName) => {
       const vsaLeaf = dsaLeaf.children.filter((item) => item._id === vsaId)[0];
       if (vsaLeaf) {
         vsaLeaf.label = newName;
+        vsaLeaf.active = active;
       }
     }
   }
@@ -519,6 +538,7 @@ const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
     appId: appId,
     dsaId: dsaId,
     type: taskType,
+    active: data.active,
   };
 };
 
@@ -644,6 +664,7 @@ const updateApplication = async () => {
     });
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     treeData.value[0].children[nodeSelected.value.key].label = res.data.name;
+    treeData.value[0].children[nodeSelected.value.key].active = res.data.active;
   } catch (error) {
     console.log('updateApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -923,7 +944,7 @@ const updateDsa = async () => {
   try {
     const res = await ApiDsa.updateDsa(dsaData.value._id, dsaData.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    updateLabelDsaLeaf(nodeSelected.value.appId, dsaData.value._id, res.data.name);
+    updateLabelDsaLeaf(nodeSelected.value.appId, dsaData.value._id, res.data.name, res.data.active);
   } catch (error) {
     console.log('updateDsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -1037,7 +1058,13 @@ const updateVsa = async () => {
   try {
     const res = await ApiDsa.updateVsa(vsaData.value._id, vsaData.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    updateLabelTaskLeaf(nodeSelected.value.appId, nodeSelected.value.dsaId, nodeSelected.value._id, res.data.name);
+    updateLabelTaskLeaf(
+      nodeSelected.value.appId,
+      nodeSelected.value.dsaId,
+      nodeSelected.value._id,
+      res.data.name,
+      res.data.active,
+    );
   } catch (error) {
     console.log('updateVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -1144,7 +1171,13 @@ const updateTsa = async () => {
   try {
     const res = await ApiDsa.updateTsa(tsaData.value._id, tsaData.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    updateLabelTaskLeaf(nodeSelected.value.appId, nodeSelected.value.dsaId, nodeSelected.value._id, res.data.name);
+    updateLabelTaskLeaf(
+      nodeSelected.value.appId,
+      nodeSelected.value.dsaId,
+      nodeSelected.value._id,
+      res.data.name,
+      res.data.active,
+    );
   } catch (error) {
     console.log('updateTsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
