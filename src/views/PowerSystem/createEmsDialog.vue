@@ -228,7 +228,7 @@ const parrentEmsSuggestions = ref([]);
 const searchPsParameterQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, '', query);
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [], query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

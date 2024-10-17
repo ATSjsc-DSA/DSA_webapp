@@ -101,7 +101,7 @@ const searchPsQueryFilter = async (event) => {
   if (definitionSelected.value) {
     const query = event ? event.query.trim() : '';
     try {
-      const res = await PowerSystemParameterApi.searchPs(props.versionId, definitionSelected.value, query);
+      const res = await PowerSystemParameterApi.searchPs(props.versionId, [definitionSelected.value], query);
       psFilterSuggestions.value = res.data;
       return res.data;
     } catch (error) {
