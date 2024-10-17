@@ -568,7 +568,7 @@ const psSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, props.definitionId, query);
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [props.definitionId], query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

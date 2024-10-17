@@ -160,7 +160,7 @@
                 <!-- filter -->
                 <flatListFilterWidget
                   v-if="showflatListFilterWidget"
-                  class="p-3"
+                  class="px-3 pt-3"
                   :canUseDefinitionFilter="canUseDefinitionFilter"
                   :canUseDefinitionStationFilter="definitionSelected.name !== 'Station'"
                   :definitionList="definitionList"

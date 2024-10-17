@@ -1,6 +1,6 @@
 <template>
   <div class="flex gap-2 justify-content-start flex-wrap xl:flex-nowrap">
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Area" class="text-sm"> Area </label>
       <AutoComplete
         v-model="areaFilter"
@@ -17,7 +17,7 @@
       />
     </div>
 
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Zone" class="text-sm"> Zone </label>
       <AutoComplete
         v-model="zoneFilter"
@@ -33,7 +33,7 @@
         @complete="searchZoneQuery"
       />
     </div>
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Owner" class="text-sm"> Owner </label>
       <AutoComplete
         v-model="ownerFilter"
@@ -50,7 +50,7 @@
       />
     </div>
 
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Type" class="text-sm"> Type </label>
       <AutoComplete
         v-model="typeFilter"
@@ -66,7 +66,7 @@
         @complete="searchTypeQuery"
       />
     </div>
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="kV" class="text-sm"> kV </label>
       <AutoComplete
         v-model="kvFilter"
@@ -85,7 +85,7 @@
 
     <Divider layout="vertical" />
 
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1 mb-3">
+    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Station" class="text-sm"> Station </label>
       <AutoComplete
         v-model="stationFilter"
@@ -203,7 +203,7 @@ const searchStationQuery = async (event) => {
 const searchPs = async (event, definitionId) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, definitionId, query);
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [definitionId], query);
     return res.data;
   } catch (error) {
     console.error('searchPsQueryFilter: error ', error);

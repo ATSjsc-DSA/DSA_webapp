@@ -77,15 +77,16 @@ export class PowerSystemParameterApi {
       parentId: parentId,
     });
   }
-  static async searchPs(projectVersionId, psdDefinition_id, query, exceptionArr = []) {
+  static async searchPs(projectVersionId, definitionList, query, exceptionArr = []) {
     let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
-    if (psdDefinition_id) {
-      url += `?psdDefinition_id=${psdDefinition_id}`;
-    }
+
     if (query) {
-      url += (psdDefinition_id ? '&' : '?') + `query=${query}`;
+      url += `?query=${query}`;
     }
-    return post(url, exceptionArr);
+    return post(url, {
+      listDefinition: definitionList,
+      form_data: exceptionArr,
+    });
   }
   // CRUD
   static async create(data, projectVersionId) {
