@@ -1,5 +1,6 @@
 <template>
   <div class="card layout-content min-h-full">
+    <ConfirmDialog></ConfirmDialog>
     <Toast />
     <AppProgressSpinner :showSpinner="isLoadingUserConfig"></AppProgressSpinner>
 
@@ -671,6 +672,7 @@ const updateApplication = async () => {
   }
 };
 const confirmDeleteApp = async (event) => {
+  console.log('abc');
   confirm.require({
     target: event.currentTarget,
     header: 'Delete Application',
@@ -681,6 +683,7 @@ const confirmDeleteApp = async (event) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: async () => {
+      console.log('def');
       await deleteApplication();
     },
   });
