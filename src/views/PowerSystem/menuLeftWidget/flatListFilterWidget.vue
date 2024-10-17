@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-2 justify-content-start flex-wrap xl:flex-nowrap">
+  <div class="flex gap-2 justify-content-start align-items-start flex-wrap xl:flex-nowrap">
     <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Area" class="text-sm"> Area </label>
       <AutoComplete
@@ -8,7 +8,7 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete"
+        class="flex-grow-1 max-w-12rem psAutoComplete"
         :disabled="!canUseDefinitionFilter"
         :suggestions="areaSuggestions"
         name="areaFilter"
@@ -123,6 +123,7 @@ const props = defineProps({
 
   definitionList: { type: Array, default: () => [] },
   projectVersionId: { type: String },
+  initData: { type: Object, default: () => {} },
 });
 
 const emits = defineEmits(['handleFilter']);
@@ -133,6 +134,18 @@ watch(
     if (props.definitionList && props.definitionList.length > 0) {
       clearFilterSelected();
     }
+  },
+);
+
+watch(
+  () => props.initData,
+  () => {
+    areaFilter.value = props.initData.area;
+    zoneFilter.value = props.initData.zone;
+    ownerFilter.value = props.initData.owner;
+    typeFilter.value = props.initData.type;
+    kvFilter.value = props.initData.kV;
+    stationFilter.value = props.initData.station;
   },
 );
 const areaFilter = ref();
@@ -221,12 +234,12 @@ const clearFilterSelected = () => {
 const handleFilterClick = () => {
   if (props.multipleSelection) {
     emits('handleFilter', {
-      area: areaFilter.value ? areaFilter.value.map((item) => item._id) : null,
-      zone: zoneFilter.value ? zoneFilter.value.map((item) => item._id) : null,
-      owner: ownerFilter.value ? ownerFilter.value.map((item) => item._id) : null,
-      type: typeFilter.value ? typeFilter.value.map((item) => item._id) : null,
-      kv: kvFilter.value ? kvFilter.value.map((item) => item._id) : null,
-      sub: stationFilter.value ? stationFilter.value.map((item) => item._id) : null,
+      area: areaFilter.value ? areaFilter.value.map((item) => item._id) : [],
+      zone: zoneFilter.value ? zoneFilter.value.map((item) => item._id) : [],
+      owner: ownerFilter.value ? ownerFilter.value.map((item) => item._id) : [],
+      type: typeFilter.value ? typeFilter.value.map((item) => item._id) : [],
+      kv: kvFilter.value ? kvFilter.value.map((item) => item._id) : [],
+      sub: stationFilter.value ? stationFilter.value.map((item) => item._id) : [],
     });
   } else {
     emits('handleFilter', {

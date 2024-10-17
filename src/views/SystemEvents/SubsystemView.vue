@@ -67,14 +67,26 @@
           </TabPanel>
           <TabPanel header="List Power System">
             <div class="p-3">
-              <filterSubSystemView />
+              <filterSubSystemView :current-filter="selectedItem.filterConditions" @changeFilter="changeFilter" />
             </div>
-            <div>
-              selectedItem
-              <pre>
+            <div class="flex gap-6">
+              <div>
+                selectedItem
+                <pre>
               {{ selectedItem }}
+              
             </pre
-              >
+                >
+              </div>
+
+              <div>
+                filterData
+                <pre>{{ filterData }}</pre>
+              </div>
+              <div>
+                filterConditions
+                <div v-for="(val, key) in selectedItem.filterConditions">{{ key }}: {{ val }}</div>
+              </div>
             </div>
           </TabPanel>
         </TabView>
@@ -175,6 +187,11 @@ const createThis = async () => {
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const filterData = ref([]);
+const changeFilter = async (newfilter) => {
+  filterData.value = newfilter;
 };
 </script>
 
