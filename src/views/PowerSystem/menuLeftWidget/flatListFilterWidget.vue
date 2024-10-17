@@ -8,7 +8,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 max-w-12rem psAutoComplete"
+        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
+        :class="{ showMoreViaDot: multipleSelection && areaFilter && areaFilter.length > 1 }"
         :disabled="!canUseDefinitionFilter"
         :suggestions="areaSuggestions"
         name="areaFilter"
@@ -25,7 +26,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete"
+        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
+        :class="{ showMoreViaDot: multipleSelection && zoneFilter && zoneFilter.length > 1 }"
         :disabled="!canUseDefinitionFilter"
         :suggestions="zoneSuggestions"
         name="zoneFilter"
@@ -41,7 +43,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete"
+        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
+        :class="{ showMoreViaDot: multipleSelection && ownerFilter && ownerFilter.length > 1 }"
         :disabled="!canUseDefinitionFilter"
         :suggestions="ownerSuggestions"
         name="ownerFilter"
@@ -58,7 +61,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete"
+        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
+        :class="{ showMoreViaDot: multipleSelection && typeFilter && typeFilter.length > 1 }"
         :disabled="!canUseDefinitionFilter"
         :suggestions="typeSuggestions"
         name="typeFilter"
@@ -74,7 +78,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete"
+        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
+        :class="{ showMoreViaDot: multipleSelection && kvFilter && kvFilter.length > 1 }"
         :disabled="!canUseDefinitionFilter"
         :suggestions="kvSuggestions"
         name="kvFilter"
@@ -93,7 +98,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete"
+        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
+        :class="{ showMoreViaDot: multipleSelection && stationFilter && stationFilter.length > 1 }"
         :disabled="!canUseDefinitionStationFilter"
         :suggestions="stationSuggestions"
         name="stationFilter"

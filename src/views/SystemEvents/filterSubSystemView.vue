@@ -30,7 +30,8 @@
         optionLabel="name"
         optionValue="_id"
         completeOnFocus
-        class="flex-grow-1 psAutoComplete w-20rem"
+        class="flex-grow-1 psFilterAutoComplete w-20rem"
+        :class="{ showMoreViaDot: psSelected.length > 1 }"
         :suggestions="psSuggestions"
         name="psFilter"
         multiple
@@ -118,9 +119,27 @@ const searchPsQueryFilter = async (event) => {
 .p-autocomplete-input {
   width: 100%;
 }
-.psAutoComplete button {
+.psFilterAutoComplete button {
   background-color: var(--gray-400);
   border-color: var(--gray-400);
   max-width: 20rem;
+}
+
+.p-autocomplete-multiple-container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.p-autocomplete-input-token {
+  flex-grow: 1;
+}
+.psFilterAutoComplete .p-autocomplete-token:nth-child(n + 2) {
+  display: none;
+}
+
+.psFilterAutoComplete.showMoreViaDot .p-autocomplete-token:first-child::after {
+  content: '...';
+  position: relative;
+  left: 2rem;
 }
 </style>
