@@ -1,125 +1,135 @@
 <template>
-  <div class="flex gap-2 justify-content-start align-items-center flex-wrap xl:flex-nowrap">
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
-      <label for="Area" class="text-sm"> Area </label>
-      <AutoComplete
-        v-model="areaFilter"
-        inputId="area"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
-        :class="{ showMoreViaDot: multipleSelection && areaFilter && areaFilter.length > 1 }"
-        :disabled="!canUseDefinitionFilter"
-        :suggestions="areaSuggestions"
-        name="areaFilter"
-        :multiple="multipleSelection"
-        @complete="searchAreaQuery"
-      />
+  <div class="grid justify-content-start align-items-center">
+    <div :class="$slots.otherFilter ? 'col-3' : 'col'" class="">
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="Area" class="text-sm"> Area </label>
+        <AutoComplete
+          v-model="areaFilter"
+          inputId="area"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :class="{ showMoreViaDot: multipleSelection && areaFilter && areaFilter.length > 1 }"
+          :disabled="!canUseDefinitionFilter"
+          :suggestions="areaSuggestions"
+          name="areaFilter"
+          :multiple="multipleSelection"
+          @complete="searchAreaQuery"
+        />
+      </div>
+    </div>
+    <div :class="$slots.otherFilter ? 'col-3' : 'col'">
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="Zone" class="text-sm"> Zone </label>
+        <AutoComplete
+          v-model="zoneFilter"
+          inputId="Zone"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :class="{ showMoreViaDot: multipleSelection && zoneFilter && zoneFilter.length > 1 }"
+          :disabled="!canUseDefinitionFilter"
+          :suggestions="zoneSuggestions"
+          name="zoneFilter"
+          :multiple="multipleSelection"
+          @complete="searchZoneQuery"
+        />
+      </div>
+    </div>
+    <div :class="$slots.otherFilter ? 'col-3' : 'col'">
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="Owner" class="text-sm"> Owner </label>
+        <AutoComplete
+          v-model="ownerFilter"
+          inputId="Owner"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :class="{ showMoreViaDot: multipleSelection && ownerFilter && ownerFilter.length > 1 }"
+          :disabled="!canUseDefinitionFilter"
+          :suggestions="ownerSuggestions"
+          name="ownerFilter"
+          :multiple="multipleSelection"
+          @complete="searchOwnerQuery"
+        />
+      </div>
+    </div>
+    <div v-if="showTypeFilter" :class="$slots.otherFilter ? 'col-3' : 'col'">
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="Type" class="text-sm"> Type </label>
+        <AutoComplete
+          v-model="typeFilter"
+          inputId="Type"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :class="{ showMoreViaDot: multipleSelection && typeFilter && typeFilter.length > 1 }"
+          :disabled="!canUseDefinitionFilter"
+          :suggestions="typeSuggestions"
+          name="typeFilter"
+          :multiple="multipleSelection"
+          @complete="searchTypeQuery"
+        />
+      </div>
+    </div>
+    <div :class="$slots.otherFilter ? 'col-3' : 'col'">
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="kV" class="text-sm"> kV </label>
+        <AutoComplete
+          v-model="kvFilter"
+          inputId="kV"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :class="{ showMoreViaDot: multipleSelection && kvFilter && kvFilter.length > 1 }"
+          :disabled="!canUseDefinitionFilter"
+          :suggestions="kvSuggestions"
+          name="kvFilter"
+          :multiple="multipleSelection"
+          @complete="searchkvQuery"
+        />
+      </div>
     </div>
 
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
-      <label for="Zone" class="text-sm"> Zone </label>
-      <AutoComplete
-        v-model="zoneFilter"
-        inputId="Zone"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
-        :class="{ showMoreViaDot: multipleSelection && zoneFilter && zoneFilter.length > 1 }"
-        :disabled="!canUseDefinitionFilter"
-        :suggestions="zoneSuggestions"
-        name="zoneFilter"
-        :multiple="multipleSelection"
-        @complete="searchZoneQuery"
-      />
+    <div :class="$slots.otherFilter ? 'col-3' : 'col'" class="flex align-items-end">
+      <Divider v-if="!$slots.otherFilter" layout="vertical" />
+      <div class="flex-grow-1 flex flex-column align-items-start gap-1">
+        <label for="Station" class="text-sm"> Station </label>
+        <AutoComplete
+          v-model="stationFilter"
+          inputId="Station"
+          optionLabel="name"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :class="{ showMoreViaDot: multipleSelection && stationFilter && stationFilter.length > 1 }"
+          :disabled="!canUseDefinitionStationFilter"
+          :suggestions="stationSuggestions"
+          name="stationFilter"
+          :multiple="multipleSelection"
+          @complete="searchStationQuery"
+        />
+      </div>
     </div>
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
-      <label for="Owner" class="text-sm"> Owner </label>
-      <AutoComplete
-        v-model="ownerFilter"
-        inputId="Owner"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
-        :class="{ showMoreViaDot: multipleSelection && ownerFilter && ownerFilter.length > 1 }"
-        :disabled="!canUseDefinitionFilter"
-        :suggestions="ownerSuggestions"
-        name="ownerFilter"
-        :multiple="multipleSelection"
-        @complete="searchOwnerQuery"
-      />
+    <div v-if="$slots.otherFilter" class="col">
+      <slot name="otherFilter" />
     </div>
-
-    <div v-if="showTypeFilter" class="flex-grow-1 flex flex-column align-items-start gap-1">
-      <label for="Type" class="text-sm"> Type </label>
-      <AutoComplete
-        v-model="typeFilter"
-        inputId="Type"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
-        :class="{ showMoreViaDot: multipleSelection && typeFilter && typeFilter.length > 1 }"
-        :disabled="!canUseDefinitionFilter"
-        :suggestions="typeSuggestions"
-        name="typeFilter"
-        :multiple="multipleSelection"
-        @complete="searchTypeQuery"
-      />
-    </div>
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
-      <label for="kV" class="text-sm"> kV </label>
-      <AutoComplete
-        v-model="kvFilter"
-        inputId="kV"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
-        :class="{ showMoreViaDot: multipleSelection && kvFilter && kvFilter.length > 1 }"
-        :disabled="!canUseDefinitionFilter"
-        :suggestions="kvSuggestions"
-        name="kvFilter"
-        :multiple="multipleSelection"
-        @complete="searchkvQuery"
-      />
-    </div>
-
-    <Divider v-if="!$slots.otherFilter" layout="vertical" />
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
-      <label for="Station" class="text-sm"> Station </label>
-      <AutoComplete
-        v-model="stationFilter"
-        inputId="Station"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete max-w-16rem"
-        :class="{ showMoreViaDot: multipleSelection && stationFilter && stationFilter.length > 1 }"
-        :disabled="!canUseDefinitionStationFilter"
-        :suggestions="stationSuggestions"
-        name="stationFilter"
-        :multiple="multipleSelection"
-        @complete="searchStationQuery"
-      />
-    </div>
-    <slot name="otherFilter" />
-
-    <div class="flex gap-2 align-items-center">
-      <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
-      <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="handleFilterClick" />
+    <div :class="$slots.otherFilter ? 'col-3' : 'col'">
+      <div class="flex gap-2 align-items-center justify-content-end">
+        <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
+        <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="handleFilterClick" />
+      </div>
     </div>
   </div>
 </template>
 <script setup>
 import { ref, watch } from 'vue';
 import AutoComplete from 'primevue/autocomplete';
-
-import FloatLabel from 'primevue/floatlabel';
-
 import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 const props = defineProps({

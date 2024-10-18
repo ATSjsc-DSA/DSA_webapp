@@ -66,7 +66,7 @@
             </div>
           </TabPanel>
           <TabPanel header="List Power System">
-            <div class="p-3">
+            <div class="pt-1">
               <filterSubSystemView
                 :current-filter="selectedItem.filterConditions"
                 :project-version-id="projectVersionId"
@@ -78,7 +78,7 @@
                 <template #header>
                   <Button label="Parameter" text />
                 </template>
-                <div style="height: 37rem">
+                <div style="height: 32rem">
                   <parameterTabWidget
                     :data="parameterData"
                     :headerData="parameterDefinitionData"
@@ -117,7 +117,7 @@
                     </SplitButton>
                   </div>
                 </template>
-                <div style="height: 37rem">
+                <div style="height: 32rem">
                   <emsTabWidget
                     :emsData="emsData"
                     :loading="isEmsLoading"
@@ -370,9 +370,11 @@ const getEmsDefinitionData = async (id) => {
 
 const emsFilterList = ref([]);
 const emsFilterSelected = ref();
-watch(emsFilterSelected, async () => {
+watch(emsFilterSelected, async (newVal, oldVal) => {
   emsCurrentPage.value = 1;
-  await getEmsList(true);
+  if (oldVal) {
+    await getEmsList(true);
+  }
 });
 const getEmsfilterList = async () => {
   try {
