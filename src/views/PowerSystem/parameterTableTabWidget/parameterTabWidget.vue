@@ -29,7 +29,7 @@
         </template>
       </Column>
     </template>
-    <Column frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+    <Column v-if="showChangeColumn" frozen alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />
@@ -140,6 +140,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false,
+  },
+  showChangeColumn: {
+    type: Boolean,
+    default: true,
   },
 });
 const emit = defineEmits(['editData', 'deleteData']);

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-2 justify-content-start align-items-start flex-wrap xl:flex-nowrap">
+  <div class="flex gap-2 justify-content-start align-items-center flex-wrap xl:flex-nowrap">
     <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Area" class="text-sm"> Area </label>
       <AutoComplete
@@ -53,7 +53,7 @@
       />
     </div>
 
-    <div class="flex-grow-1 flex flex-column align-items-start gap-1">
+    <div v-if="showTypeFilter" class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Type" class="text-sm"> Type </label>
       <AutoComplete
         v-model="typeFilter"
@@ -88,8 +88,7 @@
       />
     </div>
 
-    <Divider layout="vertical" />
-
+    <Divider v-if="!$slots.otherFilter" layout="vertical" />
     <div class="flex-grow-1 flex flex-column align-items-start gap-1">
       <label for="Station" class="text-sm"> Station </label>
       <AutoComplete
@@ -107,6 +106,7 @@
         @complete="searchStationQuery"
       />
     </div>
+    <slot name="otherFilter" />
 
     <div class="flex gap-2 align-items-center">
       <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
@@ -126,13 +126,13 @@ const props = defineProps({
   canUseDefinitionFilter: { type: Boolean, default: true },
   canUseDefinitionStationFilter: { type: Boolean, default: true },
   multipleSelection: { type: Boolean, default: false },
-
+  showTypeFilter: { type: Boolean, default: true },
   definitionList: { type: Array, default: () => [] },
   projectVersionId: { type: String },
   initData: { type: Object, default: () => {} },
 });
 
-const emits = defineEmits(['handleFilter']);
+const emits = defineEmits(['handleFilter', 'clearOtherFilterSelected']);
 
 watch(
   () => props.definitionList,
@@ -236,6 +236,7 @@ const clearFilterSelected = () => {
   typeFilter.value = undefined;
   kvFilter.value = undefined;
   stationFilter.value = undefined;
+  emits('clearOtherFilterSelected');
 };
 const handleFilterClick = () => {
   if (props.multipleSelection) {

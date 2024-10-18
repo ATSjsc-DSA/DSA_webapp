@@ -77,6 +77,14 @@ export class PowerSystemParameterApi {
       parentId: parentId,
     });
   }
+
+  static async getPsDataWithSubsystem(projectVersionId, data = {}, page = 1) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId}/parameter`, {
+      ...data,
+      page: page,
+    });
+  }
+
   static async searchPs(projectVersionId, definitionList, query, exceptionArr = []) {
     let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
 
@@ -138,6 +146,13 @@ export class PowerSystemEmsApi {
       page: page,
       parentId: parentId,
       ems_definition_id: ems_definition_id,
+    });
+  }
+
+  static async getPsDataWithSubsystem(projectVersionId, data = {}, page = 1) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId}/ems`, {
+      ...data,
+      page: page,
     });
   }
   static async searchPs(projectVersionId, psdDefinition_id = '', query = '', exceptionArr = []) {

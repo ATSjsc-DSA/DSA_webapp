@@ -4,40 +4,44 @@
       :definitionList="definitionList"
       :projectVersionId="projectVersionId"
       :multipleSelection="true"
+      :showTypeFilter="false"
       :init-data="initData"
       @handleFilter="changFilterData"
-    />
-  </div>
-  <div class="mt-3 flex justify-content-start gap-3">
-    <div class="flex flex-column align-items-start gap-1">
-      <label for="type" class="text-sm"> Type </label>
-      <MultiSelect
-        v-model="deviceTypeSelected"
-        display="chip"
-        :options="deviceTypeList"
-        optionLabel="name"
-        optionValue="_id"
-        placeholder="Select Types"
-        class="w-20rem"
-      />
-    </div>
+      @clearOtherFilterSelected="clearOtherFilterSelected"
+    >
+      <template #otherFilter>
+        <div class="flex flex-column align-items-start gap-1">
+          <label for="type" class="text-sm"> Type </label>
+          <MultiSelect
+            v-model="deviceTypeSelected"
+            display="chip"
+            :options="deviceTypeList"
+            optionLabel="name"
+            optionValue="_id"
+            placeholder="Select Types"
+            :max-selected-labels="1"
+            class="max-w-24rem"
+          />
+        </div>
 
-    <div class="flex flex-column align-items-start gap-1">
-      <label for="ps" class="text-sm"> Power System </label>
-      <AutoComplete
-        v-model="psSelected"
-        inputId="ps"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="flex-grow-1 psFilterAutoComplete w-20rem"
-        :class="{ showMoreViaDot: psSelected.length > 1 }"
-        :suggestions="psSuggestions"
-        name="psFilter"
-        multiple
-        @complete="searchPsQueryFilter"
-      />
-    </div>
+        <div class="flex flex-column align-items-start gap-1">
+          <label for="ps" class="text-sm"> Power System </label>
+          <AutoComplete
+            v-model="psSelected"
+            inputId="ps"
+            optionLabel="name"
+            optionValue="_id"
+            completeOnFocus
+            class="flex-grow-1 psFilterAutoComplete w-16rem"
+            :class="{ showMoreViaDot: psSelected.length > 1 }"
+            :suggestions="psSuggestions"
+            name="psFilter"
+            multiple
+            @complete="searchPsQueryFilter"
+          />
+        </div>
+      </template>
+    </flatListFilterWidget>
   </div>
 </template>
 
@@ -47,7 +51,6 @@ import MultiSelect from 'primevue/multiselect';
 import flatListFilterWidget from '@/views/PowerSystem/menuLeftWidget/flatListFilterWidget.vue';
 import { DefinitionListApi, PowerSystemParameterApi } from '@/views/PowerSystem/api';
 import { onMounted, watch } from 'vue';
-const projectVersionId = ref('66decf1dcff005199529524b');
 
 onMounted(async () => {
   await getDefinitionList();
@@ -56,6 +59,7 @@ onMounted(async () => {
 
 const props = defineProps({
   currentFilter: { type: Object, default: () => {} },
+  projectVersionId: { type: String, default: '' },
 });
 const emit = defineEmits(['changeFilter']);
 watch(
@@ -78,12 +82,10 @@ const getDefinitionList = async () => {
   }
 };
 
-const filterData = ref();
 const changFilterData = (newFilter) => {
   newFilter.definitionList = deviceTypeSelected.value;
   newFilter.powersystem = psSelected.value ? psSelected.value.map((item) => item._id) : [];
-  filterData.value = newFilter;
-  emit('changeFilter', filterData);
+  emit('changeFilter', newFilter);
 };
 
 const deviceTypeList = ref([]);
@@ -107,12 +109,17 @@ const psSuggestions = ref([]);
 const searchPsQueryFilter = async (event) => {
   const query = event ? event.query.trim() : '';
   try {
-    const res = await PowerSystemParameterApi.searchPs(projectVersionId.value, deviceTypeSelected.value, query);
+    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, deviceTypeSelected.value, query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {
     console.log('searchPsQueryFilter: error ', error);
   }
+};
+
+const clearOtherFilterSelected = () => {
+  deviceTypeSelected.value = [];
+  psSelected.value = [];
 };
 </script>
 <style>

@@ -28,7 +28,7 @@
         </template>
       </Column>
     </template>
-    <Column frozen alignFrozen="right" style="width: 5rem" bodyClass="p-1">
+    <Column v-if="showChangeColumn" frozen alignFrozen="right" style="width: 5rem" bodyClass="p-1">
       <template #body="slotProps">
         <div class="flex justify-content-between">
           <Button icon="pi pi-pencil " severity="success" text rounded @click="handleEditPSE(slotProps.data)" />
@@ -103,6 +103,10 @@ const props = defineProps({
   headerData: {
     type: Object,
     required: true,
+  },
+  showChangeColumn: {
+    type: Boolean,
+    default: true,
   },
 });
 
