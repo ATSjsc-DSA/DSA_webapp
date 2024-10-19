@@ -10,35 +10,41 @@
       @clearOtherFilterSelected="clearOtherFilterSelected"
     >
       <template #otherFilter>
-        <div class="flex flex-column align-items-start gap-1">
-          <label for="type" class="text-sm"> Type </label>
-          <MultiSelect
-            v-model="deviceTypeSelected"
-            display="chip"
-            :options="deviceTypeList"
-            optionLabel="name"
-            optionValue="_id"
-            placeholder="Select Types"
-            :max-selected-labels="1"
-            class="max-w-24rem"
-          />
-        </div>
+        <div class="grid gap-2">
+          <div class="col">
+            <div class="flex flex-column align-items-start gap-1">
+              <label for="type" class="text-sm"> Type </label>
+              <MultiSelect
+                v-model="deviceTypeSelected"
+                display="chip"
+                :options="deviceTypeList"
+                optionLabel="name"
+                optionValue="_id"
+                placeholder="Select Types"
+                :max-selected-labels="1"
+                class="w-full psFilterAutoComplete"
+              />
+            </div>
+          </div>
 
-        <div class="flex flex-column align-items-start gap-1">
-          <label for="ps" class="text-sm"> Power System </label>
-          <AutoComplete
-            v-model="psSelected"
-            inputId="ps"
-            optionLabel="name"
-            optionValue="_id"
-            completeOnFocus
-            class="flex-grow-1 psFilterAutoComplete w-16rem"
-            :class="{ showMoreViaDot: psSelected.length > 1 }"
-            :suggestions="psSuggestions"
-            name="psFilter"
-            multiple
-            @complete="searchPsQueryFilter"
-          />
+          <div class="col">
+            <div class="flex flex-column align-items-start gap-1">
+              <label for="ps" class="text-sm"> Power System </label>
+              <AutoComplete
+                v-model="psSelected"
+                inputId="ps"
+                optionLabel="name"
+                optionValue="_id"
+                completeOnFocus
+                class="w-full psFilterAutoComplete"
+                :class="{ showMoreViaDot: psSelected.length > 1 }"
+                :suggestions="psSuggestions"
+                name="psFilter"
+                multiple
+                @complete="searchPsQueryFilter"
+              />
+            </div>
+          </div>
         </div>
       </template>
     </flatListFilterWidget>
@@ -123,13 +129,13 @@ const clearOtherFilterSelected = () => {
 };
 </script>
 <style>
-.p-autocomplete-input {
+.p-autocomplete-input,
+.p-inputtext {
   width: 100%;
 }
 .psFilterAutoComplete button {
   background-color: var(--gray-400);
   border-color: var(--gray-400);
-  max-width: 20rem;
 }
 
 .p-autocomplete-multiple-container {
