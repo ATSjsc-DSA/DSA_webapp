@@ -1,16 +1,14 @@
 <template>
   <div class="grid">
     <template v-if="!isCreateForm">
-      <div class="col-10">
-        <div class="flex flex-column gap-2 mb-3">
+      <div class="col-12 flex justify-content-between">
+        <div class="flex flex-column gap-2 mb-3 px-3 flex-1">
           <label for="name" class="font-semibold"> Name </label>
-          <InputText id="name" v-model="data.name" class="flex-auto" autocomplete="off" />
+          <InputText id="name" v-model="data.name" class="flex-auto w-full" autocomplete="off" />
         </div>
-      </div>
-      <div class="col-2">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="active" class="font-semibold w-6rem"> Active</label>
-          <InputSwitch id="active" class="mt-2" v-model="data.active" autocomplete="off" />
+        <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
+          <label for="active" class="font-semibold"> Active</label>
+          <InputSwitch id="active" v-model="data.active" autocomplete="off" />
         </div>
       </div>
       <Divider />
@@ -120,29 +118,21 @@
   <span class="p-text-secondary block mb-5">Monitor</span>
 
   <div class="grid item">
-    <div class="col-10">
-      <div class="flex flex-column gap-2 mb-3">
+    <div class="col-12 flex justify-content-between">
+      <div class="flex flex-column gap-2 mb-3 px-3 flex-1">
         <label for="monitorSubSystemId" class="font-semibold"> Monitor Sub System</label>
-        <!-- <InputText
-          id="monitorSubSystemId"
-          v-model="data.monitor.monitorSubSystemId"
-          class="flex-auto"
-          autocomplete="off"
-        /> -->
         <Dropdown
           v-model="data.monitor.monitorSubSystemId"
           :options="listSubSystem"
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Monitor Sub System "
-          class="flex-grow-1"
+          class="!w-full"
         />
       </div>
-    </div>
-    <div class="col-2">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="monitor-active" class="font-semibold w-6rem"> Active</label>
-        <InputSwitch id="monitor-active" class="mt-2" v-model="data.monitor.active" autocomplete="off" />
+      <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
+        <label for="monitor-active" class="font-semibold"> Active</label>
+        <InputSwitch id="monitor-active" v-model="data.monitor.active" autocomplete="off" />
       </div>
     </div>
     <template v-if="data.monitor.active">

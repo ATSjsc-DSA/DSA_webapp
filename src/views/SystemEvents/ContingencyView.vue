@@ -75,26 +75,49 @@
             class="w-full"
           />
         </div>
-        <div class="field">
-          <label for="name" class="font-semibold">Power System 1</label>
-          <AutoComplete
-            v-model="autoCompleteValue1"
-            completeOnFocus
-            optionLabel="name"
-            :suggestions="items"
-            @complete="search"
-          />
+        <div class="grid">
+          <div class="field col-12 md:col-8">
+            <label for="name" class="font-semibold">Power System 1</label>
+            <AutoComplete
+              v-model="autoCompleteValue1"
+              completeOnFocus
+              optionLabel="name"
+              :suggestions="items"
+              @complete="searchPs1"
+            />
+          </div>
+          <div class="field col-12 md:col-4">
+            <label for="name" class="font-semibold">Definition</label>
+            <Dropdown
+              v-model="selectedDefinition1"
+              :options="listDefinition"
+              optionLabel="name"
+              optionValue="_id"
+              class="w-full"
+            />
+          </div>
         </div>
-
-        <div class="field" v-if="contingencyModelData.contingencyType === 1">
-          <label for="name" class="font-semibold">Power System 2</label>
-          <AutoComplete
-            v-model="autoCompleteValue2"
-            completeOnFocus
-            optionLabel="name"
-            :suggestions="items"
-            @complete="search"
-          />
+        <div v-if="contingencyModelData.contingencyType === 1" class="grid">
+          <div class="field col-12 md:col-8">
+            <label for="name" class="font-semibold">Power System 2</label>
+            <AutoComplete
+              v-model="autoCompleteValue2"
+              completeOnFocus
+              optionLabel="name"
+              :suggestions="items"
+              @complete="searchPs2"
+            />
+          </div>
+          <div class="field col-12 md:col-4">
+            <label for="name" class="font-semibold">Definition</label>
+            <Dropdown
+              v-model="selectedDefinition2"
+              :options="listDefinition"
+              optionLabel="name"
+              optionValue="_id"
+              class="w-full"
+            />
+          </div>
         </div>
         <div class="flex align-items-center gap-3 mb-5">
           <label for="active" class="font-semibold">Active</label>
@@ -113,6 +136,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ApiContingency, commonApi } from './api';
+import { PowerSystemParameterApi, DefinitionListApi } from '@/views/PowerSystem/api';
+
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
@@ -125,9 +150,9 @@ const popupButton = ref(null); // Để gắn popup vào nút
 
 const contingenciesActiveId = computed(() => props.contingenciesActive._id);
 
-// onMounted(() => {
-//   getListContingency();
-// });
+onMounted(() => {
+  getDefiniton();
+});
 
 watch(contingenciesActiveId, (newValue, oldValue) => {
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
@@ -137,6 +162,16 @@ watch(contingenciesActiveId, (newValue, oldValue) => {
 const visible = ref(false);
 const toast = useToast();
 const confirm = useConfirm();
+const listDefinition = ref();
+
+const getDefiniton = async () => {
+  try {
+    const res = await DefinitionListApi.getDefinitionSubsystem();
+    listDefinition.value = res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
 
 const contingencyModelData = ref({
   _id: '',
@@ -148,7 +183,8 @@ const contingencyModelData = ref({
 const headerDialog = ref('Edit');
 const autoCompleteValue1 = ref({});
 const autoCompleteValue2 = ref({});
-
+const selectedDefinition1 = ref();
+const selectedDefinition2 = ref();
 watchEffect(() => {
   contingencyModelData.value.listPowerSystemId = [
     ...(autoCompleteValue1.value._id ? [autoCompleteValue1.value._id] : []),
@@ -186,10 +222,19 @@ const getListContingency = async () => {
   }
 };
 
-const search = async (event) => {
+const searchPs1 = async (event) => {
   const query = event.query.trim();
+  await search(query, selectedDefinition1.value ? [selectedDefinition1.value] : []);
+};
+
+const searchPs2 = async (event) => {
+  const query = event.query.trim();
+  await search(query, selectedDefinition2.value ? [selectedDefinition2.value] : []);
+};
+
+const search = async (query, definition) => {
   try {
-    const res = await commonApi.searchPowerSystemData('', query);
+    const res = await PowerSystemParameterApi.searchPs('66decf1dcff005199529524b', definition, query);
     items.value = res.data;
   } catch (error) {
     console.log('searchPsdQueryFilter: error ', error);
@@ -216,6 +261,8 @@ const handlerCreateThis = async () => {
   contingencyModelData.value = dataDefault;
   autoCompleteValue1.value = {};
   autoCompleteValue2.value = {};
+  selectedDefinition1.value = null;
+  selectedDefinition2.value = null;
   visible.value = true;
   headerDialog.value = 'Create';
 };
@@ -231,16 +278,21 @@ const createThis = async () => {
 };
 
 const handlerEditThis = async (data) => {
-  console.log(data);
   contingencyModelData.value = JSON.parse(JSON.stringify(data)); // Tạo bản sao của data
-  visible.value = true;
   headerDialog.value = 'Edit';
   if (contingencyModelData.value.listPowerSystemId.length === 1) {
-    autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
+    const { definitionId, ...rest } = contingencyModelData.value.listPowerSystemId[0];
+    autoCompleteValue1.value = rest;
+    selectedDefinition1.value = definitionId;
   } else if (contingencyModelData.value.listPowerSystemId.length === 2) {
-    autoCompleteValue1.value = contingencyModelData.value.listPowerSystemId[0];
-    autoCompleteValue2.value = contingencyModelData.value.listPowerSystemId[1];
+    const { definitionId, ...rest1 } = contingencyModelData.value.listPowerSystemId[0];
+    autoCompleteValue1.value = rest1;
+    selectedDefinition1.value = definitionId;
+    const { definitionId: definitionId2, ...rest2 } = contingencyModelData.value.listPowerSystemId[1];
+    autoCompleteValue2.value = rest2;
+    selectedDefinition2.value = definitionId2;
   }
+  visible.value = true;
 };
 
 const editThis = async () => {

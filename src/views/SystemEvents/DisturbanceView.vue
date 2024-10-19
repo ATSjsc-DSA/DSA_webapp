@@ -153,7 +153,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ApiDisturbance, commonApi } from './api';
-import { DefinitionListApi } from '@/views/PowerSystem/api';
+import { DefinitionListApi, PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -257,7 +257,11 @@ const getListDisturbance = async () => {
 const search = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await commonApi.searchPowerSystemData(selectedDefinition.value, query);
+    const res = await PowerSystemParameterApi.searchPs(
+      '66decf1dcff005199529524b',
+      selectedDefinition.value ? [selectedDefinition.value] : [],
+      query,
+    );
     items.value = res.data;
   } catch (error) {
     console.log('searchPsdQueryFilter: error ', error);

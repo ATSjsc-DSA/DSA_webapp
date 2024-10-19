@@ -111,14 +111,16 @@
 
                 <template #VSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onVsaRightClick($event, slotProps.node)">
-                    <Tag value="VSA" rounded /> {{ slotProps.node.label }}
+                    <Tag value="VSA" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
+                    {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="vsaContextMenuRef" :model="vsaContextMenu" />
                 </template>
 
                 <template #TSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onTsaRightClick($event, slotProps.node)">
-                    <Tag value="TSA" severity="secondary" rounded /> {{ slotProps.node.label }}
+                    <Tag value="TSA" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
+                    {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="tsaContextMenuRef" :model="tsaContextMenu" />
                 </template>
@@ -201,10 +203,8 @@
                   <dependencyTableWidget :project-version-id="projectVersionId" :dependency-id="tsaData._id" />
                 </ScrollPanel>
               </TabPanel>
-              <TabPanel header="Disturbances">
-                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
-                  <div>Tôi là disturbance Tab</div>
-                </ScrollPanel>
+              <TabPanel header="Disturbance">
+                <DisturbanceView :itemActive="tsaData"></DisturbanceView>
               </TabPanel>
             </TabView>
           </template>
@@ -336,6 +336,7 @@ import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationVie
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
 import dependencyTableWidget from './dependencyTableWidget.vue';
+import DisturbanceView from '../SystemEvents/DisturbanceView.vue';
 const toast = useToast();
 const confirm = useConfirm();
 const isLoadingUserConfig = ref(false);
@@ -666,6 +667,9 @@ const updateApplication = async () => {
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     treeData.value[0].children[nodeSelected.value.key].label = res.data.name;
     treeData.value[0].children[nodeSelected.value.key].active = res.data.active;
+    treeData.value[0].children[nodeSelected.value.key].children.forEach((element) => {
+      element.active = res.data.active;
+    });
   } catch (error) {
     console.log('updateApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });

@@ -1,7 +1,7 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { psm_active, projectData } = storeToRefs(commonStore);
+const { psm_active, projectData, versionId } = storeToRefs(commonStore);
 
 import DSA_Common from '@/combosables/DSA_common';
 const { convertTimeStringToInt } = DSA_Common();
@@ -85,7 +85,7 @@ export class PowerSystemParameterApi {
     });
   }
 
-  static async searchPs(projectVersionId, definitionList, query, exceptionArr = []) {
+  static async searchPs(projectVersionId = '66decf1dcff005199529524b', definitionList=[], query, exceptionArr = []) {
     let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
 
     if (query) {
