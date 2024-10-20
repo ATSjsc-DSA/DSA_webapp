@@ -36,23 +36,8 @@
         </template>
       </Column>
       <Column field="startTimestamp" header="Start Time" sortable style="width: 18%">
-        <template #body="{ data }">
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-clock" style="color: burlywood"></i>
-
-            <span>{{ convertDateTimeToString(data.startTimestamp) }}</span>
-          </div>
-        </template>
       </Column>
-      <Column field="endTimestamp" header="End Time" sortable style="width: 18%">
-        <template #body="{ data }">
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-clock" style="color: yellow"></i>
-
-            <span>{{ convertDateTimeToString(data.endTimestamp) }}</span>
-          </div>
-        </template></Column
-      >
+      <Column field="endTimestamp" header="End Time" sortable style="width: 18%" />
       <Column field="eventValue" header="Event Value">
         <template #body="{ data }">
           <Chip :label="getEventValue(data.eventValue)" />
@@ -134,11 +119,11 @@
 
         <div class="field">
           <label for="startTimestamp" class="font-semibold">Start Time</label>
-          <Calendar id="calendar-24h" v-model="datetimeAsDateStart" showTime hourFormat="24" showSeconds />
+          <InputNumber v-model="disturbanceModelData.startTimestamp" inputId="minmaxfraction" :minFractionDigits="0" :maxFractionDigits="2" />
         </div>
         <div class="field">
           <label for="endTimestamp" class="font-semibold">End Time</label>
-          <Calendar id="calendar-24h" v-model="datetimeAsDateEnd" showTime hourFormat="24" showSeconds />
+          <InputNumber v-model="disturbanceModelData.endTimestamp" inputId="minmaxfraction" :minFractionDigits="0" :maxFractionDigits="2" />
         </div>
 
         <div class="flex justify-content-end gap-2">
@@ -170,14 +155,17 @@ const props = defineProps({
 
 onMounted(() => {
   getDefiniton();
+  getListDisturbance();
 });
 
 const popupButton = ref(null); // Để gắn popup vào nút
 
 const itemActive = computed(() => props.itemActive._id);
 
-watch(itemActive, (newValue, oldValue) => {
+watch(() => props.itemActive, (newValue, oldValue) => {
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    console.log('def');
+    
     getListDisturbance();
   }
 });
@@ -207,20 +195,7 @@ const dataDefault = {
   eventValue: 0,
 };
 
-const datetimeAsDateStart = ref(new Date()); // Khởi tạo với giá trị Date hiện tại
-const datetimeAsDateEnd = ref(new Date()); // Khởi tạo với giá trị Date hiện tại
 const autoCompleteValue = ref({});
-watchEffect(() => {
-  disturbanceModelData.value.powerSystemId = autoCompleteValue.value._id ? autoCompleteValue.value._id : null;
-
-  if (datetimeAsDateStart.value && datetimeAsDateStart.value instanceof Date) {
-    disturbanceModelData.value.startTimestamp = datetimeAsDateStart.value.getTime(); // Chuyển về seconds
-  }
-
-  if (datetimeAsDateEnd.value && datetimeAsDateEnd.value instanceof Date) {
-    disturbanceModelData.value.endTimestamp = datetimeAsDateEnd.value.getTime(); // Chuyển về seconds
-  }
-});
 
 const items = ref([]);
 
@@ -269,14 +244,6 @@ const search = async (event) => {
 };
 // ---------------- data --------------------
 
-const getDisturbanceType = (value) => {
-  switch (value) {
-    case 0:
-      return 'Short Circuit';
-    case 1:
-      return 'Switch';
-  }
-};
 
 const listDisturbanceType = [
   { name: 'Short Circuit', value: 0 },
@@ -382,13 +349,13 @@ const handlerCreateThis = async () => {
   disturbanceModelData.value = dataDefault;
   visible.value = true;
   headerDialog.value = 'Create';
-  datetimeAsDateStart.value = new Date(); // Khởi tạo với giá trị Date hiện tại
-  datetimeAsDateEnd.value = new Date(); // Khởi tạo với giá trị Date hiện tại
   autoCompleteValue.value = {};
   // datetimeAsDateStart =
 };
 const createThis = async () => {
   try {
+    console.log(disturbanceModelData.value, "GISS");
+    
     await ApiDisturbance.createDisturbance(itemActive.value, disturbanceModelData.value);
     getListDisturbance();
     visible.value = false;
@@ -399,13 +366,12 @@ const createThis = async () => {
 };
 
 const handlerEditThis = async (data) => {
-  console.log(data);
   disturbanceModelData.value = JSON.parse(JSON.stringify(data)); // Tạo bản sao của data
   visible.value = true;
   headerDialog.value = 'Edit';
-  datetimeAsDateStart.value = new Date(disturbanceModelData.value.startTimestamp);
-  datetimeAsDateEnd.value = new Date(disturbanceModelData.value.endTimestamp);
-  autoCompleteValue.value = disturbanceModelData.value.powerSystemId;
+  const {definitionId, ...rest} = disturbanceModelData.value.powerSystemId
+  autoCompleteValue.value = rest;
+  selectedDefinition.value = definitionId;
 };
 
 const editThis = async () => {

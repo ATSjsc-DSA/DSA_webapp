@@ -37,14 +37,11 @@ export class ApiContingency {
 }
 
 export class ApiDisturbance {
-  static async getListDisturbance(disturbances_id, param) {
-    return get(`/seedconfig/${disturbances_id}/disturbance`, param);
+  static async getListDisturbance(tsa_id, param) {
+    return get(`/seedconfig/${tsa_id}/disturbance`, param);
   }
-  static async createDisturbance(disturbances_id, data) {
-    return post(`/seedconfig/${disturbances_id}/disturbance`, data);
-  }
-  static async createDisturbance(data) {
-    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/disturbance`, data);
+  static async createDisturbance(tsa_id, data) {
+    return post(`/seedconfig/${tsa_id}/disturbance`, data);
   }
   static async getDisturbanceData(id) {
     return get(`/seedconfig/disturbance/${id}`);

@@ -10,7 +10,7 @@
     </div>
   </div>
   <div class="flex flex-column gap-2 mb-3">
-    <label for="monitorType" class="font-semibold"> Type </label>
+    <label for="monitorType" class="font-semibold"> Monitor Type </label>
     <Dropdown
       id="monitorType"
       v-model="data.monitorType"
@@ -96,6 +96,7 @@
       optionLabel="name"
       optionValue="_id"
       class="w-full"
+       @focus="getScadaMonitor()"
     />
   </div>
 
@@ -173,7 +174,6 @@ const psdSelected = computed({
 const psdSelectedCreate = ref();
 const psFilterSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
-  console.log(event, 'event');
   const query = event ? event.query.trim() : '';
   try {
     const res = await PowerSystemParameterApi.searchPs(
@@ -182,7 +182,6 @@ const searchPsQueryFilter = async (event) => {
       query,
     );
     psFilterSuggestions.value = res.data;
-    return res.data;
   } catch (error) {
     console.log('searchPsQueryFilter: error ', error);
   }
@@ -195,6 +194,16 @@ watch(
     listScadaMonitor.value = newVal;
   },
 );
+
+const getScadaMonitor = async () => {
+  try {
+    const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelectedCreate.value._id);
+    listScadaMonitor.value = res.data.data;
+  } catch (error) {
+    console.log('getScadaMonitor: error ', error);
+  }
+};
+
 
 watch(psdSelectedCreate, (newVal) => {
   if (props.isCreateForm) {

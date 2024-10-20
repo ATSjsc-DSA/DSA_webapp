@@ -7,7 +7,7 @@
           <InputText id="name" v-model="data.name" class="flex-auto w-full" autocomplete="off" />
         </div>
         <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
-          <label for="active" class="font-semibold"> Active</label>
+          <label for="active" class="font-semibold mb-2"> Active</label>
           <InputSwitch id="active" v-model="data.active" autocomplete="off" />
         </div>
       </div>
@@ -131,30 +131,26 @@
         />
       </div>
       <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
-        <label for="monitor-active" class="font-semibold"> Active</label>
-        <InputSwitch id="monitor-active" v-model="data.monitor.active" autocomplete="off" />
+        <label for="monitor-active" class="font-semibold mb-2"> Active</label>
+        <InputSwitch id="monitor-active" v-model="data.monitor.active"  autocomplete="off" />
       </div>
     </div>
-    <template v-if="data.monitor.active">
-      <div class="col-4">
+    <div v-if="data.monitor.active" class="col-12 flex justify-content-center gap-6 px-8 py-4">
         <div class="flex align-items-center gap-3 mb-3">
-          <label for="monitor_signalP"> Signa lP</label>
+          <label for="monitor_signalP"> SignalP</label>
           <Checkbox v-model="data.monitor.signalP" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
         </div>
-      </div>
-      <div class="col-4">
+
         <div class="flex align-items-center gap-3 mb-3">
-          <label for="monitor_signalQ"> Signa lQ </label>
+          <label for="monitor_signalQ"> SignalQ </label>
           <Checkbox v-model="data.monitor.signalQ" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
         </div>
-      </div>
-      <div class="col-4">
+
         <div class="flex align-items-center gap-3 mb-3">
-          <label for="monitor_signalV" class="font-semibold"> Signa lV </label>
+          <label for="monitor_signalV" class="font-semibold"> SignalV </label>
           <Checkbox v-model="data.monitor.signalV" inputId="monitor_signalV" name="monitor_signalV" :binary="true" />
         </div>
-      </div>
-    </template>
+    </div>
   </div>
 </template>
 

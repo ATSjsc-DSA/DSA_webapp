@@ -7,7 +7,7 @@
           <InputText id="name" v-model="data.name" class="flex-auto w-full" autocomplete="off" />
         </div>
         <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
-          <label for="active" class="font-semibold"> Active</label>
+          <label for="active" class="font-semibold mb-2"> Active</label>
           <InputSwitch id="active" v-model="data.active" autocomplete="off" />
         </div>
       </div>
@@ -61,21 +61,6 @@
           optionValue="_id"
           optionLabel="name"
           placeholder="Select a Sink"
-          class="flex-grow-1"
-        />
-      </div>
-    </div>
-
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3 px-3">
-        <label for="disturbanceId" class="font-semibold"> Disturbance</label>
-        <!-- <InputText id="disturbanceId" v-model="data.disturbanceId" class="flex-auto" autocomplete="off" /> -->
-        <Dropdown
-          v-model="data.disturbanceId"
-          :options="listDisturance"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Disturbance"
           class="flex-grow-1"
         />
       </div>
@@ -136,151 +121,77 @@
       />
     </div>
     <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
-      <label for="active" class="font-semibold"> Active</label>
+      <label for="active" class="font-semibold mb-2"> Active</label>
       <InputSwitch id="monitor-active" v-model="data.monitor.active" autocomplete="off" />
     </div>
   </div>
 
-  <div class="grid">
-    <Card class="col-12 md:col-4">
-      <template #title>
-        <div class="flex justify-content-between align-items-center">
-          <span>Bus Config</span>
-          <InputSwitch id="monitor-active" v-model="data.monitor.busConfig.active" autocomplete="off" />
-        </div>
-      </template>
-      <template #content>
-        <div class="flex flex-column gap-5 mt-3">
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-voltage"
-              v-model="data.monitor.busConfig.voltage"
-              :disabled="!data.monitor.busConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-voltage">Voltage</label>
-          </FloatLabel>
+  <div class="flex justify-content-between p-4">
+      <div class="flex-1">
+        <Chip label="Bus" class="mb-3"></Chip>
+        <div class="col-6">
+          <div class="grid">
+            <label for="monitor_signalP" class="col-6"> Voltage</label>
+            <Checkbox class="col-6" v-model="data.monitor.busConfig.voltage" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
+          </div>
 
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-freq"
-              v-model="data.monitor.busConfig.freq"
-              :disabled="!data.monitor.busConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-freq">Freq</label>
-          </FloatLabel>
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-angle"
-              v-model="data.monitor.busConfig.angle"
-              :disabled="!data.monitor.busConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-angle">Angle</label>
-          </FloatLabel>
-        </div>
-      </template>
-    </Card>
-    <!-- ==== branchConfig -->
-    <Card class="col-12 md:col-4">
-      <template #title>
-        <div class="flex justify-content-between align-items-center">
-          <span>Branch Config</span>
-          <InputSwitch id="monitor-active" v-model="data.monitor.branchConfig.active" autocomplete="off" />
-        </div>
-      </template>
-      <template #content>
-        <div class="flex flex-column gap-5 mt-3">
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-voltage"
-              v-model="data.monitor.branchConfig.activePower"
-              :disabled="!data.monitor.branchConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-voltage"> Active Power</label>
-          </FloatLabel>
+          <div class="grid">
+            <label for="monitor_signalQ" class="col-6"> Freq </label>
+            <Checkbox class="col-6" v-model="data.monitor.busConfig.freq" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
+          </div>
 
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-freq"
-              v-model="data.monitor.branchConfig.reActivePower"
-              :disabled="!data.monitor.branchConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-freq">ReActive Power</label>
-          </FloatLabel>
+          <div class="grid">
+            <label for="monitor_signalV" class="col-6"> Angle </label>
+            <Checkbox class="col-6" v-model="data.monitor.busConfig.angle" inputId="monitor_signalV" name="monitor_signalV" :binary="true" />
+          </div>
+      </div>
+      </div>
+      
+    <div class="flex-1">
+        <Chip label="Branch" class="mb-3"></Chip>
+        <div class="col-8">
+            <div class="grid">
+              <label for="monitor_signalP" class="col-6"> Active Power</label>
+              <Checkbox class="col-6" v-model="data.monitor.branchConfig.activePower" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
+            </div>
+
+            <div class="grid">
+              <label for="monitor_signalQ" class="col-6"> ReActive Power </label>
+              <Checkbox class="col-6" v-model="data.monitor.branchConfig.reActivePower" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
+            </div>
         </div>
-      </template>
-    </Card>
-    <Card class="col-12 md:col-4">
-      <template #title>
-        <div class="flex justify-content-between align-items-center">
-          <span>Gen Config</span>
-          <InputSwitch id="monitor-active" v-model="data.monitor.genConfig.active" autocomplete="off" />
+    </div>
+    <div class="flex-1">
+        <Chip label="Gen" class="mb-3"></Chip>
+        <div class="grid col-12">
+          <div class="flex-1 col-6">
+            <div class="grid">
+              <label for="monitor_rotorAngle" class="col-6"> Rotor Angle</label>
+              <Checkbox class="col-6" v-model="data.monitor.genConfig.rotorAngle" inputId="monitor_rotorAngle" name="monitor_rotorAngle" :binary="true" />
+            </div>
+
+            <div class="grid">
+              <label class="col-6" for="monitor_efd"> Efd</label>
+              <Checkbox class="col-6" v-model="data.monitor.genConfig.efd" inputId="monitor_efd" name="monitor_efd" :binary="true" />
+            </div>
+          </div>
+          <div class="flex-1 col-6">
+            <div class="grid">
+              <label class="col-6" for="monitor_electP"> Elect P</label>
+              <Checkbox class="col-6" v-model="data.monitor.genConfig.electP" inputId="monitor_electP" name="monitor_electP" :binary="true" />
+            </div>
+
+            <div class="grid">
+              <label class="col-6" for="monitor_electQ"> Elect Q</label>
+              <Checkbox class="col-6" v-model="data.monitor.genConfig.electQ" inputId="monitor_electQ" name="monitor_electQ" :binary="true" />
+            </div>
+            <div class="grid">
+              <label class="col-6" for="monitor_mechP"> Mech P</label>
+              <Checkbox class="col-6" v-model="data.monitor.genConfig.mechP" inputId="monitor_mechP" name="monitor_mechP" :binary="true" />
+            </div>
+          </div>
         </div>
-      </template>
-      <template #content>
-        <div class="flex flex-column gap-5 mt-3">
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-voltage"
-              v-model="data.monitor.genConfig.rotorAngle"
-              :disabled="!data.monitor.genConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-voltage">Rotor Angle</label>
-          </FloatLabel>
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-freq"
-              v-model="data.monitor.genConfig.electP"
-              :disabled="!data.monitor.genConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-freq">Elect P</label>
-          </FloatLabel>
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-angle"
-              v-model="data.monitor.genConfig.electQ"
-              :disabled="!data.monitor.genConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-angle">Elect Q</label>
-          </FloatLabel>
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-freq"
-              v-model="data.monitor.genConfig.mechP"
-              :disabled="!data.monitor.genConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-freq">Mech P</label>
-          </FloatLabel>
-          <FloatLabel>
-            <InputNumber
-              id="busConfig-angle"
-              v-model="data.monitor.genConfig.efd"
-              :disabled="!data.monitor.genConfig.active"
-              autocomplete="off"
-              class="w-full"
-            />
-            <label for="busConfig-angle">Efd</label>
-          </FloatLabel>
-        </div>
-      </template>
-    </Card>
+    </div>
   </div>
 
   <!-- ==== genConfig -->
@@ -293,7 +204,6 @@ import Checkbox from 'primevue/checkbox';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { ApiSubsystem, ApiDisturbance, ApiDisturbances } from '@/views/SystemEvents/api';
-import FloatLabel from 'primevue/floatlabel';
 
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
@@ -302,7 +212,6 @@ const toast = useToast();
 
 onMounted(async () => {
   await getListSubSystem();
-  await getListDisturbance();
 });
 const data = defineModel();
 
@@ -317,15 +226,5 @@ const getListSubSystem = async () => {
   }
 };
 
-const listDisturance = ref([]);
 
-const getListDisturbance = async () => {
-  try {
-    const res = await ApiDisturbances.getListDisturbances();
-    listDisturance.value = res.data;
-  } catch (error) {
-    console.log('getListDisturbance: error ', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
 </script>
