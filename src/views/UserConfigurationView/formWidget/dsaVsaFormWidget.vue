@@ -38,7 +38,7 @@
     </div>
     <div class="col-6">
       <div class="flex flex-column align-items-start gap-1">
-        <label for="ps" class="text-sm"> Contingencies</label>
+        <label for="ps" class="font-semibold"> Contingencies</label>
         <AutoComplete
           v-model="contingenciesSelected"
           inputId="ps"
@@ -127,7 +127,6 @@ const props = defineProps({
 const toast = useToast();
 
 onMounted(async () => {
-  await getListSubSystem();
   if (data.value.contingenciesId) {
     await setDefaultData();
   }
@@ -147,15 +146,6 @@ const setDefaultData = async () => {
   sinkSelected.value = await getSubSystemData(data.value.sinkId);
   fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
   monitorSubSystemSelected.value = await getSubSystemData(data.value.monitorSubSystemId);
-};
-const listSubSystem = ref();
-const getListSubSystem = async () => {
-  try {
-    const res = await ApiSubsystem.getListSubsystemOnlyName();
-    listSubSystem.value = res.data;
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
 };
 
 // contingencies
