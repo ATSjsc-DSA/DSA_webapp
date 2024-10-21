@@ -21,9 +21,7 @@ export class ApiContingency {
   static async getListContingency(contingenciesActiveId, param) {
     return get(`/seedconfig/${contingenciesActiveId}/contingency`, param);
   }
-  static async searchSubsystem(query = '', data = []) {
-    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/search/contingency?query=${query}`, data);
-  }
+
   static async createContingency(contingenciesActiveId, data) {
     return post(`/seedconfig/${contingenciesActiveId}/contingency`, data);
   }
@@ -60,7 +58,9 @@ export class ApiContingencies {
   static async getListContingencies() {
     return get(`/seedconfig/${projectData.value._id}/${versionId.value}/contingencies`);
   }
-
+  static async searchSubsystem(query = '', data = []) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/search/contingencies?query=${query}`, data);
+  }
   static async createContingencies(data) {
     return post(`/seedconfig/${projectData.value._id}/${versionId.value}/contingencies`, data);
   }
@@ -102,6 +102,9 @@ export class ApiSubsystem {
     return get(`/seedconfig/${projectData.value._id}/${versionId.value}/subsystemonlyname`);
   }
 
+  static async searchSubsystem(query = '', data = []) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/search/subsystem?query=${query}`, data);
+  }
   static async createSubsystem(data) {
     return post(`/seedconfig/${projectData.value._id}/${versionId.value}/subsystem`, data);
   }

@@ -145,17 +145,13 @@ import { ref, onMounted } from 'vue';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
 
-import ContingencyView from './ContingencyView.vue';
 import filterSubSystemView from './filterSubSystemView.vue';
-import parameterTabWidget from '../PowerSystem/parameterTableTabWidget/parameterTabWidget.vue';
 
-import { ApiSubsystem, commonApi } from './api';
-import { PowerSystemParameterApi, DefinitionListApi } from '../PowerSystem/api';
+import { ApiSubsystem } from './api';
+import { PowerSystemParameterApi } from '../PowerSystem/api';
 const visible = ref(false);
 const toast = useToast();
 const confirm = useConfirm();

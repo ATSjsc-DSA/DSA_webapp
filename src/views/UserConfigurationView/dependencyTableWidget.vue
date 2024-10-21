@@ -179,7 +179,6 @@
       <Button type="button" label="Update" @click="updateDependency"></Button>
     </template>
   </Dialog>
-  <ConfirmDialog />
 </template>
 
 <script setup>

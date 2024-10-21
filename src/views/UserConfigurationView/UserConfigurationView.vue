@@ -111,7 +111,7 @@
 
                 <template #VSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onVsaRightClick($event, slotProps.node)">
-                    <Tag value="VSA" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
+                    <Tag value="VSA" severity="success" rounded />
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="vsaContextMenuRef" :model="vsaContextMenu" />
@@ -119,7 +119,7 @@
 
                 <template #TSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onTsaRightClick($event, slotProps.node)">
-                    <Tag value="TSA" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
+                    <Tag value="TSA" severity="secondary" rounded />
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="tsaContextMenuRef" :model="tsaContextMenu" />

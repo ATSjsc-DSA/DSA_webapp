@@ -29,50 +29,31 @@
         <InputNumber id="stepChange" v-model="data.stepChange" class="flex-auto" autocomplete="off" />
       </div>
     </div>
+    <div class="col-6">
+      <searchSubsystemWidget v-model="sourceSelected" label="Source" />
+    </div>
 
     <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="sourceId" class="font-semibold"> Source</label>
-        <!-- <InputText id="sourceId" v-model="data.sourceId" class="flex-auto" autocomplete="off" /> -->
-
-        <Dropdown
-          v-model="data.sourceId"
-          :options="listSubSystem"
-          optionValue="_id"
+      <searchSubsystemWidget v-model="sinkSelected" label="Sink" />
+    </div>
+    <div class="col-6">
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="ps" class="text-sm"> Contingencies</label>
+        <AutoComplete
+          v-model="contingenciesSelected"
+          inputId="ps"
           optionLabel="name"
-          placeholder="Select a Source"
-          class="flex-grow-1"
+          optionValue="_id"
+          completeOnFocus
+          class="w-full psFilterAutoComplete"
+          :suggestions="contingenciesSuggestions"
+          name="psFilter"
+          @complete="searchContingenciesFilter"
         />
       </div>
     </div>
     <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="sinkId" class="font-semibold"> Sink</label>
-        <!-- <InputText id="sinkId" v-model="data.sinkId" class="flex-auto" autocomplete="off" /> -->
-        <Dropdown
-          v-model="data.sinkId"
-          :options="listSubSystem"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Sink"
-          class="flex-grow-1"
-        />
-      </div>
-    </div>
-
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="contingencyId" class="font-semibold"> Contingency</label>
-        <!-- <InputText id="contingencyId" v-model="data.contingencyId" class="flex-auto" autocomplete="off" /> -->
-        <Dropdown
-          v-model="data.contingencyId"
-          :options="listContingency"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Contingency"
-          class="flex-grow-1"
-        />
-      </div>
+      <searchSubsystemWidget v-model="fixSubPsSelected" label="Fix Sub System" />
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
@@ -98,20 +79,6 @@
         />
       </div>
     </div>
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="fixSubSystemId" class="font-semibold"> Fix Sub System</label>
-        <!-- <InputText id="fixSubSystemId" v-model="data.fixSubSystemId" class="flex-auto" autocomplete="off" /> -->
-        <Dropdown
-          v-model="data.fixSubSystemId"
-          :options="listSubSystem"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Fix Sub System"
-          class="flex-grow-1"
-        />
-      </div>
-    </div>
   </div>
 
   <Divider />
@@ -119,37 +86,28 @@
 
   <div class="grid item">
     <div class="col-12 flex justify-content-between">
-      <div class="flex flex-column gap-2 mb-3 px-3 flex-1">
-        <label for="monitorSubSystemId" class="font-semibold"> Monitor Sub System</label>
-        <Dropdown
-          v-model="data.monitor.monitorSubSystemId"
-          :options="listSubSystem"
-          optionValue="_id"
-          optionLabel="name"
-          placeholder="Select a Monitor Sub System "
-          class="!w-full"
-        />
-      </div>
+      <searchSubsystemWidget v-model="monitorSubSystemSelected" label="Monitor Sub System " />
+
       <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
         <label for="monitor-active" class="font-semibold mb-2"> Active</label>
-        <InputSwitch id="monitor-active" v-model="data.monitor.active"  autocomplete="off" />
+        <InputSwitch id="monitor-active" v-model="data.monitor.active" autocomplete="off" />
       </div>
     </div>
     <div v-if="data.monitor.active" class="col-12 flex justify-content-center gap-6 px-8 py-4">
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="monitor_signalP"> SignalP</label>
-          <Checkbox v-model="data.monitor.signalP" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
-        </div>
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="monitor_signalP"> SignalP</label>
+        <Checkbox v-model="data.monitor.signalP" inputId="monitor_signalP" name="monitor_signalP" :binary="true" />
+      </div>
 
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="monitor_signalQ"> SignalQ </label>
-          <Checkbox v-model="data.monitor.signalQ" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
-        </div>
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="monitor_signalQ"> SignalQ </label>
+        <Checkbox v-model="data.monitor.signalQ" inputId="monitor_signalQ" name="monitor_signalQ" :binary="true" />
+      </div>
 
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="monitor_signalV" class="font-semibold"> SignalV </label>
-          <Checkbox v-model="data.monitor.signalV" inputId="monitor_signalV" name="monitor_signalV" :binary="true" />
-        </div>
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="monitor_signalV" class="font-semibold"> SignalV </label>
+        <Checkbox v-model="data.monitor.signalV" inputId="monitor_signalV" name="monitor_signalV" :binary="true" />
+      </div>
     </div>
   </div>
 </template>
@@ -161,7 +119,8 @@ import Checkbox from 'primevue/checkbox';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { ApiSubsystem, ApiContingencies } from '@/views/SystemEvents/api';
-
+import { ref, watch } from 'vue';
+import searchSubsystemWidget from './searchSubsystemWidget.vue';
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
 });
@@ -169,11 +128,27 @@ const toast = useToast();
 
 onMounted(async () => {
   await getListSubSystem();
-  await getListContingency();
+  if (data.value.contingenciesId) {
+    await setDefaultData();
+  }
 });
 const data = defineModel();
+watch(data, async (newVal, oldVal) => {
+  if (newVal._id !== oldVal.__id) {
+    if (newVal.contingenciesId) {
+      await setDefaultData();
+    }
+  }
+});
 
-const listSubSystem = ref([]);
+const setDefaultData = async () => {
+  await getContingenciesData(data.value.contingenciesId);
+  sourceSelected.value = await getSubSystemData(data.value.sourceId);
+  sinkSelected.value = await getSubSystemData(data.value.sinkId);
+  fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
+  monitorSubSystemSelected.value = await getSubSystemData(data.value.monitorSubSystemId);
+};
+const listSubSystem = ref();
 const getListSubSystem = async () => {
   try {
     const res = await ApiSubsystem.getListSubsystemOnlyName();
@@ -183,14 +158,84 @@ const getListSubSystem = async () => {
   }
 };
 
-const listContingency = ref([]);
+// contingencies
 
-const getListContingency = async () => {
+const contingenciesSelected = ref();
+const contingenciesSuggestions = ref();
+
+watch(contingenciesSelected, (newVal) => {
+  data.value.contingenciesId = newVal._id;
+});
+const searchContingenciesFilter = async (event) => {
+  const query = event ? event.query.trim() : '';
   try {
-    const res = await ApiContingencies.getListContingencies();
-    listContingency.value = res.data;
+    const res = await ApiContingencies.searchSubsystem(query);
+    contingenciesSuggestions.value = res.data;
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
+
+const getContingenciesData = async (id) => {
+  try {
+    const res = await ApiContingencies.getContingenciesData(id);
+    contingenciesSelected.value = {
+      name: res.data.name,
+      _id: res.data._id,
+    };
+  } catch (error) {
+    console.log('getContingenciesData: error ', error);
+  }
+};
+
+// source
+
+const sourceSelected = ref();
+
+watch(sourceSelected, (newVal) => {
+  data.value.sourceId = newVal._id;
+});
+
+// sink
+
+const sinkSelected = ref();
+
+watch(sinkSelected, (newVal) => {
+  data.value.sinkId = newVal._id;
+});
+
+// fixSubPs
+
+const fixSubPsSelected = ref();
+
+watch(fixSubPsSelected, (newVal) => {
+  data.value.fixSubSystemId = newVal._id;
+});
+
+// monitorSubSystem
+
+const monitorSubSystemSelected = ref();
+
+watch(monitorSubSystemSelected, (newVal) => {
+  data.value.monitorSubSystemId = newVal._id;
+});
+
+const getSubSystemData = async (id) => {
+  try {
+    const res = await ApiSubsystem.getSubsystemData(id);
+    return {
+      name: res.data.name,
+      _id: res.data._id,
+    };
+  } catch (error) {
+    console.log('getContingenciesData: error ', error);
   }
 };
 </script>
+
+<style>
+.p-autocomplete-input,
+.p-inputtext {
+  width: 100%;
+}
+</style>
