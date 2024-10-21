@@ -13,11 +13,11 @@
         <div class="grid gap-2">
           <div class="col">
             <div class="flex flex-column align-items-start gap-1">
-              <label for="type" class="text-sm"> Type </label>
+              <label for="type" class="text-sm"> Definition </label>
               <MultiSelect
-                v-model="deviceTypeSelected"
+                v-model="definitionSubsystemSelected"
                 display="chip"
-                :options="deviceTypeList"
+                :options="definitionSubsystemList"
                 optionLabel="name"
                 optionValue="_id"
                 placeholder="Select Types"
@@ -49,6 +49,58 @@
       </template>
     </flatListFilterWidget>
   </div>
+  <div class="flex gap-4 justify-content-start align-items-center p-2">
+    <div class="font-semibold text-lg">Area</div>
+    <Dropdown
+      v-model="areaZoneConjunction"
+      :options="conjunctionOpts"
+      optionLabel="label"
+      optionValue="value"
+      class="w-7rem"
+    />
+    <div class="font-semibold text-lg">Zone</div>
+    <Dropdown
+      v-model="zoneOwnerConjunction"
+      :options="conjunctionOpts"
+      optionLabel="label"
+      optionValue="value"
+      class="w-7rem"
+    />
+    <div class="font-semibold text-lg">Owner</div>
+    <Dropdown
+      v-model="ownerKvConjunction"
+      :options="conjunctionOpts"
+      optionLabel="label"
+      optionValue="value"
+      class="w-7rem"
+    />
+    <div class="font-semibold text-lg">kV</div>
+    <Dropdown
+      v-model="kVStationConjunction"
+      :options="conjunctionOpts"
+      optionLabel="label"
+      optionValue="value"
+      class="w-7rem"
+    />
+    <div class="font-semibold text-lg">Station</div>
+    <Dropdown
+      v-model="stationDefinitionConjunction"
+      :options="conjunctionOpts"
+      optionLabel="label"
+      optionValue="value"
+      class="w-7rem"
+    />
+    <div class="font-semibold text-lg">Definition</div>
+    <Dropdown
+      v-model="definitionPsConjunction"
+      :options="conjunctionOpts"
+      optionLabel="label"
+      optionValue="value"
+      class="w-7rem"
+    />
+    <div class="font-semibold text-lg">Power System</div>
+  </div>
+  <Divider />
 </template>
 
 <script setup>
@@ -57,10 +109,11 @@ import MultiSelect from 'primevue/multiselect';
 import flatListFilterWidget from '@/views/PowerSystem/menuLeftWidget/flatListFilterWidget.vue';
 import { DefinitionListApi, PowerSystemParameterApi } from '@/views/PowerSystem/api';
 import { onMounted, watch } from 'vue';
+import Divider from 'primevue/divider';
 
 onMounted(async () => {
   await getDefinitionList();
-  await getDeviceTypeList();
+  await getdefinitionSubsystemList();
 });
 
 const props = defineProps({
@@ -71,7 +124,7 @@ const emit = defineEmits(['changeFilter']);
 watch(
   () => props.currentFilter,
   () => {
-    deviceTypeSelected.value = props.currentFilter.definition.map((item) => item._id);
+    definitionSubsystemSelected.value = props.currentFilter.definition.map((item) => item._id);
     psSelected.value = props.currentFilter.powerSystem;
     initData.value = props.currentFilter;
   },
@@ -89,24 +142,30 @@ const getDefinitionList = async () => {
 };
 
 const changFilterData = (newFilter) => {
-  newFilter.definitionList = deviceTypeSelected.value;
+  newFilter.definitionList = definitionSubsystemSelected.value;
   newFilter.powersystem = psSelected.value ? psSelected.value.map((item) => item._id) : [];
+  newFilter.filtering =
+    `AREA ${areaZoneConjunction.value} ZONE ${zoneOwnerConjunction.value} OWNER ${ownerKvConjunction.value} kv ${kVStationConjunction.value} station ${stationDefinitionConjunction.value} definitionList ${definitionPsConjunction.value} powersystem`.toUpperCase();
   emit('changeFilter', newFilter);
 };
+const clearOtherFilterSelected = () => {
+  definitionSubsystemSelected.value = [];
+  psSelected.value = [];
+};
 
-const deviceTypeList = ref([]);
-const deviceTypeSelected = ref([]);
+const definitionSubsystemList = ref([]);
+const definitionSubsystemSelected = ref([]);
 
-watch(deviceTypeSelected, () => {
+watch(definitionSubsystemSelected, () => {
   psSelected.value = [];
 });
 
-const getDeviceTypeList = async () => {
+const getdefinitionSubsystemList = async () => {
   try {
     const res = await DefinitionListApi.getDefinitionSubsystem();
-    deviceTypeList.value = res.data;
+    definitionSubsystemList.value = res.data;
   } catch (error) {
-    console.log('getDeviceTypeList: error ', error);
+    console.log('getdefinitionSubsystemList: error ', error);
     toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
@@ -115,18 +174,28 @@ const psSuggestions = ref([]);
 const searchPsQueryFilter = async (event) => {
   const query = event ? event.query.trim() : '';
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, deviceTypeSelected.value, query);
+    const res = await PowerSystemParameterApi.searchPs(
+      props.projectVersionId,
+      definitionSubsystemSelected.value,
+      query,
+    );
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {
     console.log('searchPsQueryFilter: error ', error);
   }
 };
-
-const clearOtherFilterSelected = () => {
-  deviceTypeSelected.value = [];
-  psSelected.value = [];
-};
+// ---- and/or conjunction
+const conjunctionOpts = ref([
+  { label: 'AND', value: 'AND' },
+  { label: 'OR', value: 'OR' },
+]);
+const areaZoneConjunction = ref('AND');
+const zoneOwnerConjunction = ref('AND');
+const ownerKvConjunction = ref('AND');
+const kVStationConjunction = ref('AND');
+const stationDefinitionConjunction = ref('AND');
+const definitionPsConjunction = ref('AND');
 </script>
 <style>
 .p-autocomplete-input,

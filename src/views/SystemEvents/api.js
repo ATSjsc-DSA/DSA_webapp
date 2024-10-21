@@ -21,7 +21,9 @@ export class ApiContingency {
   static async getListContingency(contingenciesActiveId, param) {
     return get(`/seedconfig/${contingenciesActiveId}/contingency`, param);
   }
-
+  static async searchSubsystem(query = '', data = []) {
+    return post(`/seedconfig/${projectData.value._id}/${versionId.value}/search/contingency?query=${query}`, data);
+  }
   static async createContingency(contingenciesActiveId, data) {
     return post(`/seedconfig/${contingenciesActiveId}/contingency`, data);
   }

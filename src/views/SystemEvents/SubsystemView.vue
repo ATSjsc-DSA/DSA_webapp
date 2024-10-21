@@ -66,7 +66,7 @@
             </div>
           </TabPanel>
           <TabPanel header="List Power System">
-            <div class="pt-1">
+            <div class="py-1">
               <filterSubSystemView
                 :current-filter="selectedItem.filterConditions"
                 :project-version-id="projectVersionId"
@@ -74,12 +74,31 @@
               />
             </div>
             <div style="height: 32rem">
-              <parameterTabWidget
-                :data="parameterData"
-                :headerData="parameterDefinitionData"
+              <DataTable
+                :value="parameterData"
+                dataKey="_id"
+                tableStyle="min-width: 50rem"
+                :lazy="true"
+                :sortOrder="1"
+                rowHover
+                scrollable
+                showGridlines
                 :loading="isParameterLoading"
-                :showChangeColumn="false"
-              />
+              >
+                <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+                  <template #body="slotProps">
+                    <div class="font-bold" style="min-width: 6rem">
+                      {{ slotProps.data.generalInfo.uniqueId }}
+                    </div>
+                  </template>
+                </Column>
+                <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
+                <Column field="generalInfo.operationName" header="Operation Name" style="text-wrap: nowrap"></Column>
+
+                <Column field="stationName" header="Station" style="text-wrap: nowrap"></Column>
+
+                <template #empty> No Data </template>
+              </DataTable>
             </div>
 
             <!-- ps table - Paginator -->
@@ -245,28 +264,12 @@ const getParameterList = async () => {
     );
     parameterData.value = res.data.items;
     parameterTotal.value = res.data.total;
-    const firstRow = res.data.items[0];
-    if (firstRow) {
-      await getParameterDefinitionData(firstRow.engineInfo.powerSystemDefinitionId);
-    }
   } catch (error) {
     parameterData.value = [];
     console.log('getParameterList error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
   isParameterLoading.value = false;
-};
-
-const parameterDefinitionData = ref({});
-const getParameterDefinitionData = async (id) => {
-  try {
-    const res = await DefinitionListApi.getDefinitionData(id);
-    parameterDefinitionData.value = res.data;
-  } catch (error) {
-    parameterDefinitionData.value = {};
-    console.log('getDefinitionData: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition Header', detail: error.data.detail, life: 3000 });
-  }
 };
 </script>
 
