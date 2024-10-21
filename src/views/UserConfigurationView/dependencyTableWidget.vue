@@ -1,40 +1,54 @@
 <template>
-  <DataTable :value="dependencyList" tableStyle="min-width: 50rem">
-    <template #header>
-      <div class="flex justify-content-end">
-        <Button type="button" icon="pi pi-plus" size="small" text @click="createVisibleDialog = true" />
-      </div>
-    </template>
-    <Column field="name" header="Name" frozen style="width: 15%; text-wrap: nowrap"> </Column>
-    <Column field="active" header="Active">
-      <template #body="{ data }">
-        <Tag :severity="data.active ? 'primary' : 'secondary'" :value="String(data.active)"></Tag>
-      </template>
-    </Column>
-    <Column field="startTimestamp" header="Start Timestamp" style="text-wrap: nowrap">
-      <template #body="{ data }">
-        <span>{{ convertDateTimeToString(data.startTimestamp) }}</span>
-      </template>
-    </Column>
-    <Column field="endTimestamp" header="End Timestamp" style="text-wrap: nowrap">
-      <template #body="{ data }">
-        <span>{{ convertDateTimeToString(data.endTimestamp) }}</span>
-      </template>
-    </Column>
-    <Column field="rateAbnormal" header="Rate Abnormal" style="text-wrap: nowrap" />
-    <Column field="rateCritical1" header="Rate Critical 1" style="text-wrap: nowrap" />
-    <Column field="rateCritical2" header="Rate Critical 2" style="text-wrap: nowrap" />
-    <Column field="rateCritical3" header="Rate Critical 3" style="text-wrap: nowrap" />
-    <Column style="width: 1%; min-width: 5rem">
-      <template #body="{ data }">
-        <div class="flex justify-content-between">
-          <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdateDependency(data)" />
-          <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDeleteDependency($event, data)" />
+  <div style="height: 43rem">
+    <DataTable :value="dependencyList" tableStyle="min-width: 50rem">
+      <template #header>
+        <div class="flex justify-content-end">
+          <Button type="button" icon="pi pi-plus" size="small" text @click="createVisibleDialog = true" />
         </div>
       </template>
-    </Column>
-    <template #empty> No Data </template>
-  </DataTable>
+      <Column field="name" header="Name" frozen style="width: 15%; text-wrap: nowrap"> </Column>
+      <Column field="active" header="Active">
+        <template #body="{ data }">
+          <Tag :severity="data.active ? 'primary' : 'secondary'" :value="String(data.active)"></Tag>
+        </template>
+      </Column>
+      <Column field="startTimestamp" header="Start Timestamp" style="text-wrap: nowrap">
+        <template #body="{ data }">
+          <span>{{ convertDateTimeToString(data.startTimestamp) }}</span>
+        </template>
+      </Column>
+      <Column field="endTimestamp" header="End Timestamp" style="text-wrap: nowrap">
+        <template #body="{ data }">
+          <span>{{ convertDateTimeToString(data.endTimestamp) }}</span>
+        </template>
+      </Column>
+      <Column field="rateAbnormal" header="Rate Abnormal" style="text-wrap: nowrap" />
+      <Column field="rateCritical1" header="Rate Critical 1" style="text-wrap: nowrap" />
+      <Column field="rateCritical2" header="Rate Critical 2" style="text-wrap: nowrap" />
+      <Column field="rateCritical3" header="Rate Critical 3" style="text-wrap: nowrap" />
+      <Column style="width: 1%; min-width: 5rem">
+        <template #body="{ data }">
+          <div class="flex justify-content-between">
+            <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdateDependency(data)" />
+            <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDeleteDependency($event, data)" />
+          </div>
+        </template>
+      </Column>
+      <template #empty> No Data </template>
+    </DataTable>
+  </div>
+  <div class="flex justify-content-end align-items-center">
+    <Paginator
+      v-if="dependencyTotal > pageRowNumber"
+      v-model:first="paginatorOffset"
+      class="flex-grow-1"
+      :rows="pageRowNumber"
+      :totalRecords="dependencyTotal"
+      :page="currentPage"
+      @page="onPageChange"
+    ></Paginator>
+    <div class="mr-3">Total: {{ dependencyTotal }}</div>
+  </div>
   <!-- create dialog data -->
   <Dialog v-model:visible="createVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
     <template #header>
@@ -203,11 +217,22 @@ watch(
     await getDependencyList();
   },
 );
+
+const pageRowNumber = ref(10);
+const dependencyTotal = ref(0);
+const currentPage = ref(1);
+const paginatorOffset = computed(() => pageRowNumber.value * currentPage.value - 1);
+
+const onPageChange = async (event) => {
+  currentPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  await getDependencyList();
+};
 const dependencyList = ref();
 const getDependencyList = async () => {
   try {
-    const res = await ApiDsa.getDependencyList(props.projectVersionId, props.dependencyId);
-    dependencyList.value = res.data;
+    const res = await ApiDsa.getDependencyList(props.projectVersionId, props.dependencyId, currentPage.value);
+    dependencyList.value = res.data.items;
+    dependencyTotal.value = res.data.total;
   } catch (error) {
     console.error('getDependencyList: error ', error);
   }

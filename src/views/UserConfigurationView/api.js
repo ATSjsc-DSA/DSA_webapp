@@ -126,8 +126,11 @@ export class ApiDsa {
   }
 
   // module dependency
-  static async getDependencyList(projectVersionId, dependencyId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency`);
+  static async getDependencyList(projectVersionId, dependencyId, page) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency`, {
+      page: page,
+      page_size: 10,
+    });
   }
   static async createDependency(projectVersionId, dependencyId, data) {
     return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency`, data);
