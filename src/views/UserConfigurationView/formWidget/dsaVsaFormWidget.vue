@@ -2,11 +2,11 @@
   <div class="grid">
     <template v-if="!isCreateForm">
       <div class="col-12 flex justify-content-between">
-        <div class="flex flex-column gap-2 mb-3 px-3 flex-1">
+        <div class="flex flex-column gap-2 mb-3 flex-1">
           <label for="name" class="font-semibold"> Name </label>
           <InputText id="name" v-model="data.name" class="flex-auto w-full" autocomplete="off" />
         </div>
-        <div class="flex flex-column gap-2 mb-3 px-3 align-items-center">
+        <div class="flex flex-column gap-2 mb-3 align-items-center">
           <label for="active" class="font-semibold mb-2"> Active</label>
           <InputSwitch id="active" v-model="data.active" autocomplete="off" />
         </div>
@@ -218,7 +218,7 @@ const getSubSystemData = async (id) => {
       _id: res.data._id,
     };
   } catch (error) {
-    console.log('getContingenciesData: error ', error);
+    console.log('getSubSystemData: error ', error);
   }
 };
 </script>

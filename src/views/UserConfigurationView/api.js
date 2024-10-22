@@ -144,4 +144,56 @@ export class ApiDsa {
   static async delDependency(dependencyId) {
     return _delete(`/userconfig/moduledependency/${dependencyId}`);
   }
+  // SSR
+  static async getSsrList(projectVersionId, dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/ssrinformations`);
+  }
+  static async createSsr(projectVersionId, dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/ssrinformations`, data);
+  }
+  static async getSsr(vsaId) {
+    return get(`/userconfig/ssrinformations/${vsaId}`);
+  }
+  static async updateSsr(vsaId, data) {
+    return put(`/userconfig/ssrinformations/${vsaId}`, data);
+  }
+  static async delSsr(vsaId) {
+    return _delete(`/userconfig/ssrinformations/${vsaId}`);
+  }
+  // SSR - frequency
+  static async getSsrFrequencyList(projectVersionId, ssrId, page) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${ssrId}/frequency`, {
+      page: page,
+      page_size: 10,
+    });
+  }
+  static async createSsrFrequency(projectVersionId, ssrId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${ssrId}/frequency`, data);
+  }
+
+  static async getSsrFrequency(ssrFrequencyId) {
+    return get(`/userconfig/SsrFrequency/${ssrFrequencyId}`);
+  }
+  static async updateSsrFrequency(ssrFrequencyId, data) {
+    return put(`/userconfig/SsrFrequency/${ssrFrequencyId}`, data);
+  }
+  static async delSsrFrequency(ssrFrequencyId) {
+    return _delete(`/userconfig/SsrFrequency/${ssrFrequencyId}`);
+  }
+  // OSL
+  static async getOslList(projectVersionId, dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/oslinformations`);
+  }
+  static async createOsl(projectVersionId, dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/oslinformations`, data);
+  }
+  static async getOsl(vsaId) {
+    return get(`/userconfig/oslinformations/${vsaId}`);
+  }
+  static async updateOsl(vsaId, data) {
+    return put(`/userconfig/oslinformations/${vsaId}`, data);
+  }
+  static async delOsl(vsaId) {
+    return _delete(`/userconfig/oslinformations/${vsaId}`);
+  }
 }

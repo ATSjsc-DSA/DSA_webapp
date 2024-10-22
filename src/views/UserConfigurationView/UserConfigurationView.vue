@@ -124,6 +124,14 @@
                   </div>
                   <ContextMenu ref="tsaContextMenuRef" :model="tsaContextMenu" />
                 </template>
+
+                <template #SSR="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onSsrRightClick($event, slotProps.node)">
+                    <Tag value="SSR" severity="info" rounded />
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="ssrContextMenuRef" :model="ssrContextMenu" />
+                </template>
               </Tree>
             </div>
           </template>
@@ -140,29 +148,36 @@
           </template>
           <template #content>
             <LoadingContainer v-show="isLoadingContainer" class="relative" />
+            <!-- Application -->
             <ScrollPanel
               v-if="nodeSelected.type === 'Application' && appData !== undefined"
               class="card"
               style="width: 100%; height: 50rem"
             >
-              <applicationFormWidget v-model="appData" />
+              <div class="py-3">
+                <applicationFormWidget v-model="appData" />
+              </div>
               <div class="flex justify-content-end gap-3">
                 <Button type="button" label="Update" @click="updateApplication"></Button>
               </div>
             </ScrollPanel>
 
+            <!-- Monitor -->
             <ScrollPanel
               v-if="nodeSelected.type === 'Monitor' && monitorData !== undefined"
               class="card"
               style="width: 100%; height: 50rem"
             >
-              <monitorWidget
-                :node-monitor-selected="nodeSelected"
-                :project-version-id="projectVersionId"
-                @update-label-monitor-leaf="updateLabelMonitorLeaf"
-              />
+              <div class="py-3">
+                <monitorWidget
+                  :node-monitor-selected="nodeSelected"
+                  :project-version-id="projectVersionId"
+                  @update-label-monitor-leaf="updateLabelMonitorLeaf"
+                />
+              </div>
             </ScrollPanel>
 
+            <!-- DSA -->
             <ScrollPanel
               v-if="nodeSelected.type === 'DSA' && dsaData !== undefined"
               class="card"
@@ -174,10 +189,13 @@
               </div>
             </ScrollPanel>
 
+            <!-- DSA - VSA -->
             <TabView v-if="nodeSelected.type === 'VSA' && vsaData !== undefined">
               <TabPanel header="Common">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
-                  <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
+                  <div class="py-3">
+                    <DsaVsaFormWidget v-model="vsaData" :is-create-form="false" />
+                  </div>
                   <div class="flex justify-content-end gap-3">
                     <Button type="button" label="Update" @click="updateVsa"></Button>
                   </div>
@@ -189,10 +207,14 @@
                 </ScrollPanel>
               </TabPanel>
             </TabView>
+
+            <!-- DSA - TSA -->
             <TabView v-if="nodeSelected.type === 'TSA' && tsaData !== undefined">
               <TabPanel header="Common">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
-                  <DsaTsaFormWidget v-model="tsaData" :is-create-form="false" />
+                  <div class="py-3">
+                    <DsaTsaFormWidget v-model="tsaData" :is-create-form="false" />
+                  </div>
                   <div class="flex justify-content-end gap-3">
                     <Button type="button" label="Update" @click="updateTsa"></Button>
                   </div>
@@ -205,6 +227,25 @@
               </TabPanel>
               <TabPanel header="Disturbance">
                 <DisturbanceView :itemActive="tsaData"></DisturbanceView>
+              </TabPanel>
+            </TabView>
+
+            <!-- DSA - SSR -->
+            <TabView v-if="nodeSelected.type === 'SSR' && ssrData !== undefined">
+              <TabPanel header="Common">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
+                  <div class="py-3">
+                    <dsaSsrFormWidget v-model="ssrData" :is-create-form="false" />
+                  </div>
+                  <div class="flex justify-content-end gap-3">
+                    <Button type="button" label="Update" @click="updateSsr"></Button>
+                  </div>
+                </ScrollPanel>
+              </TabPanel>
+              <TabPanel header="Frequency">
+                <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
+                  <ssrFrequenceTableWidget :project-version-id="projectVersionId" :ssr-id="ssrData._id" />
+                </ScrollPanel>
               </TabPanel>
             </TabView>
           </template>
@@ -288,8 +329,6 @@
       <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
           <label for="dsaType" class="font-semibold"> Type</label>
-          <!-- <InputText id="sourceId" v-model="data.sourceId" class="flex-auto" autocomplete="off" /> -->
-
           <Dropdown
             v-model="newTaskData.type"
             :options="typeDsaOpts"
@@ -303,7 +342,7 @@
     </div>
     <DsaVsaFormWidget v-if="newTaskData.type === 'VSA'" v-model="newVsaData" :is-create-form="true" />
     <DsaTsaFormWidget v-if="newTaskData.type === 'TSA'" v-model="newTsaData" :is-create-form="true" />
-
+    <dsaSsrFormWidget v-if="newTaskData.type === 'SSR'" v-model="newSsrData" :is-create-form="true" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createTaskDsaDialog = false"></Button>
       <Button type="button" label="Submit" @click="handlecreateTask"></Button>
@@ -332,11 +371,15 @@ import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 
 import monitorWidget from './monitorWidget.vue';
 import dsaFormWidget from './formWidget/dsaFormWidget.vue';
+
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
 import dependencyTableWidget from './dependencyTableWidget.vue';
 import DisturbanceView from '../SystemEvents/DisturbanceView.vue';
+import dsaSsrFormWidget from './formWidget/dsaSsrFormWidget.vue';
+import ssrFrequenceTableWidget from './ssrFrequenceTableWidget.vue';
+
 const toast = useToast();
 const confirm = useConfirm();
 const isLoadingUserConfig = ref(false);
@@ -361,6 +404,7 @@ const treeData = ref([
 const isLoadingContainer = ref(false);
 
 const getTreeData = async () => {
+  isLoadingContainer.value = true;
   await getAppList();
   const tree = [
     {
@@ -377,6 +421,7 @@ const getTreeData = async () => {
     tree[0].children.push(await getAppLeaf(app, appIndex));
   }
   treeData.value = tree;
+  isLoadingContainer.value = false;
 };
 
 const getAppLeaf = async (app, key = '') => {
@@ -436,7 +481,9 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
 const addNewMonitorLeaf = (appId, monitor) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    appLeaf.children[0].children.push(getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].length));
+    const newLeaf = getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].length);
+    appLeaf.children[0].children.push(newLeaf);
+    return newLeaf;
   }
 };
 
@@ -464,7 +511,9 @@ const getDsaBranch = async (appId, appKey = '') => {
 const addNewDsaLeaf = async (appId, dsa) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    appLeaf.children[1].children.push(await getDsaLeaf(appId, dsa, appLeaf.key + '_' + appLeaf.children[0].length));
+    const newLeaf = await getDsaLeaf(appId, dsa, appLeaf.key + '_' + appLeaf.children[0].length);
+    appLeaf.children[1].children.push(newLeaf);
+    return newLeaf;
   }
 };
 
@@ -505,6 +554,12 @@ const getTaskBranch = async (appId, dsaId, dsaKey = '') => {
     leafData.push(getTaskLeaf(appId, dsaId, tsa, 'TSA', dsaKey + '_tsa_' + index));
   }
 
+  const ssrList = await getSsrList(dsaId);
+  for (let index = 0; index < ssrList.length; index++) {
+    const ssr = ssrList[index];
+    leafData.push(getTaskLeaf(appId, dsaId, ssr, 'SSR', dsaKey + '_ssr_' + index));
+  }
+
   return leafData;
 };
 
@@ -513,7 +568,9 @@ const addNewTaskLeaf = (appId, dsaId, taskData, taskType = 'VSA') => {
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
     if (dsaLeaf) {
-      dsaLeaf.children.push(getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length));
+      const newLeaf = getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length);
+      dsaLeaf.children.push(newLeaf);
+      return newLeaf;
     }
   }
 };
@@ -587,6 +644,9 @@ const onNodeSelect = async (node) => {
   if (node.type === 'TSA') {
     await getTsaData(node._id);
   }
+  if (node.type === 'SSR') {
+    await getSsrData(node._id);
+  }
   isLoadingContainer.value = false;
 };
 
@@ -652,7 +712,9 @@ const createApplication = async () => {
     const res = await ApiApplication.createApp(projectVersionId.value, dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
-    treeData.value[0].children.push(await getAppLeaf(res.data, treeData.value[0].children.length));
+    const newLeaf = await getAppLeaf(res.data, treeData.value[0].children.length);
+    treeData.value[0].children.push(newLeaf);
+    await onNodeSelect(newLeaf);
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
@@ -675,24 +737,10 @@ const updateApplication = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
-const confirmDeleteApp = async (event) => {
-  console.log('abc');
-  confirm.require({
-    target: event.currentTarget,
-    header: 'Delete Application',
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Delete',
-    accept: async () => {
-      console.log('def');
-      await deleteApplication();
-    },
-  });
-};
+
 const deleteApplication = async () => {
+  isLoadingContainer.value = true;
+
   try {
     await ApiApplication.delAppData(appIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -701,6 +749,7 @@ const deleteApplication = async () => {
     console.log('deleteApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingContainer.value = false;
 };
 
 // ------- App Menu
@@ -715,8 +764,8 @@ const appContextMenu = ref([
   {
     label: 'Delete',
     icon: 'pi pi-trash',
-    command: (event) => {
-      confirmDeleteApp(event);
+    command: async (event) => {
+      await confirmDeleteDialog(event, deleteApplication, 'Delete Application');
     },
   },
 ]);
@@ -758,29 +807,17 @@ const createMonitor = async () => {
     const res = await ApiMonitor.createMonitor(projectVersionId.value, appIdclick.value, newMonitorData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createMonitorVisibleDialog.value = false;
-    addNewMonitorLeaf(appIdclick.value, res.data);
+    const newLeaf = addNewMonitorLeaf(appIdclick.value, res.data);
+    await onNodeSelect(newLeaf);
   } catch (error) {
     console.log('createMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 
-const confirmDeleteMonitor = async (event) => {
-  confirm.require({
-    target: event.currentTarget,
-    header: 'Delete Monitor',
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Delete',
-    accept: async () => {
-      await delMonitor();
-    },
-  });
-};
 const delMonitor = async () => {
+  isLoadingContainer.value = true;
+
   try {
     await ApiMonitor.delMonitor(monitorIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -790,6 +827,7 @@ const delMonitor = async () => {
     console.log('delMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingContainer.value = false;
 };
 
 // ------- Monitor Menu
@@ -823,8 +861,8 @@ const monitorContextMenu = computed(() => [
     label: 'Delete',
     icon: 'pi pi-trash',
     disabled: !monitorIdclick.value,
-    command: (event) => {
-      confirmDeleteMonitor(event);
+    command: async (event) => {
+      await confirmDeleteDialog(event, delMonitor, 'Delete Monitor');
     },
   },
 ]);
@@ -869,8 +907,8 @@ const dsaContextMenu = computed(() => [
     label: 'Delete',
     icon: 'pi pi-trash',
     disabled: !dsaIdclick.value,
-    command: (event) => {
-      confirmDeleteDsa(event);
+    command: async (event) => {
+      await confirmDeleteDialog(event, delDsa, 'Delete Dsa');
     },
   },
 ]);
@@ -886,8 +924,8 @@ const vsaContextMenu = ref([
   {
     label: 'Delete',
     icon: 'pi pi-trash',
-    command: (event) => {
-      confirmDeleteVsa(event);
+    command: async (event) => {
+      await confirmDeleteDialog(event, delVsa, 'Delete DSA VSA');
     },
   },
 ]);
@@ -903,8 +941,25 @@ const tsaContextMenu = ref([
   {
     label: 'Delete',
     icon: 'pi pi-trash',
-    command: (event) => {
-      confirmDeleteTsa(event);
+    command: async (event) => {
+      await confirmDeleteDialog(event, delTsa, 'Delete DSA TSA');
+    },
+  },
+]);
+
+const ssrIdclick = ref();
+const ssrContextMenuRef = ref();
+const onSsrRightClick = (event, node) => {
+  ssrIdclick.value = node._id;
+  ssrContextMenuRef.value.show(event);
+};
+
+const ssrContextMenu = ref([
+  {
+    label: 'Delete',
+    icon: 'pi pi-trash',
+    command: async (event) => {
+      await confirmDeleteDialog(event, delSsr, 'Delete DSA SSR');
     },
   },
 ]);
@@ -941,7 +996,8 @@ const createDsa = async () => {
     const res = await ApiDsa.createDsa(projectVersionId.value, appIdclick.value, newDsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createDsaVisibleDialog.value = false;
-    await addNewDsaLeaf(appIdclick.value, res.data);
+    const newLeaf = await addNewDsaLeaf(appIdclick.value, res.data);
+    await onNodeSelect(newLeaf);
   } catch (error) {
     console.log('createDsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -958,22 +1014,9 @@ const updateDsa = async () => {
   }
 };
 
-const confirmDeleteDsa = async (event) => {
-  confirm.require({
-    target: event.currentTarget,
-    header: 'Delete Dsa',
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Delete',
-    accept: async () => {
-      await delDsa();
-    },
-  });
-};
 const delDsa = async () => {
+  isLoadingContainer.value = true;
+
   try {
     await ApiDsa.delDsa(dsaIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -983,6 +1026,7 @@ const delDsa = async () => {
     console.log('delDsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingContainer.value = false;
 };
 
 const newTaskData = ref({
@@ -993,6 +1037,8 @@ const newTaskData = ref({
 const typeDsaOpts = ref([
   { label: 'VSA', value: 'VSA' },
   { label: 'TSA', value: 'TSA' },
+  { label: 'SSR', value: 'SSR' },
+  { label: 'OSL', value: 'OSL' },
 ]);
 const handlecreateTask = async () => {
   if (newTaskData.value.type === 'VSA') {
@@ -1004,6 +1050,11 @@ const handlecreateTask = async () => {
     newTsaData.value.name = newTaskData.value.name;
     newTsaData.value.active = newTaskData.value.active;
     await createTsa();
+  }
+  if (newTaskData.value.type === 'SSR') {
+    newSsrData.value.name = newTaskData.value.name;
+    newSsrData.value.active = newTaskData.value.active;
+    await createSsr();
   }
 };
 
@@ -1054,8 +1105,9 @@ const createVsa = async () => {
   try {
     const res = await ApiDsa.createVsa(projectVersionId.value, dsaIdclick.value, newVsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'VSA');
+    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'VSA');
     createTaskDsaDialog.value = false;
+    await onNodeSelect(newLeaf);
   } catch (error) {
     console.log('createVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -1078,22 +1130,8 @@ const updateVsa = async () => {
   }
 };
 
-const confirmDeleteVsa = async (event) => {
-  confirm.require({
-    target: event.currentTarget,
-    header: 'Delete Monitor Vsa',
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Delete',
-    accept: async () => {
-      await delVsa();
-    },
-  });
-};
 const delVsa = async () => {
+  isLoadingContainer.value = true;
   try {
     await ApiDsa.delVsa(vsaIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1103,6 +1141,7 @@ const delVsa = async () => {
     console.log('delVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingContainer.value = false;
 };
 
 // ---DSA - Tsa
@@ -1167,8 +1206,9 @@ const createTsa = async () => {
   try {
     const res = await ApiDsa.createTsa(projectVersionId.value, dsaIdclick.value, newTsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'TSA');
+    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'TSA');
     createTaskDsaDialog.value = false;
+    await onNodeSelect(newLeaf);
   } catch (error) {
     console.log('createTsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -1191,22 +1231,8 @@ const updateTsa = async () => {
   }
 };
 
-const confirmDeleteTsa = async (event) => {
-  confirm.require({
-    target: event.currentTarget,
-    header: 'Delete Monitor Tsa',
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Delete',
-    accept: async () => {
-      await delTsa();
-    },
-  });
-};
 const delTsa = async () => {
+  isLoadingContainer.value = true;
   try {
     await ApiDsa.delTsa(tsaIdclick.value);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1216,6 +1242,95 @@ const delTsa = async () => {
     console.log('delTsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingContainer.value = false;
+};
+
+// ---DSA - Ssr
+
+const ssrData = ref();
+const newSsrData = ref({
+  active: true,
+  contingenciesId: '',
+  name: '',
+  powerSytemId: '',
+});
+
+const getSsrList = async (dsaId) => {
+  try {
+    const res = await ApiDsa.getSsrList(projectVersionId.value, dsaId);
+    return res.data;
+  } catch (error) {
+    console.log('getSsrList: error ', error);
+    return [];
+  }
+};
+
+const getSsrData = async (ssrId) => {
+  try {
+    const res = await ApiDsa.getSsr(ssrId);
+    ssrData.value = res.data;
+  } catch (error) {
+    console.log('getSsrData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createSsr = async () => {
+  try {
+    const res = await ApiDsa.createSsr(projectVersionId.value, dsaIdclick.value, newSsrData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'SSR');
+    createTaskDsaDialog.value = false;
+    await onNodeSelect(newLeaf);
+  } catch (error) {
+    console.log('createSsr: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updateSsr = async () => {
+  try {
+    const res = await ApiDsa.updateSsr(ssrData.value._id, ssrData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelTaskLeaf(
+      nodeSelected.value.appId,
+      nodeSelected.value.dsaId,
+      nodeSelected.value._id,
+      res.data.name,
+      res.data.active,
+    );
+  } catch (error) {
+    console.log('updateSsr: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const delSsr = async () => {
+  isLoadingContainer.value = true;
+  try {
+    await ApiDsa.delSsr(ssrIdclick.value);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delSsr: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+  isLoadingContainer.value = false;
+};
+
+const confirmDeleteDialog = async (event, delFunc, header = '') => {
+  confirm.require({
+    target: event.currentTarget,
+    header: header,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await delFunc();
+    },
+  });
 };
 </script>
 

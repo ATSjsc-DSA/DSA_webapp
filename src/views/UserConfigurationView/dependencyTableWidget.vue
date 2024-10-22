@@ -1,6 +1,6 @@
 <template>
-  <div style="height: 43rem">
-    <DataTable :value="dependencyList" tableStyle="min-width: 50rem">
+  <div style="height: 42rem">
+    <DataTable :value="dependencyList" tableStyle="min-width: 50rem" size="small">
       <template #header>
         <div class="flex justify-content-end">
           <Button type="button" icon="pi pi-plus" size="small" text @click="createVisibleDialog = true" />
@@ -191,7 +191,6 @@ import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
 const confirm = useConfirm();
 import { ApiDsa } from './api';
-7;
 
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
@@ -253,10 +252,10 @@ const createDependency = async () => {
   data.startTimestamp = new Date(data.startTimestamp).getTime();
   data.endTimestamp = new Date(data.endTimestamp).getTime();
   try {
-    const res = await ApiDsa.createDependency(props.projectVersionId, props.dependencyId, data);
-    dependencyList.value.push(res.data);
+    await ApiDsa.createDependency(props.projectVersionId, props.dependencyId, data);
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
     createVisibleDialog.value = false;
+    await getDependencyList();
   } catch (error) {
     console.error('getDependencyList: error ', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });

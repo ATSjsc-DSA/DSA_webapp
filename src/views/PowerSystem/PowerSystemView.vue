@@ -938,11 +938,11 @@ const getPsParametertWithDefinition = async (page = 1) => {
     filter = JSON.parse(JSON.stringify(flatListFilter.value));
     // --without Station
     if (definitionSelected.value.name === 'Station') {
-      delete filter.sub;
+      delete filter.station;
     }
   } else {
     // -- only station
-    filter = { sub: flatListFilter.value.sub };
+    filter = { station: flatListFilter.value.station };
   }
   const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(
     definitionSelected.value._id,
@@ -1022,11 +1022,11 @@ const getPsEmstWithDefinition = async (page = 1, getHeader = false) => {
     filter = JSON.parse(JSON.stringify(flatListFilter.value));
     // --without Station
     if (definitionSelected.value.name === 'Station') {
-      delete filter.sub;
+      delete filter.station;
     }
   } else {
     // -- only station
-    filter = { sub: flatListFilter.value.sub };
+    filter = { station: flatListFilter.value.station };
   }
   if (emsFilterSelected.value) {
     filter['ems_definition_id'] = emsFilterSelected.value._id;

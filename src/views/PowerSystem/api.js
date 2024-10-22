@@ -85,7 +85,7 @@ export class PowerSystemParameterApi {
     });
   }
 
-  static async searchPs(projectVersionId = '66decf1dcff005199529524b', definitionList=[], query, exceptionArr = []) {
+  static async searchPs(projectVersionId = '66decf1dcff005199529524b', definitionList = [], query, exceptionArr = []) {
     let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
 
     if (query) {
