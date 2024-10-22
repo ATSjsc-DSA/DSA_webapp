@@ -21,6 +21,12 @@
           <Tag :severity="data.active ? 'primary' : 'secondary'" :value="String(data.active)"></Tag>
         </template>
       </Column>
+      <Column style="width: 8rem">
+        <template #body="{ data }">
+          <Button icon="pi pi-pencil" rounded text class="mr-2" @click="handlerUpdate(data)" />
+          <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete($event, data)" />
+        </template>
+      </Column>
       <template #empty> No Data </template>
       <template #expansion="{ data }">
         <div class="p-3">
@@ -42,7 +48,7 @@
     <div class="mr-3 mt-3">Total: {{ recordTotal }}</div>
   </div>
 
-  <Dialog v-model:visible="createCaseVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
+  <Dialog v-model:visible="changeVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Disturbance case</span>
@@ -51,16 +57,17 @@
 
     <div class="flex flex-column gap-2 mb-3">
       <label for="caseName" class="font-semibold"> Name </label>
-      <InputText id="caseName" v-model="newCaseData.name" class="flex-auto" autocomplete="off" />
+      <InputText id="caseName" v-model="caseData.name" class="flex-auto" autocomplete="off" />
     </div>
 
     <div class="flex align-items-center gap-3 mb-3">
       <label for="caseActive" class="font-semibold w-6rem"> Active</label>
-      <InputSwitch id="caseActive" v-model="newCaseData.active" autocomplete="off" />
+      <InputSwitch id="caseActive" v-model="caseData.active" autocomplete="off" />
     </div>
     <template #footer>
-      <Button type="button" label="Cancel" severity="secondary" @click="createCaseVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" @click="createCase"></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="changeVisibleDialog = false"></Button>
+      <Button v-if="modeChange === 'Create'" type="button" label="Save" @click="createCase"></Button>
+      <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateCase"></Button>
     </template>
   </Dialog>
 </template>
@@ -70,12 +77,13 @@ import { onMounted, watch } from 'vue';
 import InputSwitch from 'primevue/inputswitch';
 
 import ScrollPanel from 'primevue/scrollpanel';
-
+import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { ApiDisturbances, ApiDisturbance } from '@/views/SystemEvents/api';
 import tsaDisturbanceWidget from './tsaDisturbanceWidget.vue';
 
 const toast = useToast();
+const confirm = useConfirm();
 
 const props = defineProps({
   projectVersionId: {
@@ -133,26 +141,73 @@ const onRowExpand = async (event) => {
 };
 
 //  Disturbances Case - CRUD
-
-const createCaseVisibleDialog = ref(false);
-const newCaseData = ref();
+const modeChange = ref();
+const changeVisibleDialog = ref(false);
+const caseData = ref({
+  name: '',
+  active: true,
+});
 const handleCaseCreate = () => {
-  newCaseData.value = {
+  modeChange.value = 'Create';
+  caseData.value = {
     name: '',
     active: true,
   };
-  createCaseVisibleDialog.value = true;
+  changeVisibleDialog.value = true;
 };
 const createCase = async () => {
   try {
-    await ApiDisturbances.createDisturbances(props.tsaId, newCaseData.value);
+    await ApiDisturbances.createDisturbances(props.tsaId, caseData.value);
     await getDisturbancesCaseList();
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
-    createCaseVisibleDialog.value = false;
+    changeVisibleDialog.value = false;
   } catch (error) {
     console.log('getScadaList: error ', error);
-    caseList.value = [];
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const handlerUpdate = (data) => {
+  modeChange.value = 'Update';
+  caseData.value = JSON.parse(JSON.stringify(data));
+  changeVisibleDialog.value = true;
+};
+const updateCase = async () => {
+  try {
+    await ApiDisturbances.updateDisturbances(caseData.value._id, caseData.value);
+    await getDisturbancesCaseList();
+    toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
+    changeVisibleDialog.value = false;
+  } catch (error) {
+    console.log('getScadaList: error ', error);
+    toast.add({ severity: 'error', summary: 'Updated Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const confirmDelete = async (event, data) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Disturbance Case',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: () => {
+      deleteDisturbances(data);
+    },
+  });
+};
+const deleteDisturbances = async (data) => {
+  try {
+    await ApiDisturbances.deleteDisturbances(data._id);
+    await getDisturbancesCaseList();
+    toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
+    changeVisibleDialog.value = false;
+  } catch (error) {
+    console.log('deleteDisturbances: error ', error);
+    toast.add({ severity: 'error', summary: 'Deleted Message', detail: error.data.detail, life: 3000 });
   }
 };
 </script>
