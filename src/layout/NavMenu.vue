@@ -36,11 +36,6 @@ const items = ref([
         icon: 'pi pi-fw pi-clone',
         items: [
           {
-            label: 'Disturbances',
-            to: '/SystemEvents/Disturbances',
-            // icon: 'pi pi-fw pi-cog',
-          },
-          {
             label: 'Contingencies',
             to: '/SystemEvents/Contingencies',
             // icon: 'pi pi-fw pi-cog',

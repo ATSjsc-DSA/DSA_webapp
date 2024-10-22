@@ -233,7 +233,7 @@
                   <dependencyTableWidget :project-version-id="projectVersionId" :dependency-id="tsaData._id" />
                 </ScrollPanel>
               </TabPanel>
-              <TabPanel header="Disturbance">
+              <TabPanel header="Disturbance Cases">
                 <DisturbanceView :itemActive="tsaData"></DisturbanceView>
               </TabPanel>
             </TabView>

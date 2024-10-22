@@ -65,11 +65,6 @@ const router = createRouter({
           component: () => import('@/views/BranchMoniterView.vue'),
         },
         {
-          path: '/DSA/SystemEvents/Disturbances',
-          name: 'Disturbances',
-          component: () => import('@/views/DisturbancesView.vue'),
-        },
-        {
           path: '/DSA/SystemEvents/Contingencies',
           name: 'Contingencies',
           component: () => import('@/views/ContigenciesView.vue'),

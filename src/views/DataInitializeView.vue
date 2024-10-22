@@ -1,7 +1,7 @@
 <template>
   <div class="card h-full relative layout-content">
     <AppProgressSpinner :showSpinner="progressSpinnerModal"></AppProgressSpinner>
-    <BreadcrumbCommon :items="items"></BreadcrumbCommon>
+    <!-- <BreadcrumbCommon :items="items"></BreadcrumbCommon> -->
 
     <div class="card h-full w-full">
       <div class="flex flex-wrap justify-content-end gap-2">
@@ -111,7 +111,7 @@ const progressSpinnerModal = ref(false);
 const sceDialogCreate = ref(false);
 const seDialogCreate = ref(false);
 //
-const items = ref([{ label: 'System Events' }, { label: 'Disturbances', route: '/DSA/SystemEvents/Disturbances' }]);
+// const items = ref([{ label: 'System Events' }, { label: 'Disturbances', route: '/DSA/SystemEvents/Disturbances' }]);
 
 // const createDataOnDeviceDialog = ref(false);
 const createVisibleDialog = ref(false);

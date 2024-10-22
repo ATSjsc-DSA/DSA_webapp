@@ -1,7 +1,7 @@
 <template>
   <div class="card h-full relative layout-content">
     <AppProgressSpinner :showSpinner="progressSpinnerModal"></AppProgressSpinner>
-    <BreadcrumbCommon :items="items"></BreadcrumbCommon>
+    <!-- <BreadcrumbCommon :items="items"></BreadcrumbCommon> -->
     <div class="card h-full">
       <Splitter style="height: 100%">
         <SplitterPanel
@@ -43,7 +43,7 @@ import SplitterPanel from 'primevue/splitterpanel';
 import BranchMoniterView from '../BranchMoniterView.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 
-const items = ref([{ label: 'Configuration', route: '/DSA/SystemEvents/Disturbances' }]);
+// const items = ref([{ label: 'Configuration', route: '/DSA/SystemEvents/Disturbances' }]);
 // Dữ liệu cây thư mục
 const progressSpinnerModal = ref(false);
 const selectedItem = ref();
