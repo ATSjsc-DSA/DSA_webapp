@@ -1,41 +1,49 @@
 <template>
-  <ScrollPanel style="height: 41rem">
-    <DataTable
-      id="disturbanceCaseTable"
-      v-model:expandedRows="caseExpandedRows"
-      :value="caseList"
-      tableStyle="min-width: 50rem"
-      dataKey="_id"
-      size="small"
-      @rowExpand="onRowExpand"
-    >
+  <!-- <ScrollPanel style="height: 41rem"> -->
+  <DataTable
+    id="disturbanceCaseTable"
+    v-model:expandedRows="caseExpandedRows"
+    :value="caseList"
+    tableStyle="min-width: 50rem"
+    dataKey="_id"
+    size="small"
+    @rowExpand="onRowExpand"
+    scrollable
+    scrollHeight="40rem"
+    :rowStyle="rowStyle"
+  >
+    <Column expander style="width: 5rem" />
+    <Column field="name" header="Name" frozen style="width: 15%; text-wrap: nowrap"> </Column>
+    <Column field="active" header="Active">
+      <template #body="{ data }">
+        <Tag :severity="data.active ? 'primary' : 'secondary'" :value="String(data.active)"></Tag>
+      </template>
+    </Column>
+    <Column style="width: 8rem">
       <template #header>
-        <div class="flex justify-content-end">
-          <Button type="button" icon="pi pi-plus" size="small" text @click="handleCaseCreate" />
-        </div>
+        <Button
+          class="flex justify-content-center w-full"
+          type="button"
+          icon="pi pi-plus"
+          size="small"
+          text
+          @click="handleCaseCreate"
+        />
       </template>
-      <Column expander style="width: 5rem" />
-      <Column field="name" header="Name" frozen style="width: 15%; text-wrap: nowrap"> </Column>
-      <Column field="active" header="Active">
-        <template #body="{ data }">
-          <Tag :severity="data.active ? 'primary' : 'secondary'" :value="String(data.active)"></Tag>
-        </template>
-      </Column>
-      <Column style="width: 8rem">
-        <template #body="{ data }">
-          <Button icon="pi pi-pencil" rounded text class="mr-2" @click="handlerUpdate(data)" />
-          <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete($event, data)" />
-        </template>
-      </Column>
-      <template #empty> No Data </template>
-      <template #expansion="{ data }">
-        <div class="p-3">
-          <tsaDisturbanceWidget v-if="data.loadedData" :case-id="data._id" />
-        </div>
+      <template #body="{ data }">
+        <Button icon="pi pi-pencil" rounded text class="mr-2" @click="handlerUpdate(data)" />
+        <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete($event, data)" />
       </template>
-    </DataTable>
-  </ScrollPanel>
-  <div class="flex justify-content-end align-items-center">
+    </Column>
+    <template #empty> No Data </template>
+    <template #expansion="{ data }">
+      <div class="p-3">
+        <tsaDisturbanceWidget v-if="data.loadedData" :case-id="data._id" />
+      </div>
+    </template>
+  </DataTable>
+  <!-- </ScrollPanel> -->
+  <div class="flex justify-content-end align-items-center mt-2">
     <Paginator
       v-if="recordTotal > pageRowNumber"
       v-model:first="paginatorOffset"
@@ -210,11 +218,16 @@ const deleteDisturbances = async (data) => {
     toast.add({ severity: 'error', summary: 'Deleted Message', detail: error.data.detail, life: 3000 });
   }
 };
+const rowStyle = (data) => {
+  if (data._id === Object.keys(caseExpandedRows.value)[0]) {
+    return { backgroundColor: 'var(--primary-300)' };
+  }
+};
 </script>
 
 <style>
 .p-datatable-row-expansion {
-  background-color: var(--surface-100);
+  background-color: var(--primary-100);
 }
 #disturbanceCaseTable .p-column-title {
   font-size: 1.1rem;

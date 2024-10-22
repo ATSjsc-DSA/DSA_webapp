@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="data" stripedRows showGridlines size="small">
+    <DataTable :value="data" stripedRows showGridlines size="small" scrollable scrollHeight="20rem">
       <template #header>
         <div class="flex justify-content-between align-items-center">
           <div class="fonts-semibold text-lg">Disturbance list ({{ recordTotal }})</div>
