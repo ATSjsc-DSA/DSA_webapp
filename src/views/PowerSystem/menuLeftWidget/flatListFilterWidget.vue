@@ -256,7 +256,7 @@ const handleFilterClick = () => {
       owner: ownerFilter.value ? ownerFilter.value.map((item) => item._id) : [],
       type: typeFilter.value ? typeFilter.value.map((item) => item._id) : [],
       kv: kvFilter.value ? kvFilter.value.map((item) => item._id) : [],
-      sub: stationFilter.value ? stationFilter.value.map((item) => item._id) : [],
+      station: stationFilter.value ? stationFilter.value.map((item) => item._id) : [],
     });
   } else {
     emits('handleFilter', {
@@ -265,7 +265,7 @@ const handleFilterClick = () => {
       owner: ownerFilter.value ? ownerFilter.value._id : null,
       type: typeFilter.value ? typeFilter.value._id : null,
       kv: kvFilter.value ? kvFilter.value._id : null,
-      sub: stationFilter.value ? stationFilter.value._id : null,
+      station: stationFilter.value ? stationFilter.value._id : null,
     });
   }
 };
