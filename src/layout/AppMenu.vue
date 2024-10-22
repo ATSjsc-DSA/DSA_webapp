@@ -21,7 +21,7 @@ const model = ref([
     label: 'Configuration',
     items: [
       { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
-      { label: 'Group ', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
+      // { label: 'Group ', icon: 'pi pi-fw pi-list', to: '/DSA/DataInitialize' },
       // { label: 'Data Initialize', icon: 'pi pi-fw pi-list', to: '/DSA/Initialize' },
       // {
       //   label: 'System Events',

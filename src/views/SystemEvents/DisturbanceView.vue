@@ -35,8 +35,7 @@
           <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
         </template>
       </Column>
-      <Column field="startTimestamp" header="Start Time" sortable style="width: 18%">
-      </Column>
+      <Column field="startTimestamp" header="Start Time" sortable style="width: 18%"> </Column>
       <Column field="endTimestamp" header="End Time" sortable style="width: 18%" />
       <Column field="eventValue" header="Event Value">
         <template #body="{ data }">
@@ -119,11 +118,21 @@
 
         <div class="field">
           <label for="startTimestamp" class="font-semibold">Start Time</label>
-          <InputNumber v-model="disturbanceModelData.startTimestamp" inputId="minmaxfraction" :minFractionDigits="0" :maxFractionDigits="2" />
+          <InputNumber
+            v-model="disturbanceModelData.startTimestamp"
+            inputId="minmaxfraction"
+            :minFractionDigits="0"
+            :maxFractionDigits="2"
+          />
         </div>
         <div class="field">
           <label for="endTimestamp" class="font-semibold">End Time</label>
-          <InputNumber v-model="disturbanceModelData.endTimestamp" inputId="minmaxfraction" :minFractionDigits="0" :maxFractionDigits="2" />
+          <InputNumber
+            v-model="disturbanceModelData.endTimestamp"
+            inputId="minmaxfraction"
+            :minFractionDigits="0"
+            :maxFractionDigits="2"
+          />
         </div>
 
         <div class="flex justify-content-end gap-2">
@@ -162,13 +171,16 @@ const popupButton = ref(null); // Để gắn popup vào nút
 
 const itemActive = computed(() => props.itemActive._id);
 
-watch(() => props.itemActive, (newValue, oldValue) => {
-  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-    console.log('def');
-    
-    getListDisturbance();
-  }
-});
+watch(
+  () => props.itemActive,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      console.log('def');
+
+      getListDisturbance();
+    }
+  },
+);
 
 const visible = ref(false);
 const toast = useToast();
@@ -243,7 +255,6 @@ const search = async (event) => {
   }
 };
 // ---------------- data --------------------
-
 
 const listDisturbanceType = [
   { name: 'Short Circuit', value: 0 },
@@ -354,8 +365,8 @@ const handlerCreateThis = async () => {
 };
 const createThis = async () => {
   try {
-    console.log(disturbanceModelData.value, "GISS");
-    
+    console.log(disturbanceModelData.value, 'GISS');
+
     await ApiDisturbance.createDisturbance(itemActive.value, disturbanceModelData.value);
     getListDisturbance();
     visible.value = false;
@@ -369,7 +380,7 @@ const handlerEditThis = async (data) => {
   disturbanceModelData.value = JSON.parse(JSON.stringify(data)); // Tạo bản sao của data
   visible.value = true;
   headerDialog.value = 'Edit';
-  const {definitionId, ...rest} = disturbanceModelData.value.powerSystemId
+  const { definitionId, ...rest } = disturbanceModelData.value.powerSystemId;
   autoCompleteValue.value = rest;
   selectedDefinition.value = definitionId;
 };

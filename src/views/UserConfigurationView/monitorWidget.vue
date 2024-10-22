@@ -277,7 +277,13 @@ const updateMonitor = async () => {
   try {
     const res = await ApiMonitor.updateMonitor(monitorData.value._id, monitorData.value);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
-    emit('updateLabelMonitorLeaf', props.nodeMonitorSelected.appId, monitorData.value._id, res.data.name, res.data.active);
+    emit(
+      'updateLabelMonitorLeaf',
+      props.nodeMonitorSelected.appId,
+      monitorData.value._id,
+      res.data.name,
+      res.data.active,
+    );
   } catch (error) {
     console.log('updateMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });

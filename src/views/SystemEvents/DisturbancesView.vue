@@ -113,7 +113,7 @@ onMounted(() => {
 const listContingencies = ref([]);
 const getListDisturbances = async () => {
   try {
-    const res = await ApiDisturbances.getListDisturbances();
+    const res = await ApiDisturbances.getList();
     listContingencies.value = res.data;
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });

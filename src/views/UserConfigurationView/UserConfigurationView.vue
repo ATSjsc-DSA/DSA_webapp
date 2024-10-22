@@ -234,7 +234,7 @@
                 </ScrollPanel>
               </TabPanel>
               <TabPanel header="Disturbance Cases">
-                <DisturbanceView :itemActive="tsaData"></DisturbanceView>
+                <tsaDisturbanceCasesWidget :tsa-id="tsaData._id"></tsaDisturbanceCasesWidget>
               </TabPanel>
             </TabView>
 
@@ -400,11 +400,10 @@ import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationVie
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
 import dependencyTableWidget from './dependencyTableWidget.vue';
-import DisturbanceView from '../SystemEvents/DisturbanceView.vue';
 import dsaSsrFormWidget from './formWidget/dsaSsrFormWidget.vue';
 import ssrFrequenceTableWidget from './ssrFrequenceTableWidget.vue';
 import dsaOslFormWidget from './formWidget/dsaOslFormWidget.vue';
-
+import tsaDisturbanceCasesWidget from './tsaDisturbanceCasesWidget.vue';
 const toast = useToast();
 const confirm = useConfirm();
 const isLoadingUserConfig = ref(false);

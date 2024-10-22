@@ -54,9 +54,6 @@
       <TabPanel header="Contingencies">
         <ContigenciesView></ContigenciesView>
       </TabPanel>
-      <TabPanel header="Disturbances">
-        <DisturbancesView></DisturbancesView>
-      </TabPanel>
     </TabView>
   </div>
 
@@ -91,7 +88,6 @@ import listShowSpiliter from '@/components/listShowSplitter.vue';
 import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
 import BranchMoniterView from './BranchMoniterView.vue';
 import ContigenciesView from './ContigenciesView.vue';
-import DisturbancesView from './DisturbancesView.vue';
 const dsaStore = useDSAStore();
 const { listGen, listLoad, listBranch, totalSizeGen, totalSizeLoad, totalSizeBranch, listContingencies } =
   storeToRefs(dsaStore);
