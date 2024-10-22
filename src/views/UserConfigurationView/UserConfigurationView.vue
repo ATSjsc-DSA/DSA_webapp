@@ -132,6 +132,14 @@
                   </div>
                   <ContextMenu ref="ssrContextMenuRef" :model="ssrContextMenu" />
                 </template>
+
+                <template #OSL="slotProps">
+                  <div aria-haspopup="true" @contextmenu="onOslRightClick($event, slotProps.node)">
+                    <Tag value="OSL" severity="warning" rounded />
+                    {{ slotProps.node.label }}
+                  </div>
+                  <ContextMenu ref="oslContextMenuRef" :model="oslContextMenu" />
+                </template>
               </Tree>
             </div>
           </template>
@@ -248,6 +256,20 @@
                 </ScrollPanel>
               </TabPanel>
             </TabView>
+
+            <!-- DSA - OSL -->
+            <ScrollPanel
+              v-if="nodeSelected.type === 'OSL' && oslData !== undefined"
+              class="card"
+              style="width: 100%; height: 50rem"
+            >
+              <div class="py-3">
+                <dsaOslFormWidget v-model="oslData" />
+              </div>
+              <div class="flex justify-content-end gap-3">
+                <Button type="button" label="Update" @click="updateOsl"></Button>
+              </div>
+            </ScrollPanel>
           </template>
         </Card>
       </SplitterPanel>
@@ -343,6 +365,8 @@
     <DsaVsaFormWidget v-if="newTaskData.type === 'VSA'" v-model="newVsaData" :is-create-form="true" />
     <DsaTsaFormWidget v-if="newTaskData.type === 'TSA'" v-model="newTsaData" :is-create-form="true" />
     <dsaSsrFormWidget v-if="newTaskData.type === 'SSR'" v-model="newSsrData" :is-create-form="true" />
+    <!-- <dsaOslFormWidget v-if="newTaskData.type === 'OSL'" v-model="newOslData" :is-create-form="true" /> -->
+
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createTaskDsaDialog = false"></Button>
       <Button type="button" label="Submit" @click="handlecreateTask"></Button>
@@ -379,6 +403,7 @@ import dependencyTableWidget from './dependencyTableWidget.vue';
 import DisturbanceView from '../SystemEvents/DisturbanceView.vue';
 import dsaSsrFormWidget from './formWidget/dsaSsrFormWidget.vue';
 import ssrFrequenceTableWidget from './ssrFrequenceTableWidget.vue';
+import dsaOslFormWidget from './formWidget/dsaOslFormWidget.vue';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -560,6 +585,11 @@ const getTaskBranch = async (appId, dsaId, dsaKey = '') => {
     leafData.push(getTaskLeaf(appId, dsaId, ssr, 'SSR', dsaKey + '_ssr_' + index));
   }
 
+  const oslList = await getOslList(dsaId);
+  for (let index = 0; index < oslList.length; index++) {
+    const osl = oslList[index];
+    leafData.push(getTaskLeaf(appId, dsaId, osl, 'OSL', dsaKey + '_osl_' + index));
+  }
   return leafData;
 };
 
@@ -646,6 +676,9 @@ const onNodeSelect = async (node) => {
   }
   if (node.type === 'SSR') {
     await getSsrData(node._id);
+  }
+  if (node.type === 'OSL') {
+    await getOslData(node._id);
   }
   isLoadingContainer.value = false;
 };
@@ -963,6 +996,23 @@ const ssrContextMenu = ref([
     },
   },
 ]);
+
+const oslIdclick = ref();
+const oslContextMenuRef = ref();
+const onOslRightClick = (event, node) => {
+  oslIdclick.value = node._id;
+  oslContextMenuRef.value.show(event);
+};
+
+const oslContextMenu = ref([
+  {
+    label: 'Delete',
+    icon: 'pi pi-trash',
+    command: async (event) => {
+      await confirmDeleteDialog(event, delOsl, 'Delete DSA OSL');
+    },
+  },
+]);
 // ------- DSA
 
 const createDsaVisibleDialog = ref(false);
@@ -1055,6 +1105,12 @@ const handlecreateTask = async () => {
     newSsrData.value.name = newTaskData.value.name;
     newSsrData.value.active = newTaskData.value.active;
     await createSsr();
+  }
+
+  if (newTaskData.value.type === 'OSL') {
+    newOslData.value.name = newTaskData.value.name;
+    newOslData.value.active = newTaskData.value.active;
+    await createOsl();
   }
 };
 
@@ -1312,6 +1368,76 @@ const delSsr = async () => {
     await getTreeData();
   } catch (error) {
     console.log('delSsr: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+  isLoadingContainer.value = false;
+};
+
+// ---DSA - Osl
+
+const oslData = ref();
+const newOslData = ref({
+  active: true,
+  name: '',
+});
+
+const getOslList = async (dsaId) => {
+  try {
+    const res = await ApiDsa.getOslList(projectVersionId.value, dsaId);
+    return res.data;
+  } catch (error) {
+    console.log('getOslList: error ', error);
+    return [];
+  }
+};
+
+const getOslData = async (oslId) => {
+  try {
+    const res = await ApiDsa.getOsl(oslId);
+    oslData.value = res.data;
+  } catch (error) {
+    console.log('getOslData: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const createOsl = async () => {
+  try {
+    const res = await ApiDsa.createOsl(projectVersionId.value, dsaIdclick.value, newOslData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'OSL');
+    createTaskDsaDialog.value = false;
+    await onNodeSelect(newLeaf);
+  } catch (error) {
+    console.log('createOsl: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const updateOsl = async () => {
+  try {
+    const res = await ApiDsa.updateOsl(oslData.value._id, oslData.value);
+    toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
+    updateLabelTaskLeaf(
+      nodeSelected.value.appId,
+      nodeSelected.value.dsaId,
+      nodeSelected.value._id,
+      res.data.name,
+      res.data.active,
+    );
+  } catch (error) {
+    console.log('updateOsl: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const delOsl = async () => {
+  isLoadingContainer.value = true;
+  try {
+    await ApiDsa.delOsl(oslIdclick.value);
+    toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    nodeSelected.value = {};
+    await getTreeData();
+  } catch (error) {
+    console.log('delOsl: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
   isLoadingContainer.value = false;

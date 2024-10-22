@@ -194,11 +194,8 @@ const handleUpdate = (data) => {
   updateVisibleDialog.value = true;
 };
 const updateSsrFrequency = async () => {
-  const data = JSON.parse(JSON.stringify(updateData.value));
-  data.startTimestamp = new Date(data.startTimestamp).getTime();
-  data.endTimestamp = new Date(data.endTimestamp).getTime();
   try {
-    await ApiDsa.updateSsrFrequency(data._id, data);
+    await ApiDsa.updateSsrFrequency(updateData.value._id, updateData.value);
     await getfrequenceList();
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
     updateVisibleDialog.value = false;
