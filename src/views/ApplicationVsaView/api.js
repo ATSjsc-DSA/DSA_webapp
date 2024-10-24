@@ -34,7 +34,7 @@ export class api {
     return get(`/hmicurve/${curve_id}`);
   }
 
-  static async GetChartData(curve_id, data) {
-    return post(`/hmicurve/${curve_id}/chart`, data);
+  static async GetChartData(caseId, typeList = []) {
+    return post(`/hmicurve/${caseId}/chart`, { payload: typeList });
   }
 }

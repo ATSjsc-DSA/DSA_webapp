@@ -44,6 +44,7 @@ onMounted(() => {
 });
 
 const chartData = computed(() => {
+  chartOptions.value = setChartOptions();
   return setChartData(props.chartData);
 });
 const chartOptions = ref();
