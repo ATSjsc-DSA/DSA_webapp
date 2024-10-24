@@ -26,6 +26,13 @@ const router = createRouter({
         {
           path: '/DSA/VSA',
           name: 'VSA',
+          component: () => import('@/views/ApplicationVsaView/ApplicationVsaView.vue'),
+          // component: () => import('@/views/VSA_View.vue'),
+        },
+        {
+          path: '/DSA/VSA-old',
+          name: 'old VSA',
+          // component: () => import('@/views/ApplicationVsaView/ApplicationVsaView.vue'),
           component: () => import('@/views/VSA_View.vue'),
         },
         {
