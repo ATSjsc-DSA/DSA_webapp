@@ -1,42 +1,44 @@
 <template>
-  <Tree
-    v-model:expandedKeys="caseTreeExpandedKeys"
-    :selectionKeys="caseSelected"
-    :value="caseTree"
-    loadingMode="icon"
-    selectionMode="single"
-    class="w-full"
-    style="height: 52rem"
-    :loading="caseTreeloading"
-    @node-expand="onCaseNodeExpand"
-    @node-select="onCaseNodeSelect"
-  >
-    <template #Application="slotProps">
-      <div class="w-full flex align-items-center justify-content-between">
-        <div class="font-bold text-lg">
+  <ScrollPanel style="width: 100%; height: 52rem">
+    <Tree
+      v-model:expandedKeys="caseTreeExpandedKeys"
+      :selectionKeys="caseSelected"
+      :value="caseTree"
+      loadingMode="icon"
+      selectionMode="single"
+      class="w-full"
+      :loading="caseTreeloading"
+      @node-expand="onCaseNodeExpand"
+      @node-select="onCaseNodeSelect"
+    >
+      <template #Application="slotProps">
+        <div class="w-full flex align-items-center justify-content-between">
+          <div class="font-bold text-lg">
+            {{ slotProps.node.label }}
+          </div>
+          <div class="ml-3">
+            <Tag v-if="slotProps.node.active" value="Active" severity="success" />
+          </div>
+        </div>
+      </template>
+      <template #VSA="slotProps">
+        <div class="font-semibold">
           {{ slotProps.node.label }}
         </div>
-        <div class="ml-3">
-          <Tag v-if="slotProps.node.active" value="Active" severity="success" />
+      </template>
+      <template #Case="slotProps">
+        <div class="w-full">
+          {{ slotProps.node.label }}
         </div>
-      </div>
-    </template>
-    <template #VSA="slotProps">
-      <div class="font-semibold">
-        {{ slotProps.node.label }}
-      </div>
-    </template>
-    <template #Case="slotProps">
-      <div class="w-full">
-        {{ slotProps.node.label }}
-      </div>
-    </template>
-  </Tree>
+      </template>
+    </Tree>
+  </ScrollPanel>
 </template>
 <script setup>
 import { onMounted } from 'vue';
 
 import Tree from 'primevue/tree';
+import ScrollPanel from 'primevue/scrollpanel';
 
 import { ApiApplication } from '../UserConfigurationView/api';
 import { api } from './api';
@@ -135,7 +137,6 @@ const getCaseBranchData = async (vsaNode) => {
         label: vsa.name,
         _id: vsa._id,
         type: 'Case',
-        icon: 'pi pi-th-large',
         leaf: true,
       });
     }

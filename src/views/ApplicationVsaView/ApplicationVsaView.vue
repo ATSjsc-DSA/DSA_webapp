@@ -14,68 +14,80 @@
         <Card class="flex-grow-1">
           <template #title><i class="pi pi-credit-card pr-3"></i>Monitor</template>
           <template #content>
-            <Tree
-              v-model:expandedKeys="monitorTreeExpandedKeys"
-              :selectionKeys="monitorTypeSelected"
-              :value="monitorTree"
-              loadingMode="icon"
-              selectionMode="multiple"
-              class="w-full"
-              :loading="monitorTreeLoading"
-              @node-expand="onNodeExpand"
-              @node-select="onMonitorNodeSelect"
-              @node-unselect="onMonitorNodeUnSelect"
-            >
-              <template #SubCase="slotProps">
-                <div class="font-bold text-lg">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-              <template #PowerSystem="slotProps">
-                <div class="font-semibold">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-              <template #Type="slotProps">
-                <div class="w-full">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-            </Tree>
+            <ScrollPanel style="width: 100%; height: 20rem">
+              <div v-if="!caseSelected._id" class="h-full flex">
+                <div class="m-auto">Choose a Case</div>
+              </div>
+              <Tree
+                v-else
+                v-model:expandedKeys="monitorTreeExpandedKeys"
+                :selectionKeys="monitorTypeSelected"
+                :value="monitorTree"
+                loadingMode="icon"
+                selectionMode="multiple"
+                class="w-full"
+                :loading="monitorTreeLoading"
+                @node-expand="onNodeExpand"
+                @node-select="onMonitorNodeSelect"
+                @node-unselect="onMonitorNodeUnSelect"
+              >
+                <template #SubCase="slotProps">
+                  <div class="font-bold text-lg">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+                <template #PowerSystem="slotProps">
+                  <div class="font-semibold">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+                <template #Type="slotProps">
+                  <div class="w-full">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+              </Tree>
+            </ScrollPanel>
           </template>
         </Card>
         <!-- Export -->
         <Card class="flex-grow-1">
           <template #title><i class="pi pi-tags pr-3"></i>Export</template>
           <template #content>
-            <Tree
-              v-model:expandedKeys="exportTreeExpandedKeys"
-              :selectionKeys="exportTypeSelected"
-              :value="exportTree"
-              loadingMode="icon"
-              selectionMode="multiple"
-              class="w-full"
-              :loading="exportTreeLoading"
-              @node-expand="onNodeExpand"
-              @node-select="onExportTypeNodeSelect"
-              @node-unselect="onExportTypeNodeUnSelect"
-            >
-              <template #SubCase="slotProps">
-                <div class="font-bold text-lg">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-              <template #PowerSystem="slotProps">
-                <div class="font-semibold">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-              <template #Type="slotProps">
-                <div class="w-full">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-            </Tree>
+            <ScrollPanel style="width: 100%; height: 20rem">
+              <div v-if="!caseSelected._id" class="h-full flex">
+                <div class="m-auto">Choose a Case</div>
+              </div>
+              <Tree
+                v-else
+                v-model:expandedKeys="exportTreeExpandedKeys"
+                :selectionKeys="exportTypeSelected"
+                :value="exportTree"
+                loadingMode="icon"
+                selectionMode="multiple"
+                class="w-full"
+                :loading="exportTreeLoading"
+                @node-expand="onNodeExpand"
+                @node-select="onExportTypeNodeSelect"
+                @node-unselect="onExportTypeNodeUnSelect"
+              >
+                <template #SubCase="slotProps">
+                  <div class="font-bold text-lg">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+                <template #PowerSystem="slotProps">
+                  <div class="font-semibold">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+                <template #Type="slotProps">
+                  <div class="w-full">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+              </Tree>
+            </ScrollPanel>
           </template>
         </Card>
         <Card>
@@ -116,7 +128,7 @@
             </div>
           </div> -->
           <!-- end test  -->
-          <div style="height: 50rem">
+          <div style="height: 52rem">
             <comboChartBase
               :chartData="curveChartData"
               :modificationTime="modificationTime"
@@ -134,6 +146,7 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
 import Tree from 'primevue/tree';
+import ScrollPanel from 'primevue/scrollpanel';
 
 import { ApiApplication } from '../UserConfigurationView/api';
 import { api } from './api';
