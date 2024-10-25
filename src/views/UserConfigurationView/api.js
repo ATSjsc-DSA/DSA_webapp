@@ -1,17 +1,17 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { psm_active, projectData } = storeToRefs(commonStore);
+const { seedConfigVersionId, projectData } = storeToRefs(commonStore);
 
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class ApiApplication {
-  static async getList(projectVersionId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/applications`);
+  static async getList() {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/applications`);
   }
 
-  static async createApp(projectVersionId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/applications`, data);
+  static async createApp(data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/applications`, data);
   }
   static async getAppData(appId) {
     return get(`/userconfig/applications/${appId}`);
@@ -25,11 +25,11 @@ export class ApiApplication {
 }
 
 export class ApiMonitor {
-  static async getList(projectVersionId, appId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/monitors`);
+  static async getList(appId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${appId}/monitors`);
   }
-  static async createMonitor(projectVersionId, appId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/monitors`, data);
+  static async createMonitor(appId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${appId}/monitors`, data);
   }
   static async getMonitor(monitorId) {
     return get(`/userconfig/monitors/${monitorId}`);
@@ -41,11 +41,11 @@ export class ApiMonitor {
     return _delete(`/userconfig/monitors/${monitorId}`);
   }
   // Monitor Scada Config
-  static async getScadaList(projectVersionId, monitorId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`);
+  static async getScadaList(monitorId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${monitorId}/monitorscada`);
   }
-  static async createMonitorScada(projectVersionId, monitorId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorscada`, data);
+  static async createMonitorScada(monitorId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${monitorId}/monitorscada`, data);
   }
   static async getMonitorScada(monitor_scada_id) {
     return get(`/userconfig/monitorscada/${monitor_scada_id}`);
@@ -58,11 +58,11 @@ export class ApiMonitor {
   }
 
   // Monitor PMU Config
-  static async getPmuList(projectVersionId, monitorId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorpmu`);
+  static async getPmuList(monitorId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${monitorId}/monitorpmu`);
   }
-  static async createMonitorPmu(projectVersionId, monitorId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${monitorId}/monitorpmu`, data);
+  static async createMonitorPmu(monitorId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${monitorId}/monitorpmu`, data);
   }
   static async getMonitorPmu(monitorPmuId) {
     return get(`/userconfig/monitorpmu/${monitorPmuId}`);
@@ -76,11 +76,11 @@ export class ApiMonitor {
 }
 
 export class ApiDsa {
-  static async getList(projectVersionId, appId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsamodules`);
+  static async getList(appId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${appId}/dsamodules`);
   }
-  static async createDsa(projectVersionId, appId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${appId}/dsamodules`, data);
+  static async createDsa(appId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${appId}/dsamodules`, data);
   }
   static async getDsa(dsaId) {
     return get(`/userconfig/dsamodules/${dsaId}`);
@@ -93,11 +93,11 @@ export class ApiDsa {
   }
 
   // VSA Config
-  static async getVsaList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`);
+  static async getVsaList(dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/vsainformations`);
   }
-  static async createVsa(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/vsainformations`, data);
+  static async createVsa(dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/vsainformations`, data);
   }
   static async getVsa(vsaId) {
     return get(`/userconfig/vsainformations/${vsaId}`);
@@ -109,11 +109,11 @@ export class ApiDsa {
     return _delete(`/userconfig/vsainformations/${vsaId}`);
   }
   // TSA Config
-  static async getTsaList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsainformations`);
+  static async getTsaList(dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/tsainformations`);
   }
-  static async createTsa(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/tsainformations`, data);
+  static async createTsa(dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/tsainformations`, data);
   }
   static async getTsa(vsaId) {
     return get(`/userconfig/tsainformations/${vsaId}`);
@@ -126,14 +126,17 @@ export class ApiDsa {
   }
 
   // module dependency
-  static async getDependencyList(projectVersionId, dependencyId, page) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency`, {
+  static async getDependencyList(dependencyId, page) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dependencyId}/moduledependency`, {
       page: page,
       page_size: 10,
     });
   }
-  static async createDependency(projectVersionId, dependencyId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dependencyId}/moduledependency`, data);
+  static async createDependency(dependencyId, data) {
+    return post(
+      `/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dependencyId}/moduledependency`,
+      data,
+    );
   }
   static async getDependency(dependencyId) {
     return get(`/userconfig/moduledependency/${dependencyId}`);
@@ -145,11 +148,11 @@ export class ApiDsa {
     return _delete(`/userconfig/moduledependency/${dependencyId}`);
   }
   // SSR
-  static async getSsrList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/ssrinformations`);
+  static async getSsrList(dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/ssrinformations`);
   }
-  static async createSsr(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/ssrinformations`, data);
+  static async createSsr(dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/ssrinformations`, data);
   }
   static async getSsr(vsaId) {
     return get(`/userconfig/ssrinformations/${vsaId}`);
@@ -161,14 +164,14 @@ export class ApiDsa {
     return _delete(`/userconfig/ssrinformations/${vsaId}`);
   }
   // SSR - frequency
-  static async getSsrFrequencyList(projectVersionId, ssrId, page) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${ssrId}/frequency`, {
+  static async getSsrFrequencyList(ssrId, page) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${ssrId}/frequency`, {
       page: page,
       page_size: 10,
     });
   }
-  static async createSsrFrequency(projectVersionId, ssrId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${ssrId}/frequency`, data);
+  static async createSsrFrequency(ssrId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${ssrId}/frequency`, data);
   }
 
   static async getSsrFrequency(ssrFrequencyId) {
@@ -181,11 +184,11 @@ export class ApiDsa {
     return _delete(`/userconfig/SsrFrequency/${ssrFrequencyId}`);
   }
   // OSL
-  static async getOslList(projectVersionId, dsaId) {
-    return get(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/oslinformations`);
+  static async getOslList(dsaId) {
+    return get(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/oslinformations`);
   }
-  static async createOsl(projectVersionId, dsaId, data) {
-    return post(`/userconfig/${projectData.value._id}/${projectVersionId}/${dsaId}/oslinformations`, data);
+  static async createOsl(dsaId, data) {
+    return post(`/userconfig/${projectData.value._id}/${seedConfigVersionId.value}/${dsaId}/oslinformations`, data);
   }
   static async getOsl(vsaId) {
     return get(`/userconfig/oslinformations/${vsaId}`);

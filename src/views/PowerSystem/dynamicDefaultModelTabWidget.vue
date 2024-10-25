@@ -463,13 +463,10 @@ import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView
 import { PowerSystemParameterApi, DynamicDefaultApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
-const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 const props = defineProps({
   showDefinitionFlatList: { type: Boolean },
   nodeSelected: { type: Object },
-
-  projectVersionId: { type: String, required: true },
   definitionId: { type: String, required: true },
 });
 

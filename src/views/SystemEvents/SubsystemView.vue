@@ -67,11 +67,7 @@
           </TabPanel>
           <TabPanel header="List Power System">
             <div class="py-1">
-              <filterSubSystemView
-                :current-filter="selectedItem.filterConditions"
-                :project-version-id="projectVersionId"
-                @changeFilter="changeFilter"
-              />
+              <filterSubSystemView :current-filter="selectedItem.filterConditions" @changeFilter="changeFilter" />
             </div>
             <div style="height: 32rem">
               <DataTable
@@ -155,7 +151,6 @@ import { PowerSystemParameterApi } from '../PowerSystem/api';
 const visible = ref(false);
 const toast = useToast();
 const confirm = useConfirm();
-const projectVersionId = ref('66decf1dcff005199529524b');
 
 onMounted(async () => {
   await getListSubSystem();
@@ -253,11 +248,7 @@ const onParameterPageChange = async (event) => {
 const getParameterList = async () => {
   isParameterLoading.value = true;
   try {
-    const res = await PowerSystemParameterApi.getPsDataWithSubsystem(
-      projectVersionId.value,
-      filterData.value,
-      parameterCurrentPage.value,
-    );
+    const res = await PowerSystemParameterApi.getPsDataWithSubsystem(filterData.value, parameterCurrentPage.value);
     parameterData.value = res.data.items;
     parameterTotal.value = res.data.total;
   } catch (error) {

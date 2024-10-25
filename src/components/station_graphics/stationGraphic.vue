@@ -23,7 +23,7 @@ class DemoForceDirectedLayout extends go.ForceDirectedLayout {
     // call base method for standard behavior
     const net = super.makeNetwork(coll);
     net.vertexes.each((vertex) => {
-      const node = vertex.node;
+      const { node } = vertex;
       if (node !== null) vertex.isFixed = node.isSelected;
     });
     return net;
@@ -44,9 +44,10 @@ const station_psd_id = computed(() => {
   if (props.nodeSelected) {
     return props.nodeSelected._id;
   }
+  return;
 });
 const modificationTime = ref();
-var myDiagram = ref(null);
+let myDiagram = ref(null);
 
 watch(
   () => props.nodeSelected,
@@ -59,10 +60,10 @@ watch(
   },
 );
 
-var red = 'orangered'; // 0 or false
-var green = 'forestgreen'; // 1 or true
-var station_definitions = [];
-var networkData = {
+const red = 'orangered'; // 0 or false
+const green = 'forestgreen'; // 1 or true
+let station_definitions = [];
+const networkData = {
   class: 'GraphLinksModel',
   linkFromPortIdProperty: 'fromPort',
   linkToPortIdProperty: 'toPort',
@@ -71,10 +72,7 @@ var networkData = {
 };
 const getDefinitionListInStation = async () => {
   try {
-    const res = await api.DefinitionListApi.getDefinitionListInStation(
-      '66decf1dcff005199529524b',
-      station_psd_id.value,
-    );
+    const res = await api.DefinitionListApi.getDefinitionListInStation(station_psd_id.value);
     station_definitions = res.data;
     console.log(station_definitions);
   } catch (error) {
@@ -84,11 +82,7 @@ const getDefinitionListInStation = async () => {
 };
 const getPsDataWithDefinition = async (definitionId) => {
   try {
-    const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(
-      definitionId,
-      '66decf1dcff005199529524b',
-      station_psd_id.value,
-    );
+    const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(definitionId, station_psd_id.value);
     console.log(res.data);
     return res;
   } catch (error) {
@@ -99,10 +93,7 @@ const getPsDataWithDefinition = async (definitionId) => {
 
 const getNodeDataWithDefinition = async () => {
   try {
-    const res = await api.PowerSystemParameterApi.getNodeDataWithDefinition(
-      '66decf1dcff005199529524b',
-      station_psd_id.value,
-    );
+    const res = await api.PowerSystemParameterApi.getNodeDataWithDefinition(station_psd_id.value);
     console.log(res.data);
     return res;
   } catch (error) {
@@ -119,7 +110,7 @@ const makeNodeArrayAndLinkArray = (category, data) => {
   }
   for (const ems of data.ems) {
     // Lặp qua tất cả các phần tử trong ems.data
-    var in_sunfix = 1;
+    let in_sunfix = 1;
     for (const dataItem of ems.data) {
       networkData.linkDataArray.push({
         from: ems._id,
@@ -142,9 +133,9 @@ const makeNodeNodeArrayAndLinkArray = (category, data) => {
 
 const getEquipmentInStation = async () => {
   for (const item of station_definitions) {
-    let definitionId = item._id;
-    let res = await getPsDataWithDefinition(definitionId);
-    let data = res.data;
+    const definitionId = item._id;
+    const res = await getPsDataWithDefinition(definitionId);
+    const { data } = res;
     if (!data) return;
     if (item.name == 'Generator') {
       makeNodeArrayAndLinkArray('Gener', data);
@@ -166,8 +157,8 @@ const getEquipmentInStation = async () => {
       makeNodeArrayAndLinkArray('Scap', data);
     }
   }
-  let nodes = await getNodeDataWithDefinition();
-  let data_nodes = nodes.data;
+  const nodes = await getNodeDataWithDefinition();
+  const data_nodes = nodes.data;
   makeNodeNodeArrayAndLinkArray('Node', data_nodes);
 };
 
@@ -190,9 +181,9 @@ const init = async () => {
 
   // when the document is modified, add a "*" to the title Bus enable the "Save" button
   myDiagram.addDiagramListener('Modified', (e) => {
-    var button = document.getElementById('saveModel');
+    const button = document.getElementById('saveModel');
     if (button) button.disabled = !myDiagram.isModified;
-    var idx = document.title.indexOf('*');
+    const idx = document.title.indexOf('*');
     if (myDiagram.isModified) {
       if (idx < 0) document.title += '*';
     } else {
@@ -200,7 +191,7 @@ const init = async () => {
     }
   });
 
-  var palette = $(go.Palette, 'palette'); // create a new Palette in the HTML DIV element "palette"
+  const palette = $(go.Palette, 'palette'); // create a new Palette in the HTML DIV element "palette"
 
   myDiagram.linkTemplate = $(
     go.Link,
@@ -224,7 +215,7 @@ const init = async () => {
   );
 
   // node template helpers
-  var sharedToolTip = go.GraphObject.build('ToolTip', { 'Border.figure': 'RoundedRectangle' }).add(
+  const sharedToolTip = go.GraphObject.build('ToolTip', { 'Border.figure': 'RoundedRectangle' }).add(
     new go.TextBlock({ margin: 2 }).bind('text', '', (d) => d.category),
   );
   // define some common property settings
@@ -651,7 +642,7 @@ const loop = () => {
 
 // update the value Bus appearance of each node according to its type Bus input values
 const updateStates = () => {
-  var oldskip = myDiagram.skipsUndoManager;
+  const oldskip = myDiagram.skipsUndoManager;
   myDiagram.skipsUndoManager = true;
   // do all "input" nodes first
   myDiagram.nodes.each((node) => {
@@ -713,40 +704,40 @@ const doGener = (node) => {
 };
 
 const doAnd = (node) => {
-  var color = node.findLinksInto().all(linkIsTrue) ? green : red;
+  const color = node.findLinksInto().all(linkIsTrue) ? green : red;
   setOutputLinks(node, color);
 };
 
 const doScap = (node) => {
-  var color = !node.findLinksInto().all(linkIsTrue) ? green : red;
+  const color = !node.findLinksInto().all(linkIsTrue) ? green : red;
   setOutputLinks(node, color);
 };
 
 const doNode = (node) => {
-  var color = node.findLinksInto().any(linkIsTrue) ? green : red;
+  const color = node.findLinksInto().any(linkIsTrue) ? green : red;
   setOutputLinks(node, color);
 };
 
 const doNor = (node) => {
-  var color = !node.findLinksInto().any(linkIsTrue) ? green : red;
+  const color = !node.findLinksInto().any(linkIsTrue) ? green : red;
   setOutputLinks(node, color);
 };
 
 const doXor = (node) => {
-  var truecount = 0;
+  let truecount = 0;
   node.findLinksInto().each((link) => {
     if (linkIsTrue(link)) truecount++;
   });
-  var color = truecount % 2 !== 0 ? green : red;
+  const color = truecount % 2 !== 0 ? green : red;
   setOutputLinks(node, color);
 };
 
 const doBreaker = (node) => {
-  var truecount = 0;
+  let truecount = 0;
   node.findLinksInto().each((link) => {
     if (linkIsTrue(link)) truecount++;
   });
-  var color = truecount % 2 === 0 ? green : red;
+  const color = truecount % 2 === 0 ? green : red;
   setOutputLinks(node, color);
 };
 

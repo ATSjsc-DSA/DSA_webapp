@@ -2,7 +2,6 @@
   <div class="w-full">
     <flatListFilterWidget
       :definitionList="definitionList"
-      :projectVersionId="projectVersionId"
       :multipleSelection="true"
       :showTypeFilter="false"
       :init-data="initData"
@@ -118,7 +117,6 @@ onMounted(async () => {
 
 const props = defineProps({
   currentFilter: { type: Object, default: () => {} },
-  projectVersionId: { type: String, default: '' },
 });
 const emit = defineEmits(['changeFilter']);
 watch(
@@ -174,11 +172,7 @@ const psSuggestions = ref([]);
 const searchPsQueryFilter = async (event) => {
   const query = event ? event.query.trim() : '';
   try {
-    const res = await PowerSystemParameterApi.searchPs(
-      props.projectVersionId,
-      definitionSubsystemSelected.value,
-      query,
-    );
+    const res = await PowerSystemParameterApi.searchPs(definitionSubsystemSelected.value, query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

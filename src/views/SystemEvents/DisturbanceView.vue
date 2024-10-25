@@ -245,7 +245,6 @@ const search = async (event) => {
   const query = event.query.trim();
   try {
     const res = await PowerSystemParameterApi.searchPs(
-      '66decf1dcff005199529524b',
       selectedDefinition.value ? [selectedDefinition.value] : [],
       query,
     );
@@ -325,12 +324,15 @@ const listDisturbanceEventTypeSwitch = [
   { name: 'Phase A Phase B', value: 15 },
   { name: 'Phase A Phase C', value: 16 },
 ];
+
 const getEventValue = (value) => {
   switch (value) {
     case 0:
       return 'ON';
     case 1:
       return 'OFF';
+    default:
+      return 'ON';
   }
 };
 const listEventValue = [

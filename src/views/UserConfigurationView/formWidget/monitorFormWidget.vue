@@ -121,7 +121,6 @@ import { watch } from 'vue';
 const data = defineModel();
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
-  projectVersionId: { type: String, default: '' },
   psdSelected: { type: Object, default: null },
   listScadaMonitor: { type: Array, default: null },
   definitionMonitor: { type: String, default: null },
@@ -177,7 +176,6 @@ const searchPsQueryFilter = async (event) => {
   const query = event ? event.query.trim() : '';
   try {
     const res = await PowerSystemParameterApi.searchPs(
-      props.projectVersionId,
       selectedDefinition.value ? [selectedDefinition.value] : [],
       query,
     );

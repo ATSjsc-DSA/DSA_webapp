@@ -471,8 +471,6 @@ const toast = useToast();
 const props = defineProps({
   showDefinitionFlatList: { type: Boolean },
   nodeSelected: { type: Object },
-
-  projectVersionId: { type: String, required: true },
   definitionId: { type: String, required: true },
 });
 
@@ -563,7 +561,7 @@ const psSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [props.definitionId], query);
+    const res = await PowerSystemParameterApi.searchPs([props.definitionId], query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

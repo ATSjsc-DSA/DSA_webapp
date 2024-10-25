@@ -58,7 +58,6 @@
               <template #content>
                 <hierarchicalListWidget
                   v-if="!showDefinitionFlatList"
-                  :project-version-id="projectVersionId"
                   :definition-filter="treeDefinitionFilterOpts"
                   :emsFilterFollowDefinition="Object.keys(emsFilterFollowDefinition)"
                   @onNodeSelect="onNodeSelect"
@@ -164,7 +163,6 @@
                   :canUseDefinitionFilter="canUseDefinitionFilter"
                   :canUseDefinitionStationFilter="definitionSelected.name !== 'Station'"
                   :definitionList="definitionList"
-                  :projectVersionId="projectVersionId"
                   @handleFilter="handleFlatListFilterClick"
                 />
               </template>
@@ -225,7 +223,6 @@
                               <poleTableWidget
                                 :data="sublineData"
                                 :nodeSelected="nodeSelected"
-                                :projectVersionId="projectVersionId"
                                 :currentPage="sublineCurrentPage"
                                 :loading="isLoadingsubline"
                                 @reloadData="getSublineData"
@@ -348,7 +345,6 @@
                     <TabPanel :disabled="!isDefinitionGenerator">
                       <dynamicDefinitionTabWidget
                         v-if="isDefinitionGenerator"
-                        :projectVersionId="projectVersionId"
                         :definitionId="definitionSelected._id"
                         :showDefinitionFlatList="showDefinitionFlatList"
                         :nodeSelected="nodeSelected"
@@ -357,7 +353,6 @@
                     <TabPanel :disabled="!isDefinitionGenerator">
                       <dynamicDefaultModelTabWidget
                         v-if="isDefinitionGenerator"
-                        :projectVersionId="projectVersionId"
                         :definitionId="definitionSelected._id"
                         :showDefinitionFlatList="showDefinitionFlatList"
                         :nodeSelected="nodeSelected"
@@ -461,7 +456,6 @@
 
   <createPsDialog
     :visible="createPsVisibleDialog"
-    :projectVersionId="projectVersionId"
     :parameterFilter="definitionList"
     :nodeSelected="nodeSelected"
     :definitionSelected="definitionSelected"
@@ -471,7 +465,6 @@
 
   <createEmsDialog
     :visible="createEmsVisibleDialog"
-    :projectVersionId="projectVersionId"
     :parameterFilter="definitionList"
     :nodeSelected="nodeSelected"
     :emsFilterSelected="emsFilterSelected"
@@ -617,8 +610,6 @@ const { projectData, editVersionData } = storeToRefs(commonStore);
 const toast = useToast();
 const isLoadingProgress = ref(false);
 const isLoadingContainer = ref(false);
-
-const projectVersionId = ref('66decf1dcff005199529524b');
 
 onMounted(async () => {
   await loadAllData();
@@ -896,7 +887,7 @@ const onSublinePageChange = async (event) => {
 };
 const getSublineData = async () => {
   try {
-    const res = await api.SubLineApi.getData(nodeSelected.value._id, projectVersionId.value, sublineCurrentPage.value);
+    const res = await api.SubLineApi.getData(nodeSelected.value._id, sublineCurrentPage.value);
     sublineData.value = res.data.items;
     sublineTotal.value = res.data.total;
   } catch (error) {
@@ -944,12 +935,7 @@ const getPsParametertWithDefinition = async (page = 1) => {
     // -- only station
     filter = { station: flatListFilter.value.station };
   }
-  const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(
-    definitionSelected.value._id,
-    projectVersionId.value,
-    filter,
-    page,
-  );
+  const res = await api.PowerSystemParameterApi.getPsDataWithDefinition(definitionSelected.value._id, filter, page);
 
   psParameterData.value = res.data.items;
   psParameterTotal.value = res.data.total;
@@ -963,7 +949,6 @@ const getPsParameterWithTree = async (getHeader = false) => {
   try {
     const res = await api.PowerSystemParameterApi.getPsDataWithTree(
       psIdSelected.value,
-      projectVersionId.value,
       nodeParentId,
       psParameterCurrentPage.value,
     );
@@ -1031,12 +1016,7 @@ const getPsEmstWithDefinition = async (page = 1, getHeader = false) => {
   if (emsFilterSelected.value) {
     filter['ems_definition_id'] = emsFilterSelected.value._id;
   }
-  const res = await api.PowerSystemEmsApi.getPsDataWithDefinition(
-    definitionSelected.value._id,
-    projectVersionId.value,
-    filter,
-    page,
-  );
+  const res = await api.PowerSystemEmsApi.getPsDataWithDefinition(definitionSelected.value._id, filter, page);
 
   psEmsData.value = res.data.items;
   psEmsTotal.value = res.data.total;
@@ -1055,7 +1035,6 @@ const getPsEmsWithTree = async (getHeader = false) => {
   try {
     const res = await api.PowerSystemEmsApi.getPsDataWithTree(
       psIdSelected.value,
-      projectVersionId.value,
       nodeParentId,
       emsFilterSelected.value ? emsFilterSelected.value._id : undefined,
       psEmsCurrentPage.value,
@@ -1249,7 +1228,6 @@ const handleCreatePole = () => {
     poleOrder: 0,
     Longitude: 0,
     Latitude: 0,
-    currentPowerSystemVersionId: projectVersionId.value,
   };
   createPoleVisibleDialog.value = true;
 };
@@ -1258,7 +1236,7 @@ const createPole = async () => {
   try {
     const createData = JSON.parse(JSON.stringify(createPoleData.value));
     delete createData.powersystemName;
-    await api.SubLineApi.create(createPoleData.value, projectVersionId.value);
+    await api.SubLineApi.create(createPoleData.value);
     getSublineData();
     createPoleVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Pole', detail: 'Create Successfully', life: 3000 });
@@ -1271,7 +1249,7 @@ const createPole = async () => {
 // Edit
 const updatePsParameter = async (pseUpdate) => {
   try {
-    await api.PowerSystemParameterApi.update(pseUpdate, projectVersionId.value);
+    await api.PowerSystemParameterApi.update(pseUpdate);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     await reloadPsParameter();
   } catch (error) {
@@ -1282,7 +1260,7 @@ const updatePsParameter = async (pseUpdate) => {
 
 const updatePsEms = async (pseUpdate) => {
   try {
-    await api.PowerSystemEmsApi.update(pseUpdate, projectVersionId.value);
+    await api.PowerSystemEmsApi.update(pseUpdate);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     await reloadPsEms();
   } catch (error) {
@@ -1294,7 +1272,7 @@ const updatePsEms = async (pseUpdate) => {
 // Delete
 const deletePSParameter = async (pseId) => {
   try {
-    await api.PowerSystemParameterApi.delete(pseId, projectVersionId.value);
+    await api.PowerSystemParameterApi.delete(pseId);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     reloadPsParameter();
   } catch (error) {
@@ -1305,7 +1283,7 @@ const deletePSParameter = async (pseId) => {
 
 const deletePsEms = async (pseId) => {
   try {
-    await api.PowerSystemEmsApi.delete(pseId, projectVersionId.value);
+    await api.PowerSystemEmsApi.delete(pseId);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     reloadPsEms();
   } catch (error) {

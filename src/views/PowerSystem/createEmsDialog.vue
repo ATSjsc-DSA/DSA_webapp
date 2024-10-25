@@ -90,7 +90,6 @@ const toast = useToast();
 
 const props = defineProps({
   visible: { type: Boolean, default: true },
-  projectVersionId: { type: String, default: '' },
   parameterFilter: { type: Array, default: () => [] },
   emsFilterSelected: { type: Object, default: () => {} },
   nodeSelected: { type: Object, default: () => {} },
@@ -138,7 +137,6 @@ watch(
 );
 
 const createForm = reactive({
-  currentPowerSystemVersionId: props.projectVersionId,
   generalInfo: {
     name: '',
     parrentData: {},
@@ -197,7 +195,6 @@ const canSave = computed(() => {
 
 const createPsEms = async () => {
   const data = {
-    currentPowerSystemVersionId: props.projectVersionId,
     generalInfo: {
       uniqueId: createForm.generalInfo.uniqueId,
       powersystemId: createForm.generalInfo.powersystemData._id,
@@ -210,7 +207,7 @@ const createPsEms = async () => {
     },
   };
   try {
-    await PowerSystemEmsApi.create(data, props.projectVersionId);
+    await PowerSystemEmsApi.create(data);
     emit('reloadPsEms');
     emit('unvisible');
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
@@ -228,7 +225,7 @@ const parrentEmsSuggestions = ref([]);
 const searchPsParameterQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [], query);
+    const res = await PowerSystemParameterApi.searchPs([], query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {
@@ -239,7 +236,7 @@ const searchPsParameterQueryFilter = async (event) => {
 const searchPsEmsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemEmsApi.searchPs(props.projectVersionId, '', query);
+    const res = await PowerSystemEmsApi.searchPs('', query);
     parrentEmsSuggestions.value = res.data;
     return res.data;
   } catch (error) {

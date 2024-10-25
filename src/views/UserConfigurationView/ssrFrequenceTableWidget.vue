@@ -125,10 +125,6 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  projectVersionId: {
-    type: String,
-    default: '',
-  },
 });
 onMounted(async () => {
   await getfrequenceList();
@@ -157,7 +153,7 @@ const getfrequenceList = async () => {
     isLoading.value = true;
   }, 500);
   try {
-    const res = await ApiDsa.getSsrFrequencyList(props.projectVersionId, props.ssrId, currentPage.value);
+    const res = await ApiDsa.getSsrFrequencyList(props.ssrId, currentPage.value);
     frequenceList.value = res.data.items;
     recordTotal.value = res.data.total;
   } catch (error) {
@@ -178,7 +174,7 @@ const newData = ref({
 
 const createSsrFrequency = async () => {
   try {
-    await ApiDsa.createSsrFrequency(props.projectVersionId, props.ssrId, newData.value);
+    await ApiDsa.createSsrFrequency(props.ssrId, newData.value);
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
     createVisibleDialog.value = false;
     await getfrequenceList();

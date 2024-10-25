@@ -1,7 +1,7 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectData, dynamicPsVersionId } = storeToRefs(commonStore);
+const { projectData, dynamicPsVersionId, projectVersionId } = storeToRefs(commonStore);
 
 console.log('projectId', projectData.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
@@ -32,7 +32,7 @@ export class api {
   }
 
   static async openVersion(projectVersionId) {
-    return put(`/powersystem/${projectData.value._id}/powersystemversion/${projectVersionId}`);
+    return put(`/powersystem/${projectData.value._id}/powersystemversion/${projectVersionId.value}`);
   }
 }
 
@@ -54,35 +54,38 @@ export class DefinitionListApi {
 }
 
 export class PsTreeApi {
-  static async getChild(projectVersionId, data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
+  static async getChild(data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}/child`, data);
   }
 }
 
 export class PowerSystemParameterApi {
-  static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/definition/${definitionId}`, {
-      ...data,
-      page: page,
-    });
+  static async getPsDataWithDefinition(definitionId, data = {}, page = 1) {
+    return get(
+      `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}/definition/${definitionId}`,
+      {
+        ...data,
+        page: page,
+      },
+    );
   }
 
-  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`, {
+  static async getPsDataWithTree(psId, parentId = undefined, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}/${psId}`, {
       page: page,
       parentId: parentId,
     });
   }
 
-  static async getPsDataWithSubsystem(projectVersionId, data = {}, page = 1) {
-    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId}/parameter`, {
+  static async getPsDataWithSubsystem(data = {}, page = 1) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId.value}/parameter`, {
       ...data,
       page: page,
     });
   }
 
-  static async searchPs(projectVersionId = '66decf1dcff005199529524b', definitionList = [], query, exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
+  static async searchPs(definitionList = [], query, exceptionArr = []) {
+    let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}/search`;
 
     if (query) {
       url += `?query=${query}`;
@@ -93,12 +96,13 @@ export class PowerSystemParameterApi {
     });
   }
   // CRUD
-  static async create(data, projectVersionId) {
+  static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}`, data);
+    data.currentPowerSystemVersionId = projectVersionId.value;
+    return post(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}`, data);
   }
 
-  static async update(data, projectVersionId) {
+  static async update(data) {
     const updateData = {
       generalInfo: {
         name: data.generalInfo.name,
@@ -112,12 +116,16 @@ export class PowerSystemParameterApi {
         skey: data.scadaInfo.skey,
         scadaName: data.scadaInfo.scadaName,
       },
+      currentPowerSystemVersionId: projectVersionId.value,
     };
-    return put(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${data._id}`, updateData);
+    return put(
+      `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}/${data._id}`,
+      updateData,
+    );
   }
 
-  static async delete(psId, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`);
+  static async delete(psId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId.value}/${psId}`);
   }
 
   static async getPowersystemMonitor(psde_id) {
@@ -130,29 +138,32 @@ export class PowerSystemParameterApi {
 }
 
 export class PowerSystemEmsApi {
-  static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/definition/${definitionId}`, {
-      ...data,
-      page: page,
-    });
+  static async getPsDataWithDefinition(definitionId, data = {}, page = 1) {
+    return get(
+      `/powersystem/${projectData.value._id}/powersystemems/${projectVersionId.value}/definition/${definitionId}`,
+      {
+        ...data,
+        page: page,
+      },
+    );
   }
 
-  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, ems_definition_id, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`, {
+  static async getPsDataWithTree(psId, parentId = undefined, ems_definition_id, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId.value}/${psId}`, {
       page: page,
       parentId: parentId,
       ems_definition_id: ems_definition_id,
     });
   }
 
-  static async getPsDataWithSubsystem(projectVersionId, data = {}, page = 1) {
-    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId}/ems`, {
+  static async getPsDataWithSubsystem(data = {}, page = 1) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId.value}/ems`, {
       ...data,
       page: page,
     });
   }
-  static async searchPs(projectVersionId, psdDefinition_id = '', query = '', exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/search`;
+  static async searchPs(psdDefinition_id = '', query = '', exceptionArr = []) {
+    let url = `/powersystem/${projectData.value._id}/powersystemems/${projectVersionId.value}/search`;
     if (psdDefinition_id) {
       url += `?psdDefinition_id=${psdDefinition_id}`;
     }
@@ -162,22 +173,27 @@ export class PowerSystemEmsApi {
     return post(url, exceptionArr);
   }
   // CRUD
-  static async create(data, projectVersionId) {
+  static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}`, data);
+    data.currentPowerSystemVersionId = projectVersionId.value;
+
+    return post(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId.value}`, data);
   }
 
-  static async update(data, projectVersionId) {
+  static async update(data) {
     const updateData = {
       engineInfo: {
         values: data.engineInfo.values,
       },
     };
-    return put(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${data._id}`, updateData);
+    return put(
+      `/powersystem/${projectData.value._id}/powersystemems/${projectVersionId.value}/${data._id}`,
+      updateData,
+    );
   }
 
-  static async delete(psId, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`);
+  static async delete(psId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId.value}/${psId}`);
   }
   static async getPowersystemEmsData(pss_id) {
     return get(`/powersystem/powersystems/${pss_id}`);
@@ -186,24 +202,24 @@ export class PowerSystemEmsApi {
 
 // pole
 export class SubLineApi {
-  static async getData(psId, projectVersionId, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${psId}`, {
+  static async getData(psId, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/${projectVersionId.value}/PoleSubLine/${psId}`, {
       page: page,
     });
   }
   // CRUD
-  static async create(data, projectVersionId) {
+  static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine`, data);
+    return post(`/powersystem/${projectData.value._id}/${projectVersionId.value}/PoleSubLine`, data);
   }
 
-  static async update(data, projectVersionId) {
+  static async update(data) {
     data.projectId = projectData.value._id;
-    return put(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${data._id}`, data);
+    return put(`/powersystem/${projectData.value._id}/${projectVersionId.value}/PoleSubLine/${data._id}`, data);
   }
 
-  static async delete(psId, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${psId}`);
+  static async delete(psId) {
+    return _delete(`/powersystem/${projectData.value._id}/${projectVersionId.value}/PoleSubLine/${psId}`);
   }
 }
 

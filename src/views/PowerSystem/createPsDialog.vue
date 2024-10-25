@@ -109,9 +109,7 @@ const toast = useToast();
 
 const props = defineProps({
   visible: { type: Boolean, default: true },
-  projectVersionId: { type: String, default: '' },
   parameterFilter: { type: Array, default: () => [] },
-
   nodeSelected: { type: Object, default: () => {} },
   definitionSelected: { type: Object, default: () => {} },
 });
@@ -170,7 +168,6 @@ watch(
 );
 
 const createForm = reactive({
-  currentPowerSystemVersionId: props.projectVersionId,
   generalInfo: {
     name: '',
     parrentData: {},
@@ -212,7 +209,7 @@ const createPs = async () => {
   formCreate.engineInfo.values = Object.values(definitionData.value).map((item) => item.value);
 
   try {
-    await PowerSystemParameterApi.create(formCreate, props.projectVersionId);
+    await PowerSystemParameterApi.create(formCreate);
     emit('reloadPsParameter');
     emit('unvisible');
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
@@ -229,7 +226,7 @@ const psSuggestions = ref([]);
 const searchPsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [], query);
+    const res = await PowerSystemParameterApi.searchPs([], query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {

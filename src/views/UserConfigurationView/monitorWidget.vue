@@ -4,7 +4,6 @@
       <monitorFormWidget
         v-model="monitorData"
         :is-create-form="false"
-        :projectVersionId="projectVersionId"
         v-model:psdSelected="psdSelected"
         :listScadaMonitor="listScadaMonitor"
         :definitionMonitor="definitionMonitor"
@@ -169,7 +168,7 @@
         <span class="font-bold white-space-nowrap">Update Monitor Scada Configuration</span>
       </div>
     </template>
-    <monitorScadaFormWidget v-model="editScadaData" :project-version-id="projectVersionId" :isCreateForm="false" />
+    <monitorScadaFormWidget v-model="editScadaData" :isCreateForm="false" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="updataScadaVisibleDialog = false"></Button>
       <Button type="button" label="Update" :disabled="!editScadaData.name" @click="updateScada"></Button>
@@ -221,10 +220,6 @@ const toast = useToast();
 const confirm = useConfirm();
 
 const props = defineProps({
-  projectVersionId: {
-    type: String,
-    default: '',
-  },
   nodeMonitorSelected: {
     type: {},
     default: () => {},
@@ -297,7 +292,7 @@ const scadaList = ref([]);
 const getScadaList = async () => {
   loadingScada.value = true;
   try {
-    const res = await ApiMonitor.getScadaList(props.projectVersionId, monitorData.value._id);
+    const res = await ApiMonitor.getScadaList(monitorData.value._id);
     scadaList.value = res.data;
   } catch (error) {
     console.log('getScadaList: error ', error);
@@ -386,7 +381,7 @@ const newPmuData = ref({
 const getPmuList = async () => {
   loadingPmu.value = true;
   try {
-    const res = await ApiMonitor.getPmuList(props.projectVersionId, monitorData.value._id);
+    const res = await ApiMonitor.getPmuList(monitorData.value._id);
     pmuList.value = res.data;
   } catch (error) {
     console.log('getPmuList: error ', error);
@@ -397,7 +392,7 @@ const getPmuList = async () => {
 
 const createPmu = async () => {
   try {
-    const res = await ApiMonitor.createMonitorPmu(props.projectVersionId, monitorData.value._id, newPmuData.value);
+    const res = await ApiMonitor.createMonitorPmu(monitorData.value._id, newPmuData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createPmuVisibleDialog.value = false;
     pmuList.value.push(res.data);

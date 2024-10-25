@@ -143,23 +143,23 @@
       <Chip label="Branch" class="mb-3"></Chip>
       <div class="col-8">
         <div class="grid">
-          <label for="monitor_signalP" class="col-6"> Active Power</label>
+          <label for="activePower" class="col-6"> Active Power</label>
           <Checkbox
             class="col-6"
             v-model="data.monitor.branchConfig.activePower"
-            inputId="monitor_signalP"
-            name="monitor_signalP"
+            inputId="activePower"
+            name="activePower"
             :binary="true"
           />
         </div>
 
         <div class="grid">
-          <label for="monitor_signalQ" class="col-6"> ReActive Power </label>
+          <label for="reActivePower" class="col-6"> ReActive Power </label>
           <Checkbox
             class="col-6"
             v-model="data.monitor.branchConfig.reActivePower"
-            inputId="monitor_signalQ"
-            name="monitor_signalQ"
+            inputId="reActivePower"
+            name="reActivePower"
             :binary="true"
           />
         </div>
