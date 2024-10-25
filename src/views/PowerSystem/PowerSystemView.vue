@@ -58,7 +58,7 @@
               <template #content>
                 <hierarchicalListWidget
                   v-if="!showDefinitionFlatList"
-                  :version-id="projectVersionId"
+                  :project-version-id="projectVersionId"
                   :definition-filter="treeDefinitionFilterOpts"
                   :emsFilterFollowDefinition="Object.keys(emsFilterFollowDefinition)"
                   @onNodeSelect="onNodeSelect"

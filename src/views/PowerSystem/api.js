@@ -1,13 +1,9 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { psm_active, projectData, versionId } = storeToRefs(commonStore);
-
-import DSA_Common from '@/combosables/DSA_common';
-const { convertTimeStringToInt } = DSA_Common();
+const { projectData, dynamicPsVersionId } = storeToRefs(commonStore);
 
 console.log('projectId', projectData.value._id);
-console.log('psm_active', psm_active.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class api {
@@ -212,42 +208,49 @@ export class SubLineApi {
 }
 
 export class DynamicModelApi {
-  static async getDynamicModelList(additionVersion_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/dynamicModel`, { page: page });
+  static async getDynamicModelList(page) {
+    return get(`/addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModel`, { page: page });
   }
 
-  static async getDynamicModelListWithTree(additionVersion_id, parent_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/${parent_id}/dynamicModel`, { page: page });
-  }
-  static async createDynamicModel(versionId, data) {
-    return post(`addition/${projectData.value._id}/${versionId}/dynamicModel`, data);
-  }
-
-  static async updateDynamicModel(versionId, dynamicModel_id, data) {
-    return put(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`, data);
-  }
-  static async deleteDynamicModel(versionId, dynamicModel_id) {
-    return _delete(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`);
-  }
-}
-export class DynamicDefaultApi {
-  static async getDynamicDefaultList(additionVersion_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault`, { page: page });
-  }
-
-  static async getDynamicDefaultListWithTree(additionVersion_id, parent_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/${parent_id}/dynamicModelDefault`, {
+  static async getDynamicModelListWithTree(parent_id, page) {
+    return get(`/addition/${projectData.value._id}/${dynamicPsVersionId.value}/${parent_id}/dynamicModel`, {
       page: page,
     });
   }
-  static async createDynamicDefault(additionVersion_id, data) {
-    return post(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault`, data);
+  static async createDynamicModel(data) {
+    return post(`addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModel`, data);
   }
 
-  static async updateDynamicDefault(additionVersion_id, dynamicModel_id, data) {
-    return put(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault/${dynamicModel_id}`, data);
+  static async updateDynamicModel(dynamicModel_id, data) {
+    return put(`addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModel/${dynamicModel_id}`, data);
   }
-  static async deleteDynamicDefault(additionVersion_id, dynamicModel_id) {
-    return _delete(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault/${dynamicModel_id}`);
+  static async deleteDynamicModel(dynamicModel_id) {
+    return _delete(`addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModel/${dynamicModel_id}`);
+  }
+}
+export class DynamicDefaultApi {
+  static async getDynamicDefaultList(page) {
+    return get(`/addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModelDefault`, { page: page });
+  }
+
+  static async getDynamicDefaultListWithTree(parent_id, page) {
+    return get(`/addition/${projectData.value._id}/${dynamicPsVersionId.value}/${parent_id}/dynamicModelDefault`, {
+      page: page,
+    });
+  }
+  static async createDynamicDefault(data) {
+    return post(`addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModelDefault`, data);
+  }
+
+  static async updateDynamicDefault(dynamicModel_id, data) {
+    return put(
+      `addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
+      data,
+    );
+  }
+  static async deleteDynamicDefault(dynamicModel_id) {
+    return _delete(
+      `addition/${projectData.value._id}/${dynamicPsVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
+    );
   }
 }

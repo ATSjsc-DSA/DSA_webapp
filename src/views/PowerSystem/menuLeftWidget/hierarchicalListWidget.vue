@@ -59,7 +59,7 @@ import LoadingContainer from '@/components/LoadingContainer.vue';
 const toast = useToast();
 
 const props = defineProps({
-  versionId: { type: String, required: true },
+  projectVersionId: { type: String, required: true },
   definitionFilter: { type: Array, default: () => [] },
   emsFilterFollowDefinition: { type: Array, default: () => [] },
 });
@@ -101,7 +101,7 @@ const searchPsQueryFilter = async (event) => {
   if (definitionSelected.value) {
     const query = event ? event.query.trim() : '';
     try {
-      const res = await PowerSystemParameterApi.searchPs(props.versionId, [definitionSelected.value], query);
+      const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [definitionSelected.value], query);
       psFilterSuggestions.value = res.data;
       return res.data;
     } catch (error) {
@@ -122,7 +122,7 @@ const getTree = async () => {
   treeData.value = [];
   const psdId = psdSelected.value ? psdSelected.value._id : undefined;
   try {
-    const childData = await PsTreeApi.getChild(props.versionId, {
+    const childData = await PsTreeApi.getChild(props.projectVersionId, {
       definition_id: definitionSelected.value,
       psd_id: psdId,
     });
@@ -193,7 +193,7 @@ const getLeaf = async (node = {}) => {
       payload.ancestor_id = node.parentId;
     }
 
-    const childData = await PsTreeApi.getChild(props.versionId, payload);
+    const childData = await PsTreeApi.getChild(props.projectVersionId, payload);
 
     const data = [];
     for (let index = 0; index < childData.data.length; index++) {

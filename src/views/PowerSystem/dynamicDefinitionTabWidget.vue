@@ -467,7 +467,6 @@ import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView
 import { PowerSystemParameterApi, DynamicModelApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
-const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 const props = defineProps({
   showDefinitionFlatList: { type: Boolean },
@@ -532,15 +531,11 @@ const getDynamicModelList = async () => {
       total: 0,
     };
     if (props.showDefinitionFlatList) {
-      const res = await DynamicModelApi.getDynamicModelList(additionprojectVersionId.value, currentPage.value);
+      const res = await DynamicModelApi.getDynamicModelList(currentPage.value);
       resData = res.data;
     } else {
       if (props.nodeSelected) {
-        const res = await DynamicModelApi.getDynamicModelListWithTree(
-          additionprojectVersionId.value,
-          props.nodeSelected.parentId,
-          currentPage.value,
-        );
+        const res = await DynamicModelApi.getDynamicModelListWithTree(props.nodeSelected.parentId, currentPage.value);
         resData = res.data;
       }
     }
@@ -617,7 +612,7 @@ const getModelTypeOptions = async () => {
 };
 const createDynamicModel = async () => {
   try {
-    await DynamicModelApi.createDynamicModel(additionprojectVersionId.value, getValueModelInForm());
+    await DynamicModelApi.createDynamicModel(getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
@@ -627,7 +622,6 @@ const createDynamicModel = async () => {
   }
 };
 const getValueModelInForm = () => {
-  console.log(dataChange.value.powerSystemData);
   const data = {
     id: dataChange.value.id,
     powerSystemDataId:
@@ -834,7 +828,7 @@ const handleUpdate = async (data) => {
 const updateDynamicModel = async () => {
   const dataUpdate = getValueModelInForm();
   try {
-    await DynamicModelApi.updateDynamicModel(additionprojectVersionId.value, dataUpdate.id, {
+    await DynamicModelApi.updateDynamicModel(dataUpdate.id, {
       model: dataUpdate.model,
       modelDynamicType: dataUpdate.modelDynamicType,
     });
@@ -866,7 +860,7 @@ const confirmDelete = (data) => {
 
 const deleteDynamicModel = async (dynamicModel_id) => {
   try {
-    await DynamicModelApi.deleteDynamicModel(additionprojectVersionId.value, dynamicModel_id);
+    await DynamicModelApi.deleteDynamicModel(dynamicModel_id);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     await getTableData();
   } catch (error) {
