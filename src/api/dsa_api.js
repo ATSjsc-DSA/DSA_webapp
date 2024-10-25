@@ -209,6 +209,9 @@ export default class DSA_api {
   static async getPSMIdActive() {
     return get('/common/psm');
   }
+  static async getVersionActive(project_id) {
+    return get(`/common/${project_id}/versionmanagement`);
+  }
 
   static async getListPsm(param) {
     return get('/common/psm-list/', param);

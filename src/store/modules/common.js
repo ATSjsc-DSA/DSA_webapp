@@ -10,9 +10,9 @@ export const useCommonStore = defineStore('common', () => {
   const psm_active = ref({});
   const psmList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
-  const seedConfigVersionId = ref('5eb7cf5a86d9755df3a6c593');
-  const projectVersionId = ref('66decf1dcff005199529524b');
-  const dynamicPsVersionId = ref('5eb7cf5a86d9755df3a6c593');
+  const userConfigVersionId = ref('5eb7cf5a86d9755df3a6c593');
+  const powerSystemVersionId = ref('66decf1dcff005199529524b');
+  const additionVersionId = ref('5eb7cf5a86d9755df3a6c593');
   const editVersionData = ref({});
   let intervalId = null;
 
@@ -22,8 +22,11 @@ export const useCommonStore = defineStore('common', () => {
 
   const getPsmIdActive = async () => {
     try {
-      const res = await DSA_api.getPSMIdActive();
+      const res = await DSA_api.getVersionActive(projectData.value._id);
       psm_active.value = res.data;
+      userConfigVersionId.value = res.data.userConfigVersionId;
+      powerSystemVersionId.value = res.data.powerSystemVersionId;
+      additionVersionId.value = res.data.additionVersionId;
     } catch (error) {}
   };
 
@@ -80,8 +83,8 @@ export const useCommonStore = defineStore('common', () => {
     stopAutoUpdate,
     clearData,
     editVersionData,
-    seedConfigVersionId,
-    projectVersionId,
-    dynamicPsVersionId,
+    userConfigVersionId,
+    powerSystemVersionId,
+    additionVersionId,
   };
 });
