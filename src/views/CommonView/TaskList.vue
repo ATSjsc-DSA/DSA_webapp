@@ -32,10 +32,10 @@
           </div>
         </div>
       </template>
-      <Column field="powerSystemModelDetails.name" header="PSM Name" style="width: 10%">
+      <Column field="powerSystemModelDetails.name" header="Version Name" style="width: 10%">
         <template #body="{ data }">
           <div class="flex align-items-center gap-2">
-            <span> {{ data.powerSystemModelDetails.name }}</span>
+            <span> {{ data.dataVersionName }}</span>
           </div>
         </template></Column
       >
@@ -123,6 +123,7 @@ import { useCommonStore } from '@/store';
 import { intervalTime } from '@/Constants/';
 import { useRouter, useRoute } from 'vue-router';
 import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
+import { ApiCommon } from './api';
 
 const items = ref([{ label: 'Task List', route: '/DSA/Task' }]);
 
@@ -186,7 +187,7 @@ const onPageChange = (event) => {
 };
 const getTaskList = async () => {
   try {
-    const res = await DSA_api.getQueueTask({ page: currentPage.value });
+    const res = await ApiCommon.getQueueTask({ page: currentPage.value });
     listTask.value = res.data.items;
     totalList.value = res.data.total;
   } catch (error) {
