@@ -36,7 +36,7 @@
                     {{ slotProps.node.label }}
                   </div>
                 </template>
-                <template #PowerSystem="slotProps">
+                <template #Curve="slotProps">
                   <div class="font-semibold">
                     {{ slotProps.node.label }}
                   </div>
@@ -76,7 +76,7 @@
                     {{ slotProps.node.label }}
                   </div>
                 </template>
-                <template #PowerSystem="slotProps">
+                <template #Curve="slotProps">
                   <div class="font-semibold">
                     {{ slotProps.node.label }}
                   </div>
@@ -149,7 +149,7 @@ import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
 
 import { ApiApplication } from '../UserConfigurationView/api';
-import { api } from './api';
+import { VsaApi } from './api';
 import comboChartBase from '@/components/comboChartBase.vue';
 
 import caseTreeWidget from './caseTreeWidget.vue';
@@ -221,7 +221,7 @@ const getMonitorTree = async () => {
 
 const getMonitorList = async () => {
   try {
-    const res = await api.GetMonitorList(caseSelected.value._id);
+    const res = await VsaApi.getMonitorList(caseSelected.value._id);
     return res.data;
   } catch (error) {
     console.log('GetMonitorList: error ', error);
@@ -273,7 +273,7 @@ const getExportTypeTree = async () => {
 
 const getCaseExportList = async () => {
   try {
-    const res = await api.GetExportList(caseSelected.value._id);
+    const res = await VsaApi.getExportList(caseSelected.value._id);
     return res.data;
   } catch (error) {
     console.log('GetExportList: error ', error);
@@ -319,7 +319,7 @@ const onNodeExpand = async (node) => {
 
 const getCurveList = async (subCaseId) => {
   try {
-    const res = await api.GetCurveList(subCaseId);
+    const res = await VsaApi.getCurveList(subCaseId);
     return res.data;
   } catch (error) {
     console.log('GetCurveList: error ', error);
@@ -350,7 +350,7 @@ const getTypeBranch = async (parentNode) => {
 
 const getTypeList = async (subCaseId, curveId) => {
   try {
-    const res = await api.GetTypeList(subCaseId, curveId);
+    const res = await VsaApi.getTypeList(subCaseId, curveId);
     return res.data;
   } catch (error) {
     console.log('GetTypeList: error ', error);
@@ -363,7 +363,7 @@ const curveChartData = ref();
 const modificationTime = ref(0);
 const getCurveChartData = async () => {
   try {
-    const res = await api.GetChartData(caseSelected.value._id, typeSelected.value);
+    const res = await VsaApi.getChartData(caseSelected.value._id, typeSelected.value);
     curveChartData.value = res.data;
     modificationTime.value = new Date().getTime();
   } catch (error) {

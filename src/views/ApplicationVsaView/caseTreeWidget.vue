@@ -21,11 +21,12 @@
           </div>
         </div>
       </template>
-      <template #VSA="slotProps">
+      <template #VSA_TSA="slotProps">
         <div class="font-semibold">
           {{ slotProps.node.label }}
         </div>
       </template>
+
       <template #Case="slotProps">
         <div class="w-full">
           {{ slotProps.node.label }}
@@ -41,9 +42,13 @@ import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
 
 import { ApiApplication } from '../UserConfigurationView/api';
-import { api } from './api';
+import { VsaApi, TsaApi } from './api';
+
 const projectVersionId = ref('66decf1dcff005199529524b');
 
+const props = defineProps({
+  typeModel: { type: String, default: 'VSA' },
+});
 onMounted(async () => {
   await getcaseTreeData();
 });
@@ -74,9 +79,9 @@ const onCaseNodeExpand = async (node) => {
   if (!node.children) {
     node.loading = true;
     if (node.type === 'Application') {
-      node['children'] = await getVsaBranchData(node);
+      node['children'] = await getVsaTsaBranchData(node);
     }
-    if (node.type === 'VSA') {
+    if (node.type === 'VSA_TSA') {
       node['children'] = await getCaseBranchData(node);
     }
     node.loading = false;
@@ -94,48 +99,68 @@ const getAppList = async () => {
 };
 // -- VSA
 
-const getVsaBranchData = async (appNode) => {
-  const vsaList = await getVsaList(appNode._id);
-  const vsaBranch = [];
-  if (vsaList.length === 0) {
+const getVsaTsaBranchData = async (appNode) => {
+  let vsaOrTsaList = [];
+  if (props.typeModel === 'VSA') {
+    vsaOrTsaList = await getVsaList(appNode._id);
+  }
+  if (props.typeModel === 'TSA') {
+    vsaOrTsaList = await getTsaList(appNode._id);
+  }
+  const branch = [];
+  if (vsaOrTsaList.length === 0) {
     appNode.leaf = true;
   } else {
-    for (let index = 0; index < vsaList.length; index++) {
-      const vsa = vsaList[index];
-      vsaBranch.push({
-        key: appNode.key + 'vsa_' + index,
-        label: vsa.name,
-        _id: vsa._id,
-        type: 'VSA',
+    for (let index = 0; index < vsaOrTsaList.length; index++) {
+      const newNodeData = vsaOrTsaList[index];
+      branch.push({
+        key: appNode.key + '_' + props.typeModel + '_' + index,
+        label: newNodeData.name,
+        _id: newNodeData._id,
+        type: 'VSA_TSA',
         icon: 'pi pi pi-list',
         leaf: false,
       });
     }
   }
-  return vsaBranch;
+  return branch;
 };
-const getVsaList = async (vsaId) => {
+const getVsaList = async (appId) => {
   try {
-    const res = await api.GetVsaHmiWithApp(vsaId);
+    const res = await VsaApi.getVsaList(appId);
     return res.data;
   } catch (error) {
-    console.log('GetVsaHmiWithApp: error ', error);
+    console.log('getVsaList: error ', error);
+  }
+};
+const getTsaList = async (appId) => {
+  try {
+    const res = await TsaApi.getTsaList(appId);
+    return res.data;
+  } catch (error) {
+    console.log('getTsaList: error ', error);
   }
 };
 // -- Case
 
-const getCaseBranchData = async (vsaNode) => {
-  const caseList = await getCaseList(vsaNode._id);
+const getCaseBranchData = async (parentNode) => {
+  let caseList = [];
+  if (props.typeModel === 'VSA') {
+    caseList = await getVsaCaseList(parentNode._id);
+  }
+  if (props.typeModel === 'TSA') {
+    caseList = await getTsaCaseList(parentNode._id);
+  }
   const caseBranch = [];
   if (caseList.length === 0) {
-    vsaNode.leaf = true;
+    parentNode.leaf = true;
   } else {
     for (let index = 0; index < caseList.length; index++) {
-      const vsa = caseList[index];
+      const caseData = caseList[index];
       caseBranch.push({
-        key: vsaNode.key + 'vsa_' + index,
-        label: vsa.name,
-        _id: vsa._id,
+        key: parentNode.key + '_' + index,
+        label: caseData.name,
+        _id: caseData._id,
         type: 'Case',
         leaf: true,
       });
@@ -144,12 +169,21 @@ const getCaseBranchData = async (vsaNode) => {
   return caseBranch;
 };
 
-const getCaseList = async (vsaId) => {
+const getVsaCaseList = async (vsaId) => {
   try {
-    const res = await api.GetCaseOnVsa(vsaId);
+    const res = await VsaApi.getCaseList(vsaId);
     return res.data;
   } catch (error) {
-    console.log('GetCaseOnVsa: error ', error);
+    console.log('getCaseList: error ', error);
+  }
+};
+
+const getTsaCaseList = async (tsaId) => {
+  try {
+    const res = await TsaApi.getCaseList(tsaId);
+    return res.data;
+  } catch (error) {
+    console.log('getCaseList: error ', error);
   }
 };
 
