@@ -243,6 +243,9 @@ export class DynamicModelApi {
   static async deleteDynamicModel(dynamicModel_id) {
     return _delete(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel/${dynamicModel_id}`);
   }
+  static async importDynamicModel(data) {
+    return put(`addition/${projectData.value._id}/${additionVersionId.value}/import/dynamicModel`, data);
+  }
 }
 export class DynamicDefaultApi {
   static async getDynamicDefaultList(page) {
@@ -268,5 +271,9 @@ export class DynamicDefaultApi {
     return _delete(
       `addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
     );
+  }
+
+  static async importDynamicDefaultModel(data) {
+    return put(`addition/${projectData.value._id}/${additionVersionId.value}/import/dynamicDefaultModel`, data);
   }
 }
