@@ -76,7 +76,6 @@ import { TsaApi } from './ApplicationVsaView/api';
 import caseTreeWidget from './ApplicationVsaView/caseTreeWidget.vue';
 import TSA_api from '@/module/TSA/api/tsa_api';
 import lineChartSpecialBase from '@/components/lineChartSpecialBase.vue';
-const projectVersionId = ref('66decf1dcff005199529524b');
 const toast = useToast();
 
 onMounted(async () => {});

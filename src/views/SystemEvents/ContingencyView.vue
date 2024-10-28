@@ -234,7 +234,7 @@ const searchPs2 = async (event) => {
 
 const search = async (query, definition) => {
   try {
-    const res = await PowerSystemParameterApi.searchPs('66decf1dcff005199529524b', definition, query);
+    const res = await PowerSystemParameterApi.searchPs(definition, query);
     items.value = res.data;
   } catch (error) {
     console.log('searchPsdQueryFilter: error ', error);

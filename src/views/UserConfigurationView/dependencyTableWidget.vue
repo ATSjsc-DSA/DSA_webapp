@@ -200,10 +200,6 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  projectVersionId: {
-    type: String,
-    default: '',
-  },
 });
 onMounted(async () => {
   await getDependencyList();
@@ -228,7 +224,7 @@ const onPageChange = async (event) => {
 const dependencyList = ref();
 const getDependencyList = async () => {
   try {
-    const res = await ApiDsa.getDependencyList(props.projectVersionId, props.dependencyId, currentPage.value);
+    const res = await ApiDsa.getDependencyList(props.dependencyId, currentPage.value);
     dependencyList.value = res.data.items;
     dependencyTotal.value = res.data.total;
   } catch (error) {
@@ -252,7 +248,7 @@ const createDependency = async () => {
   data.startTimestamp = new Date(data.startTimestamp).getTime();
   data.endTimestamp = new Date(data.endTimestamp).getTime();
   try {
-    await ApiDsa.createDependency(props.projectVersionId, props.dependencyId, data);
+    await ApiDsa.createDependency(props.dependencyId, data);
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
     createVisibleDialog.value = false;
     await getDependencyList();

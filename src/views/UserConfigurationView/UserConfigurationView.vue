@@ -179,7 +179,6 @@
               <div class="py-3">
                 <monitorWidget
                   :node-monitor-selected="nodeSelected"
-                  :project-version-id="projectVersionId"
                   @update-label-monitor-leaf="updateLabelMonitorLeaf"
                 />
               </div>
@@ -211,7 +210,7 @@
               </TabPanel>
               <TabPanel header="Dependency Plan">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
-                  <dependencyTableWidget :project-version-id="projectVersionId" :dependency-id="vsaData._id" />
+                  <dependencyTableWidget :dependency-id="vsaData._id" />
                 </ScrollPanel>
               </TabPanel>
             </TabView>
@@ -230,7 +229,7 @@
               </TabPanel>
               <TabPanel header="Dependency Plan">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
-                  <dependencyTableWidget :project-version-id="projectVersionId" :dependency-id="tsaData._id" />
+                  <dependencyTableWidget :dependency-id="tsaData._id" />
                 </ScrollPanel>
               </TabPanel>
               <TabPanel header="Disturbance Cases">
@@ -252,7 +251,7 @@
               </TabPanel>
               <TabPanel header="Frequency">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
-                  <ssrFrequenceTableWidget :project-version-id="projectVersionId" :ssr-id="ssrData._id" />
+                  <ssrFrequenceTableWidget :ssr-id="ssrData._id" />
                 </ScrollPanel>
               </TabPanel>
             </TabView>
@@ -307,7 +306,7 @@
       </div>
     </template>
 
-    <monitorFormWidget v-model="newMonitorData" :project-version-id="projectVersionId" />
+    <monitorFormWidget v-model="newMonitorData" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createMonitorVisibleDialog = false"></Button>
       <Button type="button" label="Submit" :disabled="!newMonitorData.name" @click="createMonitor"></Button>
@@ -411,8 +410,6 @@ const isLoadingUserConfig = ref(false);
 onMounted(async () => {
   await getTreeData();
 });
-
-const projectVersionId = ref('66decf1dcff005199529524b');
 
 // treeData
 const treeData = ref([
@@ -701,7 +698,7 @@ const projectContextMenu = ref([
 const appList = ref([]);
 const getAppList = async () => {
   try {
-    const res = await ApiApplication.getList(projectVersionId.value);
+    const res = await ApiApplication.getList();
     appList.value = res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -741,7 +738,7 @@ const createApplication = async () => {
       active: newAppData.value.active,
       startTimestamp: newAppData.value.startTimestamp.getTime(),
     };
-    const res = await ApiApplication.createApp(projectVersionId.value, dataLoad);
+    const res = await ApiApplication.createApp(dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
     const newLeaf = await getAppLeaf(res.data, treeData.value[0].children.length);
@@ -817,7 +814,7 @@ const newMonitorData = ref({
 
 const getMonitorList = async (appId) => {
   try {
-    const res = await ApiMonitor.getList(projectVersionId.value, appId);
+    const res = await ApiMonitor.getList(appId);
     return res.data;
   } catch (error) {
     console.log('getMonitorList: error ', error);
@@ -836,7 +833,7 @@ const getMonitorData = async (monitorId) => {
 };
 const createMonitor = async () => {
   try {
-    const res = await ApiMonitor.createMonitor(projectVersionId.value, appIdclick.value, newMonitorData.value);
+    const res = await ApiMonitor.createMonitor(appIdclick.value, newMonitorData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createMonitorVisibleDialog.value = false;
     const newLeaf = addNewMonitorLeaf(appIdclick.value, res.data);
@@ -1023,7 +1020,7 @@ const newDsaData = ref({
 
 const getDsaList = async (appId) => {
   try {
-    const res = await ApiDsa.getList(projectVersionId.value, appId);
+    const res = await ApiDsa.getList(appId);
     return res.data;
   } catch (error) {
     console.log('getDsaList: error ', error);
@@ -1042,7 +1039,7 @@ const getDsaData = async (dsaId) => {
 };
 const createDsa = async () => {
   try {
-    const res = await ApiDsa.createDsa(projectVersionId.value, appIdclick.value, newDsaData.value);
+    const res = await ApiDsa.createDsa(appIdclick.value, newDsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createDsaVisibleDialog.value = false;
     const newLeaf = await addNewDsaLeaf(appIdclick.value, res.data);
@@ -1139,7 +1136,7 @@ const newVsaData = ref({
 
 const getVsaList = async (dsaId) => {
   try {
-    const res = await ApiDsa.getVsaList(projectVersionId.value, dsaId);
+    const res = await ApiDsa.getVsaList(dsaId);
     return res.data;
   } catch (error) {
     console.log('getVsaList: error ', error);
@@ -1158,7 +1155,7 @@ const getVsaData = async (vsaId) => {
 };
 const createVsa = async () => {
   try {
-    const res = await ApiDsa.createVsa(projectVersionId.value, dsaIdclick.value, newVsaData.value);
+    const res = await ApiDsa.createVsa(dsaIdclick.value, newVsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'VSA');
     createTaskDsaDialog.value = false;
@@ -1240,7 +1237,7 @@ const newTsaData = ref({
 
 const getTsaList = async (dsaId) => {
   try {
-    const res = await ApiDsa.getTsaList(projectVersionId.value, dsaId);
+    const res = await ApiDsa.getTsaList(dsaId);
     return res.data;
   } catch (error) {
     console.log('getTsaList: error ', error);
@@ -1259,7 +1256,7 @@ const getTsaData = async (tsaId) => {
 };
 const createTsa = async () => {
   try {
-    const res = await ApiDsa.createTsa(projectVersionId.value, dsaIdclick.value, newTsaData.value);
+    const res = await ApiDsa.createTsa(dsaIdclick.value, newTsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'TSA');
     createTaskDsaDialog.value = false;
@@ -1312,7 +1309,7 @@ const newSsrData = ref({
 
 const getSsrList = async (dsaId) => {
   try {
-    const res = await ApiDsa.getSsrList(projectVersionId.value, dsaId);
+    const res = await ApiDsa.getSsrList(dsaId);
     return res.data;
   } catch (error) {
     console.log('getSsrList: error ', error);
@@ -1331,7 +1328,7 @@ const getSsrData = async (ssrId) => {
 };
 const createSsr = async () => {
   try {
-    const res = await ApiDsa.createSsr(projectVersionId.value, dsaIdclick.value, newSsrData.value);
+    const res = await ApiDsa.createSsr(dsaIdclick.value, newSsrData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'SSR');
     createTaskDsaDialog.value = false;
@@ -1382,7 +1379,7 @@ const newOslData = ref({
 
 const getOslList = async (dsaId) => {
   try {
-    const res = await ApiDsa.getOslList(projectVersionId.value, dsaId);
+    const res = await ApiDsa.getOslList(dsaId);
     return res.data;
   } catch (error) {
     console.log('getOslList: error ', error);
@@ -1401,7 +1398,7 @@ const getOslData = async (oslId) => {
 };
 const createOsl = async () => {
   try {
-    const res = await ApiDsa.createOsl(projectVersionId.value, dsaIdclick.value, newOslData.value);
+    const res = await ApiDsa.createOsl(dsaIdclick.value, newOslData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'OSL');
     createTaskDsaDialog.value = false;

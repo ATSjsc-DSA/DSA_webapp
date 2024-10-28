@@ -93,7 +93,6 @@ const props = defineProps({
     required: true,
   },
   nodeSelected: { type: Object, default: () => {} },
-  projectVersionId: { type: String, default: '' },
   currentPage: { type: Number, default: 0 },
   loading: { type: Boolean, default: false },
 });
@@ -141,17 +140,14 @@ const updatePole = async () => {
   try {
     const updateData = JSON.parse(JSON.stringify(poleData.value));
     delete updateData.powersystemName;
-    await SubLineApi.update(
-      {
-        _id: poleData.value._id,
-        name: poleData.value.name,
-        poleOrder: poleData.value.poleOrder,
-        Longitude: poleData.value.Longitude,
-        Latitude: poleData.value.Latitude,
-      },
-      props.projectVersionId,
-    );
-    // emit('reloadData');
+    await SubLineApi.update({
+      _id: poleData.value._id,
+      name: poleData.value.name,
+      poleOrder: poleData.value.poleOrder,
+      Longitude: poleData.value.Longitude,
+      Latitude: poleData.value.Latitude,
+    });
+    emit('reloadData');
     poleVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Pole', detail: 'Update Successfully', life: 3000 });
   } catch (error) {
@@ -162,7 +158,7 @@ const updatePole = async () => {
 
 const deletePole = async () => {
   try {
-    await SubLineApi.delete(poleData.value._id, props.projectVersionId);
+    await SubLineApi.delete(poleData.value._id);
     emit('reloadData');
     poleVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Pole', detail: 'Delete Successfully', life: 3000 });

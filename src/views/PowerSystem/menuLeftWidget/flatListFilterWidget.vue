@@ -138,7 +138,6 @@ const props = defineProps({
   multipleSelection: { type: Boolean, default: false },
   showTypeFilter: { type: Boolean, default: true },
   definitionList: { type: Array, default: () => [] },
-  projectVersionId: { type: String },
   initData: { type: Object, default: () => {} },
 });
 
@@ -232,7 +231,7 @@ const searchStationQuery = async (event) => {
 const searchPs = async (event, definitionId) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemParameterApi.searchPs(props.projectVersionId, [definitionId], query);
+    const res = await PowerSystemParameterApi.searchPs([definitionId], query);
     return res.data;
   } catch (error) {
     console.error('searchPsQueryFilter: error ', error);

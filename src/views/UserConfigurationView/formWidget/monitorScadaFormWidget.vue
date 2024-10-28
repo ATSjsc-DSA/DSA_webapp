@@ -22,16 +22,11 @@
 </template>
 
 <script setup>
-import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
-import AutoComplete from 'primevue/autocomplete';
 import InputSwitch from 'primevue/inputswitch';
-
-import { watch } from 'vue';
 
 const data = defineModel();
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
-  projectVersionId: { type: String, default: '' },
 });
 </script>
 <style>

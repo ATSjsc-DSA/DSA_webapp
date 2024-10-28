@@ -153,7 +153,6 @@ import { VsaApi } from './api';
 import comboChartBase from '@/components/comboChartBase.vue';
 
 import caseTreeWidget from './caseTreeWidget.vue';
-const projectVersionId = ref('66decf1dcff005199529524b');
 const toast = useToast();
 
 onMounted(async () => {});

@@ -1,13 +1,9 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { psm_active, projectData, versionId } = storeToRefs(commonStore);
-
-import DSA_Common from '@/combosables/DSA_common';
-const { convertTimeStringToInt } = DSA_Common();
+const { projectData, additionVersionId, powerSystemVersionId } = storeToRefs(commonStore);
 
 console.log('projectId', projectData.value._id);
-console.log('psm_active', psm_active.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class api {
@@ -35,8 +31,8 @@ export class api {
     });
   }
 
-  static async openVersion(projectVersionId) {
-    return put(`/powersystem/${projectData.value._id}/powersystemversion/${projectVersionId}`);
+  static async openVersion(powerSystemVersionId) {
+    return put(`/powersystem/${projectData.value._id}/powersystemversion/${powerSystemVersionId.value}`);
   }
 }
 
@@ -58,35 +54,38 @@ export class DefinitionListApi {
 }
 
 export class PsTreeApi {
-  static async getChild(projectVersionId, data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/child`, data);
+  static async getChild(data) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/child`, data);
   }
 }
 
 export class PowerSystemParameterApi {
-  static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/definition/${definitionId}`, {
-      ...data,
-      page: page,
-    });
+  static async getPsDataWithDefinition(definitionId, data = {}, page = 1) {
+    return get(
+      `/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/definition/${definitionId}`,
+      {
+        ...data,
+        page: page,
+      },
+    );
   }
 
-  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`, {
+  static async getPsDataWithTree(psId, parentId = undefined, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/${psId}`, {
       page: page,
       parentId: parentId,
     });
   }
 
-  static async getPsDataWithSubsystem(projectVersionId, data = {}, page = 1) {
-    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId}/parameter`, {
+  static async getPsDataWithSubsystem(data = {}, page = 1) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${powerSystemVersionId.value}/parameter`, {
       ...data,
       page: page,
     });
   }
 
-  static async searchPs(projectVersionId = '66decf1dcff005199529524b', definitionList = [], query, exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/search`;
+  static async searchPs(definitionList = [], query, exceptionArr = []) {
+    let url = `/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/search`;
 
     if (query) {
       url += `?query=${query}`;
@@ -97,12 +96,13 @@ export class PowerSystemParameterApi {
     });
   }
   // CRUD
-  static async create(data, projectVersionId) {
+  static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}`, data);
+    data.currentPowerSystemVersionId = powerSystemVersionId.value;
+    return post(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}`, data);
   }
 
-  static async update(data, projectVersionId) {
+  static async update(data) {
     const updateData = {
       generalInfo: {
         name: data.generalInfo.name,
@@ -116,12 +116,16 @@ export class PowerSystemParameterApi {
         skey: data.scadaInfo.skey,
         scadaName: data.scadaInfo.scadaName,
       },
+      currentPowerSystemVersionId: powerSystemVersionId.value,
     };
-    return put(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${data._id}`, updateData);
+    return put(
+      `/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/${data._id}`,
+      updateData,
+    );
   }
 
-  static async delete(psId, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${projectVersionId}/${psId}`);
+  static async delete(psId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/${psId}`);
   }
 
   static async getPowersystemMonitor(psde_id) {
@@ -134,29 +138,32 @@ export class PowerSystemParameterApi {
 }
 
 export class PowerSystemEmsApi {
-  static async getPsDataWithDefinition(definitionId, projectVersionId, data = {}, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/definition/${definitionId}`, {
-      ...data,
-      page: page,
-    });
+  static async getPsDataWithDefinition(definitionId, data = {}, page = 1) {
+    return get(
+      `/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/definition/${definitionId}`,
+      {
+        ...data,
+        page: page,
+      },
+    );
   }
 
-  static async getPsDataWithTree(psId, projectVersionId, parentId = undefined, ems_definition_id, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`, {
+  static async getPsDataWithTree(psId, parentId = undefined, ems_definition_id, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/${psId}`, {
       page: page,
       parentId: parentId,
       ems_definition_id: ems_definition_id,
     });
   }
 
-  static async getPsDataWithSubsystem(projectVersionId, data = {}, page = 1) {
-    return post(`/powersystem/${projectData.value._id}/subsystem/${projectVersionId}/ems`, {
+  static async getPsDataWithSubsystem(data = {}, page = 1) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${powerSystemVersionId.value}/ems`, {
       ...data,
       page: page,
     });
   }
-  static async searchPs(projectVersionId, psdDefinition_id = '', query = '', exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/search`;
+  static async searchPs(psdDefinition_id = '', query = '', exceptionArr = []) {
+    let url = `/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/search`;
     if (psdDefinition_id) {
       url += `?psdDefinition_id=${psdDefinition_id}`;
     }
@@ -166,22 +173,27 @@ export class PowerSystemEmsApi {
     return post(url, exceptionArr);
   }
   // CRUD
-  static async create(data, projectVersionId) {
+  static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}`, data);
+    data.currentPowerSystemVersionId = powerSystemVersionId.value;
+
+    return post(`/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}`, data);
   }
 
-  static async update(data, projectVersionId) {
+  static async update(data) {
     const updateData = {
       engineInfo: {
         values: data.engineInfo.values,
       },
     };
-    return put(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${data._id}`, updateData);
+    return put(
+      `/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/${data._id}`,
+      updateData,
+    );
   }
 
-  static async delete(psId, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${projectVersionId}/${psId}`);
+  static async delete(psId) {
+    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/${psId}`);
   }
   static async getPowersystemEmsData(pss_id) {
     return get(`/powersystem/powersystems/${pss_id}`);
@@ -190,64 +202,71 @@ export class PowerSystemEmsApi {
 
 // pole
 export class SubLineApi {
-  static async getData(psId, projectVersionId, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${psId}`, {
+  static async getData(psId, page = 1) {
+    return get(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine/${psId}`, {
       page: page,
     });
   }
   // CRUD
-  static async create(data, projectVersionId) {
+  static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine`, data);
+    return post(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine`, data);
   }
 
-  static async update(data, projectVersionId) {
+  static async update(data) {
     data.projectId = projectData.value._id;
-    return put(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${data._id}`, data);
+    return put(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine/${data._id}`, data);
   }
 
-  static async delete(psId, projectVersionId) {
-    return _delete(`/powersystem/${projectData.value._id}/${projectVersionId}/PoleSubLine/${psId}`);
+  static async delete(psId) {
+    return _delete(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine/${psId}`);
   }
 }
 
 export class DynamicModelApi {
-  static async getDynamicModelList(additionVersion_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/dynamicModel`, { page: page });
+  static async getDynamicModelList(page) {
+    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel`, { page: page });
   }
 
-  static async getDynamicModelListWithTree(additionVersion_id, parent_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/${parent_id}/dynamicModel`, { page: page });
-  }
-  static async createDynamicModel(versionId, data) {
-    return post(`addition/${projectData.value._id}/${versionId}/dynamicModel`, data);
-  }
-
-  static async updateDynamicModel(versionId, dynamicModel_id, data) {
-    return put(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`, data);
-  }
-  static async deleteDynamicModel(versionId, dynamicModel_id) {
-    return _delete(`addition/${projectData.value._id}/${versionId}/dynamicModel/${dynamicModel_id}`);
-  }
-}
-export class DynamicDefaultApi {
-  static async getDynamicDefaultList(additionVersion_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault`, { page: page });
-  }
-
-  static async getDynamicDefaultListWithTree(additionVersion_id, parent_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersion_id}/${parent_id}/dynamicModelDefault`, {
+  static async getDynamicModelListWithTree(parent_id, page) {
+    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/${parent_id}/dynamicModel`, {
       page: page,
     });
   }
-  static async createDynamicDefault(additionVersion_id, data) {
-    return post(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault`, data);
+  static async createDynamicModel(data) {
+    return post(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel`, data);
   }
 
-  static async updateDynamicDefault(additionVersion_id, dynamicModel_id, data) {
-    return put(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault/${dynamicModel_id}`, data);
+  static async updateDynamicModel(dynamicModel_id, data) {
+    return put(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel/${dynamicModel_id}`, data);
   }
-  static async deleteDynamicDefault(additionVersion_id, dynamicModel_id) {
-    return _delete(`addition/${projectData.value._id}/${additionVersion_id}/dynamicModelDefault/${dynamicModel_id}`);
+  static async deleteDynamicModel(dynamicModel_id) {
+    return _delete(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel/${dynamicModel_id}`);
+  }
+}
+export class DynamicDefaultApi {
+  static async getDynamicDefaultList(page) {
+    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault`, { page: page });
+  }
+
+  static async getDynamicDefaultListWithTree(parent_id, page) {
+    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/${parent_id}/dynamicModelDefault`, {
+      page: page,
+    });
+  }
+  static async createDynamicDefault(data) {
+    return post(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault`, data);
+  }
+
+  static async updateDynamicDefault(dynamicModel_id, data) {
+    return put(
+      `addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
+      data,
+    );
+  }
+  static async deleteDynamicDefault(dynamicModel_id) {
+    return _delete(
+      `addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
+    );
   }
 }

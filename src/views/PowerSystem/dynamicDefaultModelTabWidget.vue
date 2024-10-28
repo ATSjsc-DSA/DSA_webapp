@@ -463,13 +463,10 @@ import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView
 import { PowerSystemParameterApi, DynamicDefaultApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
-const additionprojectVersionId = ref('5eb7cf5a86d9755df3a6c593');
 
 const props = defineProps({
   showDefinitionFlatList: { type: Boolean },
   nodeSelected: { type: Object },
-
-  projectVersionId: { type: String, required: true },
   definitionId: { type: String, required: true },
 });
 
@@ -509,7 +506,6 @@ const getTableData = async () => {
     const items = dynamicModelList.value[index];
     const typeModel = items.renewable === 0 ? 'Traditional' : 'Renewable';
     const typeModelArr = Object.values(modelDefinitionType.value[typeModel]);
-    console.log(index, items, typeModel, typeModelArr);
     for (const type of typeModelArr) {
       const modelData = items.model.filter((model) => {
         return model.modelType === type;
@@ -517,7 +513,6 @@ const getTableData = async () => {
       items[type] = modelData || '';
     }
     data.push(items);
-    console.log(items);
   }
   tableData.value = data;
   isLoadingData.value = false;
@@ -530,12 +525,11 @@ const getDynamicDefaultModelList = async () => {
       total: 0,
     };
     if (props.showDefinitionFlatList) {
-      const res = await DynamicDefaultApi.getDynamicDefaultList(additionprojectVersionId.value, currentPage.value);
+      const res = await DynamicDefaultApi.getDynamicDefaultList(currentPage.value);
       resData = res.data;
     } else {
       if (props.nodeSelected) {
         const res = await DynamicDefaultApi.getDynamicDefaultListWithTree(
-          additionprojectVersionId.value,
           props.nodeSelected.parentId,
           currentPage.value,
         );
@@ -604,7 +598,7 @@ const getModelTypeOptions = async () => {
 };
 const createDynamicDefaultModel = async () => {
   try {
-    await DynamicDefaultApi.createDynamicDefault(additionprojectVersionId.value, getValueModelInForm());
+    await DynamicDefaultApi.createDynamicDefault(getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
@@ -822,7 +816,7 @@ const handleUpdate = async (data) => {
 const updateDynamicModel = async () => {
   const dataUpdate = getValueModelInForm();
   try {
-    await DynamicDefaultApi.updateDynamicDefault(additionprojectVersionId.value, dataUpdate.id, getValueModelInForm());
+    await DynamicDefaultApi.updateDynamicDefault(dataUpdate.id, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Update successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
@@ -851,7 +845,7 @@ const confirmDelete = (data) => {
 
 const deleteDynamicModel = async (dynamicModel_id) => {
   try {
-    await DynamicDefaultApi.deleteDynamicDefault(additionprojectVersionId.value, dynamicModel_id);
+    await DynamicDefaultApi.deleteDynamicDefault(dynamicModel_id);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     await getTableData();
   } catch (error) {

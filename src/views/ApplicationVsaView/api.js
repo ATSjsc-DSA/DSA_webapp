@@ -1,6 +1,4 @@
 import { get, post } from '@/utils/request';
-import VSA from '../ConfigurationView/components/VSA.vue';
-import Monitor from '../ConfigurationView/components/Monitor.vue';
 
 export class CommonApi {}
 

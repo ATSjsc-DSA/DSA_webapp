@@ -44,8 +44,6 @@ import ScrollPanel from 'primevue/scrollpanel';
 import { ApiApplication } from '../UserConfigurationView/api';
 import { VsaApi, TsaApi } from './api';
 
-const projectVersionId = ref('66decf1dcff005199529524b');
-
 const props = defineProps({
   typeModel: { type: String, default: 'VSA' },
 });
@@ -91,10 +89,11 @@ const onCaseNodeExpand = async (node) => {
 
 const getAppList = async () => {
   try {
-    const res = await ApiApplication.getList(projectVersionId.value);
+    const res = await ApiApplication.getList();
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
+    return []
   }
 };
 // -- VSA

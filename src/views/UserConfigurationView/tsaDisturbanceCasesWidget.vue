@@ -94,10 +94,6 @@ const toast = useToast();
 const confirm = useConfirm();
 
 const props = defineProps({
-  projectVersionId: {
-    type: String,
-    default: '',
-  },
   tsaId: {
     type: String,
     required: true,
