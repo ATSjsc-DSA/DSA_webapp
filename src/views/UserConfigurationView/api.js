@@ -2,12 +2,10 @@ import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { userConfigVersionId, projectData } = storeToRefs(commonStore);
-console.log('userConfigVersionId', userConfigVersionId.value);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class ApiApplication {
   static async getList() {
-    console.log('userConfigVersionId getList', userConfigVersionId.value);
     return get(`/userconfig/${projectData.value._id}/${userConfigVersionId.value}/applications`);
   }
 

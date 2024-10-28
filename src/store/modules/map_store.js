@@ -92,7 +92,7 @@ export const useMapStore = defineStore('map_Store', () => {
         }),
       );
     });
-    console.log(featuresPoin, 'featuresPoin');
+    // console.log(featuresPoin, 'featuresPoin');
 
     return featuresPoin;
   }
@@ -260,7 +260,7 @@ export const useMapStore = defineStore('map_Store', () => {
   async function getListSub() {
     try {
       const res = await DSA_api.getListSub();
-      console.log(res.data, 'res');
+      // console.log(res.data, 'res');
 
       const newFeaturesArray = [
         ...getFeaturesPoint(res.data.sub500kV ?? [], 500, true),
@@ -271,7 +271,7 @@ export const useMapStore = defineStore('map_Store', () => {
         ...getFeaturesPoint(res.data.sub115kV ?? [], 115),
         ...getFeaturesPoint(res.data.sub20kV ?? [], 20),
       ];
-      console.log(newFeaturesArray, 'newFeaturesArray');
+      // console.log(newFeaturesArray, 'newFeaturesArray');
 
       featuresSubLine.value = newFeaturesArray;
     } catch (error) {
@@ -305,7 +305,7 @@ export const useMapStore = defineStore('map_Store', () => {
       source: sourceSubline,
       style: getFeatureStyle.bind(null, Point230Color),
     });
-    console.log(layerSubLine.value, 'layerSubLine');
+    // console.log(layerSubLine.value, 'layerSubLine');
 
     map.value.addLayer(layerSubLine.value);
   }

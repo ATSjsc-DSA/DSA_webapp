@@ -4,106 +4,161 @@
       <mapView />
     </div>
     <div class="col-3 h-full">
-      <Card class="flex-grow-1 w-full">
-        <template #title><i class="pi pi-credit-card pr-3"></i>Project</template>
-        <template #content>
-          <ScrollPanel style="width: 100%; height: 52rem">
-            <Tree
-              v-if="treeData.length > 0"
-              v-model:expandedKeys="treeExpandedKeys"
-              :selectionKeys="treeSelected"
-              :value="treeData"
-              loadingMode="icon"
-              selectionMode="single"
-              class="w-full"
-              :loading="treeloading"
-              @node-expand="onNodeExpand"
-              @node-select="onNodeSelect"
-              @node-unselect="onNodeUnSelect"
-            >
-              <template #Application="slotProps">
-                <div class="w-full flex align-items-center justify-content-between">
-                  <div class="font-bold text-lg">
+      <div class="flex flex-column gap-3 h-full">
+        <Card class="flex-grow-1 w-full">
+          <template #title><i class="pi pi-credit-card pr-3"></i>Project</template>
+          <template #content>
+            <ScrollPanel style="width: 100%; height: 52rem">
+              <Tree
+                v-if="treeData.length > 0"
+                v-model:expandedKeys="treeExpandedKeys"
+                :selectionKeys="treeSelected"
+                :value="treeData"
+                loadingMode="icon"
+                selectionMode="single"
+                class="w-full"
+                :loading="treeloading"
+                @node-expand="onNodeExpand"
+                @node-select="onNodeSelect"
+                @node-unselect="onNodeUnSelect"
+              >
+                <template #Application="slotProps">
+                  <div
+                    :id="slotProps.node.key"
+                    draggable="true"
+                    class="w-full flex align-items-center justify-content-between"
+                    @dragstart="onStartDragNode($event, slotProps.node)"
+                  >
+                    <div class="font-bold text-lg">
+                      {{ slotProps.node.label }}
+                    </div>
+                    <div class="ml-3">
+                      <Tag v-if="slotProps.node.active" value="Active" severity="success" />
+                    </div>
+                  </div>
+                </template>
+                <template #DSA="slotProps">
+                  <div class="font-semibold">
                     {{ slotProps.node.label }}
                   </div>
-                  <div class="ml-3">
-                    <Tag v-if="slotProps.node.active" value="Active" severity="success" />
-                  </div>
-                </div>
-              </template>
-              <template #DSA="slotProps">
-                <div class="font-semibold">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
+                </template>
 
-              <template #VSA="slotProps">
-                <div class="w-full flex align-items-center justify-content-start gap-3">
-                  <Tag value="VSA" severity="success" rounded />
-                  <div>
+                <template #VSA="slotProps">
+                  <div class="w-full flex align-items-center justify-content-start gap-3">
+                    <Tag value="VSA" severity="success" rounded />
+                    <div>
+                      {{ slotProps.node.label }}
+                    </div>
+                  </div>
+                </template>
+
+                <template #TSA="slotProps">
+                  <div class="w-full flex align-items-center justify-content-start gap-3">
+                    <Tag value="TSA" severity="secondary" rounded />
+                    <div>
+                      {{ slotProps.node.label }}
+                    </div>
+                  </div>
+                </template>
+
+                <template #Case="slotProps">
+                  <div class="w-full">
                     {{ slotProps.node.label }}
                   </div>
-                </div>
-              </template>
+                </template>
 
-              <template #TSA="slotProps">
-                <div class="w-full flex align-items-center justify-content-start gap-3">
-                  <Tag value="TSA" severity="secondary" rounded />
-                  <div>
+                <template #VsaCurve="slotProps">
+                  <div :id="slotProps.node.key" draggable="true" @dragstart="onStartDragNode($event, slotProps.node)">
                     {{ slotProps.node.label }}
                   </div>
-                </div>
-              </template>
-
-              <template #Case="slotProps">
-                <div class="w-full">
-                  {{ slotProps.node.label }}
-                </div>
-              </template>
-            </Tree>
-            <div v-else>No data</div>
-          </ScrollPanel>
-        </template>
-      </Card>
+                </template>
+                <template #TsaCurve="slotProps">
+                  <div :id="slotProps.node.key" draggable="true" @dragstart="onStartDragNode($event, slotProps.node)">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+              </Tree>
+              <div v-else>No data</div>
+            </ScrollPanel>
+          </template>
+        </Card>
+      </div>
     </div>
     <div class="col grid">
       <div class="col-6">
-        <Card class="flex-grow-1 w-full">
-          <template #title><i class="pi pi-credit-card pr-3"></i>TSA curve</template>
+        <Card class="flex-grow-1 w-full h-full">
+          <template #title><i class="pi pi-folder-open pr-3"></i>Application Chart</template>
           <template #content>
-            TSA curve --
-            <pre>{{ tsaCurveSelected }} </pre>
-            --
+            <div
+              id="applicationSelected"
+              class="w-full"
+              :class="{ 'border-2': canDropApplication }"
+              style="height: 20rem"
+              @dragleave.prevent="canDropApplication = false"
+              @dragenter.prevent="onDragenterApplicationChart"
+              @dragover.prevent
+              @drop.prevent="onDropApplicationChart"
+            >
+              <pre>{{ applicationSelected }}</pre>
+            </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full">
-          <template #title><i class="pi pi-credit-card pr-3"></i>treeSelected</template>
+        <Card class="flex-grow-1 w-full h-full">
+          <template #title><i class="pi pi-clone pr-3"></i>VSA Chart</template>
           <template #content>
-            treeSelected --
-            <pre>{{ treeSelected }} </pre>
-            --
+            <div
+              id="vsaCurveSelected"
+              class="w-full"
+              :class="{ 'border-2': canDropVsa }"
+              style="height: 20rem"
+              @dragleave.prevent="canDropVsa = false"
+              @dragenter.prevent="onDragenterVsaChart"
+              @dragover.prevent
+              @drop.prevent="onDropVsaChart"
+            >
+              <pre>{{ vsaCurveSelected }}</pre>
+            </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full">
-          <template #title><i class="pi pi-credit-card pr-3"></i>treeData</template>
+        <Card class="flex-grow-1 w-full h-full">
+          <template #title><i class="pi pi-clone pr-3"></i>TSA Chart</template>
           <template #content>
-            treeData --
-            <pre>{{ treeData }} </pre>
-            --
+            <div
+              id="vsaCurveChart1"
+              class="w-full"
+              :class="{ 'border-2': canDropTsa }"
+              style="height: 20rem"
+              @dragleave.prevent="canDropTsa = false"
+              @dragenter.prevent="onDragenterTsaChart"
+              @dragover.prevent
+              @drop.prevent="onDropTsaChart"
+            >
+              <pre>{{ tsaCurveSelected }}</pre>
+            </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full">
-          <template #title><i class="pi pi-credit-card pr-3"></i>vsaCurveSelected</template>
+        <Card class="flex-grow-1 w-full h-full">
+          <template #title><i class="pi pi-clone pr-3"></i>TSA Chart</template>
           <template #content>
-            vsaCurveSelected --
-            <pre>{{ vsaCurveSelected }} </pre>
-            --
+            <div
+              id="vsaCurveChart1"
+              class="w-full"
+              :class="{ 'border-2': canDropTsa }"
+              style="height: 20rem"
+              @dragleave.prevent="canDropTsa = false"
+              @dragenter.prevent="onDragenterTsaChart"
+              @dragover.prevent
+              @drop.prevent="onDropTsaChart"
+            >
+              canDropTsa: {{ canDropTsa }}
+              <pre>{{ tsaCurveSelected }}</pre>
+            </div>
           </template>
         </Card>
       </div>
@@ -112,7 +167,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
@@ -129,8 +184,6 @@ const treeData = ref([]);
 const treeloading = ref(false);
 const treeExpandedKeys = ref({});
 const treeSelected = ref({});
-const tsaCurveSelected = ref([]);
-const vsaCurveSelected = ref([]);
 
 const getTreeData = async () => {
   treeloading.value = true;
@@ -160,33 +213,23 @@ const onNodeExpand = async (node) => {
     if (node.type === 'VsaCase') {
       node['children'] = await getVsaCurveBranchData(node);
     }
+    if (node.type === 'TSA') {
+      node['children'] = await getTsaCaseBranchData(node);
+    }
+    if (node.type === 'TsaCase') {
+      node['children'] = await getTsaSubCaseBranchData(node);
+    }
+    if (node.type === 'TsaSubCase') {
+      node['children'] = await getTsaCurveBranchData(node);
+    }
     node.loading = false;
   }
 };
 
+//   chỉ chọn Curve node, các node khác thì expand và load element con
 const onNodeSelect = async (node) => {
-  console.log('node', node);
-  if (node.type === 'VsaCurve') {
-    treeSelected.value[node.key] = true;
-    vsaCurveSelected.value.push(node.label);
-  } else if (node.type === 'TsaCurve') {
-    treeSelected.value[node.key] = true;
-    tsaCurveSelected.value.push(node.label);
-  } else {
-    treeExpandedKeys.value[node.key] = true;
-    await onNodeExpand(node);
-  }
-};
-
-const onNodeUnSelect = async (node) => {
-  if (node.type === 'VsaCurve') {
-    treeSelected.value[node.key] = false;
-    tsaCurveSelected.value = tsaCurveSelected.value.filter((item) => item != node.label);
-  }
-  if (node.type === 'TsaCurve') {
-    treeSelected.value[node.key] = false;
-    tsaCurveSelected.value = tsaCurveSelected.value.filter((item) => item != node.label);
-  }
+  treeExpandedKeys.value[node.key] = true;
+  await onNodeExpand(node);
 };
 
 // --- Application
@@ -470,9 +513,79 @@ const getTsaCurveList = async (subCaseName) => {
     return [];
   }
 };
+
+// -- drag drop ---
+const nodeDrag = ref();
+const onStartDragNode = (evt, node) => {
+  evt.dataTransfer.dropEffect = 'move';
+  evt.dataTransfer.effectAllowed = 'move';
+  evt.dataTransfer.setData('itemDrag', node.label);
+  nodeDrag.value = node;
+};
+
+//  Drop Application
+const applicationSelected = ref([]);
+const canDropApplication = ref(false);
+
+const onDragenterApplicationChart = () => {
+  if (nodeDrag.value.type === 'Application' && applicationSelected.value.indexOf(nodeDrag.value._id) === -1) {
+    canDropApplication.value = true;
+  } else {
+    canDropApplication.value = false;
+  }
+};
+const onDropApplicationChart = () => {
+  if (nodeDrag.value.type === 'Application' && applicationSelected.value.indexOf(nodeDrag.value._id) === -1) {
+    applicationSelected.value.push(nodeDrag.value._id);
+    treeSelected.value[nodeDrag.value.key] = true;
+  }
+};
+
+// Drop VSA
+const vsaCurveSelected = ref([]);
+const canDropVsa = ref(false);
+
+const onDragenterVsaChart = () => {
+  if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    canDropVsa.value = true;
+  } else {
+    canDropVsa.value = false;
+  }
+};
+
+const onDropVsaChart = () => {
+  if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    vsaCurveSelected.value.push(nodeDrag.value.label);
+    treeSelected.value[nodeDrag.value.key] = true;
+  }
+};
+
+// ---drop TSA
+const tsaCurveSelected = ref([]);
+const canDropTsa = ref(false);
+const onDragenterTsaChart = () => {
+  if (nodeDrag.value.type === 'TsaCurve' && tsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    canDropTsa.value = true;
+  } else {
+    canDropTsa.value = false;
+  }
+  console.log(canDropTsa.value);
+};
+
+const onDropTsaChart = () => {
+  if (nodeDrag.value.type === 'TsaCurve' && tsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    tsaCurveSelected.value.push(nodeDrag.value.label);
+    treeSelected.value[nodeDrag.value.key] = true;
+  }
+};
 </script>
 <style>
 .p-treenode-label {
   width: 100%;
+}
+
+.disabled-drag-item {
+  opacity: 0.5;
+  pointer-events: none;
 }
 </style>
