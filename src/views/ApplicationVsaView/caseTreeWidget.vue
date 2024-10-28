@@ -93,7 +93,7 @@ const getAppList = async () => {
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
-    return []
+    return [];
   }
 };
 // -- VSA

@@ -1,7 +1,5 @@
 import { get, post } from '@/utils/request';
 
-export class CommonApi {}
-
 export class VsaApi {
   /* 
   vsa Tree 
