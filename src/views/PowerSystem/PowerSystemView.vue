@@ -543,6 +543,19 @@
           ></Button>
         </div>
       </TabPanel>
+      <TabPanel header="Dynamic Model Default">
+        <uploadFileConfig @uploadFile="loadDynamicDefaultFile" />
+        <div class="flex gap-2 justify-content-end align-items-center">
+          <Button type="button" label="Cancel" severity="secondary" @click="importVisibleDialog = false"></Button>
+          <Button
+            type="button"
+            label="Save"
+            severity="primary"
+            :disabled="!dynamicDefaultImportFormdata"
+            @click="importDynamicDefaultFile"
+          ></Button>
+        </div>
+      </TabPanel>
     </TabView>
   </Dialog>
 
@@ -599,6 +612,7 @@ import createEmsDialog from './createEmsDialog.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
+import { DynamicModelApi, DynamicDefaultApi } from './api';
 // graphic
 import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
 
@@ -1176,9 +1190,19 @@ const loadEmsFile = (formData, callback) => {
 };
 
 const dynamicImportFormdata = ref();
-const loadDynamicFile = (formData, callback) => {
+const loadDynamicFile = async (formData, callback) => {
+  await DynamicModelApi.importDynamicModel(formData);
   dynamicImportFormdata.value = formData;
   console.log('load Dynamic file', formData);
+  callback();
+};
+
+const dynamicDefaultImportFormdata = ref();
+const loadDynamicDefaultFile = async (formData, callback) => {
+  await DynamicDefaultApi.importDynamicDefaultModel(formData);
+  dynamicDefaultImportFormdata.value = formData;
+  console.log('load Dynamic file', formData);
+  callback();
 };
 
 function delayImportExport(ms = 3000) {
@@ -1194,6 +1218,14 @@ const importEmsFile = async () => {
 };
 
 const importDynamicFile = async () => {
+  isLoadingProgress.value = true;
+  await delayImportExport();
+  toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
+  importVisibleDialog.value = false;
+  isLoadingProgress.value = false;
+};
+
+const importDynamicDefaultFile = async () => {
   isLoadingProgress.value = true;
   await delayImportExport();
   toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });

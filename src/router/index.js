@@ -53,7 +53,7 @@ const router = createRouter({
         {
           path: '/DSA/Task',
           name: 'Task',
-          component: () => import('@/views/TaskList.vue'),
+          component: () => import('@/views/CommonView/TaskList.vue'),
         },
         {
           path: '/DSA/Setting',
