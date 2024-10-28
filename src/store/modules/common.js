@@ -10,9 +10,11 @@ export const useCommonStore = defineStore('common', () => {
   const psm_active = ref({});
   const psmList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
-  const userConfigVersionId = ref('5eb7cf5a86d9755df3a6c593');
-  const powerSystemVersionId = ref('66decf1dcff005199529524b');
-  const additionVersionId = ref('5eb7cf5a86d9755df3a6c593');
+  const userConfigVersionId = ref(localStorage.getItem('userConfigVersionId') || '');
+  const powerSystemVersionId = ref(localStorage.getItem('powerSystemVersionId') || '');
+  const additionVersionId = ref(localStorage.getItem('additionVersionId') || '');
+  const hmiTaskId = ref('67175dd23a41cf97c7e4bd21');
+
   const editVersionData = ref({});
   let intervalId = null;
 
@@ -22,12 +24,30 @@ export const useCommonStore = defineStore('common', () => {
 
   const getPsmIdActive = async () => {
     try {
-      const res = await DSA_api.getVersionActive(projectData.value._id);
+      const res = await DSA_api.getVersionManagement(projectData.value._id);
       psm_active.value = res.data;
-      userConfigVersionId.value = res.data.userConfigVersionId;
-      powerSystemVersionId.value = res.data.powerSystemVersionId;
-      additionVersionId.value = res.data.additionVersionId;
+      updateConfigVersionId(res.data.userConfigVersionId);
+      updatePsVersionId(res.data.powerSystemVersionId);
+      updateAdditionVersionId(res.data.additionVersionId);
     } catch (error) {}
+  };
+  const updateConfigVersionId = (newId) => {
+    if (userConfigVersionId.value != newId) {
+      userConfigVersionId.value = newId;
+      localStorage.setItem('userConfigVersionId', newId);
+    }
+  };
+  const updatePsVersionId = (newId) => {
+    if (powerSystemVersionId.value != newId) {
+      powerSystemVersionId.value = newId;
+      localStorage.setItem('powerSystemVersionId', newId);
+    }
+  };
+  const updateAdditionVersionId = (newId) => {
+    if (additionVersionId.value != newId) {
+      additionVersionId.value = newId;
+      localStorage.setItem('additionVersionId', newId);
+    }
   };
 
   const getListPsm = async (time1 = 0, time2 = 0) => {
@@ -86,5 +106,6 @@ export const useCommonStore = defineStore('common', () => {
     userConfigVersionId,
     powerSystemVersionId,
     additionVersionId,
+    hmiTaskId,
   };
 });
