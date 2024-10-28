@@ -23,8 +23,8 @@ export class VsaApi {
   static async getCurveList(caseName) {
     return get(`hmi/child/vsa/curve/${caseName}`);
   }
-  static async getChartData(curveList = []) {
-    return post(`hmi/chart/vsa/curve`, { payload: curveList });
+  static async getChartData(curveNameList = []) {
+    return post(`hmi/chart/vsa/curve`, { payload: curveNameList });
   }
 }
 

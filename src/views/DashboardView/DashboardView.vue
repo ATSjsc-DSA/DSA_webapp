@@ -20,7 +20,6 @@
                 :loading="treeloading"
                 @node-expand="onNodeExpand"
                 @node-select="onNodeSelect"
-                @node-unselect="onNodeUnSelect"
               >
                 <template #Application="slotProps">
                   <div
@@ -87,13 +86,18 @@
     <div class="col grid">
       <div class="col-6">
         <Card class="flex-grow-1 w-full h-full">
-          <template #title><i class="pi pi-folder-open pr-3"></i>Application Chart</template>
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <div><i class="pi pi-folder-open pr-3"></i>Application Chart</div>
+              <Button icon="pi pi-refresh " severity="secondary" text @click="resetApplicationSelected" />
+            </div>
+          </template>
           <template #content>
             <div
               id="applicationSelected"
               class="w-full"
               :class="{ 'border-2': canDropApplication }"
-              style="height: 20rem"
+              style="height: 22rem"
               @dragleave.prevent="canDropApplication = false"
               @dragenter.prevent="onDragenterApplicationChart"
               @dragover.prevent
@@ -106,58 +110,75 @@
       </div>
       <div class="col-6">
         <Card class="flex-grow-1 w-full h-full">
-          <template #title><i class="pi pi-clone pr-3"></i>VSA Chart</template>
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <div><i class="pi pi-clone pr-3"></i>VSA Chart</div>
+              <Button icon="pi pi-refresh " severity="secondary" text @click="resetVsaSelected" />
+            </div>
+          </template>
           <template #content>
             <div
               id="vsaCurveSelected"
               class="w-full"
               :class="{ 'border-2': canDropVsa }"
-              style="height: 20rem"
+              style="height: 22rem"
               @dragleave.prevent="canDropVsa = false"
               @dragenter.prevent="onDragenterVsaChart"
               @dragover.prevent
               @drop.prevent="onDropVsaChart"
             >
-              <pre>{{ vsaCurveSelected }}</pre>
+              <comboChartBase
+                :chartData="vsaChartData"
+                :modificationTime="modificationVsaTime"
+                @refeshData="getVsaChartData"
+              ></comboChartBase>
             </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
         <Card class="flex-grow-1 w-full h-full">
-          <template #title><i class="pi pi-clone pr-3"></i>TSA Chart</template>
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <div><i class="pi pi-clone pr-3"></i>TSA - Angle Chart</div>
+              <Button icon="pi pi-refresh " severity="secondary" text @click="resetTsaSelected" />
+            </div>
+          </template>
           <template #content>
             <div
               id="vsaCurveChart1"
               class="w-full"
               :class="{ 'border-2': canDropTsa }"
-              style="height: 20rem"
+              style="height: 22rem"
               @dragleave.prevent="canDropTsa = false"
               @dragenter.prevent="onDragenterTsaChart"
               @dragover.prevent
               @drop.prevent="onDropTsaChart"
             >
-              <pre>{{ tsaCurveSelected }}</pre>
+              <lineChartSpecialBase ChartStabe :chartData="tsaChartData" labelChart="value" class="chart border-none" />
             </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
         <Card class="flex-grow-1 w-full h-full">
-          <template #title><i class="pi pi-clone pr-3"></i>TSA Chart</template>
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <div><i class="pi pi-clone pr-3"></i>TSA - Power Transfer Chart</div>
+              <Button icon="pi pi-refresh " severity="secondary" text @click="resetTsaSelected" /></div
+          ></template>
           <template #content>
             <div
               id="vsaCurveChart1"
               class="w-full"
               :class="{ 'border-2': canDropTsa }"
-              style="height: 20rem"
+              style="height: 22rem"
               @dragleave.prevent="canDropTsa = false"
               @dragenter.prevent="onDragenterTsaChart"
               @dragover.prevent
               @drop.prevent="onDropTsaChart"
             >
-              canDropTsa: {{ canDropTsa }}
-              <pre>{{ tsaCurveSelected }}</pre>
+              <lineChartSpecialBase :chartData="tsaChartData" labelChart="powertranfer" class="chart border-none" />
             </div>
           </template>
         </Card>
@@ -173,6 +194,8 @@ import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
 
 import mapView from '@/components/mapView.vue';
+import comboChartBase from '@/components/comboChartBase.vue';
+import lineChartSpecialBase from '@/components/lineChartSpecialBase.vue';
 
 import { VsaApi, TsaApi } from './api';
 import { ApiApplication, ApiDsa } from '@/views/UserConfigurationView/api.js';
@@ -534,13 +557,34 @@ const onDragenterApplicationChart = () => {
     canDropApplication.value = false;
   }
 };
-const onDropApplicationChart = () => {
+const onDropApplicationChart = async () => {
   if (nodeDrag.value.type === 'Application' && applicationSelected.value.indexOf(nodeDrag.value._id) === -1) {
     applicationSelected.value.push(nodeDrag.value._id);
     treeSelected.value[nodeDrag.value.key] = true;
+    await getAppliactionChartData();
   }
 };
 
+const applicationChartData = ref({});
+const getAppliactionChartData = async () => {
+  try {
+    const res = await VsaApi.getChartData(vsaCurveSelected.value);
+    vsaChartData.value = res.data;
+  } catch (error) {
+    console.log('getVsaChartData: error ', error);
+    return [];
+  }
+};
+
+const resetApplicationSelected = async () => {
+  applicationChartData.value = {};
+  applicationSelected.value = [];
+  for (const key in treeSelected.value) {
+    if (key.includes('app')) {
+      treeSelected.value[key] = false;
+    }
+  }
+};
 // Drop VSA
 const vsaCurveSelected = ref([]);
 const canDropVsa = ref(false);
@@ -553,13 +597,36 @@ const onDragenterVsaChart = () => {
   }
 };
 
-const onDropVsaChart = () => {
+const onDropVsaChart = async () => {
   if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
     vsaCurveSelected.value.push(nodeDrag.value.label);
     treeSelected.value[nodeDrag.value.key] = true;
+    await getVsaChartData();
   }
 };
 
+const vsaChartData = ref({});
+const modificationVsaTime = ref(0);
+const getVsaChartData = async () => {
+  try {
+    const res = await VsaApi.getChartData(vsaCurveSelected.value);
+    vsaChartData.value = res.data;
+    modificationVsaTime.value = new Date().getTime();
+  } catch (error) {
+    console.log('getVsaChartData: error ', error);
+    return [];
+  }
+};
+
+const resetVsaSelected = async () => {
+  vsaChartData.value = {};
+  vsaCurveSelected.value = [];
+  for (const key in treeSelected.value) {
+    if (key.includes('vsa')) {
+      treeSelected.value[key] = false;
+    }
+  }
+};
 // ---drop TSA
 const tsaCurveSelected = ref([]);
 const canDropTsa = ref(false);
@@ -569,13 +636,32 @@ const onDragenterTsaChart = () => {
   } else {
     canDropTsa.value = false;
   }
-  console.log(canDropTsa.value);
 };
 
-const onDropTsaChart = () => {
+const onDropTsaChart = async () => {
   if (nodeDrag.value.type === 'TsaCurve' && tsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
     tsaCurveSelected.value.push(nodeDrag.value.label);
     treeSelected.value[nodeDrag.value.key] = true;
+    await getTsaChartData();
+  }
+};
+const tsaChartData = ref({});
+const getTsaChartData = async () => {
+  try {
+    const res = await TsaApi.getChartData(vsaCurveSelected.value);
+    tsaChartData.value = res.data;
+  } catch (error) {
+    console.log('getTsaChartData: error ', error);
+    return [];
+  }
+};
+const resetTsaSelected = async () => {
+  tsaChartData.value = {};
+  tsaCurveSelected.value = [];
+  for (const key in treeSelected.value) {
+    if (key.includes('tsa')) {
+      treeSelected.value[key] = false;
+    }
   }
 };
 </script>

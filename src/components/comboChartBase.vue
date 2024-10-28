@@ -9,13 +9,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Chart from 'primevue/chart';
 import chartComposable from '@/combosables/chartData';
 import modificationTimeFile from './modificationTimeFile.vue';
 import { useLayout } from '@/layout/composables/layout';
-import { watch } from 'vue';
-
 const { zoomOptions, convertDateTimeToString } = chartComposable();
 const { isDarkTheme } = useLayout();
 const emits = defineEmits(['refeshData']);
@@ -23,7 +21,7 @@ const props = defineProps({
   chartData: {
     type: Object,
     require: true,
-    default: {},
+    default: () => {},
   },
   modificationTime: {
     type: Number,

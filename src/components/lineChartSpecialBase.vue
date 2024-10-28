@@ -8,7 +8,7 @@ const props = defineProps({
   chartData: {
     type: Object,
     require: true,
-    default: {},
+    default: () => {},
   },
   labelChart: {
     type: String,
@@ -16,6 +16,10 @@ const props = defineProps({
     default: 'Angle chart',
   },
   ChartStabe: {
+    type: Boolean,
+    default: false,
+  },
+  showTitleChart: {
     type: Boolean,
     default: false,
   },
@@ -95,7 +99,7 @@ const setChartOptions = () => {
     aspectRatio: 0.6,
     plugins: {
       title: {
-        display: true,
+        display: props.showTitleChart,
         text: titleChart.value,
         padding: {
           top: 10,
