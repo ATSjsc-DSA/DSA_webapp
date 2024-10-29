@@ -26,13 +26,11 @@
                     :id="slotProps.node.key"
                     draggable="true"
                     class="w-full flex align-items-center justify-content-between"
+                    style="cursor: -webkit-grab; cursor: grab"
                     @dragstart="onStartDragNode($event, slotProps.node)"
                   >
-                    <div class="font-bold text-lg">
+                    <div class="font-bold text-lg" :class="{ applicationUnActive: !slotProps.node.active }">
                       {{ slotProps.node.label }}
-                    </div>
-                    <div class="ml-3">
-                      <Tag v-if="slotProps.node.active" value="Active" severity="success" />
                     </div>
                   </div>
                 </template>
@@ -67,13 +65,36 @@
                 </template>
 
                 <template #VsaCurve="slotProps">
-                  <div :id="slotProps.node.key" draggable="true" @dragstart="onStartDragNode($event, slotProps.node)">
-                    {{ slotProps.node.label }}
+                  <div
+                    :id="slotProps.node.key"
+                    draggable="true"
+                    class="w-full flex align-items-center justify-content-start"
+                    style="cursor: -webkit-grab; cursor: grab"
+                    @dragstart="onStartDragNode($event, slotProps.node)"
+                  >
+                    <Tag
+                      class="mr-3"
+                      :value="getVsaCurveTypeValue(slotProps.node.curveType)"
+                      :severity="getVsaCurveTypeSeverity(slotProps.node.curveType)"
+                    />
+
+                    <div>{{ slotProps.node.label }}</div>
                   </div>
                 </template>
                 <template #TsaCurve="slotProps">
-                  <div :id="slotProps.node.key" draggable="true" @dragstart="onStartDragNode($event, slotProps.node)">
-                    {{ slotProps.node.label }}
+                  <div
+                    :id="slotProps.node.key"
+                    draggable="true"
+                    class="w-full flex align-items-center justify-content-start"
+                    style="cursor: -webkit-grab; cursor: grab"
+                    @dragstart="onStartDragNode($event, slotProps.node)"
+                  >
+                    <Tag
+                      class="mr-3"
+                      :value="getTsaCurveTypeValue(slotProps.node.curveType)"
+                      :severity="getTsaCurveTypeSeverity(slotProps.node.curveType)"
+                    />
+                    <div>{{ slotProps.node.label }}</div>
                   </div>
                 </template>
               </Tree>
@@ -131,10 +152,10 @@
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropTsa }">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropLeftTsa }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
-              <div><i class="pi pi-clone pr-3"></i>TSA - Angle Chart</div>
+              <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
               <Button icon="pi pi-refresh " severity="secondary" text @click="resetTsaSelected" />
             </div>
           </template>
@@ -143,34 +164,34 @@
               id="vsaCurveChart1"
               class="w-full"
               style="height: 22rem"
-              @dragleave.prevent="canDropTsa = false"
+              @dragleave.prevent="canDropLeftTsa = false"
               @dragenter.prevent
-              @dragover.prevent="onDragoverTsaChart"
-              @drop.prevent="onDropTsaChart"
+              @dragover.prevent="onDragoverTsaLeftChart"
+              @drop.prevent="onDropTsaLeftChart"
             >
-              <vsaChartWidget :data="tsaChartData" />
+              <vsaChartWidget :data="tsaLeftChartData" />
             </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropTsa }">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropRightTsa }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
-              <div><i class="pi pi-clone pr-3"></i>TSA - Power Transfer Chart</div>
-              <Button icon="pi pi-refresh " severity="secondary" text @click="resetTsaSelected" /></div
+              <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
+              <Button icon="pi pi-refresh " severity="secondary" text @click="resetRightTsaSelected" /></div
           ></template>
           <template #content>
             <div
               id="vsaCurveChart1"
               class="w-full"
               style="height: 22rem"
-              @dragleave.prevent="canDropTsa = false"
+              @dragleave.prevent="canDropRightTsa = false"
               @dragenter.prevent
-              @dragover.prevent="onDragoverTsaChart"
-              @drop.prevent="onDropTsaChart"
+              @dragover.prevent="onDragoverTsaRightChart"
+              @drop.prevent="onDropTsaRightChart"
             >
-              <vsaChartWidget :data="tsaChartData" />
+              <vsaChartWidget :data="tsaRightChartData" />
             </div>
           </template>
         </Card>
@@ -387,6 +408,8 @@ const getVsaCurveBranchData = async (caseNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'VsaCurve',
+        curveType: leafData.curveType,
+
         leaf: true,
       });
     }
@@ -480,7 +503,7 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'TsaSubCase',
-        icon: 'pi pi-list',
+        icon: 'pi pi-file',
         leaf: false,
       });
     }
@@ -511,6 +534,7 @@ const getTsaCurveBranchData = async (subCaseNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'TsaCurve',
+        curveType: leafData.curveType,
         leaf: true,
       });
     }
@@ -617,46 +641,175 @@ const resetVsaSelected = async () => {
     }
   }
 };
-// ---drop TSA
-const tsaCurveSelected = ref([]);
-const canDropTsa = ref(false);
-const onDragoverTsaChart = () => {
-  if (nodeDrag.value.type === 'TsaCurve' && tsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    canDropTsa.value = true;
+// ---drop TSA - 1 - left chart
+const tsaLeftCurveSelected = ref([]);
+const tsaKeyLeftCurveSelected = ref([]);
+
+const canDropLeftTsa = ref(false);
+const onDragoverTsaLeftChart = () => {
+  if (nodeDrag.value.type === 'TsaCurve' && tsaLeftCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    canDropLeftTsa.value = true;
   } else {
-    canDropTsa.value = false;
+    canDropLeftTsa.value = false;
   }
 };
 
-const onDropTsaChart = async () => {
-  if (nodeDrag.value.type === 'TsaCurve' && tsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    tsaCurveSelected.value.push(nodeDrag.value.label);
+const onDropTsaLeftChart = async () => {
+  if (nodeDrag.value.type === 'TsaCurve' && tsaLeftCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    tsaLeftCurveSelected.value.push(nodeDrag.value.label);
     treeSelected.value[nodeDrag.value.key] = true;
-    await getTsaChartData();
-    canDropTsa.value = false;
+    await getTsaLeftChartData();
+    canDropLeftTsa.value = false;
+    tsaKeyLeftCurveSelected.value.push(nodeDrag.value.key);
   }
 };
-const tsaChartData = ref([]);
-const getTsaChartData = async () => {
+const tsaLeftChartData = ref([]);
+const getTsaLeftChartData = async () => {
   try {
-    const res = await TsaApi.getChartData(vsaCurveSelected.value);
-    tsaChartData.value = res.data;
+    const res = await TsaApi.getChartData(tsaLeftCurveSelected.value);
+    tsaLeftChartData.value = res.data;
   } catch (error) {
-    console.log('getTsaChartData: error ', error);
+    console.log('getTsaLeftChartData: error ', error);
     return [];
   }
 };
 const resetTsaSelected = async () => {
-  tsaChartData.value = {};
-  tsaCurveSelected.value = [];
-  for (const key in treeSelected.value) {
-    if (key.includes('tsa')) {
-      treeSelected.value[key] = false;
-    }
+  tsaLeftChartData.value = {};
+  tsaLeftCurveSelected.value = [];
+  for (const key in tsaKeyLeftCurveSelected.value) {
+    treeSelected.value[key] = false;
+  }
+  tsaKeyLeftCurveSelected.value = [];
+};
+// ---drop TSA - 1 - right chart
+
+const tsaRightCurveSelected = ref([]);
+const tsaKeyRightCurveSelected = ref([]);
+
+const canDropRightTsa = ref(false);
+
+const onDragoverTsaRightChart = () => {
+  if (nodeDrag.value.type === 'TsaCurve' && tsaRightCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    canDropRightTsa.value = true;
+  } else {
+    canDropRightTsa.value = false;
+  }
+};
+
+const onDropTsaRightChart = async () => {
+  if (nodeDrag.value.type === 'TsaCurve' && tsaRightCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
+    tsaRightCurveSelected.value.push(nodeDrag.value.label);
+    treeSelected.value[nodeDrag.value.key] = true;
+    await getTsaRightChartData();
+    canDropRightTsa.value = false;
+    tsaKeyRightCurveSelected.value.push(nodeDrag.value.key);
+  }
+};
+const tsaRightChartData = ref([]);
+const getTsaRightChartData = async () => {
+  try {
+    const res = await TsaApi.getChartData(tsaRightCurveSelected.value);
+    tsaRightChartData.value = res.data;
+  } catch (error) {
+    console.log('gettsaRightChartData: error ', error);
+    return [];
+  }
+};
+const resetRightTsaSelected = async () => {
+  tsaRightChartData.value = {};
+  tsaRightCurveSelected.value = [];
+  for (const key in tsaKeyRightCurveSelected.value) {
+    treeSelected.value[key] = false;
+  }
+  tsaKeyRightCurveSelected.value = [];
+};
+// ---- tsa vsa type curve
+const getVsaCurveTypeValue = (curveType) => {
+  switch (curveType) {
+    case 0:
+      return 'P';
+    case 1:
+      return 'Q';
+    case 2:
+      return 'U';
+    case 3:
+      return 'I';
+    default:
+      return curveType;
+  }
+};
+const getVsaCurveTypeSeverity = (curveType) => {
+  switch (curveType) {
+    case 0:
+      return 'primary';
+    case 1:
+      return 'secondary';
+    case 2:
+      return 'info';
+    case 3:
+      return 'warning';
+    default:
+      return '';
+  }
+};
+
+const getTsaCurveTypeValue = (curveType) => {
+  switch (curveType) {
+    case 0:
+      return 'Voltage';
+    case 1:
+      return 'Frequency';
+    case 2:
+      return 'ASngle';
+    case 3:
+      return 'ActivePower';
+    case 4:
+      return 'ReactivePower';
+    case 5:
+      return 'RotorAngle';
+    case 6:
+      return 'Elect P';
+    case 7:
+      return 'Elect Q';
+    case 8:
+      return 'MechQ';
+    case 9:
+      return 'Efd';
+    default:
+      return curveType;
+  }
+};
+const getTsaCurveTypeSeverity = (curveType) => {
+  switch (curveType) {
+    case 0:
+      return 'primary';
+    case 1:
+      return 'secondary';
+    case 2:
+      return 'info';
+    case 3:
+      return 'warning';
+    case 4:
+      return 'contrast';
+    case 5:
+      return 'danger';
+    case 6:
+      return 'success';
+    case 7:
+      return 'success';
+    case 8:
+      return 'secondary';
+    case 9:
+      return 'info';
+    default:
+      return '';
   }
 };
 </script>
 <style>
+.applicationUnActive {
+  color: var(--text-color-secondary);
+}
 .p-treenode-label {
   width: 100%;
 }
