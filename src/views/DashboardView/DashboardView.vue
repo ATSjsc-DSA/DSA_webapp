@@ -85,7 +85,7 @@
     </div>
     <div class="col grid">
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropApplication }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-folder-open pr-3"></i>Application Chart</div>
@@ -96,11 +96,10 @@
             <div
               id="applicationSelected"
               class="w-full"
-              :class="{ 'border-2': canDropApplication }"
               style="height: 22rem"
               @dragleave.prevent="canDropApplication = false"
-              @dragenter.prevent="onDragenterApplicationChart"
-              @dragover.prevent
+              @dragenter.prevent
+              @dragover.prevent="onDragoverApplicationChart"
               @drop.prevent="onDropApplicationChart"
             >
               <pre>{{ applicationSelected }}</pre>
@@ -109,7 +108,7 @@
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropVsa }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>VSA Chart</div>
@@ -120,24 +119,19 @@
             <div
               id="vsaCurveSelected"
               class="w-full"
-              :class="{ 'border-2': canDropVsa }"
               style="height: 22rem"
               @dragleave.prevent="canDropVsa = false"
-              @dragenter.prevent="onDragenterVsaChart"
-              @dragover.prevent
+              @dragenter.prevent
+              @dragover.prevent="onDragOverVsaChart"
               @drop.prevent="onDropVsaChart"
             >
-              <comboChartBase
-                :chartData="vsaChartData"
-                :modificationTime="modificationVsaTime"
-                @refeshData="getVsaChartData"
-              ></comboChartBase>
+              <vsaChartWidget :data="vsaChartData" />
             </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropTsa }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>TSA - Angle Chart</div>
@@ -148,20 +142,19 @@
             <div
               id="vsaCurveChart1"
               class="w-full"
-              :class="{ 'border-2': canDropTsa }"
               style="height: 22rem"
               @dragleave.prevent="canDropTsa = false"
-              @dragenter.prevent="onDragenterTsaChart"
-              @dragover.prevent
+              @dragenter.prevent
+              @dragover.prevent="onDragoverTsaChart"
               @drop.prevent="onDropTsaChart"
             >
-              <lineChartSpecialBase ChartStabe :chartData="tsaChartData" labelChart="value" class="chart border-none" />
+              <vsaChartWidget :data="tsaChartData" />
             </div>
           </template>
         </Card>
       </div>
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropTsa }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>TSA - Power Transfer Chart</div>
@@ -171,14 +164,13 @@
             <div
               id="vsaCurveChart1"
               class="w-full"
-              :class="{ 'border-2': canDropTsa }"
               style="height: 22rem"
               @dragleave.prevent="canDropTsa = false"
-              @dragenter.prevent="onDragenterTsaChart"
-              @dragover.prevent
+              @dragenter.prevent
+              @dragover.prevent="onDragoverTsaChart"
               @drop.prevent="onDropTsaChart"
             >
-              <lineChartSpecialBase :chartData="tsaChartData" labelChart="powertranfer" class="chart border-none" />
+              <vsaChartWidget :data="tsaChartData" />
             </div>
           </template>
         </Card>
@@ -194,8 +186,7 @@ import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
 
 import mapView from '@/components/mapView.vue';
-import comboChartBase from '@/components/comboChartBase.vue';
-import lineChartSpecialBase from '@/components/lineChartSpecialBase.vue';
+import vsaChartWidget from './vsaChartWidget.vue';
 
 import { VsaApi, TsaApi } from './api';
 import { ApiApplication, ApiDsa } from '@/views/UserConfigurationView/api.js';
@@ -550,7 +541,7 @@ const onStartDragNode = (evt, node) => {
 const applicationSelected = ref([]);
 const canDropApplication = ref(false);
 
-const onDragenterApplicationChart = () => {
+const onDragoverApplicationChart = () => {
   if (nodeDrag.value.type === 'Application' && applicationSelected.value.indexOf(nodeDrag.value._id) === -1) {
     canDropApplication.value = true;
   } else {
@@ -562,6 +553,7 @@ const onDropApplicationChart = async () => {
     applicationSelected.value.push(nodeDrag.value._id);
     treeSelected.value[nodeDrag.value.key] = true;
     await getAppliactionChartData();
+    canDropApplication.value = false;
   }
 };
 
@@ -589,29 +581,27 @@ const resetApplicationSelected = async () => {
 const vsaCurveSelected = ref([]);
 const canDropVsa = ref(false);
 
-const onDragenterVsaChart = () => {
+const onDragOverVsaChart = () => {
   if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
     canDropVsa.value = true;
   } else {
     canDropVsa.value = false;
   }
 };
-
 const onDropVsaChart = async () => {
   if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
     vsaCurveSelected.value.push(nodeDrag.value.label);
     treeSelected.value[nodeDrag.value.key] = true;
     await getVsaChartData();
+    canDropVsa.value = false;
   }
 };
 
-const vsaChartData = ref({});
-const modificationVsaTime = ref(0);
+const vsaChartData = ref([]);
 const getVsaChartData = async () => {
   try {
     const res = await VsaApi.getChartData(vsaCurveSelected.value);
     vsaChartData.value = res.data;
-    modificationVsaTime.value = new Date().getTime();
   } catch (error) {
     console.log('getVsaChartData: error ', error);
     return [];
@@ -630,7 +620,7 @@ const resetVsaSelected = async () => {
 // ---drop TSA
 const tsaCurveSelected = ref([]);
 const canDropTsa = ref(false);
-const onDragenterTsaChart = () => {
+const onDragoverTsaChart = () => {
   if (nodeDrag.value.type === 'TsaCurve' && tsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
     canDropTsa.value = true;
   } else {
@@ -643,9 +633,10 @@ const onDropTsaChart = async () => {
     tsaCurveSelected.value.push(nodeDrag.value.label);
     treeSelected.value[nodeDrag.value.key] = true;
     await getTsaChartData();
+    canDropTsa.value = false;
   }
 };
-const tsaChartData = ref({});
+const tsaChartData = ref([]);
 const getTsaChartData = async () => {
   try {
     const res = await TsaApi.getChartData(vsaCurveSelected.value);

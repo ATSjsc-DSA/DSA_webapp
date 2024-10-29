@@ -5,7 +5,7 @@ const menuMode = localStorage.getItem('menuMode') ? localStorage.getItem('menuMo
 const layoutConfig = reactive({
   ripple: true,
   darkTheme: DarkMode,
-  inputStyle: 'outlined',
+  inputStyle: 'overlay',
   menuMode: menuMode,
   theme: theme,
   scale: 14,
