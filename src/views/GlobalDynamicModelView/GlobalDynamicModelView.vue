@@ -1,11 +1,7 @@
 <template>
   <div class="card layout-content m-4">
     <Toast />
-    <div class="flex justify-content-between align-items-center flex-wrap 2xl:flex-nowrap">
-      <div class="flex justify-content-start align-items-center gap-2">
-        <Button label="Global Dynamic Model Definition" class="" :text="tabActice !== 0" @click="tabActice = 0" />
-        <Button label="Global Dynamic Model Mapping" class="" :text="tabActice !== 1" @click="tabActice = 1" />
-      </div>
+    <div class="flex justify-content-end align-items-center flex-wrap 2xl:flex-nowrap">
       <button
         v-tooltip.bottom="'Global Definition'"
         class="p-link layout-topbar-button"
@@ -17,221 +13,81 @@
     </div>
     <Divider />
 
-    <TabView id="tab-view" v-model:activeIndex="tabActice" class="flex-grow-1">
-      <TabPanel>
-        <DataTable id="globalDynamicModelDefinition" :value="dynamicDefinition" :loading="isLoadingDynamicData">
-          <template #header>
-            <div class="flex justify-content-end gap-3">
-              <Button
-                type="button"
-                label="Import"
-                icon="pi pi-upload"
-                severity="secondary"
-                @click="handleImportDefinitionFile()"
-              />
-              <Button
-                type="button"
-                label="Export"
-                icon="pi pi-download"
-                severity="secondary"
-                @click="handleExportDefinitionFile()"
-              />
-              <Divider layout="vertical" />
-              <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicDefinition" />
-            </div>
-          </template>
-
-          <Column field="name" header="Name" sortable style="width: 15rem"></Column>
-          <Column field="modelType" header="Type">
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                <Tag :value="data.modelType" :severity="getSeverityModelType(data.modelType)" />
-              </div>
-            </template>
-          </Column>
-          <Column style="width: 50%">
-            <template #header>
-              <div
-                class="flex justify-content-start w-full gap-3 align-items-center"
-                @click="isGroupedValueByFirstLetter = !isGroupedValueByFirstLetter"
-              >
-                <div>Values</div>
-                <!-- <div>
-                  <Button
-                    type="button"
-                    :icon="isGroupedValueByFirstLetter ? 'pi pi-sort-alt-slash' : 'pi pi-sort-alpha-down'"
-                    :severity="isGroupedValueByFirstLetter ? 'secondary' : 'primary'"
-                    text
-                  />
-                </div> -->
-              </div>
-            </template>
-
-            <template #body="{ data }">
-              <!-- <template v-if="isGroupedValueByFirstLetter">
-                <div
-                  v-for="(letterArr, key, index) in groupedByFirstLetter(data.values)"
-                  :key="key"
-                  class="py-2 m-1 border-round-sm"
-                  :style="{ backgroundColor: index % 2 === 0 ? 'var(--surface-50)' : 'var(--surface-0)' }"
-                >
-                  {{ letterArr.join(', ') }}
-                </div>
-              </template> -->
-              <!-- <template> -->
-              <div class="flex flex-wrap">
-                <div
-                  v-for="(val, index) in data.values"
-                  :key="val"
-                  class="px-2 m-1 border-round-sm"
-                  :style="{ backgroundColor: index % 2 === 0 ? 'var(--surface-50)' : 'var(--surface-0)' }"
-                >
-                  {{ val }}
-                </div>
-              </div>
-              <!-- </template> -->
-            </template>
-          </Column>
-
-          <Column field="createdTimestamp" header="Created At" sortable>
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                {{ convertDateTimeToString(data.createdTimestamp) }}
-              </div>
-            </template>
-          </Column>
-          <Column field="modifiedTimestamp" header="Modified At" sortable>
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                {{ convertDateTimeToString(data.modifiedTimestamp) }}
-              </div>
-            </template>
-          </Column>
-
-          <Column style="width: 1%; min-width: 5rem">
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                <Button
-                  icon="pi pi-pencil"
-                  severity="success"
-                  text
-                  rounded
-                  @click="handleUpdateDynamicDefinition(data)"
-                />
-
-                <Button
-                  icon="pi pi-trash"
-                  severity="danger"
-                  text
-                  rounded
-                  @click="confirmDeleteDynamic(data, 'definition')"
-                />
-              </div>
-            </template>
-          </Column>
-        </DataTable>
-        <div class="flex justify-content-end align-items-center mt-3">
-          <Paginator
-            v-if="definitionTotal > pageRowNumber"
-            v-model:first="definitionPaginatorOffset"
-            class="flex-grow-1"
-            :rows="pageRowNumber"
-            :totalRecords="definitionTotal"
-            :page="definitionCurrentPage"
-            @page="onDefinitionPageChange"
-          ></Paginator>
-          <div class="mr-3">Total: {{ definitionTotal }}</div>
+    <DataTable id="globalDynamicModelDefinition" :value="dynamicDefinition" :loading="isLoadingDynamicData">
+      <template #header>
+        <div class="flex justify-content-end gap-3">
+          <Button
+            type="button"
+            label="Import"
+            icon="pi pi-upload"
+            severity="secondary"
+            @click="handleImportDefinitionFile()"
+          />
+          <Button
+            type="button"
+            label="Export"
+            icon="pi pi-download"
+            severity="secondary"
+            @click="handleExportDefinitionFile()"
+          />
+          <Divider layout="vertical" />
+          <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicDefinition" />
         </div>
-      </TabPanel>
+      </template>
 
-      <TabPanel>
-        <DataTable
-          :value="mappingData"
-          tableStyle="min-width: 50rem"
-          scrollable
-          scrollHeight="50rem"
-          :loading="isLoadingmappingData"
-        >
-          <template #header>
-            <div class="flex justify-content-end gap-3">
-              <Button
-                type="button"
-                label="Import"
-                icon="pi pi-upload"
-                severity="secondary"
-                @click="handleImportMappingFile"
-              />
-              <Button
-                type="button"
-                label="Export"
-                icon="pi pi-download"
-                severity="secondary"
-                @click="handleExportMappingFile()"
-              />
-              <Divider layout="vertical" />
-              <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreateDynamicMapping" />
-            </div>
-          </template>
+      <Column field="name" header="Name" sortable></Column>
+      <Column field="digsName" header="Digs Name" sortable></Column>
+      <Column field="modelType" header="Type">
+        <template #body="{ data }">
+          <div class="flex justify-content-between">
+            <Tag :value="data.modelType" :severity="getSeverityModelType(data.modelType)" />
+          </div>
+        </template>
+      </Column>
 
-          <Column field="globalDynamicModelDefinitionName" header=" Dynamic Definition">
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                <Chip :label="data.globalDynamicModelDefinitionName"></Chip>
-              </div>
-            </template>
-          </Column>
-          <Column header="Values">
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                {{ data.mapOrder ? data.mapOrder.join(', ') : '' }}
-              </div>
-            </template>
-          </Column>
+      <Column field="createdTimestamp" header="Created At" sortable>
+        <template #body="{ data }">
+          <div class="flex justify-content-between">
+            {{ convertDateTimeToString(data.createdTimestamp) }}
+          </div>
+        </template>
+      </Column>
+      <Column field="modifiedTimestamp" header="Modified At" sortable>
+        <template #body="{ data }">
+          <div class="flex justify-content-between">
+            {{ convertDateTimeToString(data.modifiedTimestamp) }}
+          </div>
+        </template>
+      </Column>
 
-          <Column field="createdTimestamp" header="Created At" sortable>
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                {{ convertDateTimeToString(data.createdTimestamp) }}
-              </div>
-            </template>
-          </Column>
-          <Column field="modifiedTimestamp" header="Modified At" sortable>
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                {{ convertDateTimeToString(data.modifiedTimestamp) }}
-              </div>
-            </template>
-          </Column>
-          <Column style="width: 1%; min-width: 5rem">
-            <template #body="{ data }">
-              <div class="flex justify-content-between">
-                <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdateDynamicMapping(data)" />
+      <Column style="width: 1%; min-width: 5rem">
+        <template #body="{ data }">
+          <div class="flex justify-content-between">
+            <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdateDynamicDefinition(data)" />
 
-                <Button
-                  icon="pi pi-trash"
-                  severity="danger"
-                  text
-                  rounded
-                  @click="confirmDeleteDynamic(data, 'mapping')"
-                />
-              </div>
-            </template>
-          </Column>
-        </DataTable>
-        <div class="flex justify-content-end align-items-center mt-3">
-          <Paginator
-            v-if="mappingTotal > pageRowNumber"
-            v-model:first="mappingPaginatorOffset"
-            class="flex-grow-1"
-            :rows="pageRowNumber"
-            :totalRecords="mappingTotal"
-            :page="mappingCurrentPage"
-            @page="onMappingPageChange"
-          ></Paginator>
-          <div class="mr-3">Total: {{ mappingTotal }}</div>
-        </div>
-      </TabPanel>
-    </TabView>
+            <Button
+              icon="pi pi-trash"
+              severity="danger"
+              text
+              rounded
+              @click="confirmDeleteDynamic(data, 'definition')"
+            />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+    <div class="flex justify-content-end align-items-center mt-3">
+      <Paginator
+        v-if="definitionTotal > pageRowNumber"
+        v-model:first="definitionPaginatorOffset"
+        class="flex-grow-1"
+        :rows="pageRowNumber"
+        :totalRecords="definitionTotal"
+        :page="definitionCurrentPage"
+        @page="onDefinitionPageChange"
+      ></Paginator>
+      <div class="mr-3">Total: {{ definitionTotal }}</div>
+    </div>
   </div>
 
   <!-- dynamicDefinition - create/Update dialog -->
@@ -746,7 +602,7 @@ const handleExportMappingFile = async () => {
     // Tạo một thẻ <a> để thực hiện việc tải file
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = 'export.csv'; // Tên file tải về
+    link.download = 'export_dynamic_model_definition.csv';
     document.body.appendChild(link);
     link.click();
 
@@ -771,7 +627,7 @@ const onGlobalDefinitionView = () => {
 }
 
 #globalDynamicModelDefinition tbody tr {
-  height: 3.1rem;
+  height: 4.5rem;
 }
 .globalDynamicModelDefinitionDataAutocomplete,
 .p-autocomplete-input {
