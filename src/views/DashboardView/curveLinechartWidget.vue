@@ -9,7 +9,7 @@ import { watch } from 'vue';
 const props = defineProps({
   data: {
     type: Array,
-    default: () => {},
+    default: () => [],
   },
 });
 onMounted(() => {

@@ -4,6 +4,12 @@ import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { hmiTaskId } = storeToRefs(commonStore);
 
+export class ApplicationApi {
+  static async getChartData(appId = '') {
+    return get(`/hmi/task/${hmiTaskId.value}/app/${appId}`);
+  }
+}
+
 export class VsaApi {
   /* 
   vsa Tree 

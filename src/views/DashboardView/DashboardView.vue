@@ -104,7 +104,7 @@
         </Card>
       </div>
     </div>
-    <div class="col grid">
+    <div class="col-6 grid">
       <div class="col-6">
         <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropApplication }">
           <template #title>
@@ -123,7 +123,7 @@
               @dragover.prevent="onDragoverApplicationChart"
               @drop.prevent="onDropApplicationChart"
             >
-              <pre>{{ applicationSelected }}</pre>
+              <appBarchartWidget :data="applicationChartData" />
             </div>
           </template>
         </Card>
@@ -146,7 +146,7 @@
               @dragover.prevent="onDragOverVsaChart"
               @drop.prevent="onDropVsaChart"
             >
-              <vsaChartWidget :data="vsaChartData" />
+              <curveLinechartWidget :data="vsaChartData" />
             </div>
           </template>
         </Card>
@@ -169,7 +169,7 @@
               @dragover.prevent="onDragoverTsaLeftChart"
               @drop.prevent="onDropTsaLeftChart"
             >
-              <vsaChartWidget :data="tsaLeftChartData" />
+              <curveLinechartWidget :data="tsaLeftChartData" />
             </div>
           </template>
         </Card>
@@ -191,7 +191,7 @@
               @dragover.prevent="onDragoverTsaRightChart"
               @drop.prevent="onDropTsaRightChart"
             >
-              <vsaChartWidget :data="tsaRightChartData" />
+              <curveLinechartWidget :data="tsaRightChartData" />
             </div>
           </template>
         </Card>
@@ -207,9 +207,9 @@ import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
 
 import mapView from '@/components/mapView.vue';
-import vsaChartWidget from './vsaChartWidget.vue';
-
-import { VsaApi, TsaApi } from './api';
+import curveLinechartWidget from './curveLinechartWidget.vue';
+import appBarchartWidget from './appBarchartWidget.vue';
+import { VsaApi, TsaApi, ApplicationApi as ApplicationHmiApi } from './api';
 import { ApiApplication, ApiDsa } from '@/views/UserConfigurationView/api.js';
 
 onMounted(async () => {
@@ -562,44 +562,43 @@ const onStartDragNode = (evt, node) => {
 };
 
 //  Drop Application
-const applicationSelected = ref([]);
+const applicationSelected = ref();
+const applicationKeySelected = ref();
 const canDropApplication = ref(false);
 
 const onDragoverApplicationChart = () => {
-  if (nodeDrag.value.type === 'Application' && applicationSelected.value.indexOf(nodeDrag.value._id) === -1) {
+  if (nodeDrag.value.type === 'Application' && applicationSelected.value !== nodeDrag.value._id) {
     canDropApplication.value = true;
   } else {
     canDropApplication.value = false;
   }
 };
 const onDropApplicationChart = async () => {
-  if (nodeDrag.value.type === 'Application' && applicationSelected.value.indexOf(nodeDrag.value._id) === -1) {
-    applicationSelected.value.push(nodeDrag.value._id);
+  if (nodeDrag.value.type === 'Application' && applicationSelected.value !== nodeDrag.value._id) {
+    resetApplicationSelected();
+    applicationSelected.value = nodeDrag.value._id;
+    applicationKeySelected.value = nodeDrag.value.key;
     treeSelected.value[nodeDrag.value.key] = true;
     await getAppliactionChartData();
     canDropApplication.value = false;
   }
 };
 
-const applicationChartData = ref({});
+const applicationChartData = ref([]);
 const getAppliactionChartData = async () => {
   try {
-    const res = await VsaApi.getChartData(vsaCurveSelected.value);
-    vsaChartData.value = res.data;
+    const res = await ApplicationHmiApi.getChartData(applicationSelected.value);
+    applicationChartData.value = res.data;
   } catch (error) {
     console.log('getVsaChartData: error ', error);
     return [];
   }
 };
 
-const resetApplicationSelected = async () => {
+const resetApplicationSelected = () => {
   applicationChartData.value = {};
-  applicationSelected.value = [];
-  for (const key in treeSelected.value) {
-    if (key.includes('app')) {
-      treeSelected.value[key] = false;
-    }
-  }
+  applicationSelected.value = undefined;
+  treeSelected.value[applicationKeySelected.value] = false;
 };
 // Drop VSA
 const vsaCurveSelected = ref([]);
