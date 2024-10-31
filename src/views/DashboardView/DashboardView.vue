@@ -6,7 +6,18 @@
     <div class="col-3 h-full">
       <div class="flex flex-column gap-3 h-full">
         <Card class="flex-grow-1 w-full">
-          <template #title><i class="pi pi-credit-card pr-3"></i>Project</template>
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <div><i class="pi pi-credit-card pr-3"></i>Project</div>
+              <Button
+                title="Collapse All"
+                icon="pi pi-chevron-up "
+                severity="secondary"
+                text
+                @click="treeExpandedKeys = {}"
+              />
+            </div>
+          </template>
           <template #content>
             <ScrollPanel style="width: 100%; height: 52rem">
               <Tree
@@ -110,7 +121,22 @@
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-folder-open pr-3"></i>Application Chart</div>
-              <Button icon="pi pi-refresh " severity="secondary" text @click="resetApplicationSelected" />
+              <div>
+                <Button
+                  icon="pi pi-trash "
+                  title="Reset Data"
+                  severity="danger"
+                  text
+                  @click="resetApplicationSelected"
+                />
+                <Button
+                  icon="pi pi-refresh "
+                  title="Refresh chart"
+                  severity="secondary"
+                  text
+                  @click="getAppliactionChartData"
+                />
+              </div>
             </div>
           </template>
           <template #content>
@@ -133,7 +159,16 @@
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>VSA Chart</div>
-              <Button icon="pi pi-refresh " severity="secondary" text @click="resetVsaSelected" />
+              <div>
+                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetVsaSelected" />
+                <Button
+                  icon="pi pi-refresh "
+                  title="Refresh chart"
+                  severity="secondary"
+                  text
+                  @click="getVsaChartData"
+                />
+              </div>
             </div>
           </template>
           <template #content>
@@ -156,7 +191,16 @@
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
-              <Button icon="pi pi-refresh " severity="secondary" text @click="resetTsaSelected" />
+              <div>
+                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetLeftTsaSelected" />
+                <Button
+                  icon="pi pi-refresh "
+                  title="Refresh chart"
+                  severity="secondary"
+                  text
+                  @click="getTsaLeftChartData"
+                />
+              </div>
             </div>
           </template>
           <template #content>
@@ -179,8 +223,18 @@
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
-              <Button icon="pi pi-refresh " severity="secondary" text @click="resetRightTsaSelected" /></div
-          ></template>
+              <div>
+                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetLeftTsaSelected" />
+                <Button
+                  icon="pi pi-refresh "
+                  title="Refresh chart"
+                  severity="secondary"
+                  text
+                  @click="getTsaRightChartData"
+                />
+              </div>
+            </div>
+          </template>
           <template #content>
             <div
               id="vsaCurveChart1"
@@ -591,12 +645,12 @@ const getAppliactionChartData = async () => {
     applicationChartData.value = res.data;
   } catch (error) {
     console.log('getVsaChartData: error ', error);
-    return [];
+    applicationChartData.value = [];
   }
 };
 
 const resetApplicationSelected = () => {
-  applicationChartData.value = {};
+  applicationChartData.value = [];
   applicationSelected.value = undefined;
   treeSelected.value[applicationKeySelected.value] = false;
 };
@@ -627,12 +681,12 @@ const getVsaChartData = async () => {
     vsaChartData.value = res.data;
   } catch (error) {
     console.log('getVsaChartData: error ', error);
-    return [];
+    vsaChartData.value = [];
   }
 };
 
 const resetVsaSelected = async () => {
-  vsaChartData.value = {};
+  vsaChartData.value = [];
   vsaCurveSelected.value = [];
   for (const key in treeSelected.value) {
     if (key.includes('vsa')) {
@@ -669,11 +723,11 @@ const getTsaLeftChartData = async () => {
     tsaLeftChartData.value = res.data;
   } catch (error) {
     console.log('getTsaLeftChartData: error ', error);
-    return [];
+    tsaLeftChartData.value = [];
   }
 };
-const resetTsaSelected = async () => {
-  tsaLeftChartData.value = {};
+const resetLeftTsaSelected = async () => {
+  tsaLeftChartData.value = [];
   tsaLeftCurveSelected.value = [];
   for (const key in tsaKeyLeftCurveSelected.value) {
     treeSelected.value[key] = false;
@@ -711,11 +765,11 @@ const getTsaRightChartData = async () => {
     tsaRightChartData.value = res.data;
   } catch (error) {
     console.log('gettsaRightChartData: error ', error);
-    return [];
+    tsaRightChartData.value = [];
   }
 };
 const resetRightTsaSelected = async () => {
-  tsaRightChartData.value = {};
+  tsaRightChartData.value = [];
   tsaRightCurveSelected.value = [];
   for (const key in tsaKeyRightCurveSelected.value) {
     treeSelected.value[key] = false;

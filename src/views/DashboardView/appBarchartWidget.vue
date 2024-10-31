@@ -24,7 +24,10 @@
 <script setup>
 import Chart from 'primevue/chart';
 import { watch } from 'vue';
-
+import chartComposable from '@/combosables/chartData';
+const { zoomOptions, convertDateTimeToString } = chartComposable();
+import { useLayout } from '@/layout/composables/layout';
+const { isDarkTheme } = useLayout();
 const props = defineProps({
   data: {
     type: Array,
@@ -37,14 +40,18 @@ onMounted(() => {
 });
 watch(
   () => props.data,
-  (newValue, oldValue) => {
-    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      chartData.value = setChartData();
-      chartOptions.value = setChartOptions();
-    }
+  () => {
+    chartData.value = setChartData();
+    chartOptions.value = setChartOptions();
   },
 );
-
+watch(
+  isDarkTheme,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+  { immediate: false },
+);
 const chartData = ref();
 const chartOptions = ref();
 
@@ -84,6 +91,8 @@ const setChartData = () => {
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
     // vsa / tsa data F
     const moduleData = props.data[moduleIndex];
+    labels.push(moduleData.name);
+
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2']);
     onlineRate3Data.push(moduleData.online['rateCritical3']);
@@ -155,20 +164,25 @@ const setChartData = () => {
       stack: 'Stack Current',
     },
   ];
-
+  console.log('labels', labels);
+  console.table(datasets);
   return { datasets: datasets, labels: labels };
 };
 
 const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
-  const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
   return {
+    animation: false,
+    barThickness: 20,
+    stacked: true,
+    barThickness: 20,
     maintainAspectRatio: false,
     aspectRatio: 0.6,
     plugins: {
+      zoom: zoomOptions(),
       tooltip: {
         mode: 'x',
         position: 'average',
@@ -187,6 +201,11 @@ const setChartOptions = () => {
         stacked: true,
         ticks: {
           color: textColorSecondary,
+          autoSkip: true, // Cho phép Chart.js tự động bỏ qua nhãn để giảm độ phân giải
+          maxTicksLimit: 5, // Số lượng tối đa các nhãn trục x được hiển thị'
+          font: {
+            size: 9,
+          },
         },
         grid: {
           color: surfaceBorder,
@@ -194,6 +213,9 @@ const setChartOptions = () => {
       },
       y: {
         stacked: true,
+        type: 'linear',
+        display: true,
+        position: 'left',
         ticks: {
           color: textColorSecondary,
         },

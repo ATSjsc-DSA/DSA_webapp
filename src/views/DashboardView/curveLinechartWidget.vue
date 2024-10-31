@@ -3,9 +3,14 @@
 </template>
 
 <script setup>
+import { watch } from 'vue';
+
 import Chart from 'primevue/chart';
 import { colorArray } from './chartConfig';
-import { watch } from 'vue';
+import chartComposable from '@/combosables/chartData';
+
+const { zoomOptions } = chartComposable();
+
 const props = defineProps({
   data: {
     type: Array,
@@ -18,11 +23,9 @@ onMounted(() => {
 });
 watch(
   () => props.data,
-  (newValue, oldValue) => {
-    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      chartData.value = setChartData();
-      chartOptions.value = setChartOptions();
-    }
+  () => {
+    chartData.value = setChartData();
+    chartOptions.value = setChartOptions();
   },
 );
 
@@ -42,7 +45,7 @@ const setChartData = () => {
             curve_name_1: [list of y],
             curve_name_2: [list of y],
             curve_name_3: [list of y],
-            ... 
+            ...
         }
    }
   ]
@@ -81,25 +84,64 @@ const setChartOptions = () => {
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
   return {
+    animation: false,
+    stacked: true,
     maintainAspectRatio: false,
     aspectRatio: 0.6,
     plugins: {
+      zoom: zoomOptions(),
       legend: {
         labels: {
+          usePointStyle: true,
           color: textColor,
+          font: {
+            size: 8,
+          },
+          padding: 12,
         },
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'xy',
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: 'xy',
+        },
+      },
+      tooltip: {
+        enabled: true,
+        position: 'nearest', // Chỉ hiển thị tooltip cho điểm gần nhất với con trỏ chuột
+        intersect: false,
       },
     },
     scales: {
       x: {
+        type: 'linear',
+        display: true,
         ticks: {
           color: textColorSecondary,
+          x: {
+            ticks: {
+              autoSkip: true,
+              maxTicksLimit: 5,
+            },
+          },
         },
         grid: {
           color: surfaceBorder,
         },
       },
       y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
         ticks: {
           color: textColorSecondary,
         },
