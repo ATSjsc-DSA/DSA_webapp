@@ -9,7 +9,7 @@ import Chart from 'primevue/chart';
 import { colorArray } from './chartConfig';
 import chartComposable from '@/combosables/chartData';
 
-const { zoomOptions } = chartComposable();
+const { zoomOptions, nodataAnnotationOption } = chartComposable();
 
 const props = defineProps({
   data: {
@@ -70,6 +70,7 @@ const setChartData = () => {
         fill: false,
         borderColor: documentStyle.getPropertyValue(colorArray[colorIndex]),
         tension: 0.4,
+        pointRadius: 1,
       });
       colorIndex++;
     }
@@ -120,6 +121,7 @@ const setChartOptions = () => {
         position: 'nearest', // Chỉ hiển thị tooltip cho điểm gần nhất với con trỏ chuột
         intersect: false,
       },
+      annotation: props.data.length === 0 ? nodataAnnotationOption(textColorSecondary) : {},
     },
     scales: {
       x: {

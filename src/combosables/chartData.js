@@ -78,11 +78,28 @@ const chartComposable = () => {
       return 'None';
     }
   };
+  const nodataAnnotationOption = (textcolor) => {
+    return {
+      annotations: {
+        label1: {
+          type: 'label',
+          position: 'center',
+          backgroundColor: 'transparent ',
+          color: textcolor,
+          content: ['No data'],
+          font: {
+            size: 12,
+          },
+        },
+      },
+    };
+  };
   return {
     getDataSub,
     zoomOptions,
     convertDateTimeToString,
     fetchChartData,
+    nodataAnnotationOption,
   };
 };
 export default chartComposable;

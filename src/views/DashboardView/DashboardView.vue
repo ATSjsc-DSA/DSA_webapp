@@ -32,6 +32,12 @@
                 @node-expand="onNodeExpand"
                 @node-select="onNodeSelect"
               >
+                <template #default="slotProps">
+                  <div :class="{ textUnActive: !slotProps.node.active }">
+                    {{ slotProps.node.label }}
+                  </div>
+                </template>
+
                 <template #Application="slotProps">
                   <div
                     :id="slotProps.node.key"
@@ -40,13 +46,13 @@
                     style="cursor: -webkit-grab; cursor: grab"
                     @dragstart="onStartDragNode($event, slotProps.node)"
                   >
-                    <div class="font-bold text-lg" :class="{ applicationUnActive: !slotProps.node.active }">
+                    <div class="font-bold text-lg" :class="{ textUnActive: !slotProps.node.active }">
                       {{ slotProps.node.label }}
                     </div>
                   </div>
                 </template>
                 <template #DSA="slotProps">
-                  <div class="font-semibold">
+                  <div class="font-semibold" :class="{ textUnActive: !slotProps.node.active }">
                     {{ slotProps.node.label }}
                   </div>
                 </template>
@@ -54,7 +60,7 @@
                 <template #VSA="slotProps">
                   <div class="w-full flex align-items-center justify-content-start gap-3">
                     <Tag value="VSA" severity="success" rounded />
-                    <div>
+                    <div :class="{ textUnActive: !slotProps.node.active }">
                       {{ slotProps.node.label }}
                     </div>
                   </div>
@@ -63,14 +69,14 @@
                 <template #TSA="slotProps">
                   <div class="w-full flex align-items-center justify-content-start gap-3">
                     <Tag value="TSA" severity="secondary" rounded />
-                    <div>
+                    <div :class="{ textUnActive: !slotProps.node.active }">
                       {{ slotProps.node.label }}
                     </div>
                   </div>
                 </template>
 
                 <template #Case="slotProps">
-                  <div class="w-full">
+                  <div class="w-full" :class="{ textUnActive: !slotProps.node.active }">
                     {{ slotProps.node.label }}
                   </div>
                 </template>
@@ -224,7 +230,7 @@
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
               <div>
-                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetLeftTsaSelected" />
+                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetRightTsaSelected" />
                 <Button
                   icon="pi pi-refresh "
                   title="Refresh chart"
@@ -369,6 +375,7 @@ const getDsaModuleBranchData = async (appNode) => {
         type: 'DSA',
         icon: 'pi pi-th-large',
         leaf: false,
+        active: leafData.active,
       });
     }
   }
@@ -402,6 +409,7 @@ const getVsaBranchData = async (dsaModuleNode) => {
         type: 'VSA',
         icon: 'pi pi-clone',
         leaf: false,
+        active: leafData.active,
       });
     }
   }
@@ -431,6 +439,7 @@ const getVsaCaseBranchData = async (vsaNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'VsaCase',
+        active: leafData.active,
         icon: 'pi pi-list',
         leaf: false,
       });
@@ -463,7 +472,7 @@ const getVsaCurveBranchData = async (caseNode) => {
         _id: leafData._id,
         type: 'VsaCurve',
         curveType: leafData.curveType,
-
+        active: leafData.active,
         leaf: true,
       });
     }
@@ -496,6 +505,7 @@ const getTsaBranchData = async (dsaModuleNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'TSA',
+        active: leafData.active,
         icon: 'pi pi-clone',
         leaf: false,
       });
@@ -527,6 +537,7 @@ const getTsaCaseBranchData = async (tsaNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'TsaCase',
+        active: leafData.active,
         icon: 'pi pi-list',
         leaf: false,
       });
@@ -557,6 +568,7 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'TsaSubCase',
+        active: leafData.active,
         icon: 'pi pi-file',
         leaf: false,
       });
@@ -642,7 +654,7 @@ const applicationChartData = ref([]);
 const getAppliactionChartData = async () => {
   try {
     const res = await ApplicationHmiApi.getChartData(applicationSelected.value);
-    applicationChartData.value = res.data;
+    applicationChartData.value = res.data || [];
   } catch (error) {
     console.log('getVsaChartData: error ', error);
     applicationChartData.value = [];
@@ -778,6 +790,9 @@ const resetRightTsaSelected = async () => {
 };
 // ---- tsa vsa type curve
 const getVsaCurveTypeValue = (curveType) => {
+  if (!curveType) {
+    return '';
+  }
   switch (curveType) {
     case 0:
       return 'P';
@@ -792,6 +807,9 @@ const getVsaCurveTypeValue = (curveType) => {
   }
 };
 const getVsaCurveTypeSeverity = (curveType) => {
+  if (!curveType) {
+    return '';
+  }
   switch (curveType) {
     case 0:
       return 'primary';
@@ -807,6 +825,9 @@ const getVsaCurveTypeSeverity = (curveType) => {
 };
 
 const getTsaCurveTypeValue = (curveType) => {
+  if (!curveType) {
+    return '';
+  }
   switch (curveType) {
     case 0:
       return 'Voltage';
@@ -833,6 +854,9 @@ const getTsaCurveTypeValue = (curveType) => {
   }
 };
 const getTsaCurveTypeSeverity = (curveType) => {
+  if (!curveType) {
+    return '';
+  }
   switch (curveType) {
     case 0:
       return 'primary';
@@ -860,8 +884,8 @@ const getTsaCurveTypeSeverity = (curveType) => {
 };
 </script>
 <style>
-.applicationUnActive {
-  color: var(--text-color-secondary);
+.textUnActive {
+  color: var(--surface-500);
 }
 .p-treenode-label {
   width: 100%;

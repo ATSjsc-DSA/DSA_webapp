@@ -25,7 +25,7 @@
 import Chart from 'primevue/chart';
 import { watch } from 'vue';
 import chartComposable from '@/combosables/chartData';
-const { zoomOptions, convertDateTimeToString } = chartComposable();
+const { zoomOptions, nodataAnnotationOption } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
 const { isDarkTheme } = useLayout();
 const props = defineProps({
@@ -164,8 +164,6 @@ const setChartData = () => {
       stack: 'Stack Current',
     },
   ];
-  console.log('labels', labels);
-  console.table(datasets);
   return { datasets: datasets, labels: labels };
 };
 
@@ -188,13 +186,14 @@ const setChartOptions = () => {
         position: 'average',
         callbacks: {
           title: function (tooltipItems) {
-            return `${tooltipItems[0].dataset.datalabels}`;
+            return `${tooltipItems[0].label} - ${tooltipItems[0].dataset.datalabels}`;
           },
         },
       },
       legend: {
         display: false,
       },
+      annotation: props.data.length === 0 ? nodataAnnotationOption(textColorSecondary) : {},
     },
     scales: {
       x: {
@@ -204,7 +203,7 @@ const setChartOptions = () => {
           autoSkip: true, // Cho phép Chart.js tự động bỏ qua nhãn để giảm độ phân giải
           maxTicksLimit: 5, // Số lượng tối đa các nhãn trục x được hiển thị'
           font: {
-            size: 9,
+            size: 7,
           },
         },
         grid: {

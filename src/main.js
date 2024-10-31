@@ -18,8 +18,11 @@ import '@/assets/styles.scss';
 import { Chart } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import 'chart.js/auto';
+import annotationPlugin from 'chartjs-plugin-annotation';
 
 Chart.register(zoomPlugin);
+Chart.register(annotationPlugin);
+
 const app = createApp(App);
 // app.component('ConfirmDialog', ConfirmDialog);
 app.component('Toast', Toast);
