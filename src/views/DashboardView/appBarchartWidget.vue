@@ -1,21 +1,9 @@
 <template>
   <div class="flex flex-column h-full">
-    <div>
-      <div class="flex align-items-center justify-content-start gap-3 mb-1">
-        <div class="font-semibold text-primary-500">Online:</div>
-        <div class="px-2 py-1 legend-rounded text-sm bg-primary-400">Rate Critical 1</div>
-        <div class="px-2 py-1 legend-rounded text-sm bg-primary-300">Rate Critical 2</div>
-        <div class="px-2 py-1 legend-rounded text-sm bg-primary-200">Rate Critical 3</div>
-      </div>
-      <div class="flex align-items-center justify-content-start gap-3 mb-1">
-        <div class="font-semibold text-gray-500">Offline:</div>
-        <div class="px-2 py-1 legend-rounded text-sm bg-gray-400">Rate Critical 1</div>
-        <div class="px-2 py-1 legend-rounded text-sm bg-gray-300">Rate Critical 2</div>
-        <div class="px-2 py-1 legend-rounded text-sm bg-gray-200">Rate Critical 3</div>
-      </div>
-      <div class="flex align-items-center justify-content-start gap-3 mb-1">
-        <div class="px-2 py-1 legend-rounded text-sm bg-orange-400">Current</div>
-      </div>
+    <div class="flex align-items-center justify-content-center gap-3 mb-1">
+      <div class="px-2 py-1 legend-rounded text-sm bg-primary-500">Online</div>
+      <div class="px-2 py-1 legend-rounded text-sm bg-gray-500">Offline</div>
+      <div class="px-2 py-1 legend-rounded text-sm bg-orange-500">Current</div>
     </div>
     <Chart type="line" :data="chartData" :options="chartOptions" class="flex-grow-1" />
   </div>

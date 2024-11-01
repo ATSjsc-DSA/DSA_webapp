@@ -41,9 +41,9 @@
                 <template #Application="slotProps">
                   <div
                     :id="slotProps.node.key"
-                    draggable="true"
+                    :draggable="applicationDraggable"
                     class="w-full flex align-items-center justify-content-between"
-                    style="cursor: -webkit-grab; cursor: grab"
+                    :class="{ 'cursor-grap': applicationDraggable }"
                     @dragstart="onStartDragNode($event, slotProps.node)"
                   >
                     <div class="font-bold text-lg" :class="{ textUnActive: !slotProps.node.active }">
@@ -94,9 +94,9 @@
                 <template #VsaCurve="slotProps">
                   <div
                     :id="slotProps.node.key"
-                    draggable="true"
+                    :draggable="vsaCurveDraggable"
                     class="w-full flex align-items-center justify-content-start"
-                    style="cursor: -webkit-grab; cursor: grab"
+                    :class="{ 'cursor-grap': vsaCurveDraggable }"
                     @dragstart="onStartDragNode($event, slotProps.node)"
                   >
                     <Tag
@@ -111,9 +111,9 @@
                 <template #TsaCurve="slotProps">
                   <div
                     :id="slotProps.node.key"
-                    draggable="true"
+                    :draggable="tsaCurveDraggable"
                     class="w-full flex align-items-center justify-content-start"
-                    style="cursor: -webkit-grab; cursor: grab"
+                    :class="{ 'cursor-grap': tsaCurveDraggable }"
                     @dragstart="onStartDragNode($event, slotProps.node)"
                   >
                     <Tag
@@ -131,9 +131,89 @@
         </Card>
       </div>
     </div>
-    <div class="col-6 grid">
+    <div class="col-6">
+      <div class="w-full h-full flex gap-3">
+        <div
+          class="w-full h-full"
+          :class="{ 'border-2': chartComponentArr.length === 0 }"
+          @dragleave.prevent="canDropChartComponent = false"
+          @dragenter.prevent
+          @dragover.prevent="dragOverChartComponent"
+          @drop.prevent="onDropChartComponent"
+        >
+          <div ref="grid" class="grid-stack bg-blue-100"></div>
+
+          <div
+            v-if="chartComponentArr.length === 0"
+            class="flex h-full justify-content-center align-items-center"
+            :class="{ 'bg-white font-semibold': canDropChartComponent }"
+          >
+            Drag component at right to here !
+          </div>
+        </div>
+        <div class="application-right-side-custom">
+          <div class="flex flex-column gap-3 justify-content-center align-items-center sticky" style="top: 6rem">
+            <div
+              v-tooltip.left="'Compact Grid'"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-primary"
+              :style="styleButtonComponents"
+              placeholder="Left"
+            >
+              <i class="pi pi-sync" style="font-size: 1rem" @click="compactGrid" />
+            </div>
+            <Divider />
+            <div
+              v-tooltip.left="'Appplication Radar'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap"
+              :style="styleButtonComponents"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragChartTypeStart('appRadar')"
+            >
+              <i class="pi pi-chart-pie" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">RADAR</div>
+            </div>
+            <div
+              v-tooltip.left="'Appplication Bar'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap"
+              :style="styleButtonComponents"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragChartTypeStart('appBar')"
+            >
+              <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">BAR</div>
+            </div>
+
+            <div
+              v-tooltip.left="'VSA Line'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap"
+              :style="styleButtonComponents"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragChartTypeStart('vsa')"
+            >
+              <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">VSA</div>
+            </div>
+            <div
+              v-tooltip.left="'TSA Line'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap"
+              :style="styleButtonComponents"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragChartTypeStart('tsa')"
+            >
+              <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">TSA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-show="false" class="col-6 grid">
       <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropApplication }">
+        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropApplicationToBarChart }">
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <div><i class="pi pi-folder-open pr-3"></i>Application Chart</div>
@@ -143,7 +223,7 @@
                   title="Reset Data"
                   severity="danger"
                   text
-                  @click="resetApplicationSelected"
+                  @click="resetApplicationBarChartSelected"
                 />
                 <Button
                   icon="pi pi-refresh "
@@ -157,19 +237,21 @@
           </template>
           <template #content>
             <div
-              id="applicationSelected"
+              id="applicationBarChartSelected"
               class="w-full"
-              style="height: 22rem"
-              @dragleave.prevent="canDropApplication = false"
+              @dragleave.prevent="canDropApplicationToBarChart = false"
               @dragenter.prevent
-              @dragover.prevent="onDragoverApplicationChart"
-              @drop.prevent="onDropApplicationChart"
+              @dragover.prevent="onDragoverApplicationBarChart"
+              @drop.prevent="onDropApplicationBarChart"
             >
-              <appBarchartWidget :data="applicationChartData" />
+              <appBarchartWidget :data="applicationBarChartData" />
+
+              <!-- <chartData :chartData="applicationBarChartData"/> -->
             </div>
           </template>
         </Card>
       </div>
+
       <div class="col-6">
         <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropVsa }">
           <template #title>
@@ -271,19 +353,66 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, render } from 'vue';
 
 import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
-
 import mapView from '@/components/mapView.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appBarchartWidget from './appBarchartWidget.vue';
-import { VsaApi, TsaApi, ApplicationApi as ApplicationHmiApi, CommonApi } from './api';
-import { ApiApplication, ApiDsa } from '@/views/UserConfigurationView/api.js';
+import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
+
+import { GridStack } from 'gridstack';
+import 'gridstack/dist/gridstack.min.css';
+
+import gridstackContentComponent from '@/views/DashboardView/chartComponentWrap.vue';
+import appBarChartDropWrap from './appBarChartDropWrap.vue';
+const chartComponentGrid = ref(null);
 
 onMounted(async () => {
   await getTreeData();
+
+  chartComponentGrid.value = GridStack.init({
+    float: true,
+    cellHeight: '9.7rem',
+    row: 6,
+  });
+
+  chartComponentGrid.value.on('added', function (event, items) {
+    for (const item of items) {
+      const itemEl = item.el;
+      const itemElContent = itemEl.querySelector('.grid-stack-item-content');
+      if (item.typeChart === 'appBar') {
+        console.log(nodeDrag.value);
+        const itemContentVNode = h(appBarChartDropWrap, {
+          nodeDrag: nodeDrag.value,
+          addNodeTreeSelectd: addNodeTreeSelectd,
+          removeNodeTreeSelected: removeNodeTreeSelected,
+          onRemove: () => {
+            chartComponentGrid.value.removeWidget(itemEl);
+          },
+        });
+        // Render the vue node into the item element
+        render(itemContentVNode, itemElContent);
+      }
+    }
+  });
+  chartComponentGrid.value.on('removed', function (event, items) {
+    for (const item of items) {
+      const itemEl = item.el;
+      const itemElContent = itemEl.querySelector('.grid-stack-item-content');
+      render(null, itemElContent);
+    }
+  });
+});
+
+const styleButtonComponents = ref({
+  textAlign: 'center',
+  height: 'auto',
+  backgroundColor: 'var(--surface-overlay)',
+  color: 'var(--text-color)',
+  border: '1px solid gray',
+  width: '3rem',
 });
 const treeData = ref([]);
 const treeloading = ref(false);
@@ -417,7 +546,6 @@ const getVsaBranchData = async (dsaModuleNode) => {
         label: leafData.name,
         _id: leafData._id,
         type: 'VSA',
-        icon: 'pi pi-clone',
         leaf: false,
         active: leafData.active,
       });
@@ -519,7 +647,6 @@ const getTsaBranchData = async (dsaModuleNode) => {
         _id: leafData._id,
         type: 'TSA',
         active: leafData.active,
-        icon: 'pi pi-clone',
         leaf: false,
       });
     }
@@ -632,7 +759,7 @@ const getTsaCurveList = async (subCaseName) => {
 };
 
 // -- drag drop ---
-const nodeDrag = ref();
+const nodeDrag = ref({});
 const onStartDragNode = (evt, node) => {
   evt.dataTransfer.dropEffect = 'move';
   evt.dataTransfer.effectAllowed = 'move';
@@ -640,44 +767,44 @@ const onStartDragNode = (evt, node) => {
   nodeDrag.value = node;
 };
 
-//  Drop Application
-const applicationSelected = ref();
-const applicationKeySelected = ref();
-const canDropApplication = ref(false);
+//  Drop Application - bar
+const applicationBarChartSelected = ref();
+const applicationBarChartKeySelected = ref();
+const canDropApplicationToBarChart = ref(false);
 
-const onDragoverApplicationChart = () => {
-  if (nodeDrag.value.type === 'Application' && applicationSelected.value !== nodeDrag.value._id) {
-    canDropApplication.value = true;
+const onDragoverApplicationBarChart = () => {
+  if (nodeDrag.value.type === 'Application' && applicationBarChartSelected.value !== nodeDrag.value._id) {
+    canDropApplicationToBarChart.value = true;
   } else {
-    canDropApplication.value = false;
+    canDropApplicationToBarChart.value = false;
   }
 };
-const onDropApplicationChart = async () => {
-  if (nodeDrag.value.type === 'Application' && applicationSelected.value !== nodeDrag.value._id) {
-    resetApplicationSelected();
-    applicationSelected.value = nodeDrag.value._id;
-    applicationKeySelected.value = nodeDrag.value.key;
+const onDropApplicationBarChart = async () => {
+  if (nodeDrag.value.type === 'Application' && applicationBarChartSelected.value !== nodeDrag.value._id) {
+    resetApplicationBarChartSelected();
+    applicationBarChartSelected.value = nodeDrag.value._id;
+    applicationBarChartKeySelected.value = nodeDrag.value.key;
     treeSelected.value[nodeDrag.value.key] = true;
     await getAppliactionChartData();
-    canDropApplication.value = false;
+    canDropApplicationToBarChart.value = false;
   }
 };
 
-const applicationChartData = ref([]);
+const applicationBarChartData = ref([]);
 const getAppliactionChartData = async () => {
   try {
-    const res = await ApplicationHmiApi.getChartData(applicationSelected.value);
-    applicationChartData.value = res.data || [];
+    const res = await ApplicationApi.getBarChartData(applicationBarChartSelected.value);
+    applicationBarChartData.value = res.data || [];
   } catch (error) {
     console.log('getVsaChartData: error ', error);
-    applicationChartData.value = [];
+    applicationBarChartData.value = [];
   }
 };
 
-const resetApplicationSelected = () => {
-  applicationChartData.value = [];
-  applicationSelected.value = undefined;
-  treeSelected.value[applicationKeySelected.value] = false;
+const resetApplicationBarChartSelected = () => {
+  applicationBarChartData.value = [];
+  applicationBarChartSelected.value = undefined;
+  treeSelected.value[applicationBarChartKeySelected.value] = false;
 };
 // Drop VSA
 const vsaCurveSelected = ref([]);
@@ -828,6 +955,8 @@ const getVsaCaseTypeSeverity = (caseType) => {
       return 'warning';
     case 2:
       return 'success';
+    default:
+      return '';
   }
 };
 
@@ -925,8 +1054,62 @@ const getTsaCurveTypeSeverity = (curveType) => {
       return '';
   }
 };
+
+// ---  drag drop chart type
+
+const canDropChartComponent = ref(false);
+const typeChartDrag = ref();
+const applicationDraggable = ref(false);
+const vsaCurveDraggable = ref(false);
+const tsaCurveDraggable = ref(false);
+const chartComponentArr = ref([]);
+
+const compactGrid = () => {
+  chartComponentGrid.value.compact();
+};
+
+const handleDragChartTypeStart = (typeChart) => {
+  typeChartDrag.value = typeChart;
+};
+const dragOverChartComponent = () => {
+  canDropChartComponent.value = true;
+};
+const onDropChartComponent = () => {
+  canDropChartComponent.value = false;
+  if (typeChartDrag.value === 'appRadar') {
+  }
+  if (typeChartDrag.value === 'appBar') {
+    applicationDraggable.value = true;
+    addNewChartComponent(typeChartDrag.value);
+  }
+  if (typeChartDrag.value === 'vsa') {
+  }
+  if (typeChartDrag.value === 'tsa') {
+  }
+  typeChartDrag.value = undefined;
+};
+
+const addNewChartComponent = async (typeChart) => {
+  await nextTick(() => {
+    chartComponentGrid.value.addWidget({
+      w: 6,
+      h: 3,
+      typeChart: typeChart,
+    });
+  });
+  chartComponentArr.value.push(typeChart);
+};
+
+const addNodeTreeSelectd = (key) => {
+  treeSelected.value[key] = true;
+};
+const removeNodeTreeSelected = (key) => {
+  treeSelected.value[key] = false;
+};
 </script>
 <style>
+@import 'gridstack/dist/gridstack.min.css';
+
 .textUnActive {
   color: var(--surface-500);
 }
@@ -937,5 +1120,10 @@ const getTsaCurveTypeSeverity = (curveType) => {
 .disabled-drag-item {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.cursor-grap {
+  cursor: -webkit-grab;
+  cursor: grab;
 }
 </style>

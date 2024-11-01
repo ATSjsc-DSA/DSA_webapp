@@ -5,10 +5,15 @@ const commonStore = useCommonStore();
 const { hmiTaskId, projectData, userConfigVersionId } = storeToRefs(commonStore);
 
 export class ApplicationApi {
-  static async getChartData(appId = '') {
+  static async getBarChartData(appId = '') {
     return get(`/hmi/task/${hmiTaskId.value}/app/${appId}`);
   }
+
+  static async getRadarChartData(appId = '') {
+    return get(`/hmi/task/${hmiTaskId.value}/radar/app/${appId}`);
+  }
 }
+
 export class CommonApi {
   static async getAppList() {
     return get(`/hmi/${projectData.value._id}/${userConfigVersionId.value}/applications`);
