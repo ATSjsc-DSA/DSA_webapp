@@ -3,7 +3,7 @@ import { ref, onMounted, onUpdated, onUnmounted, triggerRef } from 'vue';
 import radarChart from './radarChart.vue';
 import dsa_api from '@/api/dsa_api';
 import { intervalTime } from '@/Constants/';
-
+import { ApplicationApi } from '@/views/DashboardView/api';
 // primeVue
 // import { useToast } from 'primevue/usetoast';
 // import Toast from 'primevue/toast';
@@ -23,46 +23,47 @@ const chartData = ref({
     'SSR Module',
   ],
   data: {
-    Rate1: [90, 90, 90, 90, 90, 90, 90, 90],
-    Rate2: [95, 95, 95, 95, 95, 95, 95, 95],
-    Rate3: [100, 100, 100, 100, 100, 100, 100, 100],
-    CurentState: [81, 81, 81, 81, 81, 81, 81, 81],
+    Rate1: [90, 90, 90, 90, 90, 90, 90, 0],
+    Rate2: [95, 95, 95, 95, 95, 95, 95, 0],
+    Rate3: [100, 100, 100, 100, 100, 100, 100, 0],
+    CurentState: [99, 81, 81, 81, 81, 81, 81, 0],
   },
   modificationTime: '',
 });
 
+// Function to transform API response and ensure chartData always has 7 keys
 const transformApiResponse = (apiResponse, modificationTime) => {
-  // Initialize the result object
+  console.log(apiResponse, 'apiResponse');
   const result = {
-    Key: [],
+    Key: apiResponse.Key.slice(0, 7), // If there are more than 7 keys, we take the first 7
     data: {
-      Rate1: [],
-      Rate2: [],
-      Rate3: [],
-      CurentState: [],
+      Rate1: apiResponse.data.Rate1.slice(0, 7),
+      Rate2: apiResponse.data.Rate2.slice(0, 7),
+      Rate3: apiResponse.data.Rate3.slice(0, 7),
+      CurentState: apiResponse.data.CurentState.slice(0, 7),
     },
-    modificationTime: 0,
+    modificationTime: modificationTime,
   };
-  result.modificationTime = modificationTime;
-  // Iterate through each item in the API response
-  apiResponse.forEach((item) => {
-    if (item.modificationTime > result.modificationTime) {
-      result.modificationTime = item.modificationTime;
-    }
-    result.Key.push(item.name);
-    result.data.Rate1.push(item.rate1);
-    result.data.Rate2.push(item.rate2);
-    result.data.Rate3.push(item.rate3);
-    result.data.CurentState.push(item.currentState);
-  });
+  console.log(result, 'result');
+  // Add missing slots if there are fewer than 7 keys
+  const additionalSlots = 7 - result.Key.length;
+  for (let i = 0; i < additionalSlots; i++) {
+    result.Key.push(`slot${i + 1}`);
+    result.data.Rate1.push(0);
+    result.data.Rate2.push(0);
+    result.data.Rate3.push(0);
+    result.data.CurentState.push(0);
+  }
+  console.log(result, 'result');
 
   return result;
 };
 
 const getDataCriteria = async () => {
   try {
-    const res = await dsa_api.getdataCriteria();
-    chartData.value = transformApiResponse(res.data.criteria, res.data.modificationTime);
+    const res = await ApplicationApi.getRadarChartData('6704ae00a0ce433ff084b984');
+    // chartData.value = transformApiResponse(res.data, res.data.modificationTime);
+    // chartData.value = res.data;
   } catch (error) {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
   }

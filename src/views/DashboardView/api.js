@@ -8,7 +8,6 @@ export class ApplicationApi {
   static async getBarChartData(appId = '') {
     return get(`/hmi/task/${hmiTaskId.value}/app/${appId}`);
   }
-
   static async getRadarChartData(appId = '') {
     return get(`/hmi/task/${hmiTaskId.value}/radar/app/${appId}`);
   }
