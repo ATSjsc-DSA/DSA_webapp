@@ -29,17 +29,17 @@ export class VsaApi {
   vẽ chart của 1 list Curse
  */
   static async getVsaList(dsaId) {
-    return get(`/hmi/task/${hmiTaskId.value}/child/vsa/module/${dsaId}`);
+    return get(`/hmi/${hmiTaskId.value}/child/vsa/module/${dsaId}`);
   }
   static async getCaseList(vsa_info_id) {
-    return get(`hmi/child/vsa/case/${vsa_info_id}`);
+    return get(`hmi/${hmiTaskId.value}/child/vsa/case/${vsa_info_id}`);
   }
 
   static async getCurveList(vsa_info_id, case_info_id) {
-    return get(`hmi/child/vsa/curve/${vsa_info_id}/${case_info_id}`);
+    return get(`hmi/${hmiTaskId.value}/child/vsa/curve/${vsa_info_id}/${case_info_id}`);
   }
   static async getChartData(curveNameList = []) {
-    return post(`hmi/chart/vsa/curve`, { payload: curveNameList });
+    return post(`hmi/${hmiTaskId.value}/chart/vsa/curve`, { payload: curveNameList });
   }
 }
 

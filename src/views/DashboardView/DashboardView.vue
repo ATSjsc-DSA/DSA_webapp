@@ -59,7 +59,7 @@
 
                 <template #VSA="slotProps">
                   <div class="w-full flex align-items-center justify-content-start gap-3">
-                    <Tag value="VSA" severity="success" rounded />
+                    <Tag value="VSA" severity="contrast" rounded />
                     <div :class="{ textUnActive: !slotProps.node.active }">
                       {{ slotProps.node.label }}
                     </div>
@@ -68,16 +68,26 @@
 
                 <template #TSA="slotProps">
                   <div class="w-full flex align-items-center justify-content-start gap-3">
-                    <Tag value="TSA" severity="secondary" rounded />
+                    <Tag value="TSA" severity="contrast" rounded />
                     <div :class="{ textUnActive: !slotProps.node.active }">
                       {{ slotProps.node.label }}
                     </div>
                   </div>
                 </template>
 
-                <template #Case="slotProps">
-                  <div class="w-full" :class="{ textUnActive: !slotProps.node.active }">
-                    {{ slotProps.node.label }}
+                <template #VsaCase="slotProps">
+                  <!-- <div class="w-full" :class="{ textUnActive: !slotProps.node.active }"></div> -->
+                  <div
+                    class="w-full flex align-items-center justify-content-start"
+                    :class="{ textUnActive: !slotProps.node.active }"
+                  >
+                    <Tag
+                      class="mr-1 w-2rem"
+                      :value="getVsaCaseTypeValue(slotProps.node.caseType)"
+                      :severity="getVsaCaseTypeSeverity(slotProps.node.caseType)"
+                    />
+
+                    <div>{{ slotProps.node.label }}</div>
                   </div>
                 </template>
 
@@ -427,8 +437,6 @@ const getVsaList = async (dsaId) => {
 };
 
 const getVsaCaseBranchData = async (vsaNode) => {
-  console.log(vsaNode, 'vsaNode');
-
   const branch = [];
   const dataList = await getVsaCaseList(vsaNode._id);
   if (dataList.length === 0) {
@@ -442,7 +450,7 @@ const getVsaCaseBranchData = async (vsaNode) => {
         _id: leafData._id,
         type: 'VsaCase',
         active: leafData.active,
-        icon: 'pi pi-list',
+        caseType: leafData.caseType,
         leaf: false,
         moduleInfoId: vsaNode._id,
       });
@@ -684,7 +692,6 @@ const onDragOverVsaChart = () => {
 };
 const onDropVsaChart = async () => {
   if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-
     vsaCurveSelected.value.push({
       curveInfoId: nodeDrag.value._id,
       curveType: nodeDrag.value.curveType,
@@ -799,6 +806,31 @@ const resetRightTsaSelected = async () => {
   }
   tsaKeyRightCurveSelected.value = [];
 };
+// vsa caseType
+const getVsaCaseTypeValue = (caseType) => {
+  console.log(caseType, 'caseType');
+  switch (caseType) {
+    case 0:
+      return 'N:1';
+    case 1:
+      return 'N:2';
+    case 2:
+      return 'Base';
+    default:
+      return caseType;
+  }
+};
+const getVsaCaseTypeSeverity = (caseType) => {
+  switch (caseType) {
+    case 0:
+      return 'info';
+    case 1:
+      return 'warning';
+    case 2:
+      return 'success';
+  }
+};
+
 // ---- tsa vsa type curve
 const getVsaCurveTypeValue = (curveType) => {
   if (!curveType) {
