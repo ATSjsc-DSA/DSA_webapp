@@ -269,7 +269,7 @@ import ScrollPanel from 'primevue/scrollpanel';
 import mapView from '@/components/mapView.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appBarchartWidget from './appBarchartWidget.vue';
-import { VsaApi, TsaApi, ApplicationApi as ApplicationHmiApi } from './api';
+import { VsaApi, TsaApi, ApplicationApi as ApplicationHmiApi, CommonApi } from './api';
 import { ApiApplication, ApiDsa } from '@/views/UserConfigurationView/api.js';
 
 onMounted(async () => {
@@ -350,7 +350,7 @@ const getAppBranchData = async () => {
 
 const getAppList = async () => {
   try {
-    const res = await ApiApplication.getList();
+    const res = await CommonApi.getAppList();
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -384,7 +384,7 @@ const getDsaModuleBranchData = async (appNode) => {
 
 const getDsaModuleList = async (appId) => {
   try {
-    const res = await ApiDsa.getList(appId);
+    const res = await CommonApi.getDsaModuleList(appId);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -427,8 +427,10 @@ const getVsaList = async (dsaId) => {
 };
 
 const getVsaCaseBranchData = async (vsaNode) => {
+  console.log(vsaNode, 'vsaNode');
+
   const branch = [];
-  const dataList = await getVsaCaseList(vsaNode.label);
+  const dataList = await getVsaCaseList(vsaNode._id);
   if (dataList.length === 0) {
     vsaNode.leaf = true;
   } else {
@@ -442,15 +444,16 @@ const getVsaCaseBranchData = async (vsaNode) => {
         active: leafData.active,
         icon: 'pi pi-list',
         leaf: false,
+        moduleInfoId: vsaNode._id,
       });
     }
   }
   return branch;
 };
 
-const getVsaCaseList = async (dsaName) => {
+const getVsaCaseList = async (case_id) => {
   try {
-    const res = await VsaApi.getCaseList(dsaName);
+    const res = await VsaApi.getCaseList(case_id);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -460,7 +463,7 @@ const getVsaCaseList = async (dsaName) => {
 
 const getVsaCurveBranchData = async (caseNode) => {
   const branch = [];
-  const dataList = await getVsaCurveList(caseNode.label);
+  const dataList = await getVsaCurveList(caseNode.moduleInfoId, caseNode._id);
   if (dataList.length === 0) {
     caseNode.leaf = true;
   } else {
@@ -474,15 +477,17 @@ const getVsaCurveBranchData = async (caseNode) => {
         curveType: leafData.curveType,
         active: leafData.active,
         leaf: true,
+        caseInfoId: caseNode._id,
+        moduleInfoId: caseNode.moduleInfoId,
       });
     }
   }
   return branch;
 };
 
-const getVsaCurveList = async (caseName) => {
+const getVsaCurveList = async (vsa_info_id, case_info_id) => {
   try {
-    const res = await VsaApi.getCurveList(caseName);
+    const res = await VsaApi.getCurveList(vsa_info_id, case_info_id);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -679,7 +684,13 @@ const onDragOverVsaChart = () => {
 };
 const onDropVsaChart = async () => {
   if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    vsaCurveSelected.value.push(nodeDrag.value.label);
+
+    vsaCurveSelected.value.push({
+      curveInfoId: nodeDrag.value._id,
+      curveType: nodeDrag.value.curveType,
+      caseInfoId: nodeDrag.value.caseInfoId,
+      moduleInfoId: nodeDrag.value.moduleInfoId,
+    });
     treeSelected.value[nodeDrag.value.key] = true;
     await getVsaChartData();
     canDropVsa.value = false;
