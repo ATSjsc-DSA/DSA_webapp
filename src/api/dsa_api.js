@@ -1,6 +1,12 @@
 import { get, post, put, _delete } from '@/utils/request';
+// import { useCommonStore } from '@/store';
+// const commonStore = useCommonStore();
+// const { hmiTaskId } = storeToRefs(commonStore);
 
 export default class DSA_api {
+  // static async getRadarChartData(appId = '') {
+  //   return get(`/hmi/task/${hmiTaskId.value}/app/${appId}`);
+  // }
   static async getListSub() {
     return get('/geographic/sub');
   }
