@@ -1,19 +1,21 @@
 <template>
   <div class="card h-full">
+    <!-- <Toast></Toast> -->
+    <ConfirmDialog group="dialog"></ConfirmDialog>
     <Splitter style="height: 100%">
       <SplitterPanel
         class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
         :size="20"
         :minSize="10"
       >
-        <div class="h-full w-full p-4">
+        <div class="h-full w-full p-4 flex flex-column">
           <div class="py-4 flex justify-content-between align-items-center">
             <span class="text-xl font-semibold"> List Sub System</span>
             <Button icon="pi pi-plus" text rounded aria-label="Filter" @click="handlerCreateThis" />
           </div>
           <DataView
             :value="listSubSystem"
-            class="w-full"
+            class="w-full flex-1"
             style="height: 43rem; overflow-y: auto; overflow-x: hidden; margin-right: -1rem"
           >
             <template #list="slotProps">
@@ -145,7 +147,8 @@ import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 
 import filterSubSystemView from './filterSubSystemView.vue';
-
+import Toast from 'primevue/toast';
+import ConfirmDialog from 'primevue/confirmdialog';
 import { ApiSubsystem } from './api';
 import { PowerSystemParameterApi } from '../PowerSystem/api';
 const visible = ref(false);
@@ -257,6 +260,32 @@ const getParameterList = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
   isParameterLoading.value = false;
+};
+
+const confirmDeleteThis = (id) => {
+  confirm.require({
+    message: 'Do you want to delete this sub-system?',
+    group: 'dialog',
+    header: 'Confirmation',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    accept: () => {
+      deleteThis(id);
+    },
+    reject: () => {},
+  });
+};
+const deleteThis = async (id) => {
+  try {
+    await ApiSubsystem.deleteSubsystem(id);
+    getListSubSystem();
+    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Delete successfully', life: 3000 });
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
 };
 </script>
 

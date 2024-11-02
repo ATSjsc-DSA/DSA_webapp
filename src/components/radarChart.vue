@@ -128,9 +128,9 @@ const setChartData = (radarData) => {
   const boundData = new Array(numAxis).fill(maxAxisValue);
 
   const currentValue = getChartConfig(currentData, 'rgba(0,0,0,1)', colorStatus, 'start', 'current');
-  const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(0,128,0,0.5)', '-1', 'rate1');
+  const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(40,167,69,0.5)', '-1', 'rate1');
   const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
-  const reserve3Value = getChartConfig(reserve3Data, 'navy', 'rgba(255,0,0,0.6)', '-1', 'rate3');
+  const reserve3Value = getChartConfig(reserve3Data, 'rgba(244,67,54,1)', 'rgba(244,67,54,0.6)', '-1', 'rate3');
   const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.6)', '-1', 'bound');
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
@@ -177,26 +177,16 @@ const setChartOptions = () => {
         angleLines: {
           display: true,
           lineWidth: 1,
-          color: [
-            surfaceBorder,
-            surfaceBorder,
-            surfaceBorder,
-            surfaceBorder,
-            surfaceBorder,
-            textColor2nd,
-            textColor2nd,
-            textColor2nd,
-          ],
+          color: textColor2nd,
         },
         pointLabels: {
           padding: 2,
           color: textColor,
           borderRadius: 2,
-          backdropColor: [, , , , , primaryColor, primaryColor, primaryColor],
           font: {
             size: 10,
             style: 'normal',
-            weight: ['normal', 'normal', 'normal', 'normal', 'normal', 'bold', 'bold ', 'bold '],
+            weight: 'bold',
           },
         },
 
@@ -209,6 +199,10 @@ const setChartOptions = () => {
           color: textColor,
           backdropColor: 'transparent',
           z: 10,
+          font: {
+            size: 10,
+            style: 'normal',
+          },
         },
       },
     },

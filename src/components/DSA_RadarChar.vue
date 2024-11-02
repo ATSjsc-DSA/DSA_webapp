@@ -49,12 +49,11 @@ const transformApiResponse = (apiResponse, modificationTime) => {
   const additionalSlots = 7 - result.Key.length;
   for (let i = 0; i < additionalSlots; i++) {
     result.Key.push(`slot${i + 1}`);
-    result.data.Rate1.push(0);
-    result.data.Rate2.push(0);
-    result.data.Rate3.push(0);
+    result.data.Rate1.push(90);
+    result.data.Rate2.push(95);
+    result.data.Rate3.push(100);
     result.data.CurentState.push(0);
   }
-  console.log(result, 'result');
 
   return result;
 };
@@ -62,7 +61,7 @@ const transformApiResponse = (apiResponse, modificationTime) => {
 const getDataCriteria = async () => {
   try {
     const res = await ApplicationApi.getRadarChartData('6704ae00a0ce433ff084b984');
-    // chartData.value = transformApiResponse(res.data, res.data.modificationTime);
+    chartData.value = transformApiResponse(res.data, res.data.modificationTime);
     // chartData.value = res.data;
   } catch (error) {
     // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
