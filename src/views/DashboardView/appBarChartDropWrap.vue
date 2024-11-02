@@ -1,5 +1,5 @@
 <template>
-  <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropApplicationToBarChart }">
+  <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropNode }">
     <template #title>
       <div class="flex justify-content-between align-items-center">
         <div><i class="pi pi-folder-open pr-3"></i>Application Chart</div>
@@ -10,7 +10,7 @@
             severity="danger"
             text
             :disabled="!nodeDrag._id"
-            @click="resetApplicationBarChartSelected"
+            @click="resetChart"
           />
           <Button
             icon="pi pi-refresh "
@@ -18,7 +18,7 @@
             severity="secondary"
             text
             :disabled="!nodeDrag._id"
-            @click="getAppliactionChartData"
+            @click="getChartData"
           />
           <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
         </div>
@@ -28,12 +28,12 @@
       <div
         id="applicationBarChartSelected"
         class="w-full h-full"
-        @dragleave.prevent="canDropApplicationToBarChart = false"
+        @dragleave.prevent="canDropNode = false"
         @dragenter.prevent
-        @dragover.prevent="onDragoverApplicationBarChart"
-        @drop.prevent="onDropApplicationBarChart"
+        @dragover.prevent="onDragoverComponent"
+        @drop.prevent="onDropComponent"
       >
-        <appBarchartWidget :data="applicationBarChartData" />
+        <appBarchartWidget :data="chartData" />
       </div>
     </template>
   </Card>
@@ -52,48 +52,49 @@ const props = defineProps({
 const emit = defineEmits(['addNodeTreeSelectd', 'removeNodeTreeSelected', 'onRemoveWidget']);
 
 const onRemoveWidget = () => {
+  emit('removeNodeTreeSelected', nodeKey.value);
   emit('onRemoveWidget');
 };
 const nodeKey = ref(props.nodeDrag.key);
 
 //  Drop Application - bar
-const applicationBarChartSelected = ref();
-const applicationBarChartKeySelected = ref();
-const canDropApplicationToBarChart = ref(false);
+const nodeSelected = ref();
+const nodeKeySelected = ref();
+const canDropNode = ref(false);
 
-const onDragoverApplicationBarChart = () => {
-  if (props.nodeDrag.type === 'Application' && applicationBarChartSelected.value !== props.nodeDrag._id) {
-    canDropApplicationToBarChart.value = true;
+const onDragoverComponent = () => {
+  if (props.nodeDrag.type === 'Application' && nodeSelected.value !== props.nodeDrag._id) {
+    canDropNode.value = true;
   } else {
-    canDropApplicationToBarChart.value = false;
+    canDropNode.value = false;
   }
 };
-const onDropApplicationBarChart = async () => {
-  if (props.nodeDrag.type === 'Application' && applicationBarChartSelected.value !== props.nodeDrag._id) {
-    resetApplicationBarChartSelected();
-    applicationBarChartSelected.value = props.nodeDrag._id;
-    applicationBarChartKeySelected.value = props.nodeDrag.key;
-    await getAppliactionChartData();
-    canDropApplicationToBarChart.value = false;
+const onDropComponent = async () => {
+  if (props.nodeDrag.type === 'Application' && nodeSelected.value !== props.nodeDrag._id) {
+    resetChart();
+    nodeSelected.value = props.nodeDrag._id;
+    nodeKeySelected.value = props.nodeDrag.key;
+    await getChartData();
+    canDropNode.value = false;
     emit('addNodeTreeSelectd', props.nodeDrag.key);
     nodeKey.value = props.nodeDrag.key;
   }
 };
 
-const applicationBarChartData = ref([]);
-const getAppliactionChartData = async () => {
+const chartData = ref([]);
+const getChartData = async () => {
   try {
-    const res = await ApplicationApi.getBarChartData(applicationBarChartSelected.value);
-    applicationBarChartData.value = res.data || [];
+    const res = await ApplicationApi.getBarChartData(nodeSelected.value);
+    chartData.value = res.data || [];
   } catch (error) {
     console.log('getAppliactionChartData: error ', error);
-    applicationBarChartData.value = [];
+    chartData.value = [];
   }
 };
 
-const resetApplicationBarChartSelected = () => {
-  applicationBarChartData.value = [];
-  applicationBarChartSelected.value = undefined;
+const resetChart = () => {
+  chartData.value = [];
+  nodeSelected.value = undefined;
   emit('removeNodeTreeSelected', nodeKey.value);
 };
 </script>

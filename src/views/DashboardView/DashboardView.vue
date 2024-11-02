@@ -135,14 +135,21 @@
       <div class="w-full h-full flex gap-3">
         <div
           class="w-full h-full"
-          :class="{ 'border-2': chartComponentArr.length === 0 }"
+          :class="{ 'border-2 border-gray-300': chartComponentArr.length === 0 }"
           @dragleave.prevent="canDropChartComponent = false"
           @dragenter.prevent
           @dragover.prevent="dragOverChartComponent"
           @drop.prevent="onDropChartComponent"
         >
           <!-- <div ref="grid" class="grid-stack bg-blue-100"></div> -->
-          <div class="grid-stack">
+          <div class="grid-stack" style="margin: -0.7rem">
+            <div
+              v-if="chartComponentArr.length === 0"
+              class="flex h-full justify-content-center align-items-center"
+              :class="{ 'bg-white font-semibold': canDropChartComponent }"
+            >
+              Drag component at right to here !
+            </div>
             <div
               v-for="w in chartComponentArr"
               :id="w.id"
@@ -155,23 +162,17 @@
               :gs-id="w.id"
             >
               <div class="grid-stack-item-content">
-                <template v-if="w.typeChart === 'appBar'">
-                  <appBarChartDropWrap
-                    :nodeDrag="nodeDrag"
-                    @addNodeTreeSelectd="addNodeTreeSelectd"
-                    @removeNodeTreeSelected="removeNodeTreeSelected"
-                    @onRemoveWidget="onRemoveChartComponent(w)"
-                  />
-                </template>
+                <chartComponent
+                  :nodeDrag="nodeDrag"
+                  :chartId="w.id"
+                  :typeChart="w.typeChart"
+                  :muiltiSelect="w.muiltiSelect"
+                  @addNodeTreeSelectd="addNodeTreeSelectd"
+                  @removeNodeTreeSelected="removeNodeTreeSelected"
+                  @onRemoveWidget="onRemoveChartComponent(w)"
+                />
               </div>
             </div>
-          </div>
-          <div
-            v-if="chartComponentArr.length === 0"
-            class="flex h-full justify-content-center align-items-center"
-            :class="{ 'bg-white font-semibold': canDropChartComponent }"
-          >
-            Drag component at right to here !
           </div>
         </div>
         <div class="application-right-side-custom">
@@ -234,144 +235,6 @@
         </div>
       </div>
     </div>
-    <div v-show="false" class="col-6 grid">
-      <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropApplicationToBarChart }">
-          <template #title>
-            <div class="flex justify-content-between align-items-center">
-              <div><i class="pi pi-folder-open pr-3"></i>Application Chart</div>
-              <div>
-                <Button
-                  icon="pi pi-trash "
-                  title="Reset Data"
-                  severity="danger"
-                  text
-                  @click="resetApplicationBarChartSelected"
-                />
-                <Button
-                  icon="pi pi-refresh "
-                  title="Refresh chart"
-                  severity="secondary"
-                  text
-                  @click="getAppliactionChartData"
-                />
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div
-              id="applicationBarChartSelected"
-              class="w-full"
-              @dragleave.prevent="canDropApplicationToBarChart = false"
-              @dragenter.prevent
-              @dragover.prevent="onDragoverApplicationBarChart"
-              @drop.prevent="onDropApplicationBarChart"
-            >
-              <appBarchartWidget :data="applicationBarChartData" />
-
-              <!-- <chartData :chartData="applicationBarChartData"/> -->
-            </div>
-          </template>
-        </Card>
-      </div>
-
-      <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropVsa }">
-          <template #title>
-            <div class="flex justify-content-between align-items-center">
-              <div><i class="pi pi-clone pr-3"></i>VSA Chart</div>
-              <div>
-                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetVsaSelected" />
-                <Button
-                  icon="pi pi-refresh "
-                  title="Refresh chart"
-                  severity="secondary"
-                  text
-                  @click="getVsaChartData"
-                />
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div
-              id="vsaCurveSelected"
-              class="w-full"
-              style="height: 22rem"
-              @dragleave.prevent="canDropVsa = false"
-              @dragenter.prevent
-              @dragover.prevent="onDragOverVsaChart"
-              @drop.prevent="onDropVsaChart"
-            >
-              <curveLinechartWidget :data="vsaChartData" />
-            </div>
-          </template>
-        </Card>
-      </div>
-      <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropLeftTsa }">
-          <template #title>
-            <div class="flex justify-content-between align-items-center">
-              <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
-              <div>
-                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetLeftTsaSelected" />
-                <Button
-                  icon="pi pi-refresh "
-                  title="Refresh chart"
-                  severity="secondary"
-                  text
-                  @click="getTsaLeftChartData"
-                />
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div
-              id="vsaCurveChart1"
-              class="w-full"
-              style="height: 22rem"
-              @dragleave.prevent="canDropLeftTsa = false"
-              @dragenter.prevent
-              @dragover.prevent="onDragoverTsaLeftChart"
-              @drop.prevent="onDropTsaLeftChart"
-            >
-              <curveLinechartWidget :data="tsaLeftChartData" />
-            </div>
-          </template>
-        </Card>
-      </div>
-      <div class="col-6">
-        <Card class="flex-grow-1 w-full h-full" :class="{ 'border-2': canDropRightTsa }">
-          <template #title>
-            <div class="flex justify-content-between align-items-center">
-              <div><i class="pi pi-clone pr-3"></i>TSA Chart</div>
-              <div>
-                <Button icon="pi pi-trash " title="Reset data" severity="danger" text @click="resetRightTsaSelected" />
-                <Button
-                  icon="pi pi-refresh "
-                  title="Refresh chart"
-                  severity="secondary"
-                  text
-                  @click="getTsaRightChartData"
-                />
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div
-              id="vsaCurveChart1"
-              class="w-full"
-              style="height: 22rem"
-              @dragleave.prevent="canDropRightTsa = false"
-              @dragenter.prevent
-              @dragover.prevent="onDragoverTsaRightChart"
-              @drop.prevent="onDropTsaRightChart"
-            >
-              <curveLinechartWidget :data="tsaRightChartData" />
-            </div>
-          </template>
-        </Card>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -383,21 +246,21 @@ import ScrollPanel from 'primevue/scrollpanel';
 import mapView from '@/components/mapView.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appBarchartWidget from './appBarchartWidget.vue';
+import appBarChartDropWrap from './appBarChartDropWrap.vue';
+import chartComponent from './chartComponent.vue';
 import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
 
 import { GridStack } from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
 
-import gridstackContentComponent from '@/views/DashboardView/chartComponentWrap.vue';
-import appBarChartDropWrap from './appBarChartDropWrap.vue';
 const chartComponentGrid = ref(null);
 
 onMounted(async () => {
   await getTreeData();
 
   chartComponentGrid.value = GridStack.init({
-    float: true,
-    cellHeight: '9.7rem',
+    float: false,
+    cellHeight: '10rem',
     row: 6,
     // resizable: {
     //   handles: 'e, se, s, sw, w, nw, n, ne', // Enables all resize handles
@@ -771,172 +634,6 @@ const onStartDragNode = (evt, node) => {
   nodeDrag.value = node;
 };
 
-//  Drop Application - bar
-const applicationBarChartSelected = ref();
-const applicationBarChartKeySelected = ref();
-const canDropApplicationToBarChart = ref(false);
-
-const onDragoverApplicationBarChart = () => {
-  if (nodeDrag.value.type === 'Application' && applicationBarChartSelected.value !== nodeDrag.value._id) {
-    canDropApplicationToBarChart.value = true;
-  } else {
-    canDropApplicationToBarChart.value = false;
-  }
-};
-const onDropApplicationBarChart = async () => {
-  if (nodeDrag.value.type === 'Application' && applicationBarChartSelected.value !== nodeDrag.value._id) {
-    resetApplicationBarChartSelected();
-    applicationBarChartSelected.value = nodeDrag.value._id;
-    applicationBarChartKeySelected.value = nodeDrag.value.key;
-    treeSelected.value[nodeDrag.value.key] = true;
-    await getAppliactionChartData();
-    canDropApplicationToBarChart.value = false;
-  }
-};
-
-const applicationBarChartData = ref([]);
-const getAppliactionChartData = async () => {
-  try {
-    const res = await ApplicationApi.getBarChartData(applicationBarChartSelected.value);
-    applicationBarChartData.value = res.data || [];
-  } catch (error) {
-    console.log('getVsaChartData: error ', error);
-    applicationBarChartData.value = [];
-  }
-};
-
-const resetApplicationBarChartSelected = () => {
-  applicationBarChartData.value = [];
-  applicationBarChartSelected.value = undefined;
-  treeSelected.value[applicationBarChartKeySelected.value] = false;
-};
-// Drop VSA
-const vsaCurveSelected = ref([]);
-const canDropVsa = ref(false);
-
-const onDragOverVsaChart = () => {
-  if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    canDropVsa.value = true;
-  } else {
-    canDropVsa.value = false;
-  }
-};
-const onDropVsaChart = async () => {
-  if (nodeDrag.value.type === 'VsaCurve' && vsaCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    vsaCurveSelected.value.push({
-      curveInfoId: nodeDrag.value._id,
-      curveType: nodeDrag.value.curveType,
-      caseInfoId: nodeDrag.value.caseInfoId,
-      moduleInfoId: nodeDrag.value.moduleInfoId,
-    });
-    treeSelected.value[nodeDrag.value.key] = true;
-    await getVsaChartData();
-    canDropVsa.value = false;
-  }
-};
-
-const vsaChartData = ref([]);
-const getVsaChartData = async () => {
-  try {
-    const res = await VsaApi.getChartData(vsaCurveSelected.value);
-    vsaChartData.value = res.data;
-  } catch (error) {
-    console.log('getVsaChartData: error ', error);
-    vsaChartData.value = [];
-  }
-};
-
-const resetVsaSelected = async () => {
-  vsaChartData.value = [];
-  vsaCurveSelected.value = [];
-  for (const key in treeSelected.value) {
-    if (key.includes('vsa')) {
-      treeSelected.value[key] = false;
-    }
-  }
-};
-// ---drop TSA - 1 - left chart
-const tsaLeftCurveSelected = ref([]);
-const tsaKeyLeftCurveSelected = ref([]);
-
-const canDropLeftTsa = ref(false);
-const onDragoverTsaLeftChart = () => {
-  if (nodeDrag.value.type === 'TsaCurve' && tsaLeftCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    canDropLeftTsa.value = true;
-  } else {
-    canDropLeftTsa.value = false;
-  }
-};
-
-const onDropTsaLeftChart = async () => {
-  if (nodeDrag.value.type === 'TsaCurve' && tsaLeftCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    tsaLeftCurveSelected.value.push(nodeDrag.value.label);
-    treeSelected.value[nodeDrag.value.key] = true;
-    await getTsaLeftChartData();
-    canDropLeftTsa.value = false;
-    tsaKeyLeftCurveSelected.value.push(nodeDrag.value.key);
-  }
-};
-const tsaLeftChartData = ref([]);
-const getTsaLeftChartData = async () => {
-  try {
-    const res = await TsaApi.getChartData(tsaLeftCurveSelected.value);
-    tsaLeftChartData.value = res.data;
-  } catch (error) {
-    console.log('getTsaLeftChartData: error ', error);
-    tsaLeftChartData.value = [];
-  }
-};
-const resetLeftTsaSelected = async () => {
-  tsaLeftChartData.value = [];
-  tsaLeftCurveSelected.value = [];
-  for (const key in tsaKeyLeftCurveSelected.value) {
-    treeSelected.value[key] = false;
-  }
-  tsaKeyLeftCurveSelected.value = [];
-};
-// ---drop TSA - 1 - right chart
-
-const tsaRightCurveSelected = ref([]);
-const tsaKeyRightCurveSelected = ref([]);
-
-const canDropRightTsa = ref(false);
-
-const onDragoverTsaRightChart = () => {
-  if (nodeDrag.value.type === 'TsaCurve' && tsaRightCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    canDropRightTsa.value = true;
-  } else {
-    canDropRightTsa.value = false;
-  }
-};
-
-const onDropTsaRightChart = async () => {
-  if (nodeDrag.value.type === 'TsaCurve' && tsaRightCurveSelected.value.indexOf(nodeDrag.value.label) === -1) {
-    tsaRightCurveSelected.value.push(nodeDrag.value.label);
-    treeSelected.value[nodeDrag.value.key] = true;
-    await getTsaRightChartData();
-    canDropRightTsa.value = false;
-    tsaKeyRightCurveSelected.value.push(nodeDrag.value.key);
-  }
-};
-const tsaRightChartData = ref([]);
-const getTsaRightChartData = async () => {
-  try {
-    const res = await TsaApi.getChartData(tsaRightCurveSelected.value);
-    tsaRightChartData.value = res.data;
-  } catch (error) {
-    console.log('gettsaRightChartData: error ', error);
-    tsaRightChartData.value = [];
-  }
-};
-const resetRightTsaSelected = async () => {
-  tsaRightChartData.value = [];
-  tsaRightCurveSelected.value = [];
-  for (const key in tsaKeyRightCurveSelected.value) {
-    treeSelected.value[key] = false;
-  }
-  tsaKeyRightCurveSelected.value = [];
-};
 // vsa caseType
 const getVsaCaseTypeValue = (caseType) => {
   switch (caseType) {
@@ -1058,12 +755,9 @@ const getTsaCurveTypeSeverity = (curveType) => {
   }
 };
 const addNodeTreeSelectd = (key) => {
-  console.log('addNodeTreeSelectd', key);
   treeSelected.value[key] = true;
 };
 const removeNodeTreeSelected = (key) => {
-  console.log('removeNodeTreeSelected', key);
-
   treeSelected.value[key] = false;
 };
 // ---  drag drop chart type
@@ -1086,15 +780,23 @@ const dragOverChartComponent = () => {
 };
 const onDropChartComponent = () => {
   canDropChartComponent.value = false;
-  if (typeChartDrag.value === 'appRadar') {
-  }
+
   if (typeChartDrag.value === 'appBar') {
     applicationDraggable.value = true;
-    addNewChartComponent(typeChartDrag.value);
+    addNewChartComponent(typeChartDrag.value, false);
+  }
+  if (typeChartDrag.value === 'appRadar') {
+    applicationDraggable.value = true;
+    addNewChartComponent(typeChartDrag.value, false);
   }
   if (typeChartDrag.value === 'vsa') {
+    vsaCurveDraggable.value = true;
+    addNewChartComponent(typeChartDrag.value, true);
   }
   if (typeChartDrag.value === 'tsa') {
+    tsaCurveDraggable.value = true;
+
+    addNewChartComponent(typeChartDrag.value, true);
   }
   typeChartDrag.value = undefined;
 };
@@ -1102,12 +804,13 @@ const onDropChartComponent = () => {
 // --- chart component
 const chartComponentArr = ref([]);
 
-const addNewChartComponent = async (typeChart) => {
+const addNewChartComponent = async (typeChart, muiltiSelect) => {
   const node = {
     w: 6,
     h: 3,
     id: typeChart + '_' + chartComponentArr.value.length,
     typeChart: typeChart,
+    muiltiSelect: muiltiSelect,
   };
   chartComponentArr.value.push(node);
 
