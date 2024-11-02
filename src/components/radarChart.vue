@@ -21,7 +21,6 @@ const props = defineProps({
 
 const emits = defineEmits(['refeshData']);
 const DataProps = computed(() => props.chartData);
-const chartData = ref();
 const modificationTime = ref();
 watch(DataProps, (newValue, oldValue) => {
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
@@ -29,6 +28,7 @@ watch(DataProps, (newValue, oldValue) => {
     modificationTime.value = convertDateTimeToString(newValue.modificationTime);
   }
 });
+const chartData = ref();
 
 // const chartData = computed(() => {
 //   return setChartData(props.chartData.data);
@@ -167,7 +167,7 @@ const setChartOptions = () => {
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
   return {
     animation: false,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
 
     scales: {
       r: {
@@ -281,7 +281,7 @@ const refeshData = () => {
 <template>
   <div class="card flex justify-content-center h-full">
     <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem h-full" />
   </div>
 </template>
 

@@ -68,7 +68,7 @@ const props = defineProps({
     default: false,
   },
 });
-const emit = defineEmits(['addNodeTreeSelectd', 'removeNodeTreeSelected', 'onRemoveWidget']);
+const emit = defineEmits(['onRemoveWidget']);
 
 const interval = ref(null);
 
@@ -150,7 +150,7 @@ const onDropComponent = async () => {
     interval.value = setInterval(() => {
       getChartData();
     }, intervalTime);
-    emit('addNodeTreeSelectd', props.nodeDrag.key);
+    // emit('addNodeTreeSelectd', props.nodeDrag.key);
   }
 };
 
@@ -184,10 +184,10 @@ const resetChart = () => {
   nodeSelected.value = props.muiltiSelect ? [] : undefined;
   if (Array.isArray(nodeKeySelected.value)) {
     nodeKeySelected.value.forEach((node) => {
-      emit('removeNodeTreeSelected', node);
+      // emit('removeNodeTreeSelected', node);
     });
   } else {
-    emit('removeNodeTreeSelected', nodeKeySelected.value);
+    // emit('removeNodeTreeSelected', nodeKeySelected.value);
   }
   clearInterval(interval.value);
 };

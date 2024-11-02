@@ -1,7 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import radarChart from '@/components/radarChart.vue';
-import { intervalTime } from '@/Constants/';
 import { ApplicationApi } from '@/views/DashboardView/api';
 
 const props = defineProps({
