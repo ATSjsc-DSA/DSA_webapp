@@ -35,19 +35,19 @@
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
-        <div v-if="typeChart === 'appRadar'">
-          <div>Radar chart</div>
-        </div>
+        <appRadarChartWidget v-if="typeChart === 'appRadar'" :applicationId="nodeSelected" />
       </div>
     </template>
   </Card>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, watch, onUnmounted } from 'vue';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
-import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
+import appRadarChartWidget from './appRadarChartWidget.vue';
+import { VsaApi, TsaApi, ApplicationApi } from './api';
+import { intervalTime } from '@/Constants/';
 
 const props = defineProps({
   nodeDrag: {
@@ -70,11 +70,15 @@ const props = defineProps({
 });
 const emit = defineEmits(['addNodeTreeSelectd', 'removeNodeTreeSelected', 'onRemoveWidget']);
 
+const interval = ref(null);
+
+onUnmounted(() => {
+  clearInterval(interval.value);
+});
 const onRemoveWidget = () => {
   resetChart();
   emit('onRemoveWidget');
 };
-const nodeKey = ref(props.nodeDrag.key);
 
 const typeChartCanDrop = computed(() => {
   if (props.typeChart === 'appRadar' || props.typeChart === 'appBar') {
@@ -142,19 +146,25 @@ const onDropComponent = async () => {
 
     await getChartData();
     canDropNode.value = false;
+
+    interval.value = setInterval(() => {
+      getChartData();
+    }, intervalTime);
     emit('addNodeTreeSelectd', props.nodeDrag.key);
   }
 };
 
 const chartData = ref([]);
 const getChartData = async () => {
+  console.log('get chart data', props.typeChart);
   try {
     let res = {};
-    if (props.typeChart === 'appRadar') {
-      res = await ApplicationApi.getRadarChartData(nodeSelected.value);
-    }
+
     if (props.typeChart === 'appBar') {
       res = await ApplicationApi.getBarChartData(nodeSelected.value);
+    }
+    if (props.typeChart === 'appRadar') {
+      return;
     }
     if (props.typeChart === 'vsa') {
       res = await VsaApi.getChartData(nodeSelected.value);
@@ -179,6 +189,7 @@ const resetChart = () => {
   } else {
     emit('removeNodeTreeSelected', nodeKeySelected.value);
   }
+  clearInterval(interval.value);
 };
 </script>
 

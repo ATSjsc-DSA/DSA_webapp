@@ -142,14 +142,14 @@
           @drop.prevent="onDropChartComponent"
         >
           <!-- <div ref="grid" class="grid-stack bg-blue-100"></div> -->
+          <div
+            v-if="chartComponentArr.length === 0"
+            class="flex h-full justify-content-center align-items-center"
+            :class="{ 'bg-white font-semibold': canDropChartComponent }"
+          >
+            Drag component at right to here !
+          </div>
           <div class="grid-stack" style="margin: -0.7rem">
-            <div
-              v-if="chartComponentArr.length === 0"
-              class="flex h-full justify-content-center align-items-center"
-              :class="{ 'bg-white font-semibold': canDropChartComponent }"
-            >
-              Drag component at right to here !
-            </div>
             <div
               v-for="w in chartComponentArr"
               :id="w.id"
@@ -244,11 +244,8 @@ import { onMounted, ref, render } from 'vue';
 import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
 import mapView from '@/components/mapView.vue';
-import curveLinechartWidget from './curveLinechartWidget.vue';
-import appBarchartWidget from './appBarchartWidget.vue';
-import appBarChartDropWrap from './appBarChartDropWrap.vue';
 import chartComponent from './chartComponent.vue';
-import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
+import { VsaApi, TsaApi, CommonApi } from './api';
 
 import { GridStack } from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
@@ -260,14 +257,8 @@ onMounted(async () => {
 
   chartComponentGrid.value = GridStack.init({
     float: false,
-    cellHeight: '10rem',
-    row: 6,
-    // resizable: {
-    //   handles: 'e, se, s, sw, w, nw, n, ne', // Enables all resize handles
-    // },
-    // draggable: {
-    //   handle: '.grid-stack-item-content',
-    // },
+    cellHeight: '10rem', // row's height
+    // row: 6, max row
   });
 
   chartComponentGrid.value.on('change', onChangeChartComponent);

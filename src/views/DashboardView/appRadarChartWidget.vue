@@ -1,16 +1,23 @@
 <script setup>
-import { ref, onMounted, onUpdated, onUnmounted, triggerRef } from 'vue';
-import radarChart from './radarChart.vue';
-import dsa_api from '@/api/dsa_api';
+import { ref, onMounted, onUnmounted } from 'vue';
+import radarChart from '@/components/radarChart.vue';
 import { intervalTime } from '@/Constants/';
 import { ApplicationApi } from '@/views/DashboardView/api';
-// primeVue
-// import { useToast } from 'primevue/usetoast';
-// import Toast from 'primevue/toast';
-// const toast = useToast();
-const refRadarChartContainer = ref(null);
-const signalUpdate = ref(true);
-const interval = ref(null);
+
+const props = defineProps({
+  applicationId: {
+    type: String,
+    default: '',
+  },
+});
+
+watch(
+  () => props.applicationId,
+  async () => {
+    await getDataCriteria();
+  },
+);
+
 const chartData = ref({
   Key: [
     'Line Loading',
@@ -23,10 +30,10 @@ const chartData = ref({
     'SSR Module',
   ],
   data: {
-    Rate1: [90, 90, 90, 90, 90, 90, 90, 0],
-    Rate2: [95, 95, 95, 95, 95, 95, 95, 0],
-    Rate3: [100, 100, 100, 100, 100, 100, 100, 0],
-    CurentState: [99, 81, 81, 81, 81, 81, 81, 0],
+    Rate1: [], //[90, 90, 90, 90, 90, 90, 90, 0],
+    Rate2: [], //[95, 95, 95, 95, 95, 95, 95, 0],
+    Rate3: [], //[100, 100, 100, 100, 100, 100, 100, 0],
+    CurentState: [], //[99, 81, 81, 81, 81, 81, 81, 0],
   },
   modificationTime: '',
 });
@@ -60,7 +67,7 @@ const transformApiResponse = (apiResponse, modificationTime) => {
 
 const getDataCriteria = async () => {
   try {
-    const res = await ApplicationApi.getRadarChartData('6704ae00a0ce433ff084b984');
+    const res = await ApplicationApi.getRadarChartData(props.applicationId);
     chartData.value = transformApiResponse(res.data, res.data.modificationTime);
     // chartData.value = res.data;
   } catch (error) {
@@ -69,14 +76,11 @@ const getDataCriteria = async () => {
 };
 
 onMounted(async () => {
-  await getDataCriteria();
-  interval.value = setInterval(() => {
-    getDataCriteria();
-  }, intervalTime);
+  if (props.applicationId) {
+    await getDataCriteria();
+  }
 });
-onUnmounted(() => {
-  clearInterval(interval.value);
-});
+
 const refeshData = () => {
   getDataCriteria();
 };

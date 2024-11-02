@@ -60,19 +60,27 @@ const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) =>
 });
 
 const getCurrentStateColorAndTitle = (rate1, rate2) => {
-  if (rate2 < 0) {
-    colorTitle = 'red';
-    colorStatus = 'rgba(255,0,0,1)';
-    titleStatus = 'Emergency';
-  } else if (rate1 < 0) {
-    colorTitle = 'darkOrange';
-    colorStatus = 'rgba(255,255,0,1)';
-    titleStatus = 'Abnormal';
+  if (!rate1) {
+    // nodata
+    colorTitle = 'gray';
+    colorStatus = 'gray';
+    titleStatus = 'No data';
   } else {
-    colorTitle = 'rgb(34,139,34)';
-    colorStatus = 'rgba(0,128,0,1)';
-    titleStatus = 'Normal';
+    if (rate2 < 0) {
+      colorTitle = 'red';
+      colorStatus = 'rgba(255,0,0,1)';
+      titleStatus = 'Emergency';
+    } else if (rate1 < 0) {
+      colorTitle = 'darkOrange';
+      colorStatus = 'rgba(255,255,0,1)';
+      titleStatus = 'Abnormal';
+    } else {
+      colorTitle = 'rgb(34,139,34)';
+      colorStatus = 'rgba(0,128,0,1)';
+      titleStatus = 'Normal';
+    }
   }
+
   TitleChart(titleStatus);
   colorTitleChart(colorTitle);
   chartOptions.value = setChartOptions();

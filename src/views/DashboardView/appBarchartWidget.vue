@@ -12,6 +12,7 @@
 <script setup>
 import Chart from 'primevue/chart';
 import { watch } from 'vue';
+
 import chartComposable from '@/combosables/chartData';
 const { zoomOptions, nodataAnnotationOption } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
@@ -42,6 +43,7 @@ watch(
 );
 const chartData = ref();
 const chartOptions = ref();
+const interval = ref(null);
 
 const setChartData = () => {
   const documentStyle = getComputedStyle(document.documentElement);
