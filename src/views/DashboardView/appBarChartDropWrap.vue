@@ -9,6 +9,7 @@
             title="Reset Data"
             severity="danger"
             text
+            :disabled="!nodeDrag._id"
             @click="resetApplicationBarChartSelected"
           />
           <Button
@@ -16,9 +17,10 @@
             title="Refresh chart"
             severity="secondary"
             text
+            :disabled="!nodeDrag._id"
             @click="getAppliactionChartData"
           />
-          <Button icon="pi pi-times" text severity="primary" title="Remove chart" @click="handleRemoveChart" />
+          <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
         </div>
       </div>
     </template>
@@ -35,7 +37,6 @@
       </div>
     </template>
   </Card>
-
 </template>
 
 <script setup>
@@ -48,10 +49,13 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(['addNodeTreeSelectd', 'removeNodeTreeSelected', 'remove']);
-const handleRemoveChart = () => {
-  emit('remove', props.itemId);
+const emit = defineEmits(['addNodeTreeSelectd', 'removeNodeTreeSelected', 'onRemoveWidget']);
+
+const onRemoveWidget = () => {
+  emit('onRemoveWidget');
 };
+const nodeKey = ref(props.nodeDrag.key);
+
 //  Drop Application - bar
 const applicationBarChartSelected = ref();
 const applicationBarChartKeySelected = ref();
@@ -65,15 +69,14 @@ const onDragoverApplicationBarChart = () => {
   }
 };
 const onDropApplicationBarChart = async () => {
-  console.log('drop',JSON.stringify(props.nodeDrag));
-
   if (props.nodeDrag.type === 'Application' && applicationBarChartSelected.value !== props.nodeDrag._id) {
     resetApplicationBarChartSelected();
     applicationBarChartSelected.value = props.nodeDrag._id;
     applicationBarChartKeySelected.value = props.nodeDrag.key;
-    emit('addNodeTreeSelectd', props.nodeDrag.key);
     await getAppliactionChartData();
     canDropApplicationToBarChart.value = false;
+    emit('addNodeTreeSelectd', props.nodeDrag.key);
+    nodeKey.value = props.nodeDrag.key;
   }
 };
 
@@ -83,7 +86,7 @@ const getAppliactionChartData = async () => {
     const res = await ApplicationApi.getBarChartData(applicationBarChartSelected.value);
     applicationBarChartData.value = res.data || [];
   } catch (error) {
-    console.log('getVsaChartData: error ', error);
+    console.log('getAppliactionChartData: error ', error);
     applicationBarChartData.value = [];
   }
 };
@@ -91,7 +94,7 @@ const getAppliactionChartData = async () => {
 const resetApplicationBarChartSelected = () => {
   applicationBarChartData.value = [];
   applicationBarChartSelected.value = undefined;
-  emit('removeNodeTreeSelected', props.nodeDrag.key);
+  emit('removeNodeTreeSelected', nodeKey.value);
 };
 </script>
 

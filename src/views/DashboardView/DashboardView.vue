@@ -141,8 +141,31 @@
           @dragover.prevent="dragOverChartComponent"
           @drop.prevent="onDropChartComponent"
         >
-          <div ref="grid" class="grid-stack bg-blue-100"></div>
-
+          <!-- <div ref="grid" class="grid-stack bg-blue-100"></div> -->
+          <div class="grid-stack">
+            <div
+              v-for="w in chartComponentArr"
+              :id="w.id"
+              :key="w.id"
+              class="grid-stack-item"
+              :gs-x="w.x"
+              :gs-y="w.y"
+              :gs-w="w.w"
+              :gs-h="w.h"
+              :gs-id="w.id"
+            >
+              <div class="grid-stack-item-content">
+                <template v-if="w.typeChart === 'appBar'">
+                  <appBarChartDropWrap
+                    :nodeDrag="nodeDrag"
+                    @addNodeTreeSelectd="addNodeTreeSelectd"
+                    @removeNodeTreeSelected="removeNodeTreeSelected"
+                    @onRemoveWidget="onRemoveChartComponent(w)"
+                  />
+                </template>
+              </div>
+            </div>
+          </div>
           <div
             v-if="chartComponentArr.length === 0"
             class="flex h-full justify-content-center align-items-center"
@@ -376,34 +399,15 @@ onMounted(async () => {
     float: true,
     cellHeight: '9.7rem',
     row: 6,
+    // resizable: {
+    //   handles: 'e, se, s, sw, w, nw, n, ne', // Enables all resize handles
+    // },
+    // draggable: {
+    //   handle: '.grid-stack-item-content',
+    // },
   });
 
-  chartComponentGrid.value.on('added', function (event, items) {
-    for (const item of items) {
-      const itemEl = item.el;
-      const itemElContent = itemEl.querySelector('.grid-stack-item-content');
-      if (item.typeChart === 'appBar') {
-        console.log(nodeDrag.value);
-        const itemContentVNode = h(appBarChartDropWrap, {
-          nodeDrag: nodeDrag.value,
-          addNodeTreeSelectd: addNodeTreeSelectd,
-          removeNodeTreeSelected: removeNodeTreeSelected,
-          onRemove: () => {
-            chartComponentGrid.value.removeWidget(itemEl);
-          },
-        });
-        // Render the vue node into the item element
-        render(itemContentVNode, itemElContent);
-      }
-    }
-  });
-  chartComponentGrid.value.on('removed', function (event, items) {
-    for (const item of items) {
-      const itemEl = item.el;
-      const itemElContent = itemEl.querySelector('.grid-stack-item-content');
-      render(null, itemElContent);
-    }
-  });
+  chartComponentGrid.value.on('change', onChangeChartComponent);
 });
 
 const styleButtonComponents = ref({
@@ -935,7 +939,6 @@ const resetRightTsaSelected = async () => {
 };
 // vsa caseType
 const getVsaCaseTypeValue = (caseType) => {
-  console.log(caseType, 'caseType');
   switch (caseType) {
     case 0:
       return 'N:1';
@@ -1054,7 +1057,15 @@ const getTsaCurveTypeSeverity = (curveType) => {
       return '';
   }
 };
+const addNodeTreeSelectd = (key) => {
+  console.log('addNodeTreeSelectd', key);
+  treeSelected.value[key] = true;
+};
+const removeNodeTreeSelected = (key) => {
+  console.log('removeNodeTreeSelected', key);
 
+  treeSelected.value[key] = false;
+};
 // ---  drag drop chart type
 
 const canDropChartComponent = ref(false);
@@ -1062,7 +1073,6 @@ const typeChartDrag = ref();
 const applicationDraggable = ref(false);
 const vsaCurveDraggable = ref(false);
 const tsaCurveDraggable = ref(false);
-const chartComponentArr = ref([]);
 
 const compactGrid = () => {
   chartComponentGrid.value.compact();
@@ -1089,22 +1099,44 @@ const onDropChartComponent = () => {
   typeChartDrag.value = undefined;
 };
 
+// --- chart component
+const chartComponentArr = ref([]);
+
 const addNewChartComponent = async (typeChart) => {
+  const node = {
+    w: 6,
+    h: 3,
+    id: typeChart + '_' + chartComponentArr.value.length,
+    typeChart: typeChart,
+  };
+  chartComponentArr.value.push(node);
+
   await nextTick(() => {
-    chartComponentGrid.value.addWidget({
-      w: 6,
-      h: 3,
-      typeChart: typeChart,
+    chartComponentGrid.value.makeWidget(`#${node.id}`);
+    chartComponentGrid.value.update(document.querySelector(`#${node.id}`), {
+      resizable: { handles: 'e, se, s, sw, w, nw, n, ne' },
     });
   });
-  chartComponentArr.value.push(typeChart);
 };
 
-const addNodeTreeSelectd = (key) => {
-  treeSelected.value[key] = true;
+const onRemoveChartComponent = (widget) => {
+  const index = chartComponentArr.value.findIndex((w) => w.id == widget.id);
+  chartComponentArr.value.splice(index, 1);
+  const selector = `#${widget.id}`;
+  chartComponentGrid.value.removeWidget(selector, false);
 };
-const removeNodeTreeSelected = (key) => {
-  treeSelected.value[key] = false;
+const onChangeChartComponent = (event, changeItems) => {
+  changeItems.forEach((item) => {
+    const widget = chartComponentArr.value.find((w) => w.id == item.id);
+    if (!widget) {
+      console.warn('Widget not found: ' + item.id);
+      return;
+    }
+    widget.x = item.x;
+    widget.y = item.y;
+    widget.w = item.w;
+    widget.h = item.h;
+  });
 };
 </script>
 <style>
@@ -1125,5 +1157,16 @@ const removeNodeTreeSelected = (key) => {
 .cursor-grap {
   cursor: -webkit-grab;
   cursor: grab;
+}
+/* Hide specific resize handles */
+.ui-resizable-e,
+.ui-resizable-se,
+.ui-resizable-s,
+.ui-resizable-sw,
+.ui-resizable-w,
+.ui-resizable-nw,
+.ui-resizable-n,
+.ui-resizable-ne {
+  opacity: 0.5 !important;
 }
 </style>
