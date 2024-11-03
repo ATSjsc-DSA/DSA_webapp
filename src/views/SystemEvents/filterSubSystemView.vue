@@ -1,127 +1,94 @@
 <template>
-  <div class="w-full">
-    <flatListFilterWidget
-      :definitionList="definitionList"
-      :multipleSelection="true"
-      :showTypeFilter="false"
-      :init-data="initData"
-      @handleFilter="changFilterData"
-      @clearOtherFilterSelected="clearOtherFilterSelected"
-    >
-      <template #otherFilter>
-        <div class="grid gap-2">
-          <div class="col">
-            <div class="flex flex-column align-items-start gap-1">
-              <label for="type" class="text-sm"> Definition </label>
-              <MultiSelect
-                v-model="definitionSubsystemSelected"
-                display="chip"
-                :options="definitionSubsystemList"
-                optionLabel="name"
-                optionValue="_id"
-                placeholder="Select Types"
-                :max-selected-labels="1"
-                class="w-full psFilterAutoComplete"
-              />
-            </div>
-          </div>
+  <div class="w-full mb-3 pl-3 mt-1 flex justify-content-between align-items-center">
+    <span class="text-xl font-semibold"> Filter</span>
+    <div class="flex gap-2 align-items-center justify-content-end">
+      <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
+      <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="changFilter" />
+    </div>
+  </div>
+  <ScrollPanel style="width: 100%; height: 46rem">
+    <div class="flex flex-column gap-3 pl-1">
+      <searchPsWidget
+        v-model="areaSelected"
+        label="Area"
+        :definitionId="[areaDefinitionId]"
+        :multipleSelection="true"
+      />
 
-          <div class="col">
-            <div class="flex flex-column align-items-start gap-1">
-              <label for="ps" class="text-sm"> Power System </label>
-              <div class="input-group">
-                <Dropdown
-                  v-model="selectedType"
-                  :options="definitionSubsystemList"
-                  optionLabel="name"
-                  optionValue="_id"
-                  class="border-none"
-                />
-                <AutoComplete
-                  v-model="psSelected"
-                  inputId="ps"
-                  optionLabel="name"
-                  optionValue="_id"
-                  completeOnFocus
-                  class="w-full psFilterAutoComplete"
-                  :pt="{
-                    container: () => 'border-none focus:border-none',
-                  }"
-                  :class="{ showMoreViaDot: psSelected.length > 1 }"
-                  :suggestions="psSuggestions"
-                  name="psFilter"
-                  multiple
-                  @complete="searchPsQueryFilter"
-                />
-              </div>
-            </div>
-          </div>
+      <searchPsWidget
+        v-model="zoneSelected"
+        label="Zone"
+        :definitionId="[zoneDefinitionId]"
+        :multipleSelection="true"
+      />
+
+      <searchPsWidget
+        v-model="ownerSelected"
+        label="Owner"
+        :definitionId="[ownerDefinitionId]"
+        :multipleSelection="true"
+      />
+
+      <searchPsWidget v-model="kVSelected" label="kV" :definitionId="[kVDefinitionId]" :multipleSelection="true" />
+
+      <searchPsWidget
+        v-model="stationSelected"
+        label="Station"
+        :definitionId="[stationDefinitionId]"
+        :multipleSelection="true"
+      />
+
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="type" class="font-semibold"> Definition </label>
+        <MultiSelect
+          v-model="definitionSubsystemSelected"
+          display="chip"
+          :options="definitionSubsystemList"
+          optionLabel="name"
+          optionValue="_id"
+          placeholder="Select Types"
+          class="w-full psFilterAutoComplete"
+        />
+      </div>
+
+      <div class="flex flex-column align-items-start gap-1">
+        <label for="ps" class="font-semibold"> Power System </label>
+        <div class="input-group">
+          <Dropdown
+            v-model="psDefinitionType"
+            :options="definitionSubsystemList"
+            optionLabel="name"
+            optionValue="_id"
+            class="border-none w-20rem"
+          />
+
+          <searchPsWidget
+            v-model="psSelected"
+            label=""
+            :definitionId="[psDefinitionType]"
+            :multipleSelection="true"
+            :showViaDotAtTenChild="true"
+          />
         </div>
-      </template>
-    </flatListFilterWidget>
-  </div>
-  <div class="flex gap-4 justify-content-start align-items-center p-2">
-    <div class="font-semibold text-lg">Area</div>
-    <Dropdown
-      v-model="areaZoneConjunction"
-      :options="conjunctionOpts"
-      optionLabel="label"
-      optionValue="value"
-      class="w-7rem"
-    />
-    <div class="font-semibold text-lg">Zone</div>
-    <Dropdown
-      v-model="zoneOwnerConjunction"
-      :options="conjunctionOpts"
-      optionLabel="label"
-      optionValue="value"
-      class="w-7rem"
-    />
-    <div class="font-semibold text-lg">Owner</div>
-    <Dropdown
-      v-model="ownerKvConjunction"
-      :options="conjunctionOpts"
-      optionLabel="label"
-      optionValue="value"
-      class="w-7rem"
-    />
-    <div class="font-semibold text-lg">kV</div>
-    <Dropdown
-      v-model="kVStationConjunction"
-      :options="conjunctionOpts"
-      optionLabel="label"
-      optionValue="value"
-      class="w-7rem"
-    />
-    <div class="font-semibold text-lg">Station</div>
-    <Dropdown
-      v-model="stationDefinitionConjunction"
-      :options="conjunctionOpts"
-      optionLabel="label"
-      optionValue="value"
-      class="w-7rem"
-    />
-    <div class="font-semibold text-lg">Definition</div>
-    <Dropdown
-      v-model="definitionPsConjunction"
-      :options="conjunctionOpts"
-      optionLabel="label"
-      optionValue="value"
-      class="w-7rem"
-    />
-    <div class="font-semibold text-lg">Power System</div>
-  </div>
-  <Divider />
+      </div>
+      <Divider />
+
+      <div class="flex flex-column gap-2 mb-3">
+        <label for="appName" class="font-semibold"> Conjunction </label>
+        <Textarea id="filterConjunction" v-model="filterConjunction" class="flex-auto" autocomplete="off" />
+        <small>Example: "Area and Zone or (kV and Station)"</small>
+      </div>
+    </div>
+  </ScrollPanel>
 </template>
 
 <script setup>
 import MultiSelect from 'primevue/multiselect';
+import ScrollPanel from 'primevue/scrollpanel';
 
-import flatListFilterWidget from '@/views/PowerSystem/menuLeftWidget/flatListFilterWidget.vue';
-import { DefinitionListApi, PowerSystemParameterApi } from '@/views/PowerSystem/api';
+import { DefinitionListApi } from '@/views/PowerSystem/api';
 import { onMounted, watch } from 'vue';
-import Divider from 'primevue/divider';
-
+import searchPsWidget from '../PowerSystem/searchPsWidget.vue';
 onMounted(async () => {
   await getDefinitionList();
   await getdefinitionSubsystemList();
@@ -134,33 +101,79 @@ const emit = defineEmits(['changeFilter']);
 watch(
   () => props.currentFilter,
   () => {
-    definitionSubsystemSelected.value = props.currentFilter.definition.map((item) => item._id);
+    areaSelected.value = props.currentFilter.area;
+    zoneSelected.value = props.currentFilter.zone;
+    ownerSelected.value = props.currentFilter.owner;
+    kVSelected.value = props.currentFilter.kV;
+    stationSelected.value = props.currentFilter.station;
+    definitionSubsystemSelected.value = props.currentFilter.definition;
     psSelected.value = props.currentFilter.powerSystem;
-    initData.value = props.currentFilter;
+    filterConjunction.value = props.currentFilter.filter || '';
   },
 );
-const initData = ref();
+
+const areaSelected = ref([]);
+const areaDefinitionId = ref([]);
+
+const zoneSelected = ref([]);
+const zoneDefinitionId = ref([]);
+
+const ownerSelected = ref([]);
+const ownerDefinitionId = ref([]);
+
+const kVSelected = ref([]);
+const kVDefinitionId = ref([]);
+
+const stationSelected = ref([]);
+const stationDefinitionId = ref([]);
+
+const psDefinitionType = ref();
+const psSelected = ref([]);
+
+const filterConjunction = ref('');
+const changFilter = () => {
+  const newFilter = {
+    definitionList: definitionSubsystemSelected.value,
+    area: areaSelected.value.map((item) => item._id),
+    zone: zoneSelected.value.map((item) => item._id),
+    owner: ownerSelected.value.map((item) => item._id),
+    kv: kVSelected.value.map((item) => item._id),
+    station: stationSelected.value.map((item) => item._id),
+    powersystem: psSelected.value.map((item) => item._id),
+    filtering: filterConjunction.value,
+  };
+  emit('changeFilter', newFilter);
+};
+const clearFilterSelected = () => {
+  areaSelected.value = [];
+  zoneSelected.value = [];
+  ownerSelected.value = [];
+  kVSelected.value = [];
+  stationSelected.value = [];
+  psSelected.value = [];
+  definitionSubsystemSelected.value = [];
+  filterConjunction.value = '';
+};
+
+// definiton List
 const definitionList = ref();
 const getDefinitionList = async () => {
   try {
     const res = await DefinitionListApi.getParameterDefinitionList();
     definitionList.value = res.data;
+    setDefinitionfilterId();
   } catch (error) {
     console.log('getDefinitionList: error ', error);
     toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 
-const changFilterData = (newFilter) => {
-  newFilter.definitionList = definitionSubsystemSelected.value;
-  newFilter.powersystem = psSelected.value ? psSelected.value.map((item) => item._id) : [];
-  newFilter.filtering =
-    `AREA ${areaZoneConjunction.value} ZONE ${zoneOwnerConjunction.value} OWNER ${ownerKvConjunction.value} kv ${kVStationConjunction.value} station ${stationDefinitionConjunction.value} definitionList ${definitionPsConjunction.value} powersystem`.toUpperCase();
-  emit('changeFilter', newFilter);
-};
-const clearOtherFilterSelected = () => {
-  definitionSubsystemSelected.value = [];
-  psSelected.value = [];
+const setDefinitionfilterId = () => {
+  areaDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Area'))[0]._id;
+  zoneDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Zone'))[0]._id;
+  ownerDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Owner'))[0]._id;
+  kVDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Substation_kVBase'))[0]._id;
+  stationDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Station'))[0]._id;
 };
 
 const definitionSubsystemList = ref([]);
@@ -169,8 +182,6 @@ const definitionSubsystemSelected = ref([]);
 watch(definitionSubsystemSelected, () => {
   psSelected.value = [];
 });
-
-const selectedType = ref();
 
 const getdefinitionSubsystemList = async () => {
   try {
@@ -181,56 +192,11 @@ const getdefinitionSubsystemList = async () => {
     toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
-const psSelected = ref([]);
-const psSuggestions = ref([]);
-const searchPsQueryFilter = async (event) => {
-  const query = event ? event.query.trim() : '';
-  try {
-    const res = await PowerSystemParameterApi.searchPs([selectedType.value], query);
-    psSuggestions.value = res.data;
-    return res.data;
-  } catch (error) {
-    console.log('searchPsQueryFilter: error ', error);
-  }
-};
-// ---- and/or conjunction
-const conjunctionOpts = ref([
-  { label: 'AND', value: 'AND' },
-  { label: 'OR', value: 'OR' },
-]);
-const areaZoneConjunction = ref('AND');
-const zoneOwnerConjunction = ref('AND');
-const ownerKvConjunction = ref('AND');
-const kVStationConjunction = ref('AND');
-const stationDefinitionConjunction = ref('AND');
-const definitionPsConjunction = ref('AND');
 </script>
 <style>
 .p-autocomplete-input,
 .p-inputtext {
   width: 100%;
-}
-.psFilterAutoComplete button {
-  background-color: var(--gray-400);
-  border-color: var(--gray-400);
-}
-
-.p-autocomplete-multiple-container {
-  display: flex;
-  flex-wrap: nowrap;
-}
-
-.p-autocomplete-input-token {
-  flex-grow: 1;
-}
-.psFilterAutoComplete .p-autocomplete-token:nth-child(n + 2) {
-  display: none;
-}
-
-.psFilterAutoComplete.showMoreViaDot .p-autocomplete-token:first-child::after {
-  content: '...';
-  position: relative;
-  left: 2rem;
 }
 </style>
 <style scoped>

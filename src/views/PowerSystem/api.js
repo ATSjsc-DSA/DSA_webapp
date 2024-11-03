@@ -78,10 +78,12 @@ export class PowerSystemParameterApi {
   }
 
   static async getPsDataWithSubsystem(data = {}, page = 1) {
-    return post(`/powersystem/${projectData.value._id}/subsystem/${powerSystemVersionId.value}/parameter`, {
-      ...data,
-      page: page,
-    });
+    return post(
+      `/powersystem/${projectData.value._id}/subsystem/${powerSystemVersionId.value}/parameter?page=${page}&page_size=10`,
+      {
+        ...data,
+      },
+    );
   }
 
   static async searchPs(definitionList = [], query, exceptionArr = []) {

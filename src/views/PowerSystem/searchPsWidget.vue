@@ -1,6 +1,6 @@
 <template>
   <div class="w-full flex flex-column align-items-start gap-1">
-    <label for="ps" class="font-semibold"> {{ label }}</label>
+    <label v-if="label" for="ps" class="font-semibold"> {{ label }}</label>
     <AutoComplete
       v-model="psSelected"
       inputId="ps"
@@ -8,7 +8,9 @@
       optionValue="_id"
       completeOnFocus
       class="w-full"
+      :class="{ 'psFilterAutoComplete showMoreViaDot': showViaDotAtTenChild }"
       :suggestions="suggestions"
+      :multiple="multipleSelection"
       name="psFilter"
       @complete="searchQueryFilter"
     />
@@ -22,6 +24,8 @@ import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 const props = defineProps({
   label: { type: String, default: 'Power System' },
   definitionId: { type: Array, default: () => [] },
+  multipleSelection: { type: Boolean, default: false },
+  showViaDotAtTenChild: { type: Boolean, default: false },
 });
 const psSelected = defineModel();
 
@@ -36,3 +40,27 @@ const searchQueryFilter = async (event) => {
   }
 };
 </script>
+<style>
+.psFilterAutoComplete button {
+  background-color: var(--gray-400);
+  border-color: var(--gray-400);
+}
+
+.p-autocomplete-multiple-container {
+  display: flex;
+  flex-wrap: auto;
+}
+
+.p-autocomplete-input-token {
+  flex-grow: 1;
+}
+.psFilterAutoComplete .p-autocomplete-token:nth-child(n + 10) {
+  display: none;
+}
+
+.psFilterAutoComplete.showMoreViaDot .p-autocomplete-token:nth-child(9)::after {
+  content: '...';
+  position: relative;
+  left: 2rem;
+}
+</style>

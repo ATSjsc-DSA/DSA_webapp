@@ -56,7 +56,7 @@
             <div class="p-fluid p-2">
               <div class="field">
                 <label for="name" class="font-semibold">Name</label>
-                <InputText id="name" class="flex-auto" autocomplete="off" v-model="selectedItem.name" />
+                <InputText id="name" v-model="selectedItem.name" class="flex-auto" autocomplete="off" />
               </div>
               <div class="flex align-items-center gap-3 mb-5">
                 <label for="active" class="font-semibold">Active</label>
@@ -68,50 +68,67 @@
             </div>
           </TabPanel>
           <TabPanel header="List Power System">
-            <div class="py-1">
-              <filterSubSystemView :current-filter="selectedItem.filterConditions" @changeFilter="changeFilter" />
-            </div>
-            <div style="height: 32rem">
-              <DataTable
-                :value="parameterData"
-                dataKey="_id"
-                tableStyle="min-width: 50rem"
-                :lazy="true"
-                :sortOrder="1"
-                rowHover
-                scrollable
-                showGridlines
-                :loading="isParameterLoading"
+            <Splitter style="height: 100%">
+              <SplitterPanel
+                class="flex flex-column h-full w-full align-items-start justify-content-start overflow-y-auto px-3"
+                :size="20"
+                :minSize="10"
               >
-                <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
-                  <template #body="slotProps">
-                    <div class="font-bold" style="min-width: 6rem">
-                      {{ slotProps.data.generalInfo.uniqueId }}
-                    </div>
-                  </template>
-                </Column>
-                <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
-                <Column field="generalInfo.operationName" header="Operation Name" style="text-wrap: nowrap"></Column>
+                <filterSubSystemView :current-filter="selectedItem.filterConditions" @changeFilter="changeFilter" />
+              </SplitterPanel>
+              <SplitterPanel
+                class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
+                :size="20"
+                :minSize="10"
+              >
+                <div class="w-full mb-5 px-3 mt-1 flex justify-content-between align-items-center">
+                  <span class="text-xl font-semibold"> Power System</span>
+                </div>
+                <div class="w-full px-3" style="height: 48rem">
+                  <DataTable
+                    :value="parameterData"
+                    dataKey="_id"
+                    :lazy="true"
+                    :sortOrder="1"
+                    rowHover
+                    scrollable
+                    showGridlines
+                    :loading="isParameterLoading"
+                  >
+                    <Column field="generalInfo.uniqueId" frozen header="Unique Id" style="text-wrap: nowrap">
+                      <template #body="slotProps">
+                        <div class="font-bold" style="min-width: 6rem">
+                          {{ slotProps.data.generalInfo.uniqueId }}
+                        </div>
+                      </template>
+                    </Column>
+                    <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
+                    <Column
+                      field="generalInfo.operationName"
+                      header="Operation Name"
+                      style="text-wrap: nowrap"
+                    ></Column>
 
-                <Column field="stationName" header="Station" style="text-wrap: nowrap"></Column>
+                    <Column field="stationName" header="Station" style="text-wrap: nowrap"></Column>
 
-                <template #empty> No Data </template>
-              </DataTable>
-            </div>
-
-            <!-- ps table - Paginator -->
-            <div class="flex justify-content-end align-items-center">
-              <Paginator
-                v-if="parameterTotal > pageRowNumber"
-                v-model:first="parameterTotalPaginatorOffset"
-                class="flex-grow-1"
-                :rows="pageRowNumber"
-                :totalRecords="parameterTotal"
-                :page="parameterCurrentPage"
-                @page="onParameterPageChange"
-              ></Paginator>
-              <div class="mr-3">Total: {{ parameterTotal }}</div>
-            </div>
+                    <template #empty> No Data </template>
+                  </DataTable>
+                </div>
+                <!-- ps table - Paginator -->
+                <div class="flex w-full justify-content-end align-items-center">
+                  <Paginator
+                    v-if="parameterTotal > pageRowNumber"
+                    v-model:first="parameterTotalPaginatorOffset"
+                    class="flex-grow-1"
+                    :rows="pageRowNumber"
+                    :totalRecords="parameterTotal"
+                    :page="parameterCurrentPage"
+                    @page="onParameterPageChange"
+                  ></Paginator>
+                  <div class="mr-3">Total: {{ parameterTotal }}</div>
+                </div>
+              </SplitterPanel>
+            </Splitter>
           </TabPanel>
         </TabView>
       </SplitterPanel>
@@ -121,7 +138,7 @@
       <div class="p-fluid">
         <div class="field">
           <label for="name" class="font-semibold">Name</label>
-          <InputText id="name" class="flex-auto" autocomplete="off" v-model="formItemCreate.name" />
+          <InputText id="name" v-model="formItemCreate.name" class="flex-auto" autocomplete="off" />
         </div>
         <div class="flex align-items-center gap-3 mb-5">
           <label for="active" class="font-semibold">Active</label>
@@ -232,6 +249,7 @@ const createThis = async () => {
 };
 
 const filterData = ref([]);
+
 const changeFilter = async (newfilter) => {
   filterData.value = newfilter;
   await getParameterList();
