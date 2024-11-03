@@ -1,5 +1,5 @@
 <template>
-  <Card class="flex-grow-1 w-full grid-stack-item-content">
+  <Card class="flex-grow-1 w-full h-full grid-stack-item-content">
     <template #title>
       <div class="flex justify-content-between align-items-center">
         <div><i class="pi pi-credit-card pr-3"></i>Project</div>
@@ -16,7 +16,7 @@
       </div>
     </template>
     <template #content>
-      <ScrollPanel style="width: 100%; height: 52rem">
+      <ScrollPanel style="width: 100%; height: 100%">
         <Tree
           v-if="treeData.length > 0"
           v-model:expandedKeys="treeExpandedKeys"

@@ -2,7 +2,6 @@
 import chartComposable from '@/combosables/chartData';
 import Chart from 'primevue/chart';
 import { useLayout } from '@/layout/composables/layout';
-import modificationTimeFile from './modificationTimeFile.vue';
 import { computed, watch } from 'vue';
 
 const { convertDateTimeToString } = chartComposable();
@@ -21,11 +20,9 @@ const props = defineProps({
 
 const emits = defineEmits(['refeshData']);
 const DataProps = computed(() => props.chartData);
-const modificationTime = ref();
 watch(DataProps, (newValue, oldValue) => {
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
     chartData.value = setChartData(newValue);
-    modificationTime.value = convertDateTimeToString(newValue.modificationTime);
   }
 });
 const chartData = ref();
@@ -266,21 +263,15 @@ const setChartOptions = () => {
 };
 onMounted(async () => {
   chartData.value = setChartData(props.chartData);
-  modificationTime.value = convertDateTimeToString(props.chartData.modificationTime);
   chartOptions.value = setChartOptions();
 });
 watch(isDarkTheme, () => {
   chartOptions.value = setChartOptions();
 });
-const refeshData = () => {
-  chartOptions.value = setChartOptions();
-  emits('refeshData');
-};
 </script>
 
 <template>
   <div class="card flex justify-content-center h-full">
-    <modificationTimeFile :modificationTime="modificationTime" @refeshData="refeshData"></modificationTimeFile>
     <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem h-full" />
   </div>
 </template>

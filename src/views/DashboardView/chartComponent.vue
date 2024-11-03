@@ -2,7 +2,10 @@
   <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropNode }">
     <template #title>
       <div class="flex justify-content-between align-items-center">
-        <div><i class="pi pi-folder-open pr-3"></i>{{ chartTitle }} Chart</div>
+        <div class="flex flex-column justify-content-start align-items-start">
+          <div><i class="pi pi-folder-open pr-3"></i>{{ chartTitle }}</div>
+          <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
+        </div>
         <div>
           <Button
             icon="pi pi-trash "
@@ -35,19 +38,21 @@
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
-        <appRadarChartWidget v-if="typeChart === 'appRadar'" :applicationId="nodeSelected" />
+        <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" />
       </div>
     </template>
   </Card>
 </template>
 
 <script setup>
-import { computed, onUnmounted } from 'vue';
+import { computed, onUnmounted, onMounted } from 'vue';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import { VsaApi, TsaApi, ApplicationApi } from './api';
 import { intervalTime } from '@/Constants/';
+import chartComposable from '@/combosables/chartData';
+const { convertDateTimeToString } = chartComposable();
 
 const props = defineProps({
   nodeDrag: {
@@ -72,6 +77,9 @@ const emit = defineEmits(['onRemoveWidget']);
 
 const interval = ref(null);
 
+onMounted(() => {
+  setInitTitle();
+});
 onUnmounted(() => {
   clearInterval(interval.value);
 });
@@ -94,22 +102,23 @@ const typeChartCanDrop = computed(() => {
   return '';
 });
 
-const chartTitle = computed(() => {
+const chartTitle = ref('');
+
+const setInitTitle = () => {
   if (props.typeChart === 'appRadar') {
-    return 'Radar';
+    chartTitle.value = 'Radar';
   }
   if (props.typeChart === 'appBar') {
-    return 'Application';
+    chartTitle.value = 'Application';
   }
 
   if (props.typeChart === 'vsa') {
-    return 'Vsa';
+    chartTitle.value = 'Vsa';
   }
   if (props.typeChart === 'tsa') {
-    return 'Tsa';
+    chartTitle.value = 'Tsa';
   }
-  return '';
-});
+};
 //  Drop Application - bar
 const nodeSelected = ref(props.muiltiSelect ? [] : undefined);
 const nodeKeySelected = ref(props.muiltiSelect ? [] : undefined);
@@ -124,9 +133,8 @@ const onDragoverComponent = () => {
 };
 const onDropComponent = async () => {
   if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelected.value !== props.nodeDrag._id) {
-    if (Array.isArray(nodeSelected.value)) {
+    if (props.muiltiSelect) {
       nodeKeySelected.value.push(props.nodeDrag.key);
-
       if (props.typeChart === 'vsa') {
         nodeSelected.value.push({
           curveInfoId: props.nodeDrag._id,
@@ -139,6 +147,7 @@ const onDropComponent = async () => {
         nodeSelected.value.push(props.nodeDrag.label);
       }
     } else {
+      chartTitle.value = props.nodeDrag.label;
       resetChart();
       nodeSelected.value = props.nodeDrag._id;
       nodeKeySelected.value = props.nodeDrag.key;
@@ -155,6 +164,7 @@ const onDropComponent = async () => {
 };
 
 const chartData = ref([]);
+const modificationTime = ref();
 const getChartData = async () => {
   try {
     let res = {};
@@ -163,7 +173,7 @@ const getChartData = async () => {
       res = await ApplicationApi.getBarChartData(nodeSelected.value);
     }
     if (props.typeChart === 'appRadar') {
-      return;
+      res = await ApplicationApi.getRadarChartData(nodeSelected.value);
     }
     if (props.typeChart === 'vsa') {
       res = await VsaApi.getChartData(nodeSelected.value);
@@ -171,23 +181,28 @@ const getChartData = async () => {
     if (props.typeChart === 'tsa') {
       res = await TsaApi.getChartData(nodeSelected.value);
     }
-    chartData.value = res.data || [];
+    console.log('adfasdf', res.data);
+
+    if (res.data) {
+      chartData.value = res.data;
+      modificationTime.value = res.data.modificationTime
+        ? convertDateTimeToString(res.data.modificationTime)
+        : undefined;
+    } else {
+      chartData.value = [];
+      modificationTime.value = undefined;
+    }
   } catch (error) {
     console.log('getAppliactionChartData: error ', error);
     chartData.value = [];
+    modificationTime.value = undefined;
   }
 };
 
 const resetChart = () => {
   chartData.value = [];
+  setInitTitle();
   nodeSelected.value = props.muiltiSelect ? [] : undefined;
-  if (Array.isArray(nodeKeySelected.value)) {
-    nodeKeySelected.value.forEach((node) => {
-      // emit('removeNodeTreeSelected', node);
-    });
-  } else {
-    // emit('removeNodeTreeSelected', nodeKeySelected.value);
-  }
   clearInterval(interval.value);
 };
 </script>
