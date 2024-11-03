@@ -29,19 +29,31 @@
           <div class="col">
             <div class="flex flex-column align-items-start gap-1">
               <label for="ps" class="text-sm"> Power System </label>
-              <AutoComplete
-                v-model="psSelected"
-                inputId="ps"
-                optionLabel="name"
-                optionValue="_id"
-                completeOnFocus
-                class="w-full psFilterAutoComplete"
-                :class="{ showMoreViaDot: psSelected.length > 1 }"
-                :suggestions="psSuggestions"
-                name="psFilter"
-                multiple
-                @complete="searchPsQueryFilter"
-              />
+              <div class="input-group">
+                <Dropdown
+                  v-model="selectedType"
+                  :options="definitionSubsystemList"
+                  optionLabel="name"
+                  optionValue="_id"
+                  class="border-none"
+                />
+                <AutoComplete
+                  v-model="psSelected"
+                  inputId="ps"
+                  optionLabel="name"
+                  optionValue="_id"
+                  completeOnFocus
+                  class="w-full psFilterAutoComplete"
+                  :pt="{
+                    container: () => 'border-none focus:border-none',
+                  }"
+                  :class="{ showMoreViaDot: psSelected.length > 1 }"
+                  :suggestions="psSuggestions"
+                  name="psFilter"
+                  multiple
+                  @complete="searchPsQueryFilter"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -158,6 +170,8 @@ watch(definitionSubsystemSelected, () => {
   psSelected.value = [];
 });
 
+const selectedType = ref();
+
 const getdefinitionSubsystemList = async () => {
   try {
     const res = await DefinitionListApi.getDefinitionSubsystem();
@@ -172,7 +186,7 @@ const psSuggestions = ref([]);
 const searchPsQueryFilter = async (event) => {
   const query = event ? event.query.trim() : '';
   try {
-    const res = await PowerSystemParameterApi.searchPs(definitionSubsystemSelected.value, query);
+    const res = await PowerSystemParameterApi.searchPs([selectedType.value], query);
     psSuggestions.value = res.data;
     return res.data;
   } catch (error) {
@@ -217,5 +231,15 @@ const definitionPsConjunction = ref('AND');
   content: '...';
   position: relative;
   left: 2rem;
+}
+</style>
+<style scoped>
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc; /* Viền bao quanh */
+  border-radius: 4px; /* Góc bo tròn */
+  overflow: hidden;
+  width: 100%;
 }
 </style>
