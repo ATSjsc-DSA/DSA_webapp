@@ -34,7 +34,7 @@
                 <div v-if="w.type === 'map'" class="h-full">
                   <mapView @onRemoveWidget="onRemoveGridStackComponent(w)" />
                 </div>
-                <div v-if="w.type === 'tree'">
+                <div v-if="w.type === 'tree'" class="h-full">
                   <projectTreeWidget
                     v-bind:application-draggable="applicationDraggable"
                     v-bind:vsa-curve-draggable="vsaCurveDraggable"
@@ -182,8 +182,8 @@ const gridStackComponentArr = ref([]);
 onMounted(async () => {
   gridStackComponentGrid.value = GridStack.init({
     float: false,
-    cellHeight: '10rem', // row's height
-    cellWidth: '10rem',
+    cellHeight: '1rem', // row's height
+    cellWidth: '1rem',
     // row: 6, max row
   });
 
@@ -202,6 +202,9 @@ watch(gridLock, async () => {
 });
 
 const onRemoveGridStackComponent = (widget) => {
+  if (gridLock.value) {
+    return;
+  }
   const index = gridStackComponentArr.value.findIndex((w) => w.id == widget.id);
   gridStackComponentArr.value.splice(index, 1);
   const selector = `#${widget.id}`;
@@ -306,7 +309,7 @@ const onDropGridStackComponent = () => {
 const addNewGridStackComponent = async (typeChart, muiltiSelect) => {
   const node = {
     w: 3,
-    h: 3,
+    h: 30,
     id: typeChart + '_' + gridStackComponentArr.value.length,
     typeChart: typeChart,
     muiltiSelect: muiltiSelect,
@@ -326,7 +329,7 @@ const addProjectTreeComponent = async () => {
   const treeId = 'projectTreeComponent' + v4();
   const node = {
     w: 3,
-    h: 6,
+    h: 60,
     id: treeId,
     type: 'tree',
   };
@@ -344,7 +347,7 @@ const addMapComponent = async () => {
   const mapId = 'mapComponent' + v4();
   const node = {
     w: 3,
-    h: 6,
+    h: 60,
     id: mapId,
     type: 'map',
   };

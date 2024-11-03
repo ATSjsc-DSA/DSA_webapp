@@ -1,22 +1,34 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import radarChart from '@/components/radarChart.vue';
-import { ApplicationApi } from '@/views/DashboardView/api';
+import { ref, onMounted, watch } from 'vue';
+import Chart from 'primevue/chart';
+import { useLayout } from '@/layout/composables/layout';
 
+const { isDarkTheme } = useLayout();
 const props = defineProps({
-  applicationId: {
-    type: String,
-    default: '',
+  data: {
+    type: Object,
+    default: () => {},
   },
+});
+onMounted(() => {
+  chartData.value = setChartData();
+  chartOptions.value = setChartOptions();
 });
 
 watch(
-  () => props.applicationId,
+  () => props.data,
   async () => {
-    await getDataCriteria();
+    chartData.value = setChartData();
+    chartOptions.value = setChartOptions();
   },
 );
-
+watch(
+  isDarkTheme,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+  { immediate: false },
+);
 const chartData = ref({
   Key: [
     'Line Loading',
@@ -36,19 +48,24 @@ const chartData = ref({
   },
   modificationTime: '',
 });
+const chartOptions = ref();
 
 // Function to transform API response and ensure chartData always has 7 keys
-const transformApiResponse = (apiResponse, modificationTime) => {
-  // console.log(apiResponse, 'apiResponse');
+const transformApiResponse = (data) => {
+  if (!data.Key) {
+    return {
+      Key: [],
+      data: [],
+    };
+  }
   const result = {
-    Key: apiResponse.Key.slice(0, 7), // If there are more than 7 keys, we take the first 7
+    Key: data.Key.slice(0, 7), // If there are more than 7 keys, we take the first 7
     data: {
-      Rate1: apiResponse.data.Rate1.slice(0, 7),
-      Rate2: apiResponse.data.Rate2.slice(0, 7),
-      Rate3: apiResponse.data.Rate3.slice(0, 7),
-      CurentState: apiResponse.data.CurentState.slice(0, 7),
+      Rate1: data.data.Rate1.slice(0, 7),
+      Rate2: data.data.Rate2.slice(0, 7),
+      Rate3: data.data.Rate3.slice(0, 7),
+      CurentState: data.data.CurentState.slice(0, 7),
     },
-    modificationTime: modificationTime,
   };
   // console.log(result, 'result');
   // Add missing slots if there are fewer than 7 keys
@@ -64,37 +81,240 @@ const transformApiResponse = (apiResponse, modificationTime) => {
   return result;
 };
 
-const getDataCriteria = async () => {
-  try {
-    const res = await ApplicationApi.getRadarChartData(props.applicationId);
-    chartData.value = transformApiResponse(res.data, res.data.modificationTime);
-    // chartData.value = res.data;
-  } catch (error) {
-    // toast.add({ severity: 'error', summary: 'Error Message', detail: error, life: 3000 });
+const setChartData = () => {
+  const radarData = transformApiResponse(props.data);
+  const chartValue = [];
+  const numAxis = radarData.Key.length;
+
+  const rate1 = radarData.data.Rate1;
+  const rate2 = radarData.data.Rate2;
+  const rate3 = radarData.data.Rate3;
+  const current = radarData.data.CurentState;
+
+  let reserve1Data = [];
+  let reserve2Data = [];
+  let reserve3Data = [];
+
+  for (let index = 0; index < numAxis; index++) {
+    const re1 = (-current[index] + rate1[index]) / rate3[index];
+    const re2 = (-current[index] + rate2[index]) / rate3[index];
+    const re3 = (-current[index] + rate3[index]) / rate3[index];
+    reserve1Data.push(re1);
+    reserve2Data.push(re2);
+    reserve3Data.push(re3);
   }
+
+  const maxDataValue = Math.max(...reserve1Data, ...reserve2Data, ...reserve3Data);
+  if (maxDataValue > maxAxisValue) maxAxisValue = maxDataValue;
+  maxAxisValue = maxDataValue + 0.05;
+  maxAxisValue = maxAxisValue > 0.2 ? 0.2 : maxAxisValue;
+
+  if (reserve1Data.length>0) {
+    const minRate1 = Math.min(...reserve1Data);
+    const minRate2 = Math.min(...reserve2Data);
+    getCurrentStateColorAndTitle(minRate1, minRate2);
+  } else {
+    getCurrentStateColorAndTitle(undefined, undefined);
+  }
+
+  reserve1Data = removeValueBellowZero(reserve1Data);
+  reserve2Data = removeValueBellowZero(reserve2Data);
+  reserve3Data = removeValueBellowZero(reserve3Data);
+  reserve1Data = removeValueExceed20(reserve1Data);
+  reserve2Data = removeValueExceed20(reserve2Data);
+  reserve3Data = removeValueExceed20(reserve3Data);
+
+  const currentData = new Array(numAxis).fill(0);
+  const boundData = new Array(numAxis).fill(maxAxisValue);
+
+  const currentValue = getChartConfig(currentData, 'rgba(0,0,0,1)', colorStatus, 'start', 'current');
+  const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(40,167,69,0.5)', '-1', 'rate1');
+  const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
+  const reserve3Value = getChartConfig(reserve3Data, 'rgba(244,67,54,1)', 'rgba(244,67,54,0.6)', '-1', 'rate3');
+  const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.6)', '-1', 'bound');
+
+  chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
+  return {
+    labels: radarData.Key,
+    datasets: chartValue,
+  };
 };
 
-onMounted(async () => {
-  if (props.applicationId) {
-    await getDataCriteria();
-  }
+const setChartOptions = () => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColor = documentStyle.getPropertyValue('--text-color');
+  const textColor2nd = documentStyle.getPropertyValue('--text-color-secondary');
+  const primaryColor = documentStyle.getPropertyValue('--primary-color');
+  const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+  return {
+    animation: false,
+    maintainAspectRatio: false,
+
+    scales: {
+      r: {
+        startAngle: 0,
+        beginAtZero: true,
+        stacked: true,
+        min: -0.05,
+        max: maxAxisValue,
+        grid: {
+          display: true,
+          lineWidth: 1,
+          circular: false,
+          color: surfaceBorder,
+        },
+        angleLines: {
+          display: true,
+          lineWidth: 1,
+          color: textColor2nd,
+        },
+        pointLabels: {
+          padding: 2,
+          color: textColor,
+          borderRadius: 2,
+          font: {
+            size: 10,
+            style: 'normal',
+            weight: 'bold',
+          },
+        },
+
+        ticks: {
+          display: true,
+          stepSize: 0.05,
+          callback: function (value, index, values) {
+            return (value * 100).toFixed(0) + '%';
+          },
+          color: textColor,
+          backdropColor: 'transparent',
+          z: 10,
+          font: {
+            size: 10,
+            style: 'normal',
+          },
+        },
+      },
+    },
+    plugins: {
+      title: {
+        display: true,
+        text: TitleChart,
+        color: colorTitleChart,
+        position: 'top', // Đặt vị trí tiêu đề là top
+        align: 'center', // Căn giữa
+        font: {
+          size: 18, // Kích thước font
+          weight: 'bold', // Độ đậm của font
+        },
+        padding: {
+          top: 0,
+          bottom: 0,
+        },
+      },
+      legend: {
+        display: false,
+        labels: {
+          usePointStyle: true,
+          color: 'red',
+          font: {
+            size: 8,
+          },
+          padding: 0,
+        },
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || '';
+
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.r !== null) {
+              const viewValue = context.parsed.r * 100;
+              label += viewValue;
+            }
+            return label;
+          },
+        },
+      },
+    },
+    interaction: {
+      intersect: false,
+    },
+  };
+};
+// const chartData = computed(() => {
+//   return setChartData(props.chartData.data);
+// });
+
+// const modificationTime = computed(() => {
+//   if (props.chartData.modificationTime) {
+//     return convertDateTimeToString(props.chartData.modificationTime);
+//   }
+// });
+// const label = computed(() => {
+//   console.log('123');
+//   return props.chartData.Key;
+// });
+let maxAxisValue = 0.2;
+let titleStatus = 'Secure'; // Secure , Warning , Critical
+let colorStatus = 'rgba(0,128,0,1)';
+let colorTitle = 'blue'; // blue, darkOrange, red
+const TitleChart = () => 'System status : ' + titleStatus;
+const colorTitleChart = () => colorTitle;
+const getChartConfig = (pdata, pborderColor, pbackgroundColor, pfill, plabel) => ({
+  data: pdata,
+  showLine: true,
+  pointRadius: 0,
+  borderWidth: 1,
+  borderColor: pborderColor,
+  backgroundColor: pbackgroundColor,
+  fill: pfill,
+  label: plabel,
 });
 
-const refeshData = () => {
-  getDataCriteria();
+const getCurrentStateColorAndTitle = (rate1, rate2) => {
+  if (!rate1) {
+    // nodata
+    colorTitle = 'gray';
+    colorStatus = 'gray';
+    titleStatus = 'No data';
+  } else {
+    if (rate2 < 0) {
+      colorTitle = 'red';
+      colorStatus = 'rgba(255,0,0,1)';
+      titleStatus = 'Emergency';
+    } else if (rate1 < 0) {
+      colorTitle = 'darkOrange';
+      colorStatus = 'rgba(255,255,0,1)';
+      titleStatus = 'Abnormal';
+    } else {
+      colorTitle = 'rgb(34,139,34)';
+      colorStatus = 'rgba(0,128,0,1)';
+      titleStatus = 'Normal';
+    }
+  }
+  console.log('getCurrentStateColorAndTitle', rate1, rate2);
+  TitleChart(titleStatus);
+  colorTitleChart(colorTitle);
+  chartOptions.value = setChartOptions();
+};
+
+const removeValueBellowZero = (reserveData) => {
+  var reserveDataZero = reserveData.map((item) => (item < 0 ? 0 : item));
+  return reserveDataZero;
+};
+
+const removeValueExceed20 = (reserveData) => {
+  var reserveDataExceed20 = reserveData.map((item) => (item > 0.2 ? 0.2 : item));
+  return reserveDataExceed20;
 };
 </script>
 
 <template>
-  <!--  <Toast></Toast> -->
-  <div class="radarChartContainer">
-    <radar-chart :chartData="chartData" @refeshData="refeshData"></radar-chart>
+  <div class="h-full">
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem h-full" />
   </div>
 </template>
-<style lang="scss" scoped>
-.radarChartContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-</style>
