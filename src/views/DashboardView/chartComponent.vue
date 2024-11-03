@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { computed, watch, onUnmounted } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
@@ -156,7 +156,6 @@ const onDropComponent = async () => {
 
 const chartData = ref([]);
 const getChartData = async () => {
-  console.log('get chart data', props.typeChart);
   try {
     let res = {};
 

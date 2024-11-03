@@ -1,18 +1,18 @@
 <template>
-  <Card class="flex-grow-1 w-full">
+  <Card class="flex-grow-1 w-full grid-stack-item-content">
     <template #title>
       <div class="flex justify-content-between align-items-center">
         <div><i class="pi pi-credit-card pr-3"></i>Project</div>
-        <Button
-          title="Collapse All"
-          icon="pi pi-chevron-up "
-          severity="secondary"
-          text
-          @click="treeExpandedKeys = {}"
-        />
-
-        <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="emit('onRemoveWidget')" />
-
+        <div>
+          <Button
+            title="Collapse All"
+            icon="pi pi-chevron-up "
+            severity="secondary"
+            text
+            @click="treeExpandedKeys = {}"
+          />
+          <Button icon="pi pi-times" text severity="secondary" title="Remove Tree" @click="emit('onRemoveWidget')" />
+        </div>
       </div>
     </template>
     <template #content>
@@ -148,7 +148,7 @@ const props = defineProps({
     default: false,
   },
 });
-const emit = defineEmits(['onStartDragNode','onRemoveWidget']);
+const emit = defineEmits(['onStartDragNode', 'onRemoveWidget']);
 const onStartDragNode = (evt, node) => {
   emit('onStartDragNode', evt, node);
 };

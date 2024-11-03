@@ -14,6 +14,8 @@ import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 import Tag from 'primevue/tag';
 
+const emit = defineEmits(['onRemoveWidget']);
+
 // define
 const mapStore = useMapStore();
 const toast = useToast();
@@ -211,6 +213,7 @@ const changeSelecetCriteria = (value) => {
     </div>
   </div>
   <div id="annotationLayer" class="ol-annotation">
+    <Button icon="pi pi-times" text severity="secondary" title="Remove Tree" @click="emit('onRemoveWidget')" />
     <div v-show="selectedCriteria === ''"></div>
     <div v-show="selectedCriteria === 'LHV'" class="p-1">
       <div class="flex align-items-center">
