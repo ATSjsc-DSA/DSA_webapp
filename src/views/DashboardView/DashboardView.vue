@@ -45,6 +45,7 @@
                 </div>
                 <chartComponent
                   v-if="w.type === 'chart'"
+                  v-model:nodeSelected="w.nodeSelected"
                   :nodeDrag="nodeDrag"
                   :chartId="w.id"
                   :typeChart="w.typeChart"
@@ -84,6 +85,16 @@
             >
               <i class="pi pi-trash" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">DELETE</div>
+            </div>
+
+            <div
+              v-tooltip.left="'Save Grid'"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-gray-100 button-choose-components"
+              placeholder="Left"
+              @click="saveGrid"
+            >
+              <i class="pi pi-save" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">Save</div>
             </div>
             <Divider />
             <div
@@ -176,7 +187,7 @@ import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 
 const gridStackComponentGrid = ref(null);
-const gridLock = ref(false);
+const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
 
 onMounted(async () => {
@@ -184,14 +195,42 @@ onMounted(async () => {
     float: false,
     cellHeight: '1rem', // row's height
     cellWidth: '1rem',
-    // row: 6, max row
+    disableDrag: gridLock.value,
+    disableResize: gridLock.value,
   });
 
   gridStackComponentGrid.value.on('change', onChangeGridStackComponent);
   setTimeout(() => {
-    addMapComponent();
-    addProjectTreeComponent();
-  }, 500);
+    const oldGrid = JSON.parse(localStorage.getItem('gridStackComponentArr'));
+    if (oldGrid) {
+      oldGrid.forEach((widget) => {
+        if (widget.type === 'map') {
+          addMapComponent(widget);
+        }
+        if (widget.type === 'tree') {
+          addProjectTreeComponent(widget);
+        }
+        if (widget.type === 'chart') {
+          if (widget.typeChart === 'appBar') {
+            applicationDraggable.value = true;
+            addNewChartComponent('appBar', false, widget);
+          }
+          if (widget.typeChart === 'appRadar') {
+            applicationDraggable.value = true;
+            addNewChartComponent('appRadar', false, widget);
+          }
+          if (widget.typeChart === 'vsa') {
+            vsaCurveDraggable.value = true;
+            addNewChartComponent('vsa', true, widget);
+          }
+          if (widget.typeChart === 'tsa') {
+            tsaCurveDraggable.value = true;
+            addNewChartComponent('tsa', true, widget);
+          }
+        }
+      });
+    }
+  }, 1000);
 });
 
 watch(gridLock, async () => {
@@ -254,6 +293,19 @@ const removeAllComponent = () => {
   gridStackComponentArr.value = [];
 };
 
+const saveGrid = () => {
+  const { nodes } = gridStackComponentGrid.value.engine;
+  nodes.forEach((node) => {
+    gridStackComponentArr.value.map((w) => {
+      if (w.id === node.id) {
+        w.x = node.x;
+        w.y = node.y;
+      }
+    });
+  });
+  localStorage.setItem('gridStackComponentArr', JSON.stringify(gridStackComponentArr.value));
+};
+
 // -- drag drop ---
 const nodeDrag = ref({});
 const onStartDragNode = (evt, node) => {
@@ -283,19 +335,19 @@ const onDropGridStackComponent = () => {
 
   if (componentSelected.value === 'appBar') {
     applicationDraggable.value = true;
-    addNewGridStackComponent(componentSelected.value, false);
+    addNewChartComponent(componentSelected.value, false);
   }
   if (componentSelected.value === 'appRadar') {
     applicationDraggable.value = true;
-    addNewGridStackComponent(componentSelected.value, false);
+    addNewChartComponent(componentSelected.value, false);
   }
   if (componentSelected.value === 'vsa') {
     vsaCurveDraggable.value = true;
-    addNewGridStackComponent(componentSelected.value, true);
+    addNewChartComponent(componentSelected.value, true);
   }
   if (componentSelected.value === 'tsa') {
     tsaCurveDraggable.value = true;
-    addNewGridStackComponent(componentSelected.value, true);
+    addNewChartComponent(componentSelected.value, true);
   }
   if (componentSelected.value === 'tree') {
     addProjectTreeComponent();
@@ -306,13 +358,16 @@ const onDropGridStackComponent = () => {
   componentSelected.value = undefined;
 };
 
-const addNewGridStackComponent = async (typeChart, muiltiSelect) => {
+const addNewChartComponent = async (typeChart, muiltiSelect, oldConfig = {}) => {
   const node = {
-    w: 3,
-    h: 30,
+    x: oldConfig.x || null,
+    y: oldConfig.y | null,
+    w: oldConfig.w || 3,
+    h: oldConfig.h || 30,
     id: typeChart + '_' + gridStackComponentArr.value.length,
     typeChart: typeChart,
     muiltiSelect: muiltiSelect,
+    nodeSelected: oldConfig.nodeSelected,
     type: 'chart',
   };
   gridStackComponentArr.value.push(node);
@@ -325,11 +380,14 @@ const addNewGridStackComponent = async (typeChart, muiltiSelect) => {
   });
 };
 
-const addProjectTreeComponent = async () => {
+const addProjectTreeComponent = async (oldConfig = {}) => {
   const treeId = 'projectTreeComponent' + v4();
+
   const node = {
-    w: 3,
-    h: 60,
+    x: oldConfig.x || null,
+    y: oldConfig.y | null,
+    w: oldConfig.w || 3,
+    h: oldConfig.h || 60,
     id: treeId,
     type: 'tree',
   };
@@ -343,11 +401,13 @@ const addProjectTreeComponent = async () => {
   });
 };
 
-const addMapComponent = async () => {
+const addMapComponent = async (oldConfig = {}) => {
   const mapId = 'mapComponent' + v4();
   const node = {
-    w: 3,
-    h: 60,
+    x: oldConfig.x || null,
+    y: oldConfig.y | null,
+    w: oldConfig.w || 3,
+    h: oldConfig.h || 60,
     id: mapId,
     type: 'map',
   };

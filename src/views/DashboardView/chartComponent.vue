@@ -7,22 +7,8 @@
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
         </div>
         <div>
-          <Button
-            icon="pi pi-trash "
-            title="Reset Data"
-            severity="danger"
-            text
-            :disabled="!nodeDrag._id"
-            @click="resetChart"
-          />
-          <Button
-            icon="pi pi-refresh "
-            title="Refresh chart"
-            severity="secondary"
-            text
-            :disabled="!nodeDrag._id"
-            @click="getChartData"
-          />
+          <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
+          <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="getChartData" />
           <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
         </div>
       </div>
@@ -45,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed, onUnmounted, onMounted } from 'vue';
+import { computed, onUnmounted, onMounted, watch } from 'vue';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
@@ -73,12 +59,21 @@ const props = defineProps({
     default: false,
   },
 });
+
 const emit = defineEmits(['onRemoveWidget']);
 
 const interval = ref(null);
 
 onMounted(() => {
   setInitTitle();
+  if (nodeSelected.value) {
+    getChartData();
+    interval.value = setInterval(() => {
+      getChartData();
+    }, intervalTime);
+  } else {
+    nodeSelected.value = props.muiltiSelect ? [] : undefined;
+  }
 });
 onUnmounted(() => {
   clearInterval(interval.value);
@@ -120,7 +115,9 @@ const setInitTitle = () => {
   }
 };
 //  Drop Application - bar
-const nodeSelected = ref(props.muiltiSelect ? [] : undefined);
+
+const nodeSelected = defineModel('nodeSelected');
+
 const nodeKeySelected = ref(props.muiltiSelect ? [] : undefined);
 const canDropNode = ref(false);
 
@@ -147,11 +144,12 @@ const onDropComponent = async () => {
         nodeSelected.value.push(props.nodeDrag.label);
       }
     } else {
-      chartTitle.value = props.nodeDrag.label;
       resetChart();
+      chartTitle.value = props.nodeDrag.label;
       nodeSelected.value = props.nodeDrag._id;
       nodeKeySelected.value = props.nodeDrag.key;
     }
+    nodeSelected.value = nodeSelected.value;
 
     await getChartData();
     canDropNode.value = false;
@@ -181,8 +179,6 @@ const getChartData = async () => {
     if (props.typeChart === 'tsa') {
       res = await TsaApi.getChartData(nodeSelected.value);
     }
-    console.log('adfasdf', res.data);
-
     if (res.data) {
       chartData.value = res.data;
       modificationTime.value = res.data.modificationTime
@@ -204,6 +200,7 @@ const resetChart = () => {
   setInitTitle();
   nodeSelected.value = props.muiltiSelect ? [] : undefined;
   clearInterval(interval.value);
+  nodeSelected.value = undefined;
 };
 </script>
 

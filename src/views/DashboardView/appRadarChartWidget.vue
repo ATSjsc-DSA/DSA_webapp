@@ -296,7 +296,6 @@ const getCurrentStateColorAndTitle = (rate1, rate2) => {
       titleStatus = 'Normal';
     }
   }
-  console.log('getCurrentStateColorAndTitle', rate1, rate2);
   TitleChart(titleStatus);
   colorTitleChart(colorTitle);
   chartOptions.value = setChartOptions();

@@ -10,9 +10,9 @@ export const useCommonStore = defineStore('common', () => {
   const psm_active = ref({});
   const psmList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
-  const userConfigVersionId = ref(localStorage.getItem('userConfigVersionId') || '');
-  const powerSystemVersionId = ref(localStorage.getItem('powerSystemVersionId') || '');
-  const additionVersionId = ref(localStorage.getItem('additionVersionId') || '');
+  const userConfigVersionId = ref(localStorage.getItem('userConfigVersionId') || '66decf1dcff005199529524b');
+  const powerSystemVersionId = ref(localStorage.getItem('powerSystemVersionId') || '66decf1dcff005199529524b');
+  const additionVersionId = ref(localStorage.getItem('additionVersionId') || '66decf1dcff005199529524b');
   const hmiTaskId = ref('67175dd23a41cf97c7e4bd21');
 
   const editVersionData = ref({});
