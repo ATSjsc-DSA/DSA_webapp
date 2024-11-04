@@ -22,7 +22,6 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        --nodeSelected:{{ nodeSelected }}---
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
         <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" />
@@ -62,19 +61,17 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['onRemoveWidget']);
-
+const nodeSelected = defineModel('nodeSelected');
 const interval = ref(null);
 
 onMounted(() => {
   setInitTitle();
-  console.log('nodeSelected.value', nodeSelected.value);
   if (nodeSelected.value) {
+    nodeSelectedInChart.value = nodeSelected.value;
     getChartData();
     interval.value = setInterval(() => {
       getChartData();
     }, intervalTime);
-  } else {
-    nodeSelected.value = props.muiltiSelect ? [] : undefined;
   }
 });
 onUnmounted(() => {
@@ -118,24 +115,23 @@ const setInitTitle = () => {
 };
 //  Drop Application - bar
 
-const nodeSelected = defineModel('nodeSelected');
-
+const nodeSelectedInChart = ref(props.muiltiSelect ? [] : undefined);
 const nodeKeySelected = ref(props.muiltiSelect ? [] : undefined);
 const canDropNode = ref(false);
 
 const onDragoverComponent = () => {
-  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelected.value !== props.nodeDrag._id) {
+  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
     canDropNode.value = true;
   } else {
     canDropNode.value = false;
   }
 };
 const onDropComponent = async () => {
-  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelected.value !== props.nodeDrag._id) {
+  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
     if (props.muiltiSelect) {
       nodeKeySelected.value.push(props.nodeDrag.key);
       if (props.typeChart === 'vsa') {
-        nodeSelected.value.push({
+        nodeSelectedInChart.value.push({
           curveInfoId: props.nodeDrag._id,
           curveType: props.nodeDrag.curveType,
           caseInfoId: props.nodeDrag.caseInfoId,
@@ -143,27 +139,22 @@ const onDropComponent = async () => {
         });
       }
       if (props.typeChart === 'tsa') {
-        nodeSelected.value.push(props.nodeDrag.label);
+        nodeSelectedInChart.value.push(props.nodeDrag.label);
       }
     } else {
-      // await resetChart();
+      resetChart();
       chartTitle.value = props.nodeDrag.label;
-      console.log('nodeSelected.value -- trc them vaof -===', props.nodeDrag._id, nodeSelected.value);
-
-      nodeSelected.value = props.nodeDrag._id;
-      console.log('nodeSelected.value -- sau them vaof ', props.nodeDrag._id, nodeSelected.value);
-
+      nodeSelectedInChart.value = props.nodeDrag._id;
       nodeKeySelected.value = props.nodeDrag.key;
     }
-    // nodeSelected.value = nodeSelected.value;
-    console.log('nodeSelected.value ', nodeSelected.value);
+    nodeSelected.value = nodeSelectedInChart.value;
+
     await getChartData();
     canDropNode.value = false;
 
     interval.value = setInterval(() => {
       getChartData();
     }, intervalTime);
-    // emit('addNodeTreeSelectd', props.nodeDrag.key);
   }
 };
 
@@ -172,18 +163,17 @@ const modificationTime = ref();
 const getChartData = async () => {
   try {
     let res = {};
-    console.log(props.typeChart, nodeSelected.value);
     if (props.typeChart === 'appBar') {
-      res = await ApplicationApi.getBarChartData(nodeSelected.value);
+      res = await ApplicationApi.getBarChartData((nodeSelected.value = nodeSelectedInChart.value));
     }
     if (props.typeChart === 'appRadar') {
-      res = await ApplicationApi.getRadarChartData(nodeSelected.value);
+      res = await ApplicationApi.getRadarChartData((nodeSelected.value = nodeSelectedInChart.value));
     }
     if (props.typeChart === 'vsa') {
-      res = await VsaApi.getChartData(nodeSelected.value);
+      res = await VsaApi.getChartData((nodeSelected.value = nodeSelectedInChart.value));
     }
     if (props.typeChart === 'tsa') {
-      res = await TsaApi.getChartData(nodeSelected.value);
+      res = await TsaApi.getChartData((nodeSelected.value = nodeSelectedInChart.value));
     }
     if (res.data) {
       chartData.value = res.data;
@@ -202,11 +192,11 @@ const getChartData = async () => {
 };
 
 const resetChart = async () => {
+  clearInterval(interval.value);
   chartData.value = [];
   setInitTitle();
   nodeSelected.value = props.muiltiSelect ? [] : undefined;
-  clearInterval(interval.value);
-  console.log("-------------del---------")
+  nodeSelectedInChart.value = props.muiltiSelect ? [] : undefined;
 };
 </script>
 
