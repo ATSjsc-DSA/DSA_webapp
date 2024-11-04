@@ -59,11 +59,15 @@ export class TsaApi {
     vẽ chart của 1 list Curse
    */
   static async getTsaList(dsaId) {
-    return get(`/hmi/task/${hmiTaskId.value}/child/tsa/module/${dsaId}`);
+    return get(`/hmi/${hmiTaskId.value}/child/tsa/module/${dsaId}`);
   }
-  static async getCaseList(tsaName) {
-    return get(`hmi/child/tsa/case/${tsaName}`);
+  static async getCaseList(tsa_info_id) {
+    return get(`hmi/${hmiTaskId.value}/child/tsa/case/${tsa_info_id}`);
   }
+
+  // static async getCaseList(tsaName) {
+  //   return get(`hmi/child/tsa/case/${tsaName}`);
+  // }
   static async getSubCaseList(caseName) {
     return get(`hmi/child/tsa/subCase/${caseName}`);
   }

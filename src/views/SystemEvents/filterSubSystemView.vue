@@ -59,13 +59,13 @@
             :options="definitionSubsystemList"
             optionLabel="name"
             optionValue="_id"
-            class="border-none w-20rem"
+            class="w-20rem"
           />
 
           <searchPsWidget
             v-model="psSelected"
             label=""
-            :definitionId="[psDefinitionType]"
+            :definitionId="psDefinitionType ? [psDefinitionType] : []"
             :multipleSelection="true"
             :showViaDotAtTenChild="true"
           />
@@ -203,8 +203,7 @@ const getdefinitionSubsystemList = async () => {
 .input-group {
   display: flex;
   align-items: center;
-  border: 1px solid #ccc; /* Viền bao quanh */
-  border-radius: 4px; /* Góc bo tròn */
+  gap: 1rem;
   overflow: hidden;
   width: 100%;
 }

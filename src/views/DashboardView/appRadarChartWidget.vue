@@ -30,16 +30,7 @@ watch(
   { immediate: false },
 );
 const chartData = ref({
-  Key: [
-    'Line Loading',
-    'Tranformer Loading',
-    'Generator Loading',
-    'Excitation Limiter',
-    'Low/High Voltage',
-    'VSA Module',
-    'TSA Module',
-    'SSR Module',
-  ],
+  Key: ['Slot1', 'Slot2', 'Slot3', 'Slot4', 'Slot5', 'Slot6', 'Slot7', 'Slot8'],
   data: {
     Rate1: [], //[90, 90, 90, 90, 90, 90, 90, 0],
     Rate2: [], //[95, 95, 95, 95, 95, 95, 95, 0],
@@ -69,7 +60,7 @@ const transformApiResponse = (data) => {
   };
   // console.log(result, 'result');
   // Add missing slots if there are fewer than 7 keys
-  const additionalSlots = 7 - result.Key.length;
+  const additionalSlots = 8 - result.Key.length;
   for (let i = 0; i < additionalSlots; i++) {
     result.Key.push(`slot${i + 1}`);
     result.data.Rate1.push(90);
@@ -109,7 +100,7 @@ const setChartData = () => {
   maxAxisValue = maxDataValue + 0.05;
   maxAxisValue = maxAxisValue > 0.2 ? 0.2 : maxAxisValue;
 
-  if (reserve1Data.length>0) {
+  if (reserve1Data.length > 0) {
     const minRate1 = Math.min(...reserve1Data);
     const minRate2 = Math.min(...reserve2Data);
     getCurrentStateColorAndTitle(minRate1, minRate2);
@@ -208,7 +199,7 @@ const setChartOptions = () => {
         },
         padding: {
           top: 0,
-          bottom: 0,
+          bottom: 10,
         },
       },
       legend: {
@@ -314,6 +305,6 @@ const removeValueExceed20 = (reserveData) => {
 
 <template>
   <div class="h-full">
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem h-full" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full h-full" />
   </div>
 </template>

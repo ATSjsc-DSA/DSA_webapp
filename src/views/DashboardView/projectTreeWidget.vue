@@ -407,7 +407,7 @@ const getTsaList = async (dsaId) => {
 
 const getTsaCaseBranchData = async (tsaNode) => {
   const branch = [];
-  const dataList = await getTsaCaseList(tsaNode.label);
+  const dataList = await getTsaCaseList(tsaNode._id);
   if (dataList.length === 0) {
     tsaNode.leaf = true;
   } else {

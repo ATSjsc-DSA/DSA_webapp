@@ -272,7 +272,7 @@ watch(isDarkTheme, () => {
 
 <template>
   <div class="card flex justify-content-center h-full">
-    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full md:w-27rem h-full" />
+    <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full h-full" />
   </div>
 </template>
 
