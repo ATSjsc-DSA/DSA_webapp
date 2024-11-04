@@ -22,6 +22,7 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
+        --nodeSelected:{{ nodeSelected }}---
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
         <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" />
@@ -66,6 +67,7 @@ const interval = ref(null);
 
 onMounted(() => {
   setInitTitle();
+  console.log('nodeSelected.value', nodeSelected.value);
   if (nodeSelected.value) {
     getChartData();
     interval.value = setInterval(() => {
@@ -144,13 +146,17 @@ const onDropComponent = async () => {
         nodeSelected.value.push(props.nodeDrag.label);
       }
     } else {
-      resetChart();
+      // await resetChart();
       chartTitle.value = props.nodeDrag.label;
+      console.log('nodeSelected.value -- trc them vaof -===', props.nodeDrag._id, nodeSelected.value);
+
       nodeSelected.value = props.nodeDrag._id;
+      console.log('nodeSelected.value -- sau them vaof ', props.nodeDrag._id, nodeSelected.value);
+
       nodeKeySelected.value = props.nodeDrag.key;
     }
-    nodeSelected.value = nodeSelected.value;
-
+    // nodeSelected.value = nodeSelected.value;
+    console.log('nodeSelected.value ', nodeSelected.value);
     await getChartData();
     canDropNode.value = false;
 
@@ -166,7 +172,7 @@ const modificationTime = ref();
 const getChartData = async () => {
   try {
     let res = {};
-
+    console.log(props.typeChart, nodeSelected.value);
     if (props.typeChart === 'appBar') {
       res = await ApplicationApi.getBarChartData(nodeSelected.value);
     }
@@ -195,12 +201,12 @@ const getChartData = async () => {
   }
 };
 
-const resetChart = () => {
+const resetChart = async () => {
   chartData.value = [];
   setInitTitle();
   nodeSelected.value = props.muiltiSelect ? [] : undefined;
   clearInterval(interval.value);
-  nodeSelected.value = undefined;
+  console.log("-------------del---------")
 };
 </script>
 

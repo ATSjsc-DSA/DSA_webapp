@@ -64,7 +64,7 @@
               placeholder="Left"
               @click="sortGrid"
             >
-              <i class="pi pi-sync" style="font-size: 1rem" />
+              <i class="pi pi-sync cursor-pointer" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">SORT</div>
             </div>
             <div
@@ -74,7 +74,10 @@
               placeholder="Left"
               @click="gridLock = !gridLock"
             >
-              <i :class="gridLock ? 'pi pi-lock' : 'pi pi-lock-open'" style="font-size: 1rem" />
+              <i
+                :class="gridLock ? 'pi pi-lock cursor-pointer' : 'pi pi-lock-open cursor-pointer'"
+                style="font-size: 1rem"
+              />
               <div style="font-size: 0.7rem">{{ gridLock ? 'LOCK' : 'OPEN' }}</div>
             </div>
             <div
@@ -83,7 +86,7 @@
               placeholder="Left"
               @click="confirmRemoveAllComponent"
             >
-              <i class="pi pi-trash" style="font-size: 1rem" />
+              <i class="pi pi-trash cursor-pointer" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">DELETE</div>
             </div>
 
@@ -93,7 +96,7 @@
               placeholder="Left"
               @click="saveGrid"
             >
-              <i class="pi pi-save" style="font-size: 1rem" />
+              <i class="pi pi-save cursor-pointer" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">Save</div>
             </div>
             <Divider />
@@ -167,6 +170,7 @@
     </div>
   </div>
   <ConfirmDialog />
+  <Toast />
 </template>
 
 <script setup>
@@ -174,7 +178,9 @@ import { onMounted, ref, render, watch } from 'vue';
 import { v4 } from 'uuid';
 
 import ConfirmDialog from 'primevue/confirmdialog';
+import Toast from 'primevue/toast';
 
+import { useToast } from 'primevue/usetoast';
 import mapView from '@/components/mapView.vue';
 import projectTreeWidget from './projectTreeWidget.vue';
 
@@ -183,6 +189,7 @@ import { GridStack } from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
 
 import { useConfirm } from 'primevue/useconfirm';
+const toast = useToast();
 
 const confirm = useConfirm();
 
@@ -291,6 +298,8 @@ const removeAllComponent = () => {
     gridStackComponentGrid.value.removeWidget(`#${widget.id}`, false);
   });
   gridStackComponentArr.value = [];
+  toast.add({ severity: 'success', summary: 'Removed Successfully', life: 3000 });
+
 };
 
 const saveGrid = () => {
@@ -304,6 +313,7 @@ const saveGrid = () => {
     });
   });
   localStorage.setItem('gridStackComponentArr', JSON.stringify(gridStackComponentArr.value));
+  toast.add({ severity: 'success', summary: 'Saved Successfully', life: 3000 });
 };
 
 // -- drag drop ---
