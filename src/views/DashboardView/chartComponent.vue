@@ -139,7 +139,13 @@ const onDropComponent = async () => {
         });
       }
       if (props.typeChart === 'tsa') {
-        nodeSelectedInChart.value.push(props.nodeDrag.label);
+        nodeSelectedInChart.value.push({
+          curveInfoId: props.nodeDrag._id,
+          curveType: props.nodeDrag.curveType,
+          subCaseInfoId: props.nodeDrag.subCaseInfo,
+          caseInfoId: props.nodeDrag.caseInfoId,
+          moduleInfoId: props.nodeDrag.moduleInfoId,
+        });
       }
     } else {
       resetChart();

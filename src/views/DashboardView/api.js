@@ -64,17 +64,13 @@ export class TsaApi {
   static async getCaseList(tsa_info_id) {
     return get(`hmi/${hmiTaskId.value}/child/tsa/case/${tsa_info_id}`);
   }
-
-  // static async getCaseList(tsaName) {
-  //   return get(`hmi/child/tsa/case/${tsaName}`);
-  // }
-  static async getSubCaseList(caseName) {
-    return get(`hmi/child/tsa/subCase/${caseName}`);
+  static async getSubCaseList(tsa_info_id, tsa_case_id) {
+    return get(`hmi/${hmiTaskId.value}/child/tsa/subCase/${tsa_info_id}/${tsa_case_id}`);
   }
-  static async getCurveList(subCaseName) {
-    return get(`hmi/child/tsa/curve/${subCaseName}`);
+  static async getCurveList(subCase_id) {
+    return get(`hmi/child/tsa/curve/${subCase_id}`);
   }
-  static async getChartData(curveList = []) {
-    return post(`hmi/chart/tsa/curve`, { payload: curveList });
+  static async getChartData(curveNameList = []) {
+    return post(`hmi/${hmiTaskId.value}/chart/tsa/curve`, { payload: curveNameList });
   }
 }

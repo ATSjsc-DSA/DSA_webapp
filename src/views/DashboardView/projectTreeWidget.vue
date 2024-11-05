@@ -421,15 +421,16 @@ const getTsaCaseBranchData = async (tsaNode) => {
         active: leafData.active,
         icon: 'pi pi-list',
         leaf: false,
+        moduleInfoId: tsaNode._id,
       });
     }
   }
   return branch;
 };
 
-const getTsaCaseList = async (dsaName) => {
+const getTsaCaseList = async (case_id) => {
   try {
-    const res = await TsaApi.getCaseList(dsaName);
+    const res = await TsaApi.getCaseList(case_id);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -438,7 +439,7 @@ const getTsaCaseList = async (dsaName) => {
 };
 const getTsaSubCaseBranchData = async (caseNode) => {
   const branch = [];
-  const dataList = await getTsaSubCaseList(caseNode.label);
+  const dataList = await getTsaSubCaseList(caseNode.moduleInfoId, caseNode._id);
   if (dataList.length === 0) {
     caseNode.leaf = true;
   } else {
@@ -452,15 +453,17 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         active: leafData.active,
         icon: 'pi pi-file',
         leaf: false,
+        caseInfoId: caseNode._id,
+        moduleInfoId: caseNode.moduleInfoId,
       });
     }
   }
   return branch;
 };
 
-const getTsaSubCaseList = async (caseName) => {
+const getTsaSubCaseList = async (tsa_info_id, case_info_id) => {
   try {
-    const res = await TsaApi.getSubCaseList(caseName);
+    const res = await TsaApi.getSubCaseList(tsa_info_id, case_info_id);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
@@ -470,7 +473,7 @@ const getTsaSubCaseList = async (caseName) => {
 
 const getTsaCurveBranchData = async (subCaseNode) => {
   const branch = [];
-  const dataList = await getTsaCurveList(subCaseNode.label);
+  const dataList = await getTsaCurveList(subCaseNode._id);
   if (dataList.length === 0) {
     subCaseNode.leaf = true;
   } else {
@@ -483,15 +486,18 @@ const getTsaCurveBranchData = async (subCaseNode) => {
         type: 'TsaCurve',
         curveType: leafData.curveType,
         leaf: true,
+        subCaseInfo: subCaseNode._id,
+        caseInfoId: subCaseNode.caseInfoId,
+        moduleInfoId: subCaseNode.moduleInfoId,
       });
     }
   }
   return branch;
 };
 
-const getTsaCurveList = async (subCaseName) => {
+const getTsaCurveList = async (subCase_id) => {
   try {
-    const res = await TsaApi.getCurveList(subCaseName);
+    const res = await TsaApi.getCurveList(subCase_id);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
