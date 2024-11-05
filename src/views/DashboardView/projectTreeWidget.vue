@@ -73,19 +73,32 @@
           </template>
 
           <template #VsaCase="slotProps">
-            <!-- <div class="w-full" :class="{ textUnActive: !slotProps.node.active }"></div> -->
             <div
               class="w-full flex align-items-center justify-content-start"
               :class="{ textUnActive: !slotProps.node.active }"
+              aria-haspopup="true"
+              @contextmenu="onVsaCaseRightClick($event, slotProps.node)"
             >
               <Tag
                 class="mr-1 w-2rem"
                 :value="getVsaCaseTypeValue(slotProps.node.caseType)"
                 :severity="getVsaCaseTypeSeverity(slotProps.node.caseType)"
               />
-
               <div>{{ slotProps.node.label }}</div>
             </div>
+            <ContextMenu ref="vsaCaseContextMenuRef" :model="vsaCaseContextMenu" />
+          </template>
+
+          <template #TsaCase="slotProps">
+            <div
+              class="w-full flex align-items-center justify-content-start"
+              :class="{ textUnActive: !slotProps.node.active }"
+              aria-haspopup="true"
+              @contextmenu="onTsaCaseRightClick($event, slotProps.node)"
+            >
+              <div>{{ slotProps.node.label }}</div>
+            </div>
+            <ContextMenu ref="tsaCaseContextMenuRef" :model="tsaCaseContextMenu" />
           </template>
 
           <template #VsaCurve="slotProps">
@@ -133,6 +146,10 @@ import { onMounted, ref, render } from 'vue';
 
 import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
+import ContextMenu from 'primevue/contextmenu';
+import { useToast } from 'primevue/usetoast';
+const toast = useToast();
+
 import { VsaApi, TsaApi, CommonApi } from './api';
 const props = defineProps({
   applicationDraggable: {
@@ -632,6 +649,83 @@ const getTsaCurveTypeSeverity = (curveType) => {
       return 'info';
     default:
       return '';
+  }
+};
+
+// -- right click to active/unactive
+const vsaCaseContextMenuRef = ref();
+const vsaCaseContextMenu = ref([]);
+const onVsaCaseRightClick = async (event, node) => {
+  if (node.active) {
+    vsaCaseContextMenu.value = [
+      {
+        label: 'Unactive',
+        icon: 'pi pi-times',
+        command: async () => {
+          console.log(node);
+          await updateVsaCaseActiveStatus(node._id, false);
+        },
+      },
+    ];
+  } else {
+    vsaCaseContextMenu.value = [
+      {
+        label: 'Active',
+        icon: 'pi pi-check',
+        command: async () => {
+          await updateVsaCaseActiveStatus(node._id, true);
+        },
+      },
+    ];
+  }
+  vsaCaseContextMenuRef.value.show(event);
+};
+
+const updateVsaCaseActiveStatus = async (vsaCaseId, newStatus) => {
+  try {
+    await VsaApi.updateVsaCase(vsaCaseId, { active: newStatus });
+    toast.add({ severity: 'success', summary: 'Updated Active Status successfully', life: 3000 });
+  } catch (error) {
+    console.log('updateVsaCaseActiveStatus error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const tsaCaseContextMenuRef = ref();
+const tsaCaseContextMenu = ref([]);
+const onTsaCaseRightClick = async (event, node) => {
+  if (node.active) {
+    tsaCaseContextMenu.value = [
+      {
+        label: 'Unactive',
+        icon: 'pi pi-times',
+        command: async () => {
+          console.log(node);
+          await updateTsaCaseActiveStatus(node._id, false);
+        },
+      },
+    ];
+  } else {
+    tsaCaseContextMenu.value = [
+      {
+        label: 'Active',
+        icon: 'pi pi-check',
+        command: async () => {
+          await updateTsaCaseActiveStatus(node._id, true);
+        },
+      },
+    ];
+  }
+  tsaCaseContextMenuRef.value.show(event);
+};
+
+const updateTsaCaseActiveStatus = async (tsaCaseId, newStatus) => {
+  try {
+    await TsaApi.updateTsaCase(tsaCaseId, { active: newStatus });
+    toast.add({ severity: 'success', summary: 'Updated Active Status successfully', life: 3000 });
+  } catch (error) {
+    console.log('updateTsaCaseActiveStatus error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 </script>

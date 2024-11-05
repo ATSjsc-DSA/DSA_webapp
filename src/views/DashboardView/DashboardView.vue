@@ -120,7 +120,7 @@
               v-tooltip.left="'Project Tree'"
               class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
               placeholder="Left"
-              @click="showTree = true"
+              @click="showTree = !showTree"
             >
               <i class="pi pi-list" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">TREE</div>

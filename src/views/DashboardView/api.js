@@ -1,4 +1,4 @@
-import { get, post } from '@/utils/request';
+import { get, post, put } from '@/utils/request';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
@@ -39,6 +39,9 @@ export class VsaApi {
     return get(`hmi/${hmiTaskId.value}/child/vsa/case/${vsa_info_id}`);
   }
 
+  static async updateVsaCase(vsaCaseId, data) {
+    return put(`hmi/vsa/case/${vsaCaseId}`, data);
+  }
   static async getCurveList(vsa_info_id, case_info_id) {
     return get(`hmi/${hmiTaskId.value}/child/vsa/curve/${vsa_info_id}/${case_info_id}`);
   }
@@ -63,6 +66,9 @@ export class TsaApi {
   }
   static async getCaseList(tsa_info_id) {
     return get(`hmi/${hmiTaskId.value}/child/tsa/case/${tsa_info_id}`);
+  }
+  static async updateTsaCase(tsaCaseId, data) {
+    return put(`hmi/tsa/case/${tsaCaseId}`, data);
   }
   static async getSubCaseList(tsa_info_id, tsa_case_id) {
     return get(`hmi/${hmiTaskId.value}/child/tsa/subCase/${tsa_info_id}/${tsa_case_id}`);
