@@ -1,6 +1,19 @@
 <template>
   <div class="grid w-full h-full">
-    <div class="col-12">
+    <div v-if="showTree" class="col-3">
+      <div class="sticky" style="top: 6rem">
+        <ScrollPanel style="width: 100%; height: 58rem">
+          <projectTreeWidget
+            v-bind:application-draggable="applicationDraggable"
+            v-bind:vsa-curve-draggable="vsaCurveDraggable"
+            v-bind:tsa-curve-draggable="tsaCurveDraggable"
+            @onStartDragNode="onStartDragNode"
+            @onRemoveWidget="showTree = false"
+          />
+        </ScrollPanel>
+      </div>
+    </div>
+    <div class="col">
       <div class="w-full h-full flex gap-3">
         <div
           class="w-full h-full"
@@ -34,15 +47,7 @@
                 <div v-if="w.type === 'map'" class="h-full">
                   <mapView @onRemoveWidget="onRemoveGridStackComponent(w)" />
                 </div>
-                <div v-if="w.type === 'tree'" class="h-full">
-                  <projectTreeWidget
-                    v-bind:application-draggable="applicationDraggable"
-                    v-bind:vsa-curve-draggable="vsaCurveDraggable"
-                    v-bind:tsa-curve-draggable="tsaCurveDraggable"
-                    @onStartDragNode="onStartDragNode"
-                    @onRemoveWidget="onRemoveGridStackComponent(w)"
-                  />
-                </div>
+
                 <chartComponent
                   v-if="w.type === 'chart'"
                   v-model:nodeSelected="w.nodeSelected"
@@ -113,10 +118,9 @@
 
             <div
               v-tooltip.left="'Project Tree'"
-              class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-              draggable="true"
+              class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
               placeholder="Left"
-              @dragstart="handleDragStart('tree')"
+              @click="showTree = true"
             >
               <i class="pi pi-list" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">TREE</div>
@@ -179,6 +183,7 @@ import { v4 } from 'uuid';
 
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
+import ScrollPanel from 'primevue/scrollpanel';
 
 import { useToast } from 'primevue/usetoast';
 import mapView from '@/components/mapView.vue';
@@ -192,7 +197,7 @@ import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
 
 const confirm = useConfirm();
-
+const showTree = ref(localStorage.getItem('showTree') === 'true' || false);
 const gridStackComponentGrid = ref(null);
 const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
@@ -213,9 +218,6 @@ onMounted(async () => {
       oldGrid.forEach((widget) => {
         if (widget.type === 'map') {
           addMapComponent(widget);
-        }
-        if (widget.type === 'tree') {
-          addProjectTreeComponent(widget);
         }
         if (widget.type === 'chart') {
           if (widget.typeChart === 'appBar') {
@@ -299,7 +301,6 @@ const removeAllComponent = () => {
   });
   gridStackComponentArr.value = [];
   toast.add({ severity: 'success', summary: 'Removed Successfully', life: 3000 });
-
 };
 
 const saveGrid = () => {
@@ -313,6 +314,7 @@ const saveGrid = () => {
     });
   });
   localStorage.setItem('gridStackComponentArr', JSON.stringify(gridStackComponentArr.value));
+  localStorage.setItem('showTree', JSON.stringify(showTree.value));
   toast.add({ severity: 'success', summary: 'Saved Successfully', life: 3000 });
 };
 
@@ -359,9 +361,7 @@ const onDropGridStackComponent = () => {
     tsaCurveDraggable.value = true;
     addNewChartComponent(componentSelected.value, true);
   }
-  if (componentSelected.value === 'tree') {
-    addProjectTreeComponent();
-  }
+
   if (componentSelected.value === 'map') {
     addMapComponent();
   }
@@ -385,27 +385,6 @@ const addNewChartComponent = async (typeChart, muiltiSelect, oldConfig = {}) => 
   await nextTick(() => {
     gridStackComponentGrid.value.makeWidget(`#${node.id}`);
     gridStackComponentGrid.value.update(document.querySelector(`#${node.id}`), {
-      resizable: { handles: 'e, se, s, sw, w, nw, n, ne' },
-    });
-  });
-};
-
-const addProjectTreeComponent = async (oldConfig = {}) => {
-  const treeId = 'projectTreeComponent' + v4();
-
-  const node = {
-    x: oldConfig.x || null,
-    y: oldConfig.y | null,
-    w: oldConfig.w || 3,
-    h: oldConfig.h || 60,
-    id: treeId,
-    type: 'tree',
-  };
-  gridStackComponentArr.value.push(node);
-
-  await nextTick(() => {
-    gridStackComponentGrid.value.makeWidget(treeId);
-    gridStackComponentGrid.value.update(document.querySelector(treeId), {
       resizable: { handles: 'e, se, s, sw, w, nw, n, ne' },
     });
   });

@@ -77,7 +77,7 @@ const setChartData = () => {
   const offlineRate2Data = [];
   const offlineRate3Data = [];
   const currentData = [];
-
+  const currentColor = [];
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
     // vsa / tsa data F
     const moduleData = props.data[moduleIndex];
@@ -91,16 +91,23 @@ const setChartData = () => {
     offlineRate2Data.push(moduleData.offline['rateCritical2']);
     offlineRate3Data.push(moduleData.offline['rateCritical3']);
     currentData.push(moduleData.current);
+
+    if (moduleData.current <= moduleData.online['rateCritical1']) {
+      currentColor.push(documentStyle.getPropertyValue('--primary-600'));
+    } else if (moduleData.current <= moduleData.online['rateCritical2']) {
+      currentColor.push(documentStyle.getPropertyValue('--yellow-600'));
+    } else {
+      currentColor.push(documentStyle.getPropertyValue('--red-600'));
+    }
   }
   const datasets = [
     // online
     {
       datalabels: 'Online',
-
       type: 'bar',
       label: 'Rate Critical 1',
       data: onlineRate1Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-400'),
+      backgroundColor: documentStyle.getPropertyValue('--primary-600'),
       stack: 'Stack Online',
     },
     {
@@ -108,7 +115,7 @@ const setChartData = () => {
       datalabels: 'Online',
       label: 'Rate Critical 2',
       data: onlineRate2Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-300'),
+      backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
       stack: 'Stack Online',
     },
     {
@@ -116,7 +123,7 @@ const setChartData = () => {
       datalabels: 'Online',
       label: 'Rate Critical 3',
       data: onlineRate3Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-200'),
+      backgroundColor: documentStyle.getPropertyValue('--red-600'),
       stack: 'Stack Online',
     },
     // offline
@@ -125,7 +132,7 @@ const setChartData = () => {
       datalabels: 'Offline',
       label: 'Rate Critical 1',
       data: offlineRate1Data,
-      backgroundColor: documentStyle.getPropertyValue('--gray-400'),
+      backgroundColor: documentStyle.getPropertyValue('--primary-400'),
       stack: 'Stack Offline',
     },
     {
@@ -133,7 +140,7 @@ const setChartData = () => {
       datalabels: 'Offline',
       label: 'Rate Critical 2',
       data: offlineRate2Data,
-      backgroundColor: documentStyle.getPropertyValue('--gray-300'),
+      backgroundColor: documentStyle.getPropertyValue('--yellow-400'),
       stack: 'Stack Offline',
     },
     {
@@ -141,7 +148,7 @@ const setChartData = () => {
       datalabels: 'Offline',
       label: 'Rate Critical 3',
       data: offlineRate3Data,
-      backgroundColor: documentStyle.getPropertyValue('--gray-200'),
+      backgroundColor: documentStyle.getPropertyValue('--red-400'),
       stack: 'Stack Offline',
     },
     // current
@@ -150,7 +157,7 @@ const setChartData = () => {
       datalabels: 'Current',
       label: 'Current',
       data: currentData,
-      backgroundColor: documentStyle.getPropertyValue('--orange-400'),
+      backgroundColor: currentColor,
       stack: 'Stack Current',
     },
   ];

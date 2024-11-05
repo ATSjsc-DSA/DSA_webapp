@@ -36,7 +36,6 @@ import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import { VsaApi, TsaApi, ApplicationApi } from './api';
-import { intervalTime } from '@/Constants/';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 
@@ -63,7 +62,7 @@ const props = defineProps({
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
 const interval = ref(null);
-
+const intervalTime = 1000 * 60;
 onMounted(() => {
   setInitTitle();
   if (nodeSelected.value) {
