@@ -1,45 +1,50 @@
 <template>
   <ConfirmDialog />
   <Toast />
-  <div class="card w-full h-full">
-    <DataTable id="gridcodeTable" class="w-full h-full" :value="gridCodeList" :loading="isLoading">
-      <template #header>
-        <div class="flex justify-content-between gap-3">
-          <div class="font-semibold white-space-nowrap text-xl">Grid Code</div>
-
-          <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreate" />
-        </div>
-      </template>
-
-      <Column header="Name" field="name" class="capitalize" />
-      <Column field="active" header="Active">
-        <template #body="{ data }">
-          <Tag :severity="data.active ? 'primary' : 'secondary'" class="capitalize" :value="String(data.active)"></Tag>
-        </template>
-      </Column>
-      <Column field="startTimestamp" header="Start Timestamp" style="text-wrap: nowrap">
-        <template #body="{ data }">
-          <span>{{ convertDateTimeToString(data.startTimestamp) }}</span>
-        </template>
-      </Column>
-      <Column field="endTimestamp" header="End Timestamp" style="text-wrap: nowrap">
-        <template #body="{ data }">
-          <span>{{ convertDateTimeToString(data.endTimestamp) }}</span>
-        </template>
-      </Column>
-      <Column style="width: 1%; min-width: 5rem">
-        <template #body="{ data }">
-          <div class="flex justify-content-between">
-            <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdate(data)" />
-
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete($event, data)" />
-            <router-link :to="`/gridcode/element/${data._id}`" target="_blank">
-              <Button icon="pi pi-caret-right" text rounded />
-            </router-link>
+  <div class="card layout-content min-h-full">
+    <div style="height: 52rem">
+      <DataTable id="gridcodeTable" class="w-full h-full" :value="gridCodeList" :loading="isLoading">
+        <template #header>
+          <div class="flex justify-content-between gap-3">
+            <div class="font-semibold white-space-nowrap text-xl">Grid Code</div>
+            <Button type="button" label="Create " icon="pi pi-plus" text @click="handleCreate" />
           </div>
         </template>
-      </Column>
-    </DataTable>
+
+        <Column header="Name" field="name" class="capitalize" />
+        <Column field="active" header="Active">
+          <template #body="{ data }">
+            <Tag
+              :severity="data.active ? 'primary' : 'secondary'"
+              class="capitalize"
+              :value="String(data.active)"
+            ></Tag>
+          </template>
+        </Column>
+        <Column field="startTimestamp" header="Start Timestamp" style="text-wrap: nowrap">
+          <template #body="{ data }">
+            <span>{{ convertDateTimeToString(data.startTimestamp) }}</span>
+          </template>
+        </Column>
+        <Column field="endTimestamp" header="End Timestamp" style="text-wrap: nowrap">
+          <template #body="{ data }">
+            <span>{{ convertDateTimeToString(data.endTimestamp) }}</span>
+          </template>
+        </Column>
+        <Column style="width: 1%; min-width: 5rem">
+          <template #body="{ data }">
+            <div class="flex justify-content-between">
+              <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdate(data)" />
+
+              <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete($event, data)" />
+              <router-link :to="`/gridcode/element/${data._id}`">
+                <Button icon="pi pi-caret-right" text rounded />
+              </router-link>
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
     <div class="flex justify-content-end align-items-center mt-3">
       <Paginator
         v-if="totalRecord > pageRowNumber"

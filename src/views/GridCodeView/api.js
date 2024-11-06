@@ -11,6 +11,9 @@ export class Api {
       page_size: 10,
     });
   }
+  static async getGridCodeData(gridcodeId) {
+    return get(`/gridcode/group/${gridcodeId}`);
+  }
   static async createGridCode(data) {
     return post(`/gridcode/${projectData.value._id}/${userConfigVersionId.value}/group`, data);
   }
