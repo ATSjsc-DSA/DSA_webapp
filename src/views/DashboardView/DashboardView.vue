@@ -106,17 +106,6 @@
             </div>
             <Divider />
             <div
-              v-tooltip.left="'Map'"
-              class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-              draggable="true"
-              placeholder="Left"
-              @dragstart="handleDragStart('map')"
-            >
-              <i class="pi pi-map" style="font-size: 1rem" />
-              <div style="font-size: 0.7rem">MAP</div>
-            </div>
-
-            <div
               v-tooltip.left="'Project Tree'"
               class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
               placeholder="Left"
@@ -127,6 +116,17 @@
             </div>
 
             <Divider />
+            <div
+              v-tooltip.left="'Map'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragStart('map')"
+            >
+              <i class="pi pi-map" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">MAP</div>
+            </div>
+
             <div
               v-tooltip.left="'Appplication Radar'"
               class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"

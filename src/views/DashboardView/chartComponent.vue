@@ -61,16 +61,19 @@ const props = defineProps({
 
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
+
 const interval = ref(null);
 const intervalTime = 1000 * 60;
 onMounted(() => {
-  setInitTitle();
   if (nodeSelected.value) {
-    nodeSelectedInChart.value = nodeSelected.value;
+    nodeSelectedInChart.value = nodeSelected.value.data;
+    chartTitle.value = nodeSelected.value.title;
     getChartData();
     interval.value = setInterval(() => {
       getChartData();
     }, intervalTime);
+  } else {
+    setInitTitle();
   }
 });
 onUnmounted(() => {
@@ -152,7 +155,11 @@ const onDropComponent = async () => {
       nodeSelectedInChart.value = props.nodeDrag._id;
       nodeKeySelected.value = props.nodeDrag.key;
     }
-    nodeSelected.value = nodeSelectedInChart.value;
+
+    nodeSelected.value = {
+      title: props.nodeDrag.label,
+      data: nodeSelectedInChart.value,
+    };
 
     await getChartData();
     canDropNode.value = false;
@@ -169,16 +176,16 @@ const getChartData = async () => {
   try {
     let res = {};
     if (props.typeChart === 'appBar') {
-      res = await ApplicationApi.getBarChartData((nodeSelected.value = nodeSelectedInChart.value));
+      res = await ApplicationApi.getBarChartData(nodeSelectedInChart.value);
     }
     if (props.typeChart === 'appRadar') {
-      res = await ApplicationApi.getRadarChartData((nodeSelected.value = nodeSelectedInChart.value));
+      res = await ApplicationApi.getRadarChartData(nodeSelectedInChart.value);
     }
     if (props.typeChart === 'vsa') {
-      res = await VsaApi.getChartData((nodeSelected.value = nodeSelectedInChart.value));
+      res = await VsaApi.getChartData(nodeSelectedInChart.value);
     }
     if (props.typeChart === 'tsa') {
-      res = await TsaApi.getChartData((nodeSelected.value = nodeSelectedInChart.value));
+      res = await TsaApi.getChartData(nodeSelectedInChart.value);
     }
     if (res.data) {
       chartData.value = res.data;
@@ -200,7 +207,7 @@ const resetChart = async () => {
   clearInterval(interval.value);
   chartData.value = [];
   setInitTitle();
-  nodeSelected.value = props.muiltiSelect ? [] : undefined;
+  nodeSelected.value = props.muiltiSelect ? {} : undefined;
   nodeSelectedInChart.value = props.muiltiSelect ? [] : undefined;
 };
 </script>
