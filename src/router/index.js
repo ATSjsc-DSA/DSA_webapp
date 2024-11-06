@@ -9,11 +9,6 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
-          path: '/old',
-          name: 'dashboard-old',
-          component: () => import('@/views/HomeView.vue'),
-        },
-        {
           path: '/',
           name: 'dashboard',
           component: () => import('@/views/DashboardView/DashboardView.vue'),
@@ -115,8 +110,28 @@ const router = createRouter({
           name: 'Subsystems',
           component: () => import('@/views/SystemEvents/SubsystemView.vue'),
         },
+
+        {
+          meta: {
+            title: 'Grid Code',
+          },
+          path: '/gridcode',
+          children: [
+            {
+              path: '/gridcode',
+              name: 'Grid Code',
+              component: () => import('@/views/GridCodeView/GridCodeView.vue'),
+            },
+            {
+              path: '/gridcode/element/:id',
+              name: 'Grid Code Element',
+              component: () => import('@/views/GridCodeElementView/GridCodeElementView.vue'),
+            },
+          ],
+        },
       ],
     },
+
     {
       meta: {
         title: 'Project',

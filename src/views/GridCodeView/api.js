@@ -1,0 +1,23 @@
+import { get, post, put, _delete } from '@/utils/request';
+
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { projectData, userConfigVersionId } = storeToRefs(commonStore);
+
+export class Api {
+  static async getGridCodeList(page) {
+    return get(`/gridcode/${projectData.value._id}/${userConfigVersionId.value}/group`, {
+      page: page,
+      page_size: 10,
+    });
+  }
+  static async createGridCode(data) {
+    return post(`/gridcode/${projectData.value._id}/${userConfigVersionId.value}/group`, data);
+  }
+  static async updateGridCode(gridcodeId, data) {
+    return put(`/gridcode/group/${gridcodeId}`, data);
+  }
+  static async deleteGridcode(gridcodeId) {
+    return _delete(`/gridcode/group/${gridcodeId}`);
+  }
+}

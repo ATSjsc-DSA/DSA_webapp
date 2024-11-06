@@ -49,14 +49,11 @@ const items = ref([
       },
     ],
   },
-  // {
-  //   label: 'Global Definition',
-  //   icon: 'pi pi-fw pi-server',
-  //   to: '/globaldefinition',
-  //   command: () => {
-  //     router.push('/globaldefinition');
-  //   },
-  // },
+  {
+    label: 'Grid Code',
+    icon: 'pi pi-fw pi-id-card',
+    to: '/gridcode/',
+  },
 ]);
 
 const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;

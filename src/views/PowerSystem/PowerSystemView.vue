@@ -100,18 +100,14 @@
                     <div class="flex gap-2 justify-content-start">
                       <template v-for="(tab, index) in tabMenuPSList" :key="tab">
                         <Button
-                          v-if="tab !== 'EMS'"
-                          :label="tab"
+                          v-if="tab === 'PSSE'"
+                          label="PSSE"
                           class=""
                           :text="tabMenuPSActive !== index"
-                          :disabled="
-                            ((tab === 'Dynamic' || tab === 'Dynamic Default') && !isDefinitionGenerator) ||
-                            (tab === 'Graphics' && !isStation)
-                          "
-                          @click="tabMenuPSActive = index"
+                          disabled
                         />
                         <SplitButton
-                          v-else
+                          v-else-if="tab === 'EMS'"
                           label="EMS"
                           :model="emsFilterList"
                           :text="tabMenuPSActive !== index"
@@ -127,6 +123,17 @@
                             </div>
                           </template>
                         </SplitButton>
+                        <Button
+                          v-else
+                          :label="tab"
+                          class=""
+                          :text="tabMenuPSActive !== index"
+                          :disabled="
+                            ((tab === 'Dynamic' || tab === 'Dynamic Default') && !isDefinitionGenerator) ||
+                            (tab === 'Graphics' && !isStation)
+                          "
+                          @click="tabMenuPSActive = index"
+                        />
                       </template>
                     </div>
                   </div>
