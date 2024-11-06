@@ -6,12 +6,8 @@
         <Button icon="pi pi-plus" text rounded aria-label="create" @click="handlerCreateVsaCase" />
       </div>
 
-      <ScrollPanel style="width: 100%; height: 50rem">
-        <DataView
-          :value="vsaCaseList"
-          class="w-full flex-1"
-          style="height: 43rem; overflow-y: auto; overflow-x: hidden; margin-right: -1rem"
-        >
+      <ScrollPanel style="width: 100%; height: 46rem">
+        <DataView :value="vsaCaseList" class="w-full flex-1">
           <template #list="slotProps">
             <div class="grid grid-nogutter">
               <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -47,47 +43,45 @@
 
     <SplitterPanel class="h-full" :size="75">
       <div class="py-4 px-3 flex justify-content-between align-items-center">
-        <span class="text-xl font-semibold">Configuration - VSA Case </span>
+        <span class="text-xl font-semibold">Configuration </span>
       </div>
-      <div v-if="vsaCaseData._id" class="p-3">
-        <ScrollPanel style="width: 100%; height: 50rem">
-          <div class="grid align-items-center">
-            <div class="col-12 flex justify-content-between gap-3">
-              <div class="flex flex-column gap-2 mb-3 flex-1">
-                <label for="name" class="font-semibold"> Name </label>
-                <InputText id="name" v-model="vsaCaseData.name" class="flex-auto w-full" autocomplete="off" />
-              </div>
-              <div class="flex flex-column gap-2 mb-3 align-items-center">
-                <label for="active" class="font-semibold mb-2"> Active</label>
-                <InputSwitch id="active" v-model="vsaCaseData.active" autocomplete="off" />
-              </div>
+      <div v-if="vsaCaseData._id" class="p-6">
+        <div class="grid align-items-center">
+          <div class="col-12 flex justify-content-between gap-3">
+            <div class="flex flex-column gap-2 mb-3 flex-1">
+              <label for="name" class="font-semibold"> Name </label>
+              <InputText id="name" v-model="vsaCaseData.name" class="flex-auto w-full" autocomplete="off" />
             </div>
-
-            <div class="col-6">
-              <div class="flex flex-column gap-2 mb-3">
-                <label for="contingencyType" class="font-semibold">Contingency Type</label>
-                <Dropdown
-                  id="contingencyType"
-                  v-model="vsaCaseData.contingencyType"
-                  :options="contingencyTypeOpts"
-                  optionLabel="label"
-                  optionValue="value"
-                  class="w-full"
-                />
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="flex flex-column gap-2 mb-3">
-                <label for="limitationReserve" class="font-semibold"> Limitation Reserve</label>
-                <InputNumber v-model="vsaCaseData.limitationReserve" />
-              </div>
+            <div class="flex flex-column gap-2 mb-3 align-items-center">
+              <label for="active" class="font-semibold mb-2"> Active</label>
+              <InputSwitch id="active" v-model="vsaCaseData.active" autocomplete="off" />
             </div>
           </div>
 
-          <div class="flex justify-content-end gap-3">
-            <Button type="button" label="Update" @click="updateVsaCase"></Button>
+          <div class="col-6">
+            <div class="flex flex-column gap-2 mb-3">
+              <label for="contingencyType" class="font-semibold">Contingency Type</label>
+              <Dropdown
+                id="contingencyType"
+                v-model="vsaCaseData.contingencyType"
+                :options="contingencyTypeOpts"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              />
+            </div>
           </div>
-        </ScrollPanel>
+          <div class="col-6">
+            <div class="flex flex-column gap-2 mb-3">
+              <label for="limitationReserve" class="font-semibold"> Limitation Reserve</label>
+              <InputNumber v-model="vsaCaseData.limitationReserve" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-content-end gap-3">
+          <Button type="button" label="Update" @click="updateVsaCase"></Button>
+        </div>
       </div>
     </SplitterPanel>
   </Splitter>
@@ -105,15 +99,13 @@
     </template>
 
     <div class="grid align-items-center">
-      <div class="col-8">
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="areaname" class="font-semibold w-6rem"> Name</label>
-          <InputText id="areaname" v-model="newVsaCase.name" class="flex-auto" autocomplete="off" />
+      <div class="col-12 flex justify-content-between gap-3">
+        <div class="flex flex-column gap-2 mb-3 flex-1">
+          <label for="name" class="font-semibold"> Name </label>
+          <InputText id="name" v-model="newVsaCase.name" class="flex-auto w-full" autocomplete="off" />
         </div>
-      </div>
-      <div class="col-4">
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="active" class="font-semibold w-6rem"> Active</label>
+        <div class="flex flex-column gap-2 mb-3 align-items-center">
+          <label for="active" class="font-semibold mb-2"> Active</label>
           <InputSwitch id="active" v-model="newVsaCase.active" autocomplete="off" />
         </div>
       </div>
@@ -215,8 +207,10 @@ const handlerCreateVsaCase = () => {
 
 const createVsaCase = async () => {
   try {
-    await ApiVsaCase.create(props.gridcodeId, newVsaCase.value);
+    const res = await ApiVsaCase.create(props.gridcodeId, newVsaCase.value);
     await getVsaCaseList();
+    vsaCaseData.value = res.data;
+    vsaCaseSelected.value = res.data;
     createVsaCaseVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
   } catch (error) {

@@ -1,9 +1,9 @@
 <template>
-  <div class="card layout-content min-h-full">
+  <div class="card layout-content">
     <Toast />
     <ConfirmDialog />
 
-    <TabView class="h-full w-full">
+    <TabView>
       <TabPanel header="Voltage">
         <voltageWidget />
       </TabPanel>
@@ -11,7 +11,7 @@
         <frequencyWidget />
       </TabPanel>
       <TabPanel header="Angle Stability">
-        <angleStabilityWidget />
+        <angleStabilityWidget :gridcode-id="gridCodeId" />
       </TabPanel>
       <TabPanel header="VSA Case">
         <vsaCaseWidget :gridcode-id="gridCodeId" />
