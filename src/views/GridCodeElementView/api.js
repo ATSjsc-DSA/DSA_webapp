@@ -2,13 +2,22 @@ import { get, post, put, _delete } from '@/utils/request';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { powerSystemVersionId } = storeToRefs(commonStore);
+const { projectData, userConfigVersionId } = storeToRefs(commonStore);
 
-export class Api {
-  static async getBarChartData(appId = '') {
-    return get(`/hmi/task/${powerSystemVersionId.value}/app/${appId}`);
+export class ApiVsaCase {
+  static async getList(gridcodeId) {
+    return get(`/gridcode/${gridcodeId}/gridcodevsacase`);
   }
-  static async getRadarChartData(appId = '') {
-    return get(`/hmi/task/${powerSystemVersionId.value}/radar/app/${appId}`);
+  static async getVsaCaseById(vsaCaseId) {
+    return get(`/gridcode/gridcodevsacase/${vsaCaseId}`);
+  }
+  static async create(gridcodeId, data) {
+    return post(`/gridcode/${gridcodeId}/gridcodevsacase`, data);
+  }
+  static async update(vsaCaseId, data) {
+    return put(`/gridcode/gridcodevsacase/${vsaCaseId}`, data);
+  }
+  static async deleteVsaCase(vsaCaseId) {
+    return _delete(`/gridcode/gridcodevsacase/${vsaCaseId}`);
   }
 }

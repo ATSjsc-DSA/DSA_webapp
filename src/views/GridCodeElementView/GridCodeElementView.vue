@@ -1,3 +1,47 @@
-<template>je je je! element nafy</template>
+<template>
+  <div class="card layout-content min-h-full">
+    <Toast />
+    <ConfirmDialog />
 
-<script setup></script>
+    <TabView class="h-full w-full">
+      <TabPanel header="Voltage">
+        <voltageWidget />
+      </TabPanel>
+      <TabPanel header="Frequency">
+        <frequencyWidget />
+      </TabPanel>
+      <TabPanel header="Angle Stability">
+        <angleStabilityWidget />
+      </TabPanel>
+      <TabPanel header="VSA Case">
+        <vsaCaseWidget :gridcode-id="gridCodeId" />
+      </TabPanel>
+    </TabView>
+  </div>
+</template>
+
+<script setup>
+import { watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import Toast from 'primevue/toast';
+import ConfirmDialog from 'primevue/confirmdialog';
+
+import voltageWidget from './voltageWidget.vue';
+import frequencyWidget from './frequencyWidget.vue';
+import angleStabilityWidget from './angleStabilityWidget.vue';
+import vsaCaseWidget from './vsaCaseWidget.vue';
+
+const route = useRoute();
+
+onMounted(async () => {});
+watch(
+  () => route.params.id,
+  async (newId, oldId) => {
+    gridCodeId.value = route.params.id;
+  },
+);
+const gridCodeId = ref(route.params.id);
+</script>

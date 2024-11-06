@@ -238,7 +238,6 @@ const confirmDelete = (event, data) => {
     acceptClass: 'p-button-sm p-button-danger',
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
-    data: data,
     accept: async () => {
       await deleteGridCode(data._id);
     },
