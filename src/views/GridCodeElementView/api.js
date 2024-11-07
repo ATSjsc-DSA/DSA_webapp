@@ -58,6 +58,22 @@ export class ApiAngleStability {
   static async deleteAngleRestoreTime(angleRestoreTimeId) {
     return _delete(`/gridcode/gridcodeanglerestoretime/${angleRestoreTimeId}`);
   }
+}
 
-  // /api/gridcode/{gridCodeStandard_id}/gridcodeanglerestoretime
+export class ApiVoltage {
+  static async getVoltageList(gridcodeId) {
+    return get(`/gridcode/${gridcodeId}/gridcodevol`);
+  }
+  static async getVoltageById(voltageId) {
+    return get(`/gridcode/gridcodevol/${voltageId}`);
+  }
+  static async createVoltage(gridcodeId, data) {
+    return post(`/gridcode/${gridcodeId}/gridcodevol`, data);
+  }
+  static async updateVoltage(voltageId, data) {
+    return put(`/gridcode/gridcodevol/${voltageId}`, data);
+  }
+  static async deleteVoltage(voltageId) {
+    return _delete(`/gridcode/gridcodevol/${voltageId}`);
+  }
 }
