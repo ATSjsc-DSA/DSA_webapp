@@ -115,3 +115,21 @@ export class ApiContingency {
     return _delete(`/gridcode/gridcodedynamicstd/${contingencyId}`);
   }
 }
+
+export class ApiFrequency {
+  static async getFrequencyList(gridcodeId) {
+    return get(`/gridcode/${gridcodeId}/gridcodefreq`);
+  }
+  static async getFrequencyById(frequencyId) {
+    return get(`/gridcode/gridcodefreq/${frequencyId}`);
+  }
+  static async createFrequency(gridcodeId, data) {
+    return post(`/gridcode/${gridcodeId}/gridcodefreq`, data);
+  }
+  static async updateFrequency(frequencyId, data) {
+    return put(`/gridcode/gridcodefreq/${frequencyId}`, data);
+  }
+  static async deleteFrequency(frequencyId) {
+    return _delete(`/gridcode/gridcodefreq/${frequencyId}`);
+  }
+}

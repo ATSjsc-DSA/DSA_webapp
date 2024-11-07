@@ -7,8 +7,9 @@
       <TabPanel header="Voltage">
         <voltageWidget :gridcode-id="gridCodeId" />
       </TabPanel>
+
       <TabPanel header="Frequency">
-        <frequencyWidget />
+        <frequencyWidget :gridcode-id="gridCodeId" />
       </TabPanel>
 
       <TabPanel header="VSA Case">
