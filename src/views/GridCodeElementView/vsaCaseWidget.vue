@@ -3,7 +3,14 @@
     <SplitterPanel :size="25" :minSize="10">
       <div class="py-4 px-3 flex justify-content-between align-items-center">
         <span class="text-xl font-semibold"> List VSA case</span>
-        <Button icon="pi pi-plus" text rounded aria-label="create" @click="handlerCreateVsaCase" />
+        <Button
+          icon="pi pi-plus"
+          text
+          rounded
+          aria-label="create"
+          :disabled="vsaCaseList.length === 3"
+          @click="handlerCreateVsaCase"
+        />
       </div>
 
       <ScrollPanel style="width: 100%; height: 46rem">
@@ -20,8 +27,15 @@
                   @click="vsaCaseClick(item)"
                 >
                   <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1 ml-2">
-                    <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
-                      <i class="pi pi-folder text-yellow-400"></i>{{ item.name }}
+                    <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2 capitalize">
+                      <!-- <i class="pi pi-folder text-yellow-400"></i> -->
+                      <Tag
+                        :value="getContingencyTypeLabel(item.contingencyType)"
+                        :severity="getSeverityContingencyType(item.contingencyType)"
+                        class="w-3rem"
+                      />
+
+                      {{ item.name }}
                     </div>
                     <Button
                       class="item-button"
@@ -45,36 +59,29 @@
       <div class="py-4 px-3 flex justify-content-between align-items-center">
         <span class="text-xl font-semibold">Configuration </span>
       </div>
-      <div v-if="vsaCaseData._id" class="p-6">
+      <div v-if="vsaCaseSelectedChange._id" class="p-6">
         <div class="grid align-items-center">
           <div class="col-12 flex justify-content-between gap-3">
             <div class="flex flex-column gap-2 mb-3 flex-1">
               <label for="name" class="font-semibold"> Name </label>
-              <InputText id="name" v-model="vsaCaseData.name" class="flex-auto w-full" autocomplete="off" />
+              <InputText id="name" v-model="vsaCaseSelectedChange.name" class="flex-auto w-full" autocomplete="off" />
             </div>
             <div class="flex flex-column gap-2 mb-3 align-items-center">
               <label for="active" class="font-semibold mb-2"> Active</label>
-              <InputSwitch id="active" v-model="vsaCaseData.active" autocomplete="off" />
+              <InputSwitch id="active" v-model="vsaCaseSelectedChange.active" autocomplete="off" />
             </div>
           </div>
 
           <div class="col-6">
             <div class="flex flex-column gap-2 mb-3">
               <label for="contingencyType" class="font-semibold">Contingency Type</label>
-              <Dropdown
-                id="contingencyType"
-                v-model="vsaCaseData.contingencyType"
-                :options="contingencyTypeOpts"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-              />
+              <InputText disabled :value="getContingencyTypeLabel(vsaCaseSelectedChange.contingencyType)" />
             </div>
           </div>
           <div class="col-6">
             <div class="flex flex-column gap-2 mb-3">
               <label for="limitationReserve" class="font-semibold"> Limitation Reserve</label>
-              <InputNumber v-model="vsaCaseData.limitationReserve" />
+              <InputNumber v-model="vsaCaseSelectedChange.limitationReserve" />
             </div>
           </div>
         </div>
@@ -146,7 +153,7 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
 import { ApiVsaCase } from './api';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 const toast = useToast();
 const confirm = useConfirm();
 
@@ -160,8 +167,8 @@ const props = defineProps({
 onMounted(async () => {
   await getVsaCaseList();
 });
+const vsaCaseSelected = ref({});
 const vsaCaseList = ref([]);
-
 const getVsaCaseList = async () => {
   try {
     const res = await ApiVsaCase.getList(props.gridcodeId);
@@ -171,34 +178,51 @@ const getVsaCaseList = async () => {
   }
 };
 
-const vsaCaseSelected = ref({});
-const vsaCaseData = ref({});
-const vsaCaseClick = async (item) => {
-  vsaCaseSelected.value = item;
-  await getVsaCaseData();
-};
 // -- VSA case  - crud
 
-const getVsaCaseData = async () => {
-  try {
-    const res = await ApiVsaCase.getVsaCaseById(vsaCaseSelected.value._id);
-    vsaCaseData.value = res.data;
-  } catch (error) {
-    vsaCaseData.value = {};
-    console.log('getVsaCaseList error', error);
-  }
-};
 const newVsaCase = ref();
 const createVsaCaseVisibleDialog = ref(false);
-const contingencyTypeOpts = ref([
-  { label: 'N-1', value: 0 },
-  { label: 'N-2', value: 1 },
-  { label: 'Base', value: 2 },
-]);
+
+const contingencyTypeOpts = computed(() => {
+  const opts = [];
+  const contingencyType = [0, 1, 2];
+  contingencyType.forEach((typeValue) => {
+    if (vsaCaseList.value.filter((item) => item.contingencyType === typeValue).length === 0) {
+      opts.push({ label: getContingencyTypeLabel(typeValue), value: typeValue });
+    }
+  });
+  return opts;
+});
+
+const getContingencyTypeLabel = (typeValue) => {
+  switch (typeValue) {
+    case 0:
+      return 'N-1';
+    case 1:
+      return 'N-2';
+    case 2:
+      return 'Base';
+    default:
+      return 'N-1';
+  }
+};
+
+const getSeverityContingencyType = (typeValue) => {
+  switch (typeValue) {
+    case 0:
+      return 'primary';
+    case 1:
+      return 'info';
+    case 2:
+      return 'secondary';
+    default:
+      return 'primary';
+  }
+};
 const handlerCreateVsaCase = () => {
   newVsaCase.value = {
     name: '',
-    contingencyType: 0,
+    contingencyType: contingencyTypeOpts.value[0].value,
     active: true,
     limitationReserve: 0,
   };
@@ -209,7 +233,6 @@ const createVsaCase = async () => {
   try {
     const res = await ApiVsaCase.create(props.gridcodeId, newVsaCase.value);
     await getVsaCaseList();
-    vsaCaseData.value = res.data;
     vsaCaseSelected.value = res.data;
     createVsaCaseVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
@@ -219,11 +242,16 @@ const createVsaCase = async () => {
   }
 };
 
+const vsaCaseSelectedChange = ref({});
+const vsaCaseClick = (item) => {
+  vsaCaseSelected.value = item;
+  vsaCaseSelectedChange.value = JSON.parse(JSON.stringify(item));
+};
+
 const updateVsaCase = async () => {
   try {
-    await ApiVsaCase.update(vsaCaseData.value._id, vsaCaseData.value);
+    await ApiVsaCase.update(vsaCaseSelectedChange.value._id, vsaCaseSelectedChange.value);
     await getVsaCaseList();
-    await getVsaCaseData();
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
   } catch (error) {
     console.log('getVsaCaseList error', error);
@@ -251,7 +279,7 @@ const deleteVsaCaseData = async (id) => {
   try {
     await ApiVsaCase.deleteVsaCase(id);
     await getVsaCaseList();
-    vsaCaseData.value = {};
+    vsaCaseUpdateData.value = {};
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('getVsaCaseList error', error);
