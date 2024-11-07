@@ -52,7 +52,7 @@
           </div>
         </TabPanel>
         <TabPanel header="Contigency">
-          <div>Contigency</div>
+          <contigencyWidget v-if="voltageData._id" :standard-id="voltageData._id" />
         </TabPanel>
       </TabView>
     </SplitterPanel>
@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import ScrollPanel from 'primevue/scrollpanel';
@@ -86,8 +87,8 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
 import voltageForm from './voltageForm.vue';
+import contigencyWidget from './contigencyWidget.vue';
 import { ApiVoltage } from './api';
-import { computed, onMounted } from 'vue';
 const toast = useToast();
 const confirm = useConfirm();
 
@@ -99,6 +100,12 @@ const props = defineProps({
 });
 onMounted(async () => {
   await getVoltageList();
+  // this is for test
+  // setTimeout(() => {
+  //   voltageClick({ _id: '672b2169f3a38f337ce9c5f2', name: 'GridCode_test334' });
+  // }, 500);
+
+  // end test
 });
 const voltageList = ref([]);
 const getVoltageList = async () => {
@@ -197,4 +204,6 @@ const deleteVoltage = async (id) => {
     console.log('deleteAngleStabilityData error', error);
   }
 };
+
+// contingency
 </script>

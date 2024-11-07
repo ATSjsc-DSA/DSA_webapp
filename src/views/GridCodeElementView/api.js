@@ -77,3 +77,21 @@ export class ApiVoltage {
     return _delete(`/gridcode/gridcodevol/${voltageId}`);
   }
 }
+
+export class ApiContingency {
+  static async getContingencyList(standartId) {
+    return get(`/gridcode/${standartId}/gridcodecontingency`);
+  }
+  static async getContingencyById(contingencyId) {
+    return get(`/gridcode/gridcodecontingency/${contingencyId}`);
+  }
+  static async createContingency(standartId, data) {
+    return post(`/gridcode/${standartId}/gridcodecontingency`, data);
+  }
+  static async updateContingency(contingencyId, data) {
+    return put(`/gridcode/gridcodecontingency/${contingencyId}`, data);
+  }
+  static async deleteContingency(contingencyId) {
+    return _delete(`/gridcode/gridcodecontingency/${contingencyId}`);
+  }
+}

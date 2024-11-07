@@ -40,7 +40,7 @@
 
     <div class="col-12">
       <div class="flex align-items-center gap-6">
-        <label for="abnormalActivation" class=" p-text-secondary blockmr-3"> Abnomal Voltage Limit</label>
+        <label for="abnormalActivation" class="p-text-secondary blockmr-3"> Abnomal Voltage Limit</label>
 
         <div class="flex align-items-center">
           <Checkbox v-model="formData.abnormalActivation" inputId="abnormalActivation" :binary="true" />
