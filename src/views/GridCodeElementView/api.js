@@ -23,19 +23,41 @@ export class ApiVsaCase {
 }
 
 export class ApiAngleStability {
-  static async getList(gridcodeId) {
+  static async getAngleStabilityList(gridcodeId) {
     return get(`/gridcode/${gridcodeId}/gridcodeanglestability`);
   }
   static async getAngleStabilityById(angleStabilityId) {
     return get(`/gridcode/gridcodeanglestability/${angleStabilityId}`);
   }
-  static async create(gridcodeId, data) {
+  static async createAngleStability(gridcodeId, data) {
     return post(`/gridcode/${gridcodeId}/gridcodeanglestability`, data);
   }
-  static async update(angleStabilityId, data) {
+  static async updateAngleStability(angleStabilityId, data) {
     return put(`/gridcode/gridcodeanglestability/${angleStabilityId}`, data);
   }
   static async deleteAngleStability(angleStabilityId) {
     return _delete(`/gridcode/gridcodeanglestability/${angleStabilityId}`);
   }
+
+  // --- RestoreTime
+  static async getAngleRestoreTimeList(angleStabilityId, page) {
+    return get(`/gridcode/${angleStabilityId}/gridcodeanglerestoretime`, {
+      page: page,
+      page_size: 10,
+    });
+  }
+  static async getAngleRestoreTimeById(angleRestoreTimeId) {
+    return get(`/gridcode/gridcodeanglerestoretime/${angleRestoreTimeId}`);
+  }
+  static async createAngleRestoreTime(angleStabilityId, data) {
+    return post(`/gridcode/${angleStabilityId}/gridcodeanglerestoretime`, data);
+  }
+  static async updateAngleRestoreTime(angleRestoreTimeId, data) {
+    return put(`/gridcode/gridcodeanglerestoretime/${angleRestoreTimeId}`, data);
+  }
+  static async deleteAngleRestoreTime(angleRestoreTimeId) {
+    return _delete(`/gridcode/gridcodeanglerestoretime/${angleRestoreTimeId}`);
+  }
+
+  // /api/gridcode/{gridCodeStandard_id}/gridcodeanglerestoretime
 }

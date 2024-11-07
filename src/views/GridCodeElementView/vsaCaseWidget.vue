@@ -59,7 +59,7 @@
       <div class="py-4 px-3 flex justify-content-between align-items-center">
         <span class="text-xl font-semibold">Configuration </span>
       </div>
-      <div v-if="vsaCaseSelectedChange._id" class="p-6">
+      <div v-if="vsaCaseSelectedChange._id" class="px-5 py-3">
         <div class="grid align-items-center">
           <div class="col-12 flex justify-content-between gap-3">
             <div class="flex flex-column gap-2 mb-3 flex-1">

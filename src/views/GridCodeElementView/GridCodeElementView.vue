@@ -4,15 +4,16 @@
     <ConfirmDialog />
 
     <TabView>
+      <TabPanel header="Angle Stability">
+        <angleStabilityWidget :gridcode-id="gridCodeId" />
+      </TabPanel>
       <TabPanel header="Voltage">
         <voltageWidget />
       </TabPanel>
       <TabPanel header="Frequency">
         <frequencyWidget />
       </TabPanel>
-      <TabPanel header="Angle Stability">
-        <angleStabilityWidget :gridcode-id="gridCodeId" />
-      </TabPanel>
+
       <TabPanel header="VSA Case">
         <vsaCaseWidget :gridcode-id="gridCodeId" />
       </TabPanel>
