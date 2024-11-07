@@ -7,7 +7,7 @@
       </div>
 
       <ScrollPanel style="width: 100%; height: 46rem">
-        <DataView :value="voltageList" class="w-full flex-1">
+        <DataView :value="voltageList" class="w-full flex-1" :class="{ 'p-3': voltageList.length === 0 }">
           <template #list="slotProps">
             <div class="grid grid-nogutter">
               <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -100,12 +100,6 @@ const props = defineProps({
 });
 onMounted(async () => {
   await getVoltageList();
-  // this is for test
-  // setTimeout(() => {
-  //   voltageClick({ _id: '672b2169f3a38f337ce9c5f2', name: 'GridCode_test334' });
-  // }, 500);
-
-  // end test
 });
 const voltageList = ref([]);
 const getVoltageList = async () => {
@@ -199,6 +193,7 @@ const deleteVoltage = async (id) => {
     await ApiVoltage.deleteVoltage(id);
     await getVoltageList();
     voltageSelected.value = {};
+    voltageData.value = {};
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);

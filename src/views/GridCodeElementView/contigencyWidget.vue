@@ -7,7 +7,7 @@
       </div>
 
       <ScrollPanel style="width: 100%; height: 41rem">
-        <DataView :value="contingencyList" class="w-full flex-1">
+        <DataView :value="contingencyList" class="w-full flex-1" :class="{ 'p-3': contingencyList.length === 0 }">
           <template #list="slotProps">
             <div class="grid grid-nogutter">
               <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -55,7 +55,122 @@
             </div>
           </div>
         </TabPanel>
-        <TabPanel header="Dynamic"> tôi là dynamic </TabPanel>
+        <TabPanel header="Dynamic">
+          <div style="height: 34rem; margin-top: 2rem">
+            <DataTable
+              id="gridcodeTable"
+              class="w-full h-full"
+              :value="dynamicStdList"
+              showGridlines
+              :loading="isLoadingDynamicStd"
+              size="small"
+            >
+              <template #header>
+                <div class="flex justify-content-between align-items-center gap-3">
+                  <div class="font-semibold white-space-nowrap text-lg">Dynamic Std</div>
+                  <Button
+                    type="button"
+                    icon="pi pi-plus"
+                    text
+                    :disabled="!contingencyData._id"
+                    @click="handleCreateDynamicStd"
+                  />
+                </div>
+              </template>
+
+              <ColumnGroup type="header">
+                <Row>
+                  <Column header="Name" :rowspan="2" />
+                  <Column header="Active" :rowspan="2" />
+                  <Column header="Restore Time" :rowspan="2" />
+                  <Column :colspan="2">
+                    <template #header>
+                      <div class="block w-full text-center">Error</div>
+                    </template>
+                  </Column>
+                  <Column :colspan="2">
+                    <template #header>
+                      <div class="block w-full text-center">Stable Range</div>
+                    </template>
+                  </Column>
+                  <Column :rowspan="2" />
+                </Row>
+                <Row>
+                  <Column>
+                    <template #header>
+                      <div class="block w-full text-center">Lower</div>
+                    </template>
+                  </Column>
+                  <Column>
+                    <template #header>
+                      <div class="block w-full text-center">Upper</div>
+                    </template>
+                  </Column>
+                  <Column>
+                    <template #header>
+                      <div class="block w-full text-center">Lower</div>
+                    </template>
+                  </Column>
+                  <Column>
+                    <template #header>
+                      <div class="block w-full text-center">Upper</div>
+                    </template>
+                  </Column>
+                </Row>
+              </ColumnGroup>
+
+              <Column header="Name" field="name" class="capitalize">
+                <template #body="{ data }">
+                  <div style="min-width: 6rem">{{ data.name }}</div>
+                </template>
+              </Column>
+              <Column field="active" header="Active">
+                <template #body="{ data }">
+                  <Tag
+                    :severity="data.active ? 'primary' : 'secondary'"
+                    class="capitalize"
+                    :value="String(data.active)"
+                  ></Tag>
+                </template>
+              </Column>
+
+              <Column field="restoreTime" header="Restore Time" style="text-wrap: nowrap" />
+
+              <Column field="lowerError" style="text-wrap: nowrap" />
+              <Column field="upperError" style="text-wrap: nowrap" />
+
+              <Column field="stableRangeLower" style="text-wrap: nowrap" />
+              <Column field="stableRangeUpper" style="text-wrap: nowrap" />
+              <Column style="width: 4rem; padding-top: 0; padding-bottom: 0">
+                <template #body="{ data }">
+                  <div class="flex w-full justify-content-between align-items-center">
+                    <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdateDynamicStd(data)" />
+                    <Button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      text
+                      rounded
+                      @click="confirmDeleteDynamicStd($event, data)"
+                    />
+                  </div>
+                </template>
+              </Column>
+              <template #empty> No data </template>
+            </DataTable>
+          </div>
+          <div class="flex justify-content-end align-items-center mt-3">
+            <Paginator
+              v-if="totalDynamicStdRecord > pageRowNumber"
+              v-model:first="paginatorOffsetDynamicStd"
+              class="flex-grow-1"
+              :rows="pageRowNumber"
+              :totalRecords="totalDynamicStdRecord"
+              :page="currentDynamicStdPage"
+              @page="onDynamicStdPageChange"
+            ></Paginator>
+            <div class="mr-3">Total: {{ totalDynamicStdRecord }}</div>
+          </div>
+        </TabPanel>
       </TabView>
     </SplitterPanel>
   </Splitter>
@@ -82,10 +197,48 @@
       <Button type="button" label="Save" :disabled="!newContingency.name" @click="createContingency"></Button>
     </template>
   </Dialog>
+
+  <Dialog
+    v-model:visible="createDynamicStdVisibleDialog"
+    :style="{ width: '48rem' }"
+    header="Create Dialog "
+    :modal="true"
+  >
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Contingency - Dynamic Std</span>
+      </div>
+    </template>
+
+    <contingencyDynamicStdForm v-model:form-data="newDynamicStd" />
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="createDynamicStdVisibleDialog = false"></Button>
+      <Button type="button" label="Save" @click="createDynamicStd"></Button>
+    </template>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="updateDynamicStdVisibleDialog"
+    :style="{ width: '48rem' }"
+    header="Create Dialog "
+    :modal="true"
+  >
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap">Contingency - Dynamic Std</span>
+      </div>
+    </template>
+
+    <contingencyDynamicStdForm v-model:form-data="editDynamicStd" />
+    <template #footer>
+      <Button type="button" label="Cancel" severity="secondary" @click="updateDynamicStdVisibleDialog = false"></Button>
+      <Button type="button" label="Save" @click="updateDynamicStd"></Button>
+    </template>
+  </Dialog>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import ScrollPanel from 'primevue/scrollpanel';
@@ -94,6 +247,7 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
 import contingencyForm from './contingencyForm.vue';
+import contingencyDynamicStdForm from './contingencyDynamicStdForm.vue';
 import { ApiContingency } from './api';
 const toast = useToast();
 const confirm = useConfirm();
@@ -107,10 +261,18 @@ const props = defineProps({
 onMounted(async () => {
   await getContingencyList();
 });
+watch(
+  () => props.standardId,
+  async (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      await getContingencyList();
+    }
+  },
+);
+
 const contingencyList = ref([]);
 const getContingencyList = async () => {
   try {
-    console.log(props.standardId);
     const res = await ApiContingency.getContingencyList(props.standardId);
     contingencyList.value = res.data;
   } catch (error) {
@@ -124,6 +286,7 @@ const contingencyData = ref({});
 const contingencyClick = async (item) => {
   contingencySelected.value = item;
   await getContingencyData();
+  await getDynamicStdList();
 };
 
 const getContingencyData = async () => {
@@ -196,6 +359,7 @@ const deleteContingency = async (id) => {
     await ApiContingency.deleteContingency(id);
     await getContingencyList();
     contingencySelected.value = {};
+    contingencyData.value = {};
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);
@@ -226,5 +390,99 @@ const getSeverityContingencyType = (typeValue) => {
       return 'primary';
   }
 };
-// contingency
+// DynacmicStd
+
+const dynamicStdList = ref([]);
+
+const isLoadingDynamicStd = ref(false);
+const pageRowNumber = ref(10);
+const currentDynamicStdPage = ref(1);
+const totalDynamicStdRecord = ref(0);
+const paginatorOffsetDynamicStd = computed(() => pageRowNumber.value * currentDynamicStdPage.value - 1);
+const onDynamicStdPageChange = async (event) => {
+  currentDynamicStdPage.value = event.page + 1; // event.page là chỉ số trang bắt đầu từ 0
+  await getDynamicStdList();
+};
+const getDynamicStdList = async () => {
+  try {
+    const res = await ApiContingency.getDynacmicStdList(contingencySelected.value._id, currentDynamicStdPage.value);
+    dynamicStdList.value = res.data.items;
+    totalDynamicStdRecord.value = res.data.total;
+  } catch (error) {
+    dynamicStdList.value = [];
+    console.log('getVsaCaseList error', error);
+  }
+};
+
+const newDynamicStd = ref();
+const createDynamicStdVisibleDialog = ref(false);
+
+const handleCreateDynamicStd = () => {
+  newDynamicStd.value = {
+    active: true,
+    name: '',
+    restoreTime: 5,
+    lowerError: 0.1,
+    upperError: 0.1,
+    stableRangeLower: -1,
+    stableRangeUpper: 1,
+  };
+  createDynamicStdVisibleDialog.value = true;
+};
+
+const createDynamicStd = async () => {
+  try {
+    await ApiContingency.createDynacmicStd(contingencySelected.value._id, newDynamicStd.value);
+    await getDynamicStdList();
+    createDynamicStdVisibleDialog.value = false;
+    toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
+  } catch (error) {
+    console.log('createDynamicStd error', error);
+    toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const editDynamicStd = ref();
+const updateDynamicStdVisibleDialog = ref(false);
+const handleUpdateDynamicStd = (data) => {
+  editDynamicStd.value = JSON.parse(JSON.stringify(data));
+  updateDynamicStdVisibleDialog.value = true;
+};
+const updateDynamicStd = async () => {
+  try {
+    await ApiContingency.updateDynacmicStd(editDynamicStd.value._id, editDynamicStd.value);
+    await getDynamicStdList();
+    updateDynamicStdVisibleDialog.value = false;
+    toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
+  } catch (error) {
+    console.log('updateVsaCase error', error);
+    toast.add({ severity: 'error', summary: 'Updated Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const confirmDeleteDynamicStd = (event, dynamicStd) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Delete Dynamic Std - ' + dynamicStd.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept: async () => {
+      await deleteDynamicStd(dynamicStd._id);
+    },
+    reject: () => {},
+  });
+};
+
+const deleteDynamicStd = async (id) => {
+  try {
+    await ApiContingency.deleteDynacmicStd(id);
+    await getDynamicStdList();
+    toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
+  } catch (error) {
+    console.log('deleteDynamicStd error', error);
+  }
+};
 </script>

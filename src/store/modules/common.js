@@ -26,9 +26,9 @@ export const useCommonStore = defineStore('common', () => {
     try {
       const res = await DSA_api.getVersionManagement(projectData.value._id);
       psm_active.value = res.data;
-      updateConfigVersionId(res.data.userConfigVersionId);
-      updatePsVersionId(res.data.powerSystemVersionId);
-      updateAdditionVersionId(res.data.additionVersionId);
+      updateConfigVersionId(res.data.versionData.userConfigVersionId);
+      updatePsVersionId(res.data.versionData.powerSystemVersionId);
+      updateAdditionVersionId(res.data.versionData.additionVersionId);
     } catch (error) {}
   };
   const updateConfigVersionId = (newId) => {

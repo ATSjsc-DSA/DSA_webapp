@@ -94,4 +94,24 @@ export class ApiContingency {
   static async deleteContingency(contingencyId) {
     return _delete(`/gridcode/gridcodecontingency/${contingencyId}`);
   }
+
+  // DynacmicStd
+  static async getDynacmicStdList(contingencyId, page) {
+    return get(`/gridcode/${contingencyId}/gridcodedynamicstd`, {
+      page: page,
+      page_size: 10,
+    });
+  }
+  static async getDynacmicStdById(contingencyId) {
+    return get(`/gridcode/gridcodedynamicstd/${contingencyId}`);
+  }
+  static async createDynacmicStd(contingencyId, data) {
+    return post(`/gridcode/${contingencyId}/gridcodedynamicstd`, data);
+  }
+  static async updateDynacmicStd(contingencyId, data) {
+    return put(`/gridcode/gridcodedynamicstd/${contingencyId}`, data);
+  }
+  static async deleteDynacmicStd(contingencyId) {
+    return _delete(`/gridcode/gridcodedynamicstd/${contingencyId}`);
+  }
 }
