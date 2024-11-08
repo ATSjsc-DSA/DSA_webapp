@@ -15,9 +15,9 @@
                   class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-2"
                   :class="{
                     'border-top-1 surface-border': index !== 0,
-                    'selected-item': contingencySelected && contingencySelected.name === item.name,
+                    'selected-item': index === contingencyIndexSelected,
                   }"
-                  @click="contingencyClick(item)"
+                  @click="contingencyClick(index)"
                 >
                   <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1 ml-2">
                     <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2 capitalize">
@@ -35,7 +35,7 @@
                       size="small"
                       rounded
                       severity="danger"
-                      @click="confirmDeleteContingency($event, item)"
+                      @click="confirmDeleteContingency($event, item, index)"
                     />
                   </div>
                 </div>
@@ -281,17 +281,17 @@ const getContingencyList = async () => {
 };
 
 // ------ contingency - CRUD
-const contingencySelected = ref({});
+const contingencyIndexSelected = ref({});
 const contingencyData = ref({});
-const contingencyClick = async (item) => {
-  contingencySelected.value = item;
+const contingencyClick = async (index) => {
+  contingencyIndexSelected.value = index;
   await getContingencyData();
   await getDynamicStdList();
 };
 
 const getContingencyData = async () => {
   try {
-    const res = await ApiContingency.getContingencyById(contingencySelected.value._id);
+    const res = await ApiContingency.getContingencyById(contingencyList.value[contingencyIndexSelected.value]._id);
     contingencyData.value = res.data;
   } catch (error) {
     contingencyData.value = {};
@@ -315,8 +315,9 @@ const handlerCreateContingency = () => {
 const createContingency = async () => {
   try {
     const res = await ApiContingency.createContingency(props.standardId, newContingency.value);
-    await getContingencyList();
-    contingencySelected.value = res.data;
+    // await getContingencyList();
+    contingencyList.value.push(res.data);
+    contingencyIndexSelected.value = contingencyList.value.length - 1;
     contingencyData.value = res.data;
     createContingencyVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
@@ -328,8 +329,8 @@ const createContingency = async () => {
 const updateContingency = async () => {
   try {
     const res = await ApiContingency.updateContingency(contingencyData.value._id, contingencyData.value);
-    await getContingencyList();
-    contingencySelected.value = res.data;
+    // await getContingencyList();
+    contingencyList.value[contingencyIndexSelected.value] = res.data;
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
   } catch (error) {
     console.log('updateContingency error', error);
@@ -337,7 +338,7 @@ const updateContingency = async () => {
   }
 };
 
-const confirmDeleteContingency = (event, contingency) => {
+const confirmDeleteContingency = (event, contingency, index) => {
   confirm.require({
     target: event.currentTarget,
     header: 'Delete Contingency - ' + contingency.name,
@@ -348,18 +349,20 @@ const confirmDeleteContingency = (event, contingency) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: async () => {
-      await deleteContingency(contingency._id);
+      await deleteContingency(contingency._id, index);
     },
     reject: () => {},
   });
 };
 
-const deleteContingency = async (id) => {
+const deleteContingency = async (id, index) => {
   try {
     await ApiContingency.deleteContingency(id);
-    await getContingencyList();
-    contingencySelected.value = {};
+    // await getContingencyList();
+    contingencyIndexSelected.value = undefined;
     contingencyData.value = {};
+    contingencyList.value.splice(index, 1);
+
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);
@@ -405,7 +408,7 @@ const onDynamicStdPageChange = async (event) => {
 };
 const getDynamicStdList = async () => {
   try {
-    const res = await ApiContingency.getDynacmicStdList(contingencySelected.value._id, currentDynamicStdPage.value);
+    const res = await ApiContingency.getDynacmicStdList(contingencyData.value._id, currentDynamicStdPage.value);
     dynamicStdList.value = res.data.items;
     totalDynamicStdRecord.value = res.data.total;
   } catch (error) {
@@ -432,7 +435,7 @@ const handleCreateDynamicStd = () => {
 
 const createDynamicStd = async () => {
   try {
-    await ApiContingency.createDynacmicStd(contingencySelected.value._id, newDynamicStd.value);
+    await ApiContingency.createDynacmicStd(contingencyData.value._id, newDynamicStd.value);
     await getDynamicStdList();
     createDynamicStdVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });

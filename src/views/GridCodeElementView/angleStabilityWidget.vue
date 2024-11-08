@@ -19,9 +19,9 @@
                   class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-2"
                   :class="{
                     'border-top-1 surface-border': index !== 0,
-                    'selected-item': angleStabilitySelected && angleStabilitySelected.name === item.name,
+                    'selected-item': index === angleStabilityKeySelected,
                   }"
-                  @click="angleStabilityClick(item)"
+                  @click="angleStabilityClick(index)"
                 >
                   <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1 ml-2">
                     <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2">
@@ -34,7 +34,7 @@
                       size="small"
                       rounded
                       severity="danger"
-                      @click="confirmDeleteAngleStability($event, item)"
+                      @click="confirmDeleteAngleStability($event, item, index)"
                     />
                   </div>
                 </div>
@@ -94,7 +94,7 @@
                     type="button"
                     icon="pi pi-plus"
                     text
-                    :disabled="!angleStabilitySelected._id"
+                    :disabled="!angleStabilityData._id"
                     @click="handleCreateRestoreTime"
                   />
                 </div>
@@ -359,10 +359,10 @@ const getAngleStabilityList = async () => {
   }
 };
 
-const angleStabilitySelected = ref({});
+const angleStabilityKeySelected = ref();
 const angleStabilityData = ref({});
-const angleStabilityClick = async (item) => {
-  angleStabilitySelected.value = item;
+const angleStabilityClick = async (index) => {
+  angleStabilityKeySelected.value = index;
   await getAngleStabilityData();
   await getAngleRestoreTimeList();
 };
@@ -370,7 +370,9 @@ const angleStabilityClick = async (item) => {
 
 const getAngleStabilityData = async () => {
   try {
-    const res = await ApiAngleStability.getAngleStabilityById(angleStabilitySelected.value._id);
+    const res = await ApiAngleStability.getAngleStabilityById(
+      angleStabilityList.value[angleStabilityKeySelected.value]._id,
+    );
     angleStabilityData.value = res.data;
   } catch (error) {
     angleStabilityData.value = {};
@@ -393,9 +395,10 @@ const handlerCreateAngleStability = () => {
 const createAngleStability = async () => {
   try {
     const res = await ApiAngleStability.createAngleStability(props.gridcodeId, newAngleStability.value);
-    await getAngleStabilityList();
+    // await getAngleStabilityList();
+    angleStabilityList.value.push(res.data);
+    angleStabilityKeySelected.value = angleStabilityList.value.length - 1;
     angleStabilityData.value = res.data;
-    angleStabilitySelected.value = res.data;
 
     createAngleStabilityVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
@@ -416,7 +419,7 @@ const updateAngleStability = async () => {
     toast.add({ severity: 'error', summary: 'Updated Message', detail: error.data.detail, life: 3000 });
   }
 };
-const confirmDeleteAngleStability = (event, angleStability) => {
+const confirmDeleteAngleStability = (event, angleStability, index) => {
   confirm.require({
     target: event.currentTarget,
     header: 'Delete Angle Stability - ' + angleStability.name,
@@ -427,16 +430,18 @@ const confirmDeleteAngleStability = (event, angleStability) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: async () => {
-      await deleteAngleStabilityData(angleStability._id);
+      await deleteAngleStabilityData(angleStability._id, index);
     },
     reject: () => {},
   });
 };
 
-const deleteAngleStabilityData = async (id) => {
+const deleteAngleStabilityData = async (angleStabilityId, delIndex) => {
   try {
-    await ApiAngleStability.deleteAngleStability(id);
-    await getAngleStabilityList();
+    await ApiAngleStability.deleteAngleStability(angleStabilityId);
+    // await getAngleStabilityList();
+    angleStabilityList.value.splice(delIndex, 1);
+    angleStabilityKeySelected.value = undefined;
     angleStabilityData.value = {};
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
@@ -459,7 +464,7 @@ const onRestoreTimePageChange = async (event) => {
 const getAngleRestoreTimeList = async () => {
   try {
     const res = await ApiAngleStability.getAngleRestoreTimeList(
-      angleStabilitySelected.value._id,
+      angleStabilityData.value._id,
       currentRestoreTimePage.value,
     );
     restoreTimeList.value = res.data.items;
@@ -492,7 +497,7 @@ const handleCreateRestoreTime = () => {
 
 const createRestoreTime = async () => {
   try {
-    await ApiAngleStability.createAngleRestoreTime(angleStabilitySelected.value._id, newRestoreTime.value);
+    await ApiAngleStability.createAngleRestoreTime(angleStabilityData.value._id, newRestoreTime.value);
     await getAngleRestoreTimeList();
     createRestoreTimeVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });

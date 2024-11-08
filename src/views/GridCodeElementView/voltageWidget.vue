@@ -15,9 +15,9 @@
                   class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-2"
                   :class="{
                     'border-top-1 surface-border': index !== 0,
-                    'selected-item': voltageSelected && voltageSelected.name === item.name,
+                    'selected-item': index === voltageIndexSelected,
                   }"
-                  @click="voltageClick(item)"
+                  @click="voltageClick(index)"
                 >
                   <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1 ml-2">
                     <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2 capitalize">
@@ -31,7 +31,7 @@
                       size="small"
                       rounded
                       severity="danger"
-                      @click="confirmDeleteVoltage($event, item)"
+                      @click="confirmDeleteVoltage($event, item, index)"
                     />
                   </div>
                 </div>
@@ -112,16 +112,16 @@ const getVoltageList = async () => {
 };
 
 // ------ voltage - CRUD
-const voltageSelected = ref({});
+const voltageIndexSelected = ref();
 const voltageData = ref({});
-const voltageClick = async (item) => {
-  voltageSelected.value = item;
+const voltageClick = async (index) => {
+  voltageIndexSelected.value = index;
   await getVoltageData();
 };
 
 const getVoltageData = async () => {
   try {
-    const res = await ApiVoltage.getVoltageById(voltageSelected.value._id);
+    const res = await ApiVoltage.getVoltageById(voltageList.value[voltageIndexSelected.value]._id);
     voltageData.value = res.data;
   } catch (error) {
     voltageData.value = {};
@@ -149,8 +149,9 @@ const handlerCreateVoltage = () => {
 const createVoltage = async () => {
   try {
     const res = await ApiVoltage.createVoltage(props.gridcodeId, newVoltage.value);
-    await getVoltageList();
-    voltageSelected.value = res.data;
+    // await getVoltageList();
+    voltageList.value.push(res.data);
+    voltageIndexSelected.value = voltageList.value.length - 1;
     voltageData.value = res.data;
     createVoltageVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
@@ -162,8 +163,10 @@ const createVoltage = async () => {
 const updateVoltage = async () => {
   try {
     const res = await ApiVoltage.updateVoltage(voltageData.value._id, voltageData.value);
-    await getVoltageList();
-    voltageSelected.value = res.data;
+    // await getVoltageList();
+    voltageList.value[voltageIndexSelected.value] = res.data;
+    voltageData.value = res.data;
+
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
   } catch (error) {
     console.log('updateVoltage error', error);
@@ -171,7 +174,7 @@ const updateVoltage = async () => {
   }
 };
 
-const confirmDeleteVoltage = (event, voltage) => {
+const confirmDeleteVoltage = (event, voltage, index) => {
   confirm.require({
     target: event.currentTarget,
     header: 'Delete Voltage - ' + voltage.name,
@@ -182,18 +185,19 @@ const confirmDeleteVoltage = (event, voltage) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: async () => {
-      await deleteVoltage(voltage._id);
+      await deleteVoltage(voltage._id, index);
     },
     reject: () => {},
   });
 };
 
-const deleteVoltage = async (id) => {
+const deleteVoltage = async (id, index) => {
   try {
     await ApiVoltage.deleteVoltage(id);
-    await getVoltageList();
-    voltageSelected.value = {};
+    // await getVoltageList();
+    voltageIndexSelected.value = undefined;
     voltageData.value = {};
+    voltageList.value.splice(index, 1);
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);
