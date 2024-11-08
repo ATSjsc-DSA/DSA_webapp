@@ -136,6 +136,7 @@ const handlerCreateFrequency = () => {
   newFrequency.value = {
     active: true,
     name: '',
+    unitType: 2,
     normalVolLimitLower: 0,
     normalVolLimitUpper: 0,
     norminalFreq: 0,

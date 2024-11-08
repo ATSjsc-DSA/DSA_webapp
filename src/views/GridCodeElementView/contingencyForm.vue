@@ -30,13 +30,13 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="criticalLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.criticalLower" :max="formData.criticalUpper" />
+        <InputNumber :maxFractionDigits="999" v-model="formData.criticalLower" :max="formData.criticalUpper" />
       </div>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="criticalUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.criticalUpper" :min="formData.criticalLower" />
+        <InputNumber :maxFractionDigits="999" v-model="formData.criticalUpper" :min="formData.criticalLower" />
       </div>
     </div>
   </div>

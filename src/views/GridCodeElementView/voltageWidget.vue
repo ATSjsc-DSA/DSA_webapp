@@ -139,6 +139,7 @@ const handlerCreateVoltage = () => {
     abnormalVolLimitUpper: 0,
     active: true,
     name: '',
+    unitType: 0,
     normalVolLimitLower: 0,
     normalVolLimitUpper: 0,
     volRangeLower: 0,

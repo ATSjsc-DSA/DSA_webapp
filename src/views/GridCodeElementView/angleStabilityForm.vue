@@ -10,19 +10,31 @@
         <InputSwitch id="active" v-model="formData.active" autocomplete="off" />
       </div>
     </div>
-    <div class="col-10">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="norminalFreq" class="font-semibold"> Norminal Frequency</label>
-        <InputNumber v-model="formData.norminalFreq" :suffix="unitLabel" />
+
+    <div class="col-12">
+      <span class="p-text-secondary block">Instantaneous</span>
+    </div>
+    <div class="col-9 grid align-items-center">
+      <div class="col-6">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="instantaneousMin" class="font-semibold"> Min</label>
+          <InputNumber v-model="formData.instantaneousMin" />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="instantaneousMax" class="font-semibold"> Max</label>
+          <InputNumber v-model="formData.instantaneousMax" />
+        </div>
       </div>
     </div>
-    <div class="col-2">
+    <div class="col-3">
       <div class="flex flex-column gap-2 mb-3 flex-1">
         <label for="unitType" class="font-semibold"> Unit </label>
         <Dropdown
           id="unitType"
           v-model="formData.unitType"
-          :options="frequencyUnitOpts"
+          :options="angleUnitOpts"
           optionLabel="label"
           optionValue="value"
           class="flex-auto w-full"
@@ -30,32 +42,16 @@
         />
       </div>
     </div>
-
-    <div class="col-12">
-      <span class="p-text-secondary block"> Normal Voltage Limit</span>
-    </div>
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="normalVolLimitLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.normalVolLimitLower" :suffix="unitLabel" />
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="normalVolLimitUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.normalVolLimitUpper" :suffix="unitLabel" />
-      </div>
-    </div>
   </div>
 </template>
 <script setup>
 const formData = defineModel('formData');
-const frequencyUnitOpts = ref([
+const angleUnitOpts = ref([
   { label: '%', value: 1 },
-  { label: 'Hz', value: 2 },
+  { label: 'Degree', value: 3 },
 ]);
 const unitLabel = computed(() => {
-  return ' ' + frequencyUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;
+  return ' ' + angleUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;
 });
 </script>
 <style>

@@ -49,30 +49,8 @@
       <TabView>
         <TabPanel header="Common">
           <div v-if="angleStabilityData._id" class="p-3">
-            <div class="grid align-items-center">
-              <div class="col-12 flex justify-content-between gap-3">
-                <div class="flex flex-column gap-2 mb-3 flex-1">
-                  <label for="name" class="font-semibold"> Name </label>
-                  <InputText id="name" v-model="angleStabilityData.name" class="flex-auto w-full" autocomplete="off" />
-                </div>
-                <div class="flex flex-column gap-2 mb-3 align-items-center">
-                  <label for="active" class="font-semibold mb-2"> Active</label>
-                  <InputSwitch id="active" v-model="angleStabilityData.active" autocomplete="off" />
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="flex flex-column gap-2 mb-3">
-                  <label for="limitationReserve" class="font-semibold"> Instantaneous Min</label>
-                  <InputNumber v-model="angleStabilityData.instantaneousMin" />
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="flex flex-column gap-2 mb-3">
-                  <label for="limitationReserve" class="font-semibold"> Instantaneous Max</label>
-                  <InputNumber v-model="angleStabilityData.instantaneousMax" />
-                </div>
-              </div>
-            </div>
+            <angleStabilityForm v-model:formData="angleStabilityData" />
+
             <div class="flex justify-content-end gap-3">
               <Button type="button" label="Update" @click="updateAngleStability"></Button>
             </div>
@@ -238,30 +216,7 @@
       </div>
     </template>
 
-    <div class="grid align-items-center">
-      <div class="col-12 flex justify-content-between gap-3">
-        <div class="flex flex-column gap-2 mb-3 flex-1">
-          <label for="name" class="font-semibold"> Name </label>
-          <InputText id="name" v-model="newAngleStability.name" class="flex-auto w-full" autocomplete="off" />
-        </div>
-        <div class="flex flex-column gap-2 mb-3 align-items-center">
-          <label for="active" class="font-semibold mb-2"> Active</label>
-          <InputSwitch id="active" v-model="newAngleStability.active" autocomplete="off" />
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="limitationReserve" class="font-semibold"> Instantaneous Min</label>
-          <InputNumber v-model="newAngleStability.instantaneousMin" />
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="limitationReserve" class="font-semibold"> Instantaneous Max</label>
-          <InputNumber v-model="newAngleStability.instantaneousMax" />
-        </div>
-      </div>
-    </div>
+    <angleStabilityForm v-model:formData="newAngleStability" />
 
     <template #footer>
       <Button
@@ -332,6 +287,7 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
 import angleRestoreTimeForm from './angleRestoreTimeForm.vue';
+import angleStabilityForm from './angleStabilityForm.vue';
 import { ApiAngleStability } from './api';
 import { onMounted } from 'vue';
 const toast = useToast();
@@ -387,6 +343,7 @@ const handlerCreateAngleStability = () => {
     active: true,
     instantaneousMax: 1,
     instantaneousMin: -1,
+    unitType: 3,
     name: '',
   };
   createAngleStabilityVisibleDialog.value = true;
