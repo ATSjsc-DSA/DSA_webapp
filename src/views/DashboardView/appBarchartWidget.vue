@@ -43,7 +43,6 @@ watch(
 );
 const chartData = ref();
 const chartOptions = ref();
-const interval = ref(null);
 
 const setChartData = () => {
   const documentStyle = getComputedStyle(document.documentElement);

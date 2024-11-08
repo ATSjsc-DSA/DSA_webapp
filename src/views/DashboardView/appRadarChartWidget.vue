@@ -9,6 +9,10 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  dataKey: {
+    type: Array,
+    default: () => [],
+  },
 });
 onMounted(() => {
   chartData.value = setChartData();
@@ -17,6 +21,14 @@ onMounted(() => {
 
 watch(
   () => props.data,
+  async () => {
+    chartData.value = setChartData();
+    chartOptions.value = setChartOptions();
+  },
+);
+
+watch(
+  () => props.dataKey,
   async () => {
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
@@ -293,12 +305,12 @@ const getCurrentStateColorAndTitle = (rate1, rate2) => {
 };
 
 const removeValueBellowZero = (reserveData) => {
-  var reserveDataZero = reserveData.map((item) => (item < 0 ? 0 : item));
+  const reserveDataZero = reserveData.map((item) => (item < 0 ? 0 : item));
   return reserveDataZero;
 };
 
 const removeValueExceed20 = (reserveData) => {
-  var reserveDataExceed20 = reserveData.map((item) => (item > 0.2 ? 0.2 : item));
+  const reserveDataExceed20 = reserveData.map((item) => (item > 0.2 ? 0.2 : item));
   return reserveDataExceed20;
 };
 </script>

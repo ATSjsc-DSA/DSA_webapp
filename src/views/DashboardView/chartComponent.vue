@@ -6,7 +6,16 @@
           <div><i class="pi pi-folder-open pr-3"></i>{{ chartTitle }}</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
         </div>
-        <div>
+        <div class="flex justify-content-between align-items-center">
+          <div v-if="chartData.Key">
+            <MultiSelect
+              v-model="chartBarDataKey"
+              :options="chartData.Key"
+              :disabled="chartData.Key.length === 0"
+              :maxSelectedLabels="3"
+              class="w-full"
+            />
+          </div>
           <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
           <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="getChartData" />
           <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
@@ -24,7 +33,7 @@
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
-        <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" />
+        <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartBarDataKey" />
       </div>
     </template>
   </Card>
@@ -32,6 +41,9 @@
 
 <script setup>
 import { computed, onUnmounted, onMounted, watch } from 'vue';
+
+import MultiSelect from 'primevue/multiselect';
+
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
@@ -68,8 +80,13 @@ const intervalTime = 3000;
 onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
-    chartTitle.value = nodeSelected.value.title;
+    if (!props.muiltiSelect) {
+      chartTitle.value = nodeSelected.value.title;
+    } else {
+      setInitTitle();
+    }
     getChartData();
+    chartBarDataKey.value = nodeSelected.value.dataKey;
 
     if (!stopReloadChartData.value) {
       interval.value = setInterval(() => {
@@ -83,10 +100,8 @@ onMounted(() => {
 
 watch(stopReloadChartData, (stt) => {
   if (stt) {
-    console.log(chartTitle.value, 'clearInterval');
     clearInterval(interval.value);
   } else {
-    console.log(chartTitle.value, 'start interval');
     getChartData();
     interval.value = setInterval(() => {
       getChartData();
@@ -176,6 +191,7 @@ const onDropComponent = async () => {
     nodeSelected.value = {
       title: props.nodeDrag.label,
       data: nodeSelectedInChart.value,
+      dataKey: [],
     };
 
     await getChartData();
@@ -187,10 +203,14 @@ const onDropComponent = async () => {
   }
 };
 
+const chartBarDataKey = ref();
+watch(chartBarDataKey, (keyArr) => {
+  nodeSelected.value.dataKey = keyArr;
+});
+
 const chartData = ref([]);
 const modificationTime = ref();
 const getChartData = async () => {
-  console.log(chartTitle.value, 'getChartData');
   try {
     let res = {};
     if (props.typeChart === 'appBar') {
@@ -198,6 +218,9 @@ const getChartData = async () => {
     }
     if (props.typeChart === 'appRadar') {
       res = await ApplicationApi.getRadarChartData(nodeSelectedInChart.value);
+      if (!chartBarDataKey.value) {
+        chartBarDataKey.value = res.data.Key.slice(0, 8);
+      }
     }
     if (props.typeChart === 'vsa') {
       res = await VsaApi.getChartData(nodeSelectedInChart.value);

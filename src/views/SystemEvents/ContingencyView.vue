@@ -23,7 +23,7 @@
         </div>
       </template>
       <Column field="name" header="Name"></Column>
-      <Column field="contingencyType" header="Type">
+      <Column field="contingencyType" header="Type" style="text-wrap: nowrap">
         <template #body="{ data }">
           <Chip :label="data.contingencyType === 0 ? 'N-1' : 'N-2'" />
         </template>

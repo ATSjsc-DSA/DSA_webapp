@@ -24,13 +24,6 @@ const items = ref([
     label: 'Configuration',
     items: [
       { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
-      // { label: 'Configuration ', icon: 'pi pi-fw pi-file-edit', to: '/Configuration' },
-
-      // { label: 'Study Mode', icon: 'pi pi-fw pi-clone', to: '/DSA/StudyMode' },
-      { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
-      { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
-
-      { label: 'User Configuration', icon: 'pi pi-file-edit', to: '/user_config' },
       {
         label: 'System Events',
         icon: 'pi pi-fw pi-clone',
@@ -47,6 +40,10 @@ const items = ref([
           },
         ],
       },
+      { label: 'User Configuration', icon: 'pi pi-file-edit', to: '/user_config' },
+
+      { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
+      { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
     ],
   },
   {

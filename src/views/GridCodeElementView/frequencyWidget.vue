@@ -15,7 +15,7 @@
                   class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-2"
                   :class="{
                     'border-top-1 surface-border': index !== 0,
-                    'selected-item': (index = frequencyIndexSelected),
+                    'selected-item': index === frequencyIndexSelected,
                   }"
                   @click="frequencyClick(index)"
                 >
