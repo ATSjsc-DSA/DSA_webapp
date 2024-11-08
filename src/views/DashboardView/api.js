@@ -11,6 +11,7 @@ export class ApplicationApi {
   static async getRadarChartData(appId = '') {
     return get(`/hmi/task/${hmiTaskId.value}/radar/app/${appId}`);
   }
+
 }
 
 export class CommonApi {
@@ -19,6 +20,9 @@ export class CommonApi {
   }
   static async getDsaModuleList(app_id) {
     return get(`hmi/${projectData.value._id}/${userConfigVersionId.value}/${app_id}/dsamodule`);
+  }
+  static async getProjectRadarChartData() {
+    return get(`/hmi/task/${hmiTaskId.value}/radar/project/${projectData.value._id}`);
   }
 }
 

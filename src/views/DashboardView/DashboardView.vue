@@ -23,7 +23,6 @@
           @dragover.prevent="dragOverGridStackComponent"
           @drop.prevent="onDropGridStackComponent"
         >
-          <!-- <div ref="grid" class="grid-stack bg-blue-100"></div> -->
           <div
             v-if="gridStackComponentArr.length === 0"
             class="flex h-full justify-content-center align-items-center"
@@ -140,9 +139,7 @@
               <i class="pi pi-list" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">TREE</div>
             </div>
-
             <Divider class="m-1" />
-            <div class="font-semibold" style="font-size: 0.8rem">CHART</div>
 
             <div
               v-tooltip.left="'Map'"
@@ -155,6 +152,19 @@
               <div style="font-size: 0.7rem">MAP</div>
             </div>
 
+            <Divider class="m-1" />
+            <div class="font-semibold" style="font-size: 0.8rem">CHART</div>
+            <div
+              v-tooltip.left="'Project Radar'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragStart('projectRadar')"
+            >
+              <i class="pi pi-chart-pie" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">PROJECT</div>
+            </div>
+
             <div
               v-tooltip.left="'Appplication Radar'"
               class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
@@ -163,7 +173,7 @@
               @dragstart="handleDragStart('appRadar')"
             >
               <i class="pi pi-chart-pie" style="font-size: 1rem" />
-              <div style="font-size: 0.7rem">RADAR</div>
+              <div style="font-size: 0.7rem">APP</div>
             </div>
             <div
               v-tooltip.left="'Appplication Bar'"
@@ -264,6 +274,9 @@ onMounted(async () => {
           if (widget.typeChart === 'tsa') {
             tsaCurveDraggable.value = true;
             addNewChartComponent('tsa', true, widget);
+          }
+          if (widget.typeChart === 'projectRadar') {
+            addNewChartComponent('projectRadar', true, widget);
           }
         }
       });
@@ -382,6 +395,9 @@ const onDropGridStackComponent = () => {
   if (componentSelected.value === 'appRadar') {
     applicationDraggable.value = true;
     addNewChartComponent(componentSelected.value, false);
+  }
+  if (componentSelected.value === 'projectRadar') {
+    addNewChartComponent(componentSelected.value, true, { nodeSelected: { data: 'project' } });
   }
   if (componentSelected.value === 'vsa') {
     vsaCurveDraggable.value = true;

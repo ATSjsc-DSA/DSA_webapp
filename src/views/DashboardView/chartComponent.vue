@@ -9,7 +9,7 @@
         <div class="flex justify-content-between align-items-center">
           <div v-if="chartData.Key">
             <MultiSelect
-              v-model="chartBarDataKey"
+              v-model="chartRadarDataKey"
               :options="chartData.Key"
               :disabled="chartData.Key.length === 0"
               :maxSelectedLabels="3"
@@ -33,7 +33,8 @@
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
-        <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartBarDataKey" />
+        <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
+        <projectRadarChartWidget v-if="typeChart === 'projectRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
       </div>
     </template>
   </Card>
@@ -47,7 +48,8 @@ import MultiSelect from 'primevue/multiselect';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
-import { VsaApi, TsaApi, ApplicationApi } from './api';
+import projectRadarChartWidget from './projectRadarChartWidget.vue';
+import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 
@@ -86,7 +88,7 @@ onMounted(() => {
       setInitTitle();
     }
     getChartData();
-    chartBarDataKey.value = nodeSelected.value.dataKey;
+    chartRadarDataKey.value = nodeSelected.value.dataKey;
 
     if (!stopReloadChartData.value) {
       interval.value = setInterval(() => {
@@ -95,6 +97,12 @@ onMounted(() => {
     }
   } else {
     setInitTitle();
+  }
+  if (props.typeChart === 'projectRadar') {
+    getChartData();
+    interval.value = setInterval(() => {
+      getChartData();
+    }, intervalTime);
   }
 });
 
@@ -139,7 +147,9 @@ const setInitTitle = () => {
   if (props.typeChart === 'appBar') {
     chartTitle.value = 'Application';
   }
-
+  if (props.typeChart === 'projectRadar') {
+    chartTitle.value = 'Project';
+  }
   if (props.typeChart === 'vsa') {
     chartTitle.value = 'Vsa';
   }
@@ -154,6 +164,9 @@ const nodeKeySelected = ref(props.muiltiSelect ? [] : undefined);
 const canDropNode = ref(false);
 
 const onDragoverComponent = () => {
+  if (props.typeChart === 'projectRadar') {
+    return false;
+  }
   if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
     canDropNode.value = true;
   } else {
@@ -203,8 +216,8 @@ const onDropComponent = async () => {
   }
 };
 
-const chartBarDataKey = ref();
-watch(chartBarDataKey, (keyArr) => {
+const chartRadarDataKey = ref();
+watch(chartRadarDataKey, (keyArr) => {
   nodeSelected.value.dataKey = keyArr;
 });
 
@@ -218,8 +231,16 @@ const getChartData = async () => {
     }
     if (props.typeChart === 'appRadar') {
       res = await ApplicationApi.getRadarChartData(nodeSelectedInChart.value);
-      if (!chartBarDataKey.value) {
-        chartBarDataKey.value = res.data.Key.slice(0, 8);
+      if (!chartRadarDataKey.value) {
+        chartRadarDataKey.value = res.data.Key.slice(0, 8);
+      }
+    }
+    if (props.typeChart === 'projectRadar') {
+      res = await ApplicationApi.getRadarChartData('67063c04c8dfd984e9fe1f2e');
+
+      // res = await CommonApi.getProjectRadarChartData();
+      if (!chartRadarDataKey.value) {
+        chartRadarDataKey.value = res.data.Key.slice(0, 8);
       }
     }
     if (props.typeChart === 'vsa') {
