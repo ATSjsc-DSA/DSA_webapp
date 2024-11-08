@@ -51,6 +51,7 @@
                 <chartComponent
                   v-if="w.type === 'chart'"
                   v-model:nodeSelected="w.nodeSelected"
+                  v-model:stopReloadChartData="stopReloadChartData"
                   :nodeDrag="nodeDrag"
                   :chartId="w.id"
                   :typeChart="w.typeChart"
@@ -62,7 +63,32 @@
           </div>
         </div>
         <div class="application-right-side-custom">
-          <div class="flex flex-column gap-3 justify-content-center align-items-center sticky" style="top: 6rem">
+          <div class="flex flex-column gap-2 justify-content-center align-items-center sticky" style="top: 6rem">
+            <div class="font-semibold" style="font-size: 0.8rem">DATA</div>
+            <div
+              v-tooltip.left="stopReloadChartData ? 'Start Auto Reload' : 'Stop Auto Reload'"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components"
+              :class="stopReloadChartData ? 'bg-primary' : 'bg-red-400'"
+              placeholder="Left"
+              @click="stopReloadChartData = !stopReloadChartData"
+            >
+              <i v-if="stopReloadChartData" class="pi pi-play cursor-pointer" style="font-size: 1rem" />
+              <i v-else class="pi pi-pause cursor-pointer" style="font-size: 1rem" />
+
+              <div style="font-size: 0.7rem">{{ stopReloadChartData ? 'START' : 'STOP' }}</div>
+            </div>
+
+            <div
+              v-tooltip.left="'Reload Data'"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components"
+              placeholder="Left"
+              @click="reloadData"
+            >
+              <i class="pi pi-replay cursor-pointer" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">RELOAD</div>
+            </div>
+            <Divider class="m-1" />
+            <div class="font-semibold" style="font-size: 0.8rem">GRID</div>
             <div
               v-tooltip.left="'Compact Grid'"
               class="flex flex-column align-items-center gap-1 px-1 py-2 bg-primary button-choose-components"
@@ -94,7 +120,6 @@
               <i class="pi pi-trash cursor-pointer" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">DELETE</div>
             </div>
-
             <div
               v-tooltip.left="'Save Grid'"
               class="flex flex-column align-items-center gap-1 px-1 py-2 bg-gray-100 button-choose-components"
@@ -104,7 +129,8 @@
               <i class="pi pi-save cursor-pointer" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">Save</div>
             </div>
-            <Divider />
+            <Divider class="m-1" />
+            <div class="font-semibold" style="font-size: 0.8rem">COMPONENT</div>
             <div
               v-tooltip.left="'Project Tree'"
               class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
@@ -115,7 +141,9 @@
               <div style="font-size: 0.7rem">TREE</div>
             </div>
 
-            <Divider />
+            <Divider class="m-1" />
+            <div class="font-semibold" style="font-size: 0.8rem">CHART</div>
+
             <div
               v-tooltip.left="'Map'"
               class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
@@ -197,6 +225,7 @@ import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
 
 const confirm = useConfirm();
+
 const showTree = ref(localStorage.getItem('showTree') === 'true' || false);
 const gridStackComponentGrid = ref(null);
 const gridLock = ref(true);
@@ -315,6 +344,7 @@ const saveGrid = () => {
   });
   localStorage.setItem('gridStackComponentArr', JSON.stringify(gridStackComponentArr.value));
   localStorage.setItem('showTree', JSON.stringify(showTree.value));
+  localStorage.setItem('stopReloadChartData', stopReloadChartData.value);
   toast.add({ severity: 'success', summary: 'Saved Successfully', life: 3000 });
 };
 
@@ -409,6 +439,19 @@ const addMapComponent = async (oldConfig = {}) => {
     });
   });
 };
+
+// --- control reload data
+
+const stopReloadChartData = ref(localStorage.getItem('stopReloadChartData') === 'true');
+const reloadData = () => {
+  const oldStt = stopReloadChartData.value;
+  stopReloadChartData.value = false;
+  if (oldStt != false) {
+    setTimeout(() => {
+      stopReloadChartData.value = oldStt;
+    }, 1000);
+  }
+};
 </script>
 <style>
 @import 'gridstack/dist/gridstack.min.css';
@@ -447,5 +490,9 @@ const addMapComponent = async (oldConfig = {}) => {
   color: var(--text-color);
   border: 1px solid gray;
   width: 3rem;
+}
+
+.button-choose-components:hover {
+  background-color: var(--surface-hover);
 }
 </style>

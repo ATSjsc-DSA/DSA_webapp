@@ -2,12 +2,12 @@
   <Splitter>
     <SplitterPanel :size="25" :minSize="10">
       <div class="py-4 px-3 flex justify-content-between align-items-center">
-        <span class="text-xl font-semibold"> List Frequency</span>
-        <Button icon="pi pi-plus" text rounded aria-label="create" @click="handlerCreateFrequency" />
+        <span class="text-xl font-semibold"> List Voltage</span>
+        <Button icon="pi pi-plus" text rounded aria-label="create" @click="handlerCreateVoltage" />
       </div>
 
       <ScrollPanel style="width: 100%; height: 46rem">
-        <DataView :value="frequencyList" class="w-full flex-1" :class="{ 'p-3': frequencyList.length === 0 }">
+        <DataView :value="voltageList" class="w-full flex-1">
           <template #list="slotProps">
             <div class="grid grid-nogutter">
               <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -15,9 +15,9 @@
                   class="flex flex-column sm:flex-row sm:align-items-center gap-3 item-data p-2"
                   :class="{
                     'border-top-1 surface-border': index !== 0,
-                    'selected-item': (index = frequencyIndexSelected),
+                    'selected-item': voltageSelected && voltageSelected.name === item.name,
                   }"
-                  @click="frequencyClick(index)"
+                  @click="voltageClick(item)"
                 >
                   <div class="flex flex-row justify-content-between align-items-center gap-2 flex-1 ml-2">
                     <div class="flex flex-row justify-content-start align-items-center gap-2 flex-1 ml-2 capitalize">
@@ -31,7 +31,7 @@
                       size="small"
                       rounded
                       severity="danger"
-                      @click="confirmDeleteFrequency($event, item, index)"
+                      @click="confirmDeleteVoltage($event, item)"
                     />
                   </div>
                 </div>
@@ -43,36 +43,36 @@
     </SplitterPanel>
     <SplitterPanel class="h-full" :size="75">
       <TabView>
+        <TabPanel header="Contigency">
+          <contigencyWidget v-if="voltageData._id" :standard-id="voltageData._id" />
+        </TabPanel>
         <TabPanel header="Common">
-          <div v-if="frequencyData._id" class="p-3">
-            <frequencyForm v-model:form-data="frequencyData" />
+          <div v-if="voltageData._id" class="p-3">
+            <voltageForm v-model:form-data="voltageData" />
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Update" @click="updateFrequency"></Button>
+              <Button type="button" label="Update" @click="updateVoltage"></Button>
             </div>
           </div>
-        </TabPanel>
-        <TabPanel header="Contigency">
-          <contigencyWidget v-if="frequencyData._id" :standard-id="frequencyData._id" />
         </TabPanel>
       </TabView>
     </SplitterPanel>
   </Splitter>
 
   <Dialog
-    v-model:visible="createFrequencyVisibleDialog"
+    v-model:visible="createVoltageVisibleDialog"
     :style="{ width: '48rem' }"
     header="Create Dialog "
     :modal="true"
   >
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Grid Code - Frequency</span>
+        <span class="font-bold white-space-nowrap">Grid Code - Voltage</span>
       </div>
     </template>
-    <frequencyForm v-model:form-data="newFrequency" />
+    <voltageForm v-model:form-data="newVoltage" />
     <template #footer>
-      <Button type="button" label="Cancel" severity="secondary" @click="createFrequencyVisibleDialog = false"></Button>
-      <Button type="button" label="Save" :disabled="!newFrequency.name" @click="createFrequency"></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="createVoltageVisibleDialog = false"></Button>
+      <Button type="button" label="Save" :disabled="!newVoltage.name" @click="createVoltage"></Button>
     </template>
   </Dialog>
 </template>
@@ -86,9 +86,9 @@ import ScrollPanel from 'primevue/scrollpanel';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
-import frequencyForm from './frequencyForm.vue';
+import voltageForm from './voltageForm.vue';
 import contigencyWidget from './contigencyWidget.vue';
-import { ApiFrequency } from './api';
+import { ApiVoltage } from './api';
 const toast = useToast();
 const confirm = useConfirm();
 
@@ -99,78 +99,88 @@ const props = defineProps({
   },
 });
 onMounted(async () => {
-  await getFrequencyList();
+  await getVoltageList();
+  // this is for test
+  setTimeout(() => {
+    voltageClick({ _id: '672b2169f3a38f337ce9c5f2', name: 'GridCode_test334' });
+  }, 500);
+
+  // end test
 });
-const frequencyList = ref([]);
-const getFrequencyList = async () => {
+const voltageList = ref([]);
+const getVoltageList = async () => {
   try {
-    const res = await ApiFrequency.getFrequencyList(props.gridcodeId);
-    frequencyList.value = res.data;
+    const res = await ApiVoltage.getVoltageList(props.gridcodeId);
+    voltageList.value = res.data;
   } catch (error) {
-    console.log('getfrequencyList error', error);
+    console.log('getvoltageList error', error);
   }
 };
 
-// ------ frequency - CRUD
-const frequencyIndexSelected = ref();
-const frequencyData = ref({});
-const frequencyClick = async (index) => {
-  frequencyIndexSelected.value = index;
-  await getFrequencyData();
+// ------ voltage - CRUD
+const voltageSelected = ref({});
+const voltageData = ref({});
+const voltageClick = async (item) => {
+  voltageSelected.value = item;
+  await getVoltageData();
 };
 
-const getFrequencyData = async () => {
+const getVoltageData = async () => {
   try {
-    const res = await ApiFrequency.getFrequencyById(frequencyList.value[frequencyIndexSelected.value]._id);
-    frequencyData.value = res.data;
+    const res = await ApiVoltage.getVoltageById(voltageSelected.value._id);
+    voltageData.value = res.data;
   } catch (error) {
-    frequencyData.value = {};
-    console.log('getfrequencyList error', error);
+    voltageData.value = {};
+    console.log('getvoltageList error', error);
   }
 };
 
-const newFrequency = ref();
-const createFrequencyVisibleDialog = ref(false);
+const newVoltage = ref();
+const createVoltageVisibleDialog = ref(false);
 
-const handlerCreateFrequency = () => {
-  newFrequency.value = {
+const handlerCreateVoltage = () => {
+  newVoltage.value = {
+    abnormalActivation: true,
+    abnormalVolLimitLower: 0,
+    abnormalVolLimitUpper: 0,
     active: true,
     name: '',
     normalVolLimitLower: 0,
     normalVolLimitUpper: 0,
-    norminalFreq: 0,
+    volRangeLower: 0,
+    volRangeUpper: 0,
   };
-  createFrequencyVisibleDialog.value = true;
+  createVoltageVisibleDialog.value = true;
 };
-const createFrequency = async () => {
+const createVoltage = async () => {
   try {
-    const res = await ApiFrequency.createFrequency(props.gridcodeId, newFrequency.value);
-    frequencyList.value.push(res.data);
-    frequencyData.value = res.data;
-    frequencyIndexSelected.value = frequencyList.value.length - 1;
-    createFrequencyVisibleDialog.value = false;
+    const res = await ApiVoltage.createVoltage(props.gridcodeId, newVoltage.value);
+    await getVoltageList();
+    voltageSelected.value = res.data;
+    voltageData.value = res.data;
+    createVoltageVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
   } catch (error) {
     console.log('createAngleStability error', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
   }
 };
-const updateFrequency = async () => {
+const updateVoltage = async () => {
   try {
-    const res = await ApiFrequency.updateFrequency(frequencyData.value._id, frequencyData.value);
-    // await getFrequencyList();
-    frequencyList.value[frequencyIndexSelected.value] = res.data;
+    const res = await ApiVoltage.updateVoltage(voltageData.value._id, voltageData.value);
+    await getVoltageList();
+    voltageSelected.value = res.data;
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
   } catch (error) {
-    console.log('updateFrequency error', error);
+    console.log('updateVoltage error', error);
     toast.add({ severity: 'error', summary: 'Updated Message', detail: error.data.detail, life: 3000 });
   }
 };
 
-const confirmDeleteFrequency = (event, frequency, index) => {
+const confirmDeleteVoltage = (event, voltage) => {
   confirm.require({
     target: event.currentTarget,
-    header: 'Delete Frequency - ' + frequency.name,
+    header: 'Delete Voltage - ' + voltage.name,
     message: 'Are you sure you want to proceed?',
     icon: 'pi pi-exclamation-triangle',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
@@ -178,17 +188,17 @@ const confirmDeleteFrequency = (event, frequency, index) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
     accept: async () => {
-      await deleteFrequency(frequency._id, index);
+      await deleteVoltage(voltage._id);
     },
+    reject: () => {},
   });
 };
 
-const deleteFrequency = async (id, delIndex) => {
+const deleteVoltage = async (id) => {
   try {
-    await ApiFrequency.deleteFrequency(id);
-    frequencyList.value.splice(delIndex, 1);
-    frequencyIndexSelected.value = undefined;
-    frequencyData.value = {};
+    await ApiVoltage.deleteVoltage(id);
+    await getVoltageList();
+    voltageSelected.value = {};
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);

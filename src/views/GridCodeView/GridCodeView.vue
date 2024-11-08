@@ -43,6 +43,8 @@
             </div>
           </template>
         </Column>
+
+        <template #empty> No data </template>
       </DataTable>
     </div>
     <div class="flex justify-content-end align-items-center mt-3">

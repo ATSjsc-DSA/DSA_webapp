@@ -61,19 +61,36 @@ const props = defineProps({
 
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
+const stopReloadChartData = defineModel('stopReloadChartData');
 
 const interval = ref(null);
-const intervalTime = 1000 * 60;
+const intervalTime = 3000;
 onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
     chartTitle.value = nodeSelected.value.title;
     getChartData();
+
+    if (!stopReloadChartData.value) {
+      interval.value = setInterval(() => {
+        getChartData();
+      }, intervalTime);
+    }
+  } else {
+    setInitTitle();
+  }
+});
+
+watch(stopReloadChartData, (stt) => {
+  if (stt) {
+    console.log(chartTitle.value, 'clearInterval');
+    clearInterval(interval.value);
+  } else {
+    console.log(chartTitle.value, 'start interval');
+    getChartData();
     interval.value = setInterval(() => {
       getChartData();
     }, intervalTime);
-  } else {
-    setInitTitle();
   }
 });
 onUnmounted(() => {
@@ -173,6 +190,7 @@ const onDropComponent = async () => {
 const chartData = ref([]);
 const modificationTime = ref();
 const getChartData = async () => {
+  console.log(chartTitle.value, 'getChartData');
   try {
     let res = {};
     if (props.typeChart === 'appBar') {
