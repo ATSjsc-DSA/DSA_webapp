@@ -155,7 +155,6 @@
             </div>
           </template>
           <template #content>
-            <LoadingContainer v-show="isLoadingContainer" class="relative" />
             <!-- Application -->
             <ScrollPanel
               v-if="nodeSelected.type === 'Application' && appData !== undefined"
@@ -208,7 +207,7 @@
                   </div>
                 </ScrollPanel>
               </TabPanel>
-              <TabPanel header="Dependency Plan">
+              <TabPanel header="Offline">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
                   <dependencyTableWidget :dependency-id="vsaData._id" />
                 </ScrollPanel>
@@ -227,7 +226,7 @@
                   </div>
                 </ScrollPanel>
               </TabPanel>
-              <TabPanel header="Dependency Plan">
+              <TabPanel header="Offline">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
                   <dependencyTableWidget :dependency-id="tsaData._id" />
                 </ScrollPanel>

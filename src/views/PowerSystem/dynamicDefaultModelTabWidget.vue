@@ -478,7 +478,7 @@ watch(
 );
 
 onMounted(async () => {
-  await getTableData();
+  // await getTableData();
   // // Traditional
 });
 

@@ -31,25 +31,22 @@ const items = ref([
           {
             label: 'Contingencies',
             to: '/SystemEvents/Contingencies',
-            // icon: 'pi pi-fw pi-cog',
           },
           {
             label: 'Subsystems',
             to: '/SystemEvents/Subsystems',
-            // icon: 'pi pi-fw pi-cog',
           },
         ],
       },
       { label: 'User Configuration', icon: 'pi pi-file-edit', to: '/user_config' },
-
+      {
+        label: 'Grid Code',
+        icon: 'pi pi-fw pi-id-card',
+        to: '/gridcode/',
+      },
       { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
       { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
     ],
-  },
-  {
-    label: 'Grid Code',
-    icon: 'pi pi-fw pi-id-card',
-    to: '/gridcode/',
   },
 ]);
 

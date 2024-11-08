@@ -129,8 +129,7 @@
                           class=""
                           :text="tabMenuPSActive !== index"
                           :disabled="
-                            ((tab === 'Dynamic' || tab === 'Dynamic Default') && !isDefinitionGenerator) ||
-                            (tab === 'Graphics' && !isStation)
+                            (tab === 'Dynamic' && !isDefinitionGenerator) || (tab === 'Graphics' && !isStation)
                           "
                           @click="tabMenuPSActive = index"
                         />
@@ -357,15 +356,6 @@
                         :nodeSelected="nodeSelected"
                       />
                     </TabPanel>
-                    <TabPanel :disabled="!isDefinitionGenerator">
-                      <dynamicDefaultModelTabWidget
-                        v-if="isDefinitionGenerator"
-                        :definitionId="definitionSelected._id"
-                        :showDefinitionFlatList="showDefinitionFlatList"
-                        :nodeSelected="nodeSelected"
-                      />
-                    </TabPanel>
-
                     <TabPanel :disabled="isStation">
                       <div
                         :style="{
@@ -550,19 +540,6 @@
           ></Button>
         </div>
       </TabPanel>
-      <TabPanel header="Dynamic Model Default">
-        <uploadFileConfig @uploadFile="loadDynamicDefaultFile" />
-        <div class="flex gap-2 justify-content-end align-items-center">
-          <Button type="button" label="Cancel" severity="secondary" @click="importVisibleDialog = false"></Button>
-          <Button
-            type="button"
-            label="Save"
-            severity="primary"
-            :disabled="!dynamicDefaultImportFormdata"
-            @click="importDynamicDefaultFile"
-          ></Button>
-        </div>
-      </TabPanel>
     </TabView>
   </Dialog>
 
@@ -611,7 +588,6 @@ import poleTableWidget from './parameterTableTabWidget/poleTableWidget.vue';
 
 import emsTabWidget from './emsTabWidget.vue';
 import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
-import dynamicDefaultModelTabWidget from './dynamicDefaultModelTabWidget.vue';
 
 import createPsDialog from './createPsDialog.vue';
 import createEmsDialog from './createEmsDialog.vue';
@@ -619,7 +595,7 @@ import createEmsDialog from './createEmsDialog.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
-import { DynamicModelApi, DynamicDefaultApi } from './api';
+import { DynamicModelApi } from './api';
 // graphic
 import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
 
@@ -639,7 +615,7 @@ onMounted(async () => {
 onUnmounted(() => {});
 
 const tabMenuPSActive = ref(0);
-const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Dynamic Default', 'Graphics']);
+const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Graphics']);
 const showDefinitionFlatList = ref(false);
 
 const loadAllData = async () => {
@@ -658,9 +634,8 @@ const isDefinitionGenerator = ref(false);
 const isStation = ref(false);
 watch(isDefinitionGenerator, (newStatus) => {
   const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
-  const isDynamicDefaultTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic Default';
 
-  if (!newStatus && (isDynamicTab || isDynamicDefaultTab)) {
+  if (!newStatus && isDynamicTab) {
     tabMenuPSActive.value = 0;
   }
 });
@@ -752,9 +727,8 @@ const canUseDefinitionFilter = computed(() => {
 
 const showflatListFilterWidget = computed(() => {
   const isDynamicTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic';
-  const isDynamicDefaultTab = tabMenuPSList.value[tabMenuPSActive.value] === 'Dynamic Default';
 
-  if (isDynamicTab || isDynamicDefaultTab) {
+  if (isDynamicTab) {
     return false;
   }
   return showDefinitionFlatList.value;
@@ -1204,14 +1178,6 @@ const loadDynamicFile = async (formData, callback) => {
   callback();
 };
 
-const dynamicDefaultImportFormdata = ref();
-const loadDynamicDefaultFile = async (formData, callback) => {
-  await DynamicDefaultApi.importDynamicDefaultModel(formData);
-  dynamicDefaultImportFormdata.value = formData;
-  console.log('load Dynamic file', formData);
-  callback();
-};
-
 function delayImportExport(ms = 3000) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -1225,14 +1191,6 @@ const importEmsFile = async () => {
 };
 
 const importDynamicFile = async () => {
-  isLoadingProgress.value = true;
-  await delayImportExport();
-  toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
-  importVisibleDialog.value = false;
-  isLoadingProgress.value = false;
-};
-
-const importDynamicDefaultFile = async () => {
   isLoadingProgress.value = true;
   await delayImportExport();
   toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
