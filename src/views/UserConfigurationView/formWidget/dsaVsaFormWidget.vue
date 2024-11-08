@@ -55,7 +55,7 @@
     <div class="col-6">
       <searchSubsystemWidget v-model="fixSubPsSelected" label="Fix Sub System" />
     </div>
-    <div class="col-6">
+    <div v-show="false" class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="remedialActionId" class="font-semibold"> Remedial Action</label>
         <InputText
@@ -67,7 +67,7 @@
         />
       </div>
     </div>
-    <div class="col-6">
+    <div v-show="false" class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="digsilentSettingId" class="font-semibold"> Digsilent Setting</label>
         <InputText
