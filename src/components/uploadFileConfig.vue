@@ -1,10 +1,16 @@
 <template>
   <div class="card">
-    <FileUpload name="gen" :multiple="true" :maxFileSize="1000000" accept=".xlsx, .xls, .csv">
+    <FileUpload name="gen" :multiple="multipleFile" :fileLimit="fileLimit" accept=".xlsx, .xls, .csv">
       <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
         <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
           <div class="flex gap-2">
-            <Button @click="chooseCallback()" icon="pi pi-file" rounded outlined></Button>
+            <Button
+              @click="chooseCallback()"
+              icon="pi pi-file"
+              rounded
+              outlined
+              :disabled="files.length === fileLimit"
+            ></Button>
             <Button
               @click="uploadEvent(uploadCallback, files)"
               icon="pi pi-cloud-upload"
@@ -87,6 +93,20 @@
 <script setup>
 import { usePrimeVue } from 'primevue/config';
 
+const props = defineProps({
+  multipleFile: {
+    type: Boolean,
+    default: false,
+  },
+  fileLimit: {
+    type: Number,
+    default: 1,
+  },
+});
+const multipleFile = computed(() => props.multipleFile);
+const fileLimit = computed(() => props.fileLimit);
+console.log(multipleFile.value, 'multipleFile');
+
 const emit = defineEmits(['uploadFile']);
 
 const $primevue = usePrimeVue();
@@ -128,8 +148,19 @@ const formatSize = (bytes) => {
 };
 const uploadEvent = async (callback, files) => {
   const formData = new FormData();
-  formData.append('file', files[0]);
-  totalSizePercent.value = totalSize.value / 10;
+  if (multipleFile.value) {
+    console.log(files, 'files');
+    files.forEach((file) => {
+      if (file.type === 'text/csv') {
+        formData.append('file_gen', file);
+      } else {
+        formData.append('file_ems', file);
+      }
+    });
+  } else {
+    formData.append('file', files[0]);
+    totalSizePercent.value = totalSize.value / 10;
+  }
   emit('uploadFile', formData, callback);
 };
 </script>

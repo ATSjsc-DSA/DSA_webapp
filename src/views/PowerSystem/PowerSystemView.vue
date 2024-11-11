@@ -515,30 +515,10 @@
   >
     <TabView id="import-tab-view">
       <TabPanel header="EMS">
-        <uploadFileConfig @uploadFile="loadEmsFile" />
-        <div class="flex gap-2 justify-content-end align-items-center">
-          <Button type="button" label="Cancel" severity="secondary" @click="importVisibleDialog = false"></Button>
-          <Button
-            type="button"
-            label="Save"
-            severity="primary"
-            :disabled="!emsImportFormdata"
-            @click="importEmsFile"
-          ></Button>
-        </div>
+        <uploadFileConfig @uploadFile="loadEmsFile" :multipleFile="true" :fileLimit="2" />
       </TabPanel>
       <TabPanel header="Dynamic Model">
         <uploadFileConfig @uploadFile="loadDynamicFile" />
-        <div class="flex gap-2 justify-content-end align-items-center">
-          <Button type="button" label="Cancel" severity="secondary" @click="importVisibleDialog = false"></Button>
-          <Button
-            type="button"
-            label="Save"
-            severity="primary"
-            :disabled="!dynamicImportFormdata"
-            @click="importDynamicFile"
-          ></Button>
-        </div>
       </TabPanel>
     </TabView>
   </Dialog>
@@ -595,7 +575,7 @@ import createEmsDialog from './createEmsDialog.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
-import { DynamicModelApi } from './api';
+import { DynamicModelApi, CommonApi } from './api';
 // graphic
 import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
 
@@ -1165,17 +1145,36 @@ const toggleMenuConfig = (event) => {
 };
 
 const emsImportFormdata = ref();
-const loadEmsFile = (formData, callback) => {
-  emsImportFormdata.value = formData;
-  console.log('load EMS file', formData);
+const loadEmsFile = async (formData, callback) => {
+  try {
+    isLoadingProgress.value = true;
+    emsImportFormdata.value = formData;
+    await CommonApi.importPowerSystemData(formData);
+    await delayImportExport();
+    toast.add({ severity: 'success', summary: 'EMS', detail: 'Import Successfully', life: 3000 });
+    isLoadingProgress.value = false;
+    callback();
+  } catch (error) {
+    toast.add({ severity: 'danger', summary: 'EMS', detail: error, life: 3000 });
+    isLoadingProgress.value = false;
+  }
 };
 
 const dynamicImportFormdata = ref();
 const loadDynamicFile = async (formData, callback) => {
-  await DynamicModelApi.importDynamicModel(formData);
-  dynamicImportFormdata.value = formData;
-  console.log('load Dynamic file', formData);
-  callback();
+  try {
+    isLoadingProgress.value = true;
+    dynamicImportFormdata.value = formData;
+    console.log('load Dynamic file', formData);
+    await DynamicModelApi.importDynamicModel(formData);
+    await delayImportExport();
+    toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
+    isLoadingProgress.value = false;
+    callback();
+  } catch (error) {
+    toast.add({ severity: 'danger', summary: 'Dynamic Model', detail: error, life: 3000 });
+    isLoadingProgress.value = false;
+  }
 };
 
 function delayImportExport(ms = 3000) {

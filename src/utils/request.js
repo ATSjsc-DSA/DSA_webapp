@@ -4,7 +4,7 @@ import router from '@/router';
 import { BASE_URL } from '@/Constants';
 const instance = axios.create({
   baseURL: BASE_URL + '/api',
-  timeout: 10000,
+  timeout: 1000000,
   headers: {
     'Access-Control-Allow-Origin': '*',
   },

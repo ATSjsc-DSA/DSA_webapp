@@ -258,4 +258,9 @@ export default class DSA_api {
   static async getElementsData(psm_id, ElementsDefinition_id) {
     return get('/common/elements/' + psm_id + '/' + ElementsDefinition_id);
   }
+
+  // new api
+  static async getMeasInfoActive(project_id) {
+    return get(`/common/${project_id}/measInfo/active`);
+  }
 }

@@ -6,7 +6,15 @@ const { projectData, additionVersionId, powerSystemVersionId } = storeToRefs(com
 console.log('projectId', projectData.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
+export class CommonApi {
+  static async importPowerSystemData(data) {
+    return put(`/powersystem/${projectData.value._id}/66fbc590ed4ab3c5440916e1/upload`, data);
+  }
+}
+
 export class api {
+  // import ems
+
   // tree - powersystem edit
 
   // compare
