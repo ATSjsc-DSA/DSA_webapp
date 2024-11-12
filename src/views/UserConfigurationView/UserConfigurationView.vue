@@ -177,6 +177,7 @@
             >
               <div class="py-3">
                 <monitorWidget
+                  :monitorData="monitorData"
                   :node-monitor-selected="nodeSelected"
                   @update-label-monitor-leaf="updateLabelMonitorLeaf"
                 />
@@ -305,7 +306,7 @@
       </div>
     </template>
 
-    <monitorFormWidget v-model="newMonitorData" />
+    <monitorFormWidget :data="newMonitorData" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createMonitorVisibleDialog = false"></Button>
       <Button type="button" label="Submit" :disabled="!newMonitorData.name" @click="createMonitor"></Button>

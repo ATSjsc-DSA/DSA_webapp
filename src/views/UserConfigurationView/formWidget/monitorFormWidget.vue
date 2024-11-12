@@ -35,7 +35,7 @@
     />
   </div>
 
-  <div v-if="isCreateForm" class="grid m-0">
+  <!-- <div v-if="isCreateForm" class="grid m-0">
     <div class="col-12 md:col-8 flex flex-column gap-2 mb-3">
       <label for="psdSelected" class="font-semibold">Power System</label>
       <AutoComplete
@@ -60,11 +60,21 @@
         class="w-full"
       />
     </div>
-  </div>
+  </div> -->
 
-  <div v-else class="grid m-0">
-    <div class="col-12 md:col-8 flex flex-column gap-2 mb-3">
-      <label for="psdSelected" class="font-semibold">Power System</label>
+  <div class="grid m-0 p-0 ">
+    <div class="col-12 md:col-4 flex flex-column gap-2 mb-3 pl-0">
+      <label for="psdSelected" class="font-semibold">Type Element</label>
+      <Dropdown
+        v-model="selectedDefinition"
+        :options="listDefinition"
+        optionLabel="name"
+        optionValue="_id"
+        class="w-full"
+      />
+    </div>
+    <div class="col-12 md:col-8 flex flex-column gap-2 mb-3 pr-0">
+      <label for="psdSelected" class="font-semibold">Element</label>
       <AutoComplete
         v-model="psdSelected"
         optionLabel="name"
@@ -77,16 +87,7 @@
         @complete="searchPsQueryFilter"
       />
     </div>
-    <div class="col-12 md:col-4 flex flex-column gap-2 mb-3">
-      <label for="psdSelected" class="font-semibold">Definition</label>
-      <Dropdown
-        v-model="selectedDefinition"
-        :options="listDefinition"
-        optionLabel="name"
-        optionValue="_id"
-        class="w-full"
-      />
-    </div>
+    
   </div>
   <div class="flex flex-column gap-3 mb-3">
     <label for="scadaMonitorPsSelected" class="font-semibold">Scada Monitor</label>
@@ -118,14 +119,25 @@ import AutoComplete from 'primevue/autocomplete';
 import Dropdown from 'primevue/dropdown';
 import { watch } from 'vue';
 
-const data = defineModel();
 const props = defineProps({
+  data: { type: Object, default: null },
   isCreateForm: { type: Boolean, default: true },
   psdSelected: { type: Object, default: null },
   listScadaMonitor: { type: Array, default: null },
   definitionMonitor: { type: String, default: null },
 });
 
+const data = ref(props.data)
+watch(
+  () => props.data,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      nextTick(() => {
+        data.value = newValue;
+      });
+    }
+  }
+);
 const typeOpts = ref([
   { name: 'Frequency', code: 1 },
   { name: 'Voltage', code: 2 },
@@ -141,9 +153,6 @@ const priorityOpts = ref([
   { name: 'PMU', code: 2 },
   { name: 'BOTH', code: 3 },
 ]);
-onMounted(() => {
-  getDefiniton();
-});
 
 const listDefinition = ref();
 const selectedDefinition = ref(props.definitionMonitor);
@@ -166,11 +175,17 @@ const getDefiniton = async () => {
 const emit = defineEmits(['update:psdSelected']);
 
 // Computed property for two-way binding
-const psdSelected = computed({
-  get: () => props.psdSelected,
-  set: (value) => emit('update:psdSelected', value),
+// const psdSelected = computed({
+//   get: () => props.psdSelected,
+//   set: (value) => emit('update:psdSelected', value),
+// });
+const psdSelected = ref(props.psdSelected)
+watch(()=>props.psdSelected, async (newValue, oldValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+    psdSelected.value = newValue
+  }
 });
-const psdSelectedCreate = ref();
+// const psdSelectedCreate = ref();
 const psFilterSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
   const query = event ? event.query.trim() : '';
@@ -195,7 +210,7 @@ watch(
 
 const getScadaMonitor = async () => {
   try {
-    const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelectedCreate.value._id);
+    const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelected.value._id);
     listScadaMonitor.value = res.data.data;
   } catch (error) {
     listScadaMonitor.value = undefined;
@@ -203,15 +218,18 @@ const getScadaMonitor = async () => {
   }
 };
 
-watch(psdSelectedCreate, (newVal) => {
-  if (props.isCreateForm) {
-    data.value.powersystemId = newVal._id;
-  }
-});
 watch(listScadaMonitor, (newVal) => {
   if (newVal && props.isCreateForm) {
     data.value.listScadaMonitorId = newVal.map((item) => item._id);
   }
+});
+watch(psdSelected, (newVal) => {
+  if (newVal && props.isCreateForm) {
+    data.value.powersystemId = newVal._id;
+  }
+});
+onMounted(() => {
+  getDefiniton();
 });
 </script>
 <style>

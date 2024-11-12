@@ -2,7 +2,7 @@
   <TabView>
     <TabPanel header="Common">
       <monitorFormWidget
-        v-model="monitorData"
+        :data="monitorData"
         :is-create-form="false"
         v-model:psdSelected="psdSelected"
         :listScadaMonitor="listScadaMonitor"
@@ -214,7 +214,7 @@ import monitorPmuFormWidget from './formWidget/monitorPmuFormWidget.vue';
 import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 import { ApiMonitor } from '@/views/UserConfigurationView/api';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -224,6 +224,11 @@ const props = defineProps({
     type: {},
     default: () => {},
   },
+  monitorData: {
+    type: {},
+    default: () => {},
+  }
+  
 });
 
 const emit = defineEmits(['updateLabelMonitorLeaf']);
@@ -236,28 +241,30 @@ onMounted(async () => {
   getPmuList();
 });
 
-const monitorData = ref({});
-const psdSelected = ref();
-const listScadaMonitor = ref();
-const definitionMonitor = ref();
+const monitorData = ref(props.monitorData);
+
 watch(
-  () => props.nodeMonitorSelected,
+  () => props.monitorData,
   (newValue, oldValue) => {
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      nextTick(async () => {
+      nextTick(async() => {
+        monitorData.value = newValue;
         await getMonitorData();
         getScadaList();
         getPmuList();
       });
     }
-  },
+  }
 );
+const psdSelected = ref();
+const listScadaMonitor = ref();
+const definitionMonitor = ref();
 
 const getMonitorData = async () => {
   try {
-    const res = await ApiMonitor.getMonitor(props.nodeMonitorSelected._id);
-    const result = await PowerSystemParameterApi.getPowersystemMonitor(res.data.powersystemId);
-    monitorData.value = res.data;
+    console.log(monitorData.value, "monitorData.value");
+    
+    const result = await PowerSystemParameterApi.getPowersystemMonitor(monitorData.value.powersystemId);
     psdSelected.value = {
       _id: result.data._id,
       name: result.data.name,
@@ -286,7 +293,6 @@ const updateMonitor = async () => {
 };
 
 // ------ Scada
-
 const scadaList = ref([]);
 
 const getScadaList = async () => {
