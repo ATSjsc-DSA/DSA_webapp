@@ -169,11 +169,11 @@ const getDefinitionList = async () => {
 };
 
 const setDefinitionfilterId = () => {
-  areaDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Area'))[0]._id;
-  zoneDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Zone'))[0]._id;
-  ownerDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Owner'))[0]._id;
-  kVDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Substation_kVBase'))[0]._id;
-  stationDefinitionId.value = definitionList.value.filter((item) => (item.name = 'Station'))[0]._id;
+  areaDefinitionId.value = definitionList.value.filter((item) => item.name === 'Area')[0]._id;
+  zoneDefinitionId.value = definitionList.value.filter((item) => item.name === 'Zone')[0]._id;
+  ownerDefinitionId.value = definitionList.value.filter((item) => item.name === 'Owner')[0]._id;
+  kVDefinitionId.value = definitionList.value.filter((item) => item.name === 'Substation_kVBase')[0]._id;
+  stationDefinitionId.value = definitionList.value.filter((item) => item.name === 'Station')[0]._id;
 };
 
 const definitionSubsystemList = ref([]);
