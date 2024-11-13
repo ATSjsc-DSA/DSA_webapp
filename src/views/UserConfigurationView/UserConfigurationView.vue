@@ -266,19 +266,7 @@
   <Toast />
 
   <!-- update confirm dialog -->
-  <ConfirmDialog group="updateDialog">
-    <template #message="slotProps">
-      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
-        <div>
-          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
-        </div>
-        <div class="flex flex-column gap-3 p-3">
-          <div class="font-semibold">This Action will affect the final calculation result.</div>
-          <div class="text-orange-500 font-semibold">Are you sure you want to <b>Update</b>?</div>
-        </div>
-      </div>
-    </template>
-  </ConfirmDialog>
+  <confirmUpdateDialog />
   <Dialog
     v-model:visible="createApplicationVisibleDialog"
     :style="{ width: '32rem' }"
@@ -392,6 +380,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import ContextMenu from 'primevue/contextmenu';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
+import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
 import applicationFormWidget from './formWidget/applicationFormWidget.vue';
 import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 
@@ -814,7 +803,7 @@ const createApplication = async () => {
   }
 };
 const confirmUpdateApplication = async (event) => {
-  await confirmUpdateDialog(event, updateApplication, 'Update Application');
+  await confirmUpdate(event, updateApplication, 'Update Application');
 };
 const updateApplication = async () => {
   try {
@@ -1027,7 +1016,7 @@ const getDsaData = async (dsaId) => {
   }
 };
 const confirmUpdateDsa = async (event) => {
-  await confirmUpdateDialog(event, updateDsa, 'Update Dsa - ' + dsaData.value.name);
+  await confirmUpdate(event, updateDsa, 'Update Dsa - ' + dsaData.value.name);
 };
 const updateDsa = async () => {
   try {
@@ -1179,7 +1168,7 @@ const createVsa = async () => {
 };
 
 const confirmUpdateVsa = async (event) => {
-  await confirmUpdateDialog(event, updateVsa, 'Update VSA - ' + vsaData.value.name);
+  await confirmUpdate(event, updateVsa, 'Update VSA - ' + vsaData.value.name);
 };
 const updateVsa = async () => {
   try {
@@ -1302,7 +1291,7 @@ const createTsa = async () => {
   }
 };
 const confirmUpdateTsa = async (event) => {
-  await confirmUpdateDialog(event, updateTsa, 'Update TSA - ' + tsaData.value.name);
+  await confirmUpdate(event, updateTsa, 'Update TSA - ' + tsaData.value.name);
 };
 const updateTsa = async () => {
   try {
@@ -1395,7 +1384,7 @@ const createSsr = async () => {
   }
 };
 const confirmUpdateSsr = async (event) => {
-  await confirmUpdateDialog(event, updateSsr, 'Update SSR - ' + ssrData.value.name);
+  await confirmUpdate(event, updateSsr, 'Update SSR - ' + ssrData.value.name);
 };
 const updateSsr = async () => {
   try {
@@ -1486,7 +1475,7 @@ const createOsl = async () => {
   }
 };
 const confirmUpdateOsl = async (event) => {
-  await confirmUpdateDialog(event, updateOsl, 'Update OSL - ' + oslData.value.name);
+  await confirmUpdate(event, updateOsl, 'Update OSL - ' + oslData.value.name);
 };
 const updateOsl = async () => {
   try {
@@ -1537,7 +1526,7 @@ const delOsl = async () => {
   isLoadingContainer.value = false;
 };
 
-const confirmUpdateDialog = async (event, updateFunc, header = '') => {
+const confirmUpdate = async (event, updateFunc, header = '') => {
   confirm.require({
     group: 'updateDialog',
     target: event.currentTarget,

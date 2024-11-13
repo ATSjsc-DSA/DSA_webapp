@@ -1,6 +1,6 @@
 <template>
   <div class="card h-full">
-    <ConfirmDialog group="dialog"></ConfirmDialog>
+    <ConfirmDialog group="confirmDeleteDialog"></ConfirmDialog>
     <Splitter style="height: 100%">
       <SplitterPanel
         class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
@@ -63,7 +63,7 @@
               </div>
             </div>
             <div class="card flex justify-content-end">
-              <Button label="Submit" @click="updateThis()" />
+              <Button label="Update" :disabled="!selectedItem._id" @click="confirmUpdate($event)" />
             </div>
           </TabPanel>
           <TabPanel header="List Contingency">
@@ -90,6 +90,9 @@
       </div>
     </Dialog>
   </div>
+
+  <!-- update confirm dialog -->
+  <confirmUpdateDialog />
 </template>
 
 <script setup>
@@ -97,6 +100,7 @@ import { ref, onMounted } from 'vue';
 import { ApiContingencies, commonApi } from './api';
 import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
+import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import ContingencyView from './ContingencyView.vue';
@@ -132,7 +136,24 @@ const handleRowClick = (item) => {
   };
 };
 
-const updateThis = async () => {
+const confirmUpdate = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Contigencies',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateContigencies();
+    },
+  });
+};
+
+const updateContigencies = async () => {
   try {
     await ApiContingencies.updateContingenciesData(selectedItem.value._id, formItemSelect.value);
     getListContingencies();
@@ -169,7 +190,7 @@ const createThis = async () => {
 const confirmDeleteThis = (id) => {
   confirm.require({
     message: 'Do you want to delete this Contingencies?',
-    group: 'dialog',
+    group: 'confirmDeleteDialog',
     header: 'Confirmation',
     icon: 'pi pi-info-circle',
     rejectLabel: 'Cancel',
