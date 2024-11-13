@@ -16,7 +16,7 @@
       >
         <template #header>
           <div class="flex align-items-center justify-content-between">
-            <div class="font-semibold text-lg">Dynamic Model Default</div>
+            <div class="font-semibold text-xl py-3">Dynamic Model Default</div>
             <div class="flex align-items-center justify-content-end">
               <Button type="button" label="Upload" icon="pi pi-upload" text @click="uploadVisibleDialog = true" />
               <Button type="button" label="Create" icon="pi pi-plus" text @click="handleCreate()" />
@@ -938,19 +938,16 @@ const uploadFile = async (formData, callback) => {
     isImporting.value = true;
     formData.value = formData;
     await Api.importFile(formData);
-    await delayImportExport();
     toast.add({ severity: 'success', summary: 'Dynamic Model Default', detail: 'Imported Successfully', life: 3000 });
     isImporting.value = false;
-    callback();
+    uploadVisibleDialog.value = false;
+    await getTableData();
+    // callback();
   } catch (error) {
     toast.add({ severity: 'danger', summary: 'Dynamic Model Default', detail: error.data.detail, life: 3000 });
     isImporting.value = false;
   }
 };
-
-function delayImportExport(ms = 3000) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 </script>
 <style>
 #psDynamicTable .frozen-column {
