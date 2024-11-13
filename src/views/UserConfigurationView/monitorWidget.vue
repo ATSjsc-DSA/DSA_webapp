@@ -2,9 +2,9 @@
   <TabView>
     <TabPanel header="Common">
       <monitorFormWidget
+        v-model:psdSelected="psdSelected"
         :data="monitorData"
         :is-create-form="false"
-        v-model:psdSelected="psdSelected"
         :listScadaMonitor="listScadaMonitor"
         :definitionMonitor="definitionMonitor"
       />

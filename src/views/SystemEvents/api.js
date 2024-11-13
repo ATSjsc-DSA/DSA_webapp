@@ -41,10 +41,7 @@ export class ApiContingencies {
     return get(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/contingencies`);
   }
   static async searchSubsystem(query = '', data = []) {
-    return post(
-      `/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/search/contingencies?query=${query}`,
-      data,
-    );
+    return post(`/seedconfig/${projectData.value._id}/search/contingencies?query=${query}`, data);
   }
   static async createContingencies(data) {
     return post(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/contingencies`, data);
