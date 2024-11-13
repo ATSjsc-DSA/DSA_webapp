@@ -86,6 +86,11 @@ const router = createRouter({
           component: () => import('@/views/PowerSystem/PowerSystemView.vue'),
         },
         {
+          path: '/SystemEvents/dynamicModelDefault',
+          name: 'dynamicModelDefault',
+          component: () => import('@/views/dynamicModelDefault/DynamicModelDefaultView.vue'),
+        },
+        {
           path: '/Configuration',
           name: 'Configuration',
           component: () => import('@/views/ConfigurationView/ConfigurationView.vue'),

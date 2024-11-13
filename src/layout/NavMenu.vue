@@ -12,14 +12,14 @@ const items = ref([
       router.push('/');
     },
   },
-  {
-    label: 'Application View',
-    items: [
-      { label: 'SSR', icon: 'pi pi-fw pi-id-card', to: '/DSA/SSR' },
-      { label: 'TSA', icon: 'pi pi-fw pi-check-square', to: '/DSA/TSA' },
-      { label: 'VSA', icon: 'pi pi-fw pi-bookmark', to: '/DSA/VSA' },
-    ],
-  },
+  // {
+  //   label: 'Application View',
+  //   items: [
+  //     { label: 'SSR', icon: 'pi pi-fw pi-id-card', to: '/DSA/SSR' },
+  //     { label: 'TSA', icon: 'pi pi-fw pi-check-square', to: '/DSA/TSA' },
+  //     { label: 'VSA', icon: 'pi pi-fw pi-bookmark', to: '/DSA/VSA' },
+  //   ],
+  // },
   {
     label: 'Configuration',
     items: [
@@ -35,6 +35,10 @@ const items = ref([
           {
             label: 'Subsystems',
             to: '/SystemEvents/Subsystems',
+          },
+          {
+            label: 'Dynamic Model Default',
+            to: '/SystemEvents/dynamicModelDefault',
           },
         ],
       },

@@ -257,33 +257,3 @@ export class DynamicModelApi {
     return put(`addition/${projectData.value._id}/${additionVersionId.value}/import/dynamicModel`, data);
   }
 }
-export class DynamicDefaultApi {
-  static async getDynamicDefaultList(page) {
-    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault`, { page: page });
-  }
-
-  static async getDynamicDefaultListWithTree(parent_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/${parent_id}/dynamicModelDefault`, {
-      page: page,
-    });
-  }
-  static async createDynamicDefault(data) {
-    return post(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault`, data);
-  }
-
-  static async updateDynamicDefault(dynamicModel_id, data) {
-    return put(
-      `addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
-      data,
-    );
-  }
-  static async deleteDynamicDefault(dynamicModel_id) {
-    return _delete(
-      `addition/${projectData.value._id}/${additionVersionId.value}/dynamicModelDefault/${dynamicModel_id}`,
-    );
-  }
-
-  static async importDynamicDefaultModel(data) {
-    return put(`addition/${projectData.value._id}/${additionVersionId.value}/import/dynamicDefaultModel`, data);
-  }
-}
