@@ -9,7 +9,7 @@
         :definitionMonitor="definitionMonitor"
       />
       <div class="flex justify-content-end gap-3">
-        <Button type="button" label="Update" @click="updateMonitor"></Button>
+        <Button type="button" label="Update" @click="confirmUpdateMonitor"></Button>
       </div>
     </TabPanel>
 
@@ -227,8 +227,7 @@ const props = defineProps({
   monitorData: {
     type: {},
     default: () => {},
-  }
-  
+  },
 });
 
 const emit = defineEmits(['updateLabelMonitorLeaf']);
@@ -247,14 +246,14 @@ watch(
   () => props.monitorData,
   (newValue, oldValue) => {
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      nextTick(async() => {
+      nextTick(async () => {
         monitorData.value = newValue;
         await getMonitorData();
         getScadaList();
         getPmuList();
       });
     }
-  }
+  },
 );
 const psdSelected = ref();
 const listScadaMonitor = ref();
@@ -262,8 +261,8 @@ const definitionMonitor = ref();
 
 const getMonitorData = async () => {
   try {
-    console.log(monitorData.value, "monitorData.value");
-    
+    console.log(monitorData.value, 'monitorData.value');
+
     const result = await PowerSystemParameterApi.getPowersystemMonitor(monitorData.value.powersystemId);
     psdSelected.value = {
       _id: result.data._id,
@@ -274,6 +273,22 @@ const getMonitorData = async () => {
   } catch (error) {
     console.log('getMonitorData: error ', error);
   }
+};
+const confirmUpdateMonitor = async (event) => {
+  confirm.require({
+    group: 'updateDialog',
+    target: event.currentTarget,
+    header: 'Update Monitor',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateMonitor();
+    },
+  });
 };
 const updateMonitor = async () => {
   try {

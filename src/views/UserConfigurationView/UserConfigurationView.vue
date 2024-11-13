@@ -1,7 +1,5 @@
 <template>
   <div class="card layout-content min-h-full">
-    <ConfirmDialog></ConfirmDialog>
-    <Toast />
     <AppProgressSpinner :showSpinner="isLoadingUserConfig"></AppProgressSpinner>
 
     <Splitter style="height: 56rem">
@@ -9,38 +7,29 @@
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
         <Card style="height: 100%">
           <template #title>
-            <div class="flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
               <div>Project</div>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <Button
-                  type="button"
-                  icon="pi pi-chevron-down"
-                  severity="secondary"
-                  text
-                  title="Expand All"
-                  :disabled="!treeData"
-                  @click="expandAll"
-                />
-                <Button
-                  type="button"
-                  icon="pi pi-chevron-up"
-                  severity="secondary"
-                  text
-                  title="Collapse All"
-                  :disabled="!treeData"
-                  @click="collapseAll"
-                />
-              </div>
+              <Button
+                type="button"
+                icon="pi pi-chevron-up"
+                severity="secondary"
+                text
+                title="Collapse All"
+                :disabled="!treeData"
+                @click="expandedKeys = {}"
+              />
             </div>
           </template>
           <template #content>
             <div style="height: 48rem" aria-haspopup="true">
               <Tree
                 v-model:expandedKeys="expandedKeys"
-                v-model:selectionKeys="keySelected"
+                :selectionKeys="keySelected"
                 selectionMode="single"
+                loadingMode="icon"
                 :value="treeData"
                 class="w-full"
+                @node-expand="onNodeExpand"
                 @node-select="onNodeSelect"
               >
                 <template #nodeicon="slotProps">
@@ -53,12 +42,12 @@
                   ></i>
                 </template>
                 <template #default="slotProps">
-                  <div>{{ slotProps.node.label }}</div>
+                  <div>{{ slotProps.node.key + '__' + slotProps.node.label }}</div>
                 </template>
 
                 <template #Project="slotProps">
                   <div class="font-bold text-xl" aria-haspopup="true" @contextmenu="onProjectRightClick">
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="projectContextMenuRef" :model="projectContextMenu" />
                 </template>
@@ -66,9 +55,9 @@
                   <div
                     class="font-bold text-lg"
                     aria-haspopup="true"
-                    @contextmenu="onApplicationRightClick($event, slotProps.node.appId)"
+                    @contextmenu="onApplicationRightClick($event, slotProps.node)"
                   >
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="appContextMenuRef" :model="appContextMenu" />
                 </template>
@@ -80,13 +69,13 @@
                     aria-haspopup="true"
                     @contextmenu="onMonitorGroupRightClick($event, slotProps.node)"
                   >
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="monitorGroupContextMenuRef" :model="monitorGroupContextMenu" />
                 </template>
                 <template #Monitor="slotProps">
                   <div aria-haspopup="true" @contextmenu="onMonitorRightClick($event, slotProps.node)">
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="monitorContextMenuRef" :model="monitorContextMenu" />
                 </template>
@@ -98,13 +87,13 @@
                     aria-haspopup="true"
                     @contextmenu="onDsaGroupRightClick($event, slotProps.node)"
                   >
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="dsaGroupContextMenuRef" :model="dsaGroupContextMenu" />
                 </template>
                 <template #DSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onDsaRightClick($event, slotProps.node)">
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="dsaContextMenuRef" :model="dsaContextMenu" />
                 </template>
@@ -112,7 +101,7 @@
                 <template #VSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onVsaRightClick($event, slotProps.node)">
                     <Tag value="VSA" severity="success" rounded />
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="vsaContextMenuRef" :model="vsaContextMenu" />
                 </template>
@@ -120,7 +109,7 @@
                 <template #TSA="slotProps">
                   <div aria-haspopup="true" @contextmenu="onTsaRightClick($event, slotProps.node)">
                     <Tag value="TSA" severity="secondary" rounded />
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="tsaContextMenuRef" :model="tsaContextMenu" />
                 </template>
@@ -128,7 +117,7 @@
                 <template #SSR="slotProps">
                   <div aria-haspopup="true" @contextmenu="onSsrRightClick($event, slotProps.node)">
                     <Tag value="SSR" severity="info" rounded />
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="ssrContextMenuRef" :model="ssrContextMenu" />
                 </template>
@@ -136,7 +125,7 @@
                 <template #OSL="slotProps">
                   <div aria-haspopup="true" @contextmenu="onOslRightClick($event, slotProps.node)">
                     <Tag value="OSL" severity="warning" rounded />
-                    {{ slotProps.node.label }}
+                    {{ slotProps.node.key + '__' + slotProps.node.label }}
                   </div>
                   <ContextMenu ref="oslContextMenuRef" :model="oslContextMenu" />
                 </template>
@@ -146,8 +135,17 @@
         </Card>
       </SplitterPanel>
 
-      <!-- Config  -->
-      <SplitterPanel :size="75" :minSize="20" style="overflow-y: auto">
+      <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
+        <ScrollPanel class="card" style="width: 100%; height: 50rem">
+          <div>
+            <pre v-if="treeData">
+            {{ treeData }}
+          </pre
+            >
+          </div>
+        </ScrollPanel>
+      </SplitterPanel>
+      <SplitterPanel :size="50" :minSize="20" style="overflow-y: auto">
         <Card style="height: 100%">
           <template #title>
             <div class="flex flex-wrap justify-content-between align-items-center gap-2">
@@ -165,7 +163,7 @@
                 <applicationFormWidget v-model="appData" />
               </div>
               <div class="flex justify-content-end gap-3">
-                <Button type="button" label="Update" @click="updateApplication"></Button>
+                <Button type="button" label="Update" @click="confirmUpdateApplication"></Button>
               </div>
             </ScrollPanel>
 
@@ -274,7 +272,23 @@
       </SplitterPanel>
     </Splitter>
   </div>
+  <ConfirmDialog></ConfirmDialog>
+  <Toast />
 
+  <!-- update confirm dialog -->
+  <ConfirmDialog group="updateDialog">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div class="font-semibold">This Action will affect the final calculation result.</div>
+          <div class="text-orange-500 font-semibold">Are you sure you want to <b>Update</b>?</div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
   <Dialog
     v-model:visible="createApplicationVisibleDialog"
     :style="{ width: '32rem' }"
@@ -386,7 +400,6 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 
 import ContextMenu from 'primevue/contextmenu';
-import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 
 import applicationFormWidget from './formWidget/applicationFormWidget.vue';
@@ -435,6 +448,7 @@ const getTreeData = async () => {
       icon: 'pi pi-server',
       children: [],
       active: true,
+      leaf: false,
     },
   ];
   for (let appIndex = 0; appIndex < appList.value.length; appIndex++) {
@@ -456,33 +470,38 @@ const getAppLeaf = async (app, key = '') => {
     active: app.active,
     children: [
       {
-        key: 'monitor_' + key,
+        key: 'MonitorGroup' + key,
         label: 'Monitor',
         type: 'MonitorGroup',
         icon: 'pi pi-list',
         appId: app._id,
-        children: await getMonitorBranch(app._id, key),
         active: app.active,
+        leaf: false,
       },
       {
-        key: 'dsa_' + key,
+        key: 'DSAGroup' + key,
         label: 'DSA Module',
         appId: app._id,
         icon: 'pi pi-th-large',
         type: 'DSAGroup',
-        children: await getDsaBranch(app._id, key),
         active: app.active,
+        leaf: false,
       },
     ],
+    leaf: false,
   };
 };
 
-const getMonitorBranch = async (appId, appKey = '') => {
-  const monitorList = await getMonitorList(appId);
+const deleteAppLeaf = (keyDelete) => {
+  treeData.value[0].children = treeData.value[0].children.filter((item) => item.key != keyDelete);
+};
+// -----
+const getMonitorBranch = async (parentNode) => {
+  const monitorList = await getMonitorList(parentNode.appId);
   const leafData = [];
   for (let index = 0; index < monitorList.length; index++) {
     const monitor = monitorList[index];
-    leafData.push(getMonitorLeaf(appId, monitor, appKey + '_' + index));
+    leafData.push(getMonitorLeaf(parentNode.appId, monitor, parentNode.key.replace('MonitorGroup', '') + '_' + index));
   }
   return leafData;
 };
@@ -496,13 +515,15 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
     icon: 'pi pi-file',
     type: 'Monitor',
     active: monitor.active,
+    leaf: true,
   };
 };
 
 const addNewMonitorLeaf = (appId, monitor) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    const newLeaf = getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].length);
+    console.log(appLeaf.children[0]);
+    const newLeaf = getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].children.length);
     appLeaf.children[0].children.push(newLeaf);
     return newLeaf;
   }
@@ -518,13 +539,22 @@ const updateLabelMonitorLeaf = (appId, monitorId, newName, active) => {
     }
   }
 };
+const deleteMonitorLeaf = (key) => {
+  const [appKey, monitorKey] = key.replace('monitor_', '').split('_');
+  console.log(appKey, monitorKey);
+  const appLeaf = treeData.value[0].children.filter((item) => String(item.key) === appKey)[0];
+  console.log('appLeaf', appLeaf);
+  if (appLeaf) {
+    appLeaf.children[0].children = appLeaf.children[0].children.filter((item) => String(item.key) !== key);
+  }
+};
 
-const getDsaBranch = async (appId, appKey = '') => {
-  const dsaList = await getDsaList(appId);
+const getDsaBranch = async (parentNode) => {
+  const dsaList = await getDsaList(parentNode.appId);
   const leafData = [];
   for (let index = 0; index < dsaList.length; index++) {
     const dsa = dsaList[index];
-    leafData.push(await getDsaLeaf(appId, dsa, appKey + '_' + index));
+    leafData.push(await getDsaLeaf(parentNode.appId, dsa, parentNode.key.replace('DSAGroup', '') + '_' + index));
   }
   return leafData;
 };
@@ -557,8 +587,8 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
     appId: appId,
     type: 'DSA',
     icon: 'pi pi-clone',
-    children: await getTaskBranch(appId, dsa._id, key),
     active: dsa.active,
+    leaf: false,
   };
 };
 
@@ -617,7 +647,7 @@ const updateLabelTaskLeaf = (appId, dsaId, vsaId, newName, active) => {
 
 const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
   return {
-    key: 'task_' + key,
+    key: key,
     label: data.name,
     _id: data._id,
     appId: appId,
@@ -631,30 +661,12 @@ const getTaskLeaf = (appId, dsaId, data, taskType = 'VSA', key = '') => {
 const expandedKeys = ref({});
 const nodeSelected = ref({});
 const keySelected = ref({});
-const expandAll = () => {
-  for (const node of treeData.value) {
-    expandNode(node);
-  }
-
-  expandedKeys.value = { ...expandedKeys.value };
-};
-const expandNode = (node) => {
-  if (node.children && node.children.length) {
-    expandedKeys.value[node.key] = true;
-
-    for (const child of node.children) {
-      expandNode(child);
-    }
-  }
-};
-
-const collapseAll = () => {
-  expandedKeys.value = {};
-};
 
 const onNodeSelect = async (node) => {
   nodeSelected.value = node;
+
   isLoadingContainer.value = true;
+  const keyCanSelected = ['Application', 'Monitor', 'DSA', 'VSA', 'TSA', 'SSR', 'OSL'];
   if (node.type === 'Application') {
     await getAppData(node._id);
   }
@@ -676,21 +688,53 @@ const onNodeSelect = async (node) => {
   if (node.type === 'OSL') {
     await getOslData(node._id);
   }
+  if (keyCanSelected.includes(node.type)) {
+    keySelected.value = node.key;
+  }
+
+  expandedKeys.value[node.key] = true;
+  await onNodeExpand(node);
   isLoadingContainer.value = false;
 };
 
+const onNodeExpand = async (node) => {
+  if (!node.children) {
+    node.loading = true;
+    if (node.type === 'MonitorGroup') {
+      node.children = await getMonitorBranch(node);
+    }
+    if (node.type === 'DSAGroup') {
+      node.children = await getDsaBranch(node);
+    }
+    if (node.type === 'DSA') {
+      node.children = await getTaskBranch(node.appId, node._id, node.key);
+    }
+    if (!node.children || node.children.length === 0) {
+      node.leaf = true;
+    }
+    node.loading = false;
+  }
+};
 // --------- Application
 
 const projectContextMenuRef = ref();
-const onProjectRightClick = (event) => {
-  projectContextMenuRef.value.show(event); // this is my ref
+const onProjectRightClick = async (event) => {
+  await closeAllContextMenu();
+  projectContextMenuRef.value.show(event);
 };
+
+const newAppData = ref({});
 const projectContextMenu = ref([
   {
     label: 'Create Application',
     icon: 'pi pi-plus',
     command: () => {
       createApplicationVisibleDialog.value = true;
+      newAppData.value = {
+        name: '',
+        active: true,
+        startTimestamp: new Date(),
+      };
     },
   },
 ]);
@@ -714,11 +758,6 @@ const appData = ref({
   active: true,
   _id: '',
   startTimestamp: 0,
-});
-const newAppData = ref({
-  name: '',
-  active: true,
-  startTimestamp: new Date(),
 });
 
 const getAppData = async (appId) => {
@@ -748,6 +787,9 @@ const createApplication = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+const confirmUpdateApplication = async (event) => {
+  await confirmUpdateDialog(event, updateApplication, 'Update Application');
+};
 const updateApplication = async () => {
   try {
     const res = await ApiApplication.updateAppData(appData.value._id, {
@@ -769,11 +811,11 @@ const updateApplication = async () => {
 
 const deleteApplication = async () => {
   isLoadingContainer.value = true;
-
   try {
-    await ApiApplication.delAppData(appIdclick.value);
+    await ApiApplication.delAppData(appNodeRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
-    await getTreeData();
+    deleteAppLeaf(appNodeRightClick.value.key);
+    appNodeRightClick.value = undefined;
   } catch (error) {
     console.log('deleteApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -782,10 +824,11 @@ const deleteApplication = async () => {
 };
 
 // ------- App Menu
-const appIdclick = ref();
+const appNodeRightClick = ref();
 const appContextMenuRef = ref();
-const onApplicationRightClick = (event, appId) => {
-  appIdclick.value = appId;
+const onApplicationRightClick = async (event, appNode) => {
+  appNodeRightClick.value = appNode;
+  await closeAllContextMenu();
   appContextMenuRef.value.show(event);
 };
 
@@ -794,7 +837,7 @@ const appContextMenu = ref([
     label: 'Delete',
     icon: 'pi pi-trash',
     command: async (event) => {
-      await confirmDeleteDialog(event, deleteApplication, 'Delete Application');
+      await confirmDeleteDialog(event, deleteApplication, 'Delete Application - ' + appNodeRightClick.value.label);
     },
   },
 ]);
@@ -803,14 +846,6 @@ const appContextMenu = ref([
 
 const createMonitorVisibleDialog = ref(false);
 const monitorData = ref();
-const newMonitorData = ref({
-  monitorType: 1,
-  name: '',
-  powersystemId: '',
-  priority: 1,
-  scadaMonitorPowerSytemId: '',
-  listScadaMonitorId: [],
-});
 
 const getMonitorList = async (appId) => {
   try {
@@ -831,27 +866,15 @@ const getMonitorData = async (monitorId) => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
-const createMonitor = async () => {
-  try {
-    const res = await ApiMonitor.createMonitor(appIdclick.value, newMonitorData.value);
-    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    createMonitorVisibleDialog.value = false;
-    const newLeaf = addNewMonitorLeaf(appIdclick.value, res.data);
-    await onNodeSelect(newLeaf);
-  } catch (error) {
-    console.log('createMonitor: error ', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
 
 const delMonitor = async () => {
   isLoadingContainer.value = true;
-
   try {
-    await ApiMonitor.delMonitor(monitorIdclick.value);
+    await ApiMonitor.delMonitor(monitorRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
+    deleteMonitorLeaf(monitorRightClick.value.key);
+    monitorRightClick.value = undefined;
     nodeSelected.value = {};
-    await getTreeData();
   } catch (error) {
     console.log('delMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -859,47 +882,70 @@ const delMonitor = async () => {
   isLoadingContainer.value = false;
 };
 
-// ------- Monitor Menu
-
+// ------- Monitor Group Menu -> create monitor
+const monitorGroupRightClick = ref();
 const monitorGroupContextMenuRef = ref();
-const onMonitorGroupRightClick = (event, node) => {
-  appIdclick.value = node.appId;
+const onMonitorGroupRightClick = async (event, node) => {
+  monitorGroupRightClick.value = node;
+  await closeAllContextMenu();
   monitorGroupContextMenuRef.value.show(event);
 };
-
+const newMonitorData = ref();
 const monitorGroupContextMenu = computed(() => [
   {
     label: 'Create Monitor',
     icon: 'pi pi-plus',
     command: () => {
+      newMonitorData.value = {
+        monitorType: 1,
+        name: '',
+        powersystemId: '',
+        priority: 1,
+        scadaMonitorPowerSytemId: '',
+        listScadaMonitorId: [],
+      };
       createMonitorVisibleDialog.value = true;
     },
   },
 ]);
 
-const monitorIdclick = ref();
+const createMonitor = async () => {
+  try {
+    const res = await ApiMonitor.createMonitor(monitorGroupRightClick.value.appId, newMonitorData.value);
+    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    createMonitorVisibleDialog.value = false;
+    const newLeaf = addNewMonitorLeaf(monitorGroupRightClick.value.appId, res.data);
+    await onNodeSelect(newLeaf);
+  } catch (error) {
+    console.log('createMonitor: error ', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+// ------- Monitor Menu
+
+const monitorRightClick = ref();
 const monitorContextMenuRef = ref();
-const onMonitorRightClick = (event, node) => {
-  monitorIdclick.value = node._id;
-  appIdclick.value = node.appId;
+const onMonitorRightClick = async (event, node) => {
+  await closeAllContextMenu();
+  monitorRightClick.value = node;
   monitorContextMenuRef.value.show(event);
 };
-
 const monitorContextMenu = computed(() => [
   {
     label: 'Delete',
     icon: 'pi pi-trash',
-    disabled: !monitorIdclick.value,
+    disabled: !monitorRightClick.value,
     command: async (event) => {
-      await confirmDeleteDialog(event, delMonitor, 'Delete Monitor');
+      await confirmDeleteDialog(event, delMonitor, 'Delete Monitor - ' + monitorRightClick.value.label);
     },
   },
 ]);
 
 // ------- DSA Menu
 const dsaGroupContextMenuRef = ref();
-const onDsaGroupRightClick = (event, node) => {
-  appIdclick.value = node.appId;
+const onDsaGroupRightClick = async (event, node) => {
+  await closeAllContextMenu();
+  appNodeRightClick.value = node.appId;
   dsaGroupContextMenuRef.value.show(event);
 };
 
@@ -915,9 +961,10 @@ const dsaGroupContextMenu = computed(() => [
 
 const dsaIdclick = ref();
 const dsaContextMenuRef = ref();
-const onDsaRightClick = (event, node) => {
+const onDsaRightClick = async (event, node) => {
+  await closeAllContextMenu();
   dsaIdclick.value = node._id;
-  appIdclick.value = node.appId;
+  appNodeRightClick.value = node.appId;
   dsaContextMenuRef.value.show(event);
 };
 
@@ -944,7 +991,8 @@ const dsaContextMenu = computed(() => [
 
 const vsaIdclick = ref();
 const vsaContextMenuRef = ref();
-const onVsaRightClick = (event, node) => {
+const onVsaRightClick = async (event, node) => {
+  await closeAllContextMenu();
   vsaIdclick.value = node._id;
   vsaContextMenuRef.value.show(event);
 };
@@ -961,7 +1009,8 @@ const vsaContextMenu = ref([
 
 const tsaIdclick = ref();
 const tsaContextMenuRef = ref();
-const onTsaRightClick = (event, node) => {
+const onTsaRightClick = async (event, node) => {
+  await closeAllContextMenu();
   tsaIdclick.value = node._id;
   tsaContextMenuRef.value.show(event);
 };
@@ -978,7 +1027,8 @@ const tsaContextMenu = ref([
 
 const ssrIdclick = ref();
 const ssrContextMenuRef = ref();
-const onSsrRightClick = (event, node) => {
+const onSsrRightClick = async (event, node) => {
+  await closeAllContextMenu();
   ssrIdclick.value = node._id;
   ssrContextMenuRef.value.show(event);
 };
@@ -995,7 +1045,8 @@ const ssrContextMenu = ref([
 
 const oslIdclick = ref();
 const oslContextMenuRef = ref();
-const onOslRightClick = (event, node) => {
+const onOslRightClick = async (event, node) => {
+  await closeAllContextMenu();
   oslIdclick.value = node._id;
   oslContextMenuRef.value.show(event);
 };
@@ -1039,10 +1090,10 @@ const getDsaData = async (dsaId) => {
 };
 const createDsa = async () => {
   try {
-    const res = await ApiDsa.createDsa(appIdclick.value, newDsaData.value);
+    const res = await ApiDsa.createDsa(appNodeRightClick.value, newDsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createDsaVisibleDialog.value = false;
-    const newLeaf = await addNewDsaLeaf(appIdclick.value, res.data);
+    const newLeaf = await addNewDsaLeaf(appNodeRightClick.value, res.data);
     await onNodeSelect(newLeaf);
   } catch (error) {
     console.log('createDsa: error ', error);
@@ -1157,7 +1208,7 @@ const createVsa = async () => {
   try {
     const res = await ApiDsa.createVsa(dsaIdclick.value, newVsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'VSA');
+    const newLeaf = addNewTaskLeaf(appNodeRightClick.value, dsaIdclick.value, res.data, 'VSA');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
   } catch (error) {
@@ -1258,7 +1309,7 @@ const createTsa = async () => {
   try {
     const res = await ApiDsa.createTsa(dsaIdclick.value, newTsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'TSA');
+    const newLeaf = addNewTaskLeaf(appNodeRightClick.value, dsaIdclick.value, res.data, 'TSA');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
   } catch (error) {
@@ -1330,7 +1381,7 @@ const createSsr = async () => {
   try {
     const res = await ApiDsa.createSsr(dsaIdclick.value, newSsrData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'SSR');
+    const newLeaf = addNewTaskLeaf(appNodeRightClick.value, dsaIdclick.value, res.data, 'SSR');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
   } catch (error) {
@@ -1400,7 +1451,7 @@ const createOsl = async () => {
   try {
     const res = await ApiDsa.createOsl(dsaIdclick.value, newOslData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    const newLeaf = addNewTaskLeaf(appIdclick.value, dsaIdclick.value, res.data, 'OSL');
+    const newLeaf = addNewTaskLeaf(appNodeRightClick.value, dsaIdclick.value, res.data, 'OSL');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
   } catch (error) {
@@ -1439,6 +1490,23 @@ const delOsl = async () => {
   isLoadingContainer.value = false;
 };
 
+const confirmUpdateDialog = async (event, updateFunc, header = '') => {
+  confirm.require({
+    group: 'updateDialog',
+    target: event.currentTarget,
+    header: header,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateFunc();
+    },
+  });
+};
+
 const confirmDeleteDialog = async (event, delFunc, header = '') => {
   confirm.require({
     target: event.currentTarget,
@@ -1452,6 +1520,41 @@ const confirmDeleteDialog = async (event, delFunc, header = '') => {
     accept: async () => {
       await delFunc();
     },
+  });
+};
+
+const closeAllContextMenu = async () => {
+  await nextTick(() => {
+    if (projectContextMenuRef.value) {
+      projectContextMenuRef.value.hide();
+    }
+    if (appContextMenuRef.value) {
+      appContextMenuRef.value.hide();
+    }
+    if (monitorGroupContextMenuRef.value) {
+      monitorGroupContextMenuRef.value.hide();
+    }
+    if (monitorContextMenuRef.value) {
+      monitorContextMenuRef.value.hide();
+    }
+    if (dsaGroupContextMenuRef.value) {
+      dsaGroupContextMenuRef.value.hide();
+    }
+    if (dsaContextMenuRef.value) {
+      dsaContextMenuRef.value.hide();
+    }
+    if (vsaContextMenuRef.value) {
+      vsaContextMenuRef.value.hide();
+    }
+    if (tsaContextMenuRef.value) {
+      tsaContextMenuRef.value.hide();
+    }
+    if (ssrContextMenuRef.value) {
+      ssrContextMenuRef.value.hide();
+    }
+    if (oslContextMenuRef.value) {
+      oslContextMenuRef.value.hide();
+    }
   });
 };
 </script>
