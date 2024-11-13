@@ -6,78 +6,56 @@ const { convertTimeStringToInt } = DSA_Common();
 
 export const useCommonStore = defineStore('common', () => {
   const isLoading = ref(false);
-  const psm_automatic = ref(true);
-  const psm_active = ref({});
-  const psmList = ref([]);
+  const measInfo_automatic = ref(true);
+  const measInfoList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
   const userConfigVersionId = ref(localStorage.getItem('userConfigVersionId') || '66decf1dcff005199529524b');
   const powerSystemVersionId = ref(localStorage.getItem('powerSystemVersionId') || '66decf1dcff005199529524b');
   const additionVersionId = ref(localStorage.getItem('additionVersionId') || '66decf1dcff005199529524b');
   const hmiTaskId = ref(localStorage.getItem('hmiTaskId') || '67175dd23a41cf97c7e4bd21');
-  const measInfoId = ref(localStorage.getItem('measInfoId'));
+  const measInfoActiveId = ref(localStorage.getItem('measInfoActiveId'));
   // const hmiTaskId = ref('67175dd23a41cf97c7e4bd21');
   const editVersionData = ref({});
-  let intervalId = null;
 
+  const userConfigProfileIdActive = ref(localStorage.getItem('userConfigProfileIdActive'));
+  let intervalId = null;
   const setLoading = (loading) => {
     isLoading.value = loading;
   };
-
-  const getPsmIdActive = async () => {
+  const getDsaServiceInfo = async () => {
     try {
-      const res = await DSA_api.getVersionManagement(projectData.value._id);
-      psm_active.value = res.data.versionData;
-      updateConfigVersionId(res.data.versionData.userConfigVersionId);
-      updatePsVersionId(res.data.versionData.powerSystemVersionId);
-      updateAdditionVersionId(res.data.versionData.additionVersionId);
-      updateHmiTaskId(res.data.taskId);
+      const res = await DSA_api.getDsaService();
+      updateUserConfigProfileIdActive(res.data.dataVersion.userConfigProfileId);
     } catch (error) {}
   };
+
+  const updateUserConfigProfileIdActive = (newId) => {
+    if (userConfigProfileIdActive.value != newId) {
+      userConfigProfileIdActive.value = newId;
+      localStorage.setItem('userConfigProfileIdActive', newId);
+    }
+  };
+
   const getMeasInfoActive = async () => {
     try {
       const res = await DSA_api.getMeasInfoActive(projectData.value._id);
-      updateMeasInfoId(res.data._id);
+      updateMeasInfoActiveId(res.data._id);
     } catch (error) {}
   };
-  const updateConfigVersionId = (newId) => {
-    if (userConfigVersionId.value != newId) {
-      userConfigVersionId.value = newId;
-      localStorage.setItem('userConfigVersionId', newId);
-    }
-  };
-  const updatePsVersionId = (newId) => {
-    if (powerSystemVersionId.value != newId) {
-      powerSystemVersionId.value = newId;
-      localStorage.setItem('powerSystemVersionId', newId);
-    }
-  };
-  const updateAdditionVersionId = (newId) => {
-    if (additionVersionId.value != newId) {
-      additionVersionId.value = newId;
-      localStorage.setItem('additionVersionId', newId);
-    }
-  };
-  const updateHmiTaskId = (newId) => {
-    if (hmiTaskId.value != newId) {
-      hmiTaskId.value = newId;
-      localStorage.setItem('hmiTaskId', newId);
+  const updateMeasInfoActiveId = (newId) => {
+    if (measInfoActiveId.value != newId) {
+      measInfoActiveId.value = newId;
+      localStorage.setItem('measInfoActiveId', newId);
     }
   };
 
-  const updateMeasInfoId = (newId) => {
-    if (measInfoId.value != newId) {
-      measInfoId.value = newId;
-      localStorage.setItem('measInfoId', newId);
-    }
-  };
-
-  const getListPsm = async (time1 = 0, time2 = 0) => {
+  const getListMeasInfo = async (time1 = 0, time2 = 0) => {
     try {
-      const res = await DSA_api.getListPsm({
+      const res = await DSA_api.getListMeasInfo(projectData.value._id, {
         startTime: time1 === 0 ? 0 : convertTimeStringToInt(time1),
         endTime: time2 === 0 ? 0 : convertTimeStringToInt(time2),
       });
-      psmList.value = res.data;
+      measInfoList.value = res.data;
     } catch (error) {
       console.log(error);
     }
@@ -86,7 +64,8 @@ export const useCommonStore = defineStore('common', () => {
   const startAutoUpdate = () => {
     if (intervalId) return; // Prevent multiple intervals
     intervalId = setInterval(() => {
-      getPsmIdActive();
+      getDsaServiceInfo();
+      getMeasInfoActive();
     }, intervalTime);
   };
 
@@ -98,7 +77,7 @@ export const useCommonStore = defineStore('common', () => {
   };
 
   //watch
-  watch(psm_automatic, (newValue, oldValue) => {
+  watch(measInfo_automatic, (newValue, oldValue) => {
     if (newValue !== oldValue) {
       if (newValue) {
         startAutoUpdate();
@@ -109,18 +88,50 @@ export const useCommonStore = defineStore('common', () => {
   });
 
   const clearData = () => {
-    psmList.value = [];
+    measInfoList.value = [];
   };
+
+  // const getPsmIdActive = async () => {
+  //   try {
+  //     const res = await DSA_api.getVersionManagement(projectData.value._id);
+  //     psm_active.value = res.data.versionData;
+  //     updateConfigVersionId(res.data.versionData.userConfigVersionId);
+  //     updatePsVersionId(res.data.versionData.powerSystemVersionId);
+  //     updateAdditionVersionId(res.data.versionData.additionVersionId);
+  //     updateHmiTaskId(res.data.taskId);
+  //   } catch (error) {}
+  // };
+
+  // const updateConfigVersionId = (newId) => {
+  //   if (userConfigVersionId.value != newId) {
+  //     userConfigVersionId.value = newId;
+  //     localStorage.setItem('userConfigVersionId', newId);
+  //   }
+  // };
+  // const updatePsVersionId = (newId) => {
+  //   if (powerSystemVersionId.value != newId) {
+  //     powerSystemVersionId.value = newId;
+  //     localStorage.setItem('powerSystemVersionId', newId);
+  //   }
+  // };
+  // const updateAdditionVersionId = (newId) => {
+  //   if (additionVersionId.value != newId) {
+  //     additionVersionId.value = newId;
+  //     localStorage.setItem('additionVersionId', newId);
+  //   }
+  // };
+  // const updateHmiTaskId = (newId) => {
+  //   if (hmiTaskId.value != newId) {
+  //     hmiTaskId.value = newId;
+  //     localStorage.setItem('hmiTaskId', newId);
+  //   }
+  // };
+
   return {
     projectData: projectData,
-    psm_automatic,
+    measInfo_automatic,
     isLoading,
     setLoading,
-    psm_active,
-    getPsmIdActive,
-    getMeasInfoActive,
-    psmList,
-    getListPsm,
     startAutoUpdate,
     stopAutoUpdate,
     clearData,
@@ -129,5 +140,11 @@ export const useCommonStore = defineStore('common', () => {
     powerSystemVersionId,
     additionVersionId,
     hmiTaskId,
+    getMeasInfoActive,
+    getDsaServiceInfo,
+    getListMeasInfo,
+    userConfigProfileIdActive,
+    measInfoActiveId,
+    measInfoList,
   };
 });

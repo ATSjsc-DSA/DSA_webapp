@@ -263,4 +263,12 @@ export default class DSA_api {
   static async getMeasInfoActive(project_id) {
     return get(`/common/${project_id}/measInfo/active`);
   }
+
+  static async getListMeasInfo(project_id, param) {
+    return get(`/common/${project_id}/measInfo`, param);
+  }
+
+  static async getDsaService() {
+    return get(`/common/dsa/service`);
+  }
 }

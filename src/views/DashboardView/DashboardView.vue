@@ -65,67 +65,71 @@
           <div class="flex flex-column gap-2 justify-content-center align-items-center sticky" style="top: 6rem">
             <div class="font-semibold" style="font-size: 0.8rem">DATA</div>
             <div
-              v-tooltip.left="stopReloadChartData ? 'Start Auto Reload' : 'Stop Auto Reload'"
-              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components"
+              v-tooltip.left="stopReloadChartData ? 'Start Automatic Mode' : 'Stop Automatic Mode'"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
               :class="stopReloadChartData ? 'bg-primary' : 'bg-red-400'"
               placeholder="Left"
               @click="stopReloadChartData = !stopReloadChartData"
             >
               <i v-if="stopReloadChartData" class="pi pi-play cursor-pointer" style="font-size: 1rem" />
-              <i v-else class="pi pi-pause cursor-pointer" style="font-size: 1rem" />
+              <i v-else class="pi pi-pause" style="font-size: 1rem" />
 
               <div style="font-size: 0.7rem">{{ stopReloadChartData ? 'START' : 'STOP' }}</div>
             </div>
-
+            <Button
+              v-show="stopReloadChartData"
+              v-tooltip.left="'His HMI Data'"
+              icon="pi  pi-ellipsis-h"
+              aria-label="Filter"
+              text
+              @click="changeMeasInfoActive()"
+            />
             <div
               v-tooltip.left="'Reload Data'"
-              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
               placeholder="Left"
               @click="reloadData"
             >
-              <i class="pi pi-replay cursor-pointer" style="font-size: 1rem" />
+              <i class="pi pi-replay" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">RELOAD</div>
             </div>
             <Divider class="m-1" />
             <div class="font-semibold" style="font-size: 0.8rem">GRID</div>
             <div
               v-tooltip.left="'Compact Grid'"
-              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-primary button-choose-components"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-primary button-choose-components button-select cursor-pointer"
               placeholder="Left"
               @click="sortGrid"
             >
-              <i class="pi pi-sync cursor-pointer" style="font-size: 1rem" />
+              <i class="pi pi-sync" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">SORT</div>
             </div>
             <div
               v-tooltip.left="'Lock'"
-              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
               :class="gridLock ? 'bg-gray-400' : 'bg-orange-400'"
               placeholder="Left"
               @click="gridLock = !gridLock"
             >
-              <i
-                :class="gridLock ? 'pi pi-lock cursor-pointer' : 'pi pi-lock-open cursor-pointer'"
-                style="font-size: 1rem"
-              />
+              <i :class="gridLock ? 'pi pi-lock' : 'pi pi-lock-open'" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">{{ gridLock ? 'LOCK' : 'OPEN' }}</div>
             </div>
             <div
               v-tooltip.left="'Compact Grid'"
-              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-red-400 button-choose-components"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-red-400 button-choose-components button-select cursor-pointer"
               placeholder="Left"
               @click="confirmRemoveAllComponent"
             >
-              <i class="pi pi-trash cursor-pointer" style="font-size: 1rem" />
+              <i class="pi pi-trash" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">DELETE</div>
             </div>
             <div
               v-tooltip.left="'Save Grid'"
-              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-gray-100 button-choose-components"
+              class="flex flex-column align-items-center gap-1 px-1 py-2 bg-cyan-600 button-choose-components button-select cursor-pointer"
               placeholder="Left"
               @click="saveGrid"
             >
-              <i class="pi pi-save cursor-pointer" style="font-size: 1rem" />
+              <i class="pi pi-save" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">Save</div>
             </div>
             <Divider class="m-1" />
@@ -211,6 +215,7 @@
       </div>
     </div>
   </div>
+  <MeasInfoDialog v-model:dialogVisible="MeasInfoDialogVisible"></MeasInfoDialog>
   <ConfirmDialog />
   <Toast />
 </template>
@@ -230,7 +235,7 @@ import projectTreeWidget from './projectTreeWidget.vue';
 import chartComponent from './chartComponent.vue';
 import { GridStack } from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
-
+import MeasInfoDialog from './MeasInfoDialog.vue';
 import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
 
@@ -240,8 +245,15 @@ const showTree = ref(localStorage.getItem('showTree') === 'true' || false);
 const gridStackComponentGrid = ref(null);
 const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
+const MeasInfoDialogVisible = ref(false);
+
+const changeMeasInfoActive = () => {
+  MeasInfoDialogVisible.value = true;
+};
 
 onMounted(async () => {
+  console.log('dashboard');
+
   gridStackComponentGrid.value = GridStack.init({
     float: false,
     cellHeight: '1rem', // row's height
@@ -510,5 +522,9 @@ const reloadData = () => {
 
 .button-choose-components:hover {
   background-color: var(--surface-hover);
+}
+.button-select {
+  border: 0;
+  border-radius: 0.5rem;
 }
 </style>

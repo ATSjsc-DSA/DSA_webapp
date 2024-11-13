@@ -25,14 +25,15 @@ const op = ref();
 const audioSrc = '@/public/img/Elevator Ding-SoundBible.com-685385892.mp3';
 
 onMounted(async () => {
-  await commonStore.getPsmIdActive();
-  await commonStore.getListPsm();
+  // await commonStore.getMeasInfoActive();
+  // await commonStore
+  // await commonStore.getListMeasInfo();
   commonStore.startAutoUpdate();
   bindOutsideClickListener();
-  getLogs();
-  interval.value = setInterval(() => {
-    getLogs();
-  }, intervalTime);
+  // getLogs();
+  // interval.value = setInterval(() => {
+  //   getLogs();
+  // }, intervalTime);
 });
 
 onBeforeUnmount(() => {

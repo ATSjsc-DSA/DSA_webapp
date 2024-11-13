@@ -15,6 +15,7 @@ export const useDSAStore = defineStore('DSA_Store', () => {
   const listDisturbances = ref([]);
   const listContingencies = ref([]);
   const listEquipment = ref([]);
+
   const getListGen = async (pageNumber = 1) => {
     try {
       const res = await DSA_api.getListGen({ page: pageNumber });

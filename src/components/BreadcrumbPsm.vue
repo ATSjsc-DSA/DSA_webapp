@@ -38,11 +38,6 @@
     </div>
     <Dialog v-model:visible="visible" modal header="Change Power System Model" :style="{ width: '30rem' }">
       <span class="p-text-secondary block mb-5">Update power system model information.</span>
-
-      <!-- <div class="flex flex-column gap-2 mb-3">
-        <label for="mode" class="font-semibold">Mode</label>
-        <Dropdown v-model="mode" :options="modes" placeholder="Select a City" class="w-full" />
-      </div> -->
       <div class="flex gap-2 mb-5">
         <div class="flex-auto">
           <label for="calendar-24h" class="font-bold block mb-2"> Date-time start </label>
