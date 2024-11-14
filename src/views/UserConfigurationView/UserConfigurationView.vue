@@ -312,7 +312,7 @@
     <monitorFormWidget :data="newMonitorData" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createMonitorVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" :disabled="!newMonitorData.name" @click="createMonitor"></Button>
+      <Button type="button" label="Submit" :disabled="!isMonitorValid(newMonitorData)" @click="createMonitor"></Button>
     </template>
   </Dialog>
 
@@ -921,6 +921,21 @@ const createMonitor = async () => {
   }
 };
 
+const isMonitorValid = (data) => {
+  if (!data.name) {
+    return false;
+  }
+  if (!data.powersystemId) {
+    return false;
+  }
+  if (!data.listScadaMonitorId) {
+    return false;
+  }
+  if (!data.scadaMonitorPowerSytemId) {
+    return false;
+  }
+  return true;
+};
 // ------- Monitor - RUD
 
 const monitorData = ref();

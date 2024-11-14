@@ -70,6 +70,7 @@
       optionValue="_id"
       class="w-full"
       :loading="isLoadingScadaMonitor"
+      :emptyMessage="getScadaEmptyMessage()"
     />
   </div>
 </template>
@@ -197,6 +198,19 @@ watch(psdSelected, async (newVal) => {
 
   await getScadaMonitor();
 });
+
+const getScadaEmptyMessage = () => {
+  if (!psdSelected || !selectedDefinition) {
+    return 'Select a "Type Element" and "Element" to Continue';
+  }
+  if (!psdSelected) {
+    return 'Select a "Element" to Continue';
+  }
+  if (!selectedDefinition) {
+    return 'Select a "Type Element" to Continue';
+  }
+  return 'No available options';
+};
 onMounted(() => {
   getDefiniton();
 });
