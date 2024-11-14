@@ -2,6 +2,9 @@
   <div class="w-full mb-3 pl-3 mt-1 flex justify-content-between align-items-center">
     <span class="text-xl font-semibold"> Filter</span>
     <div class="flex gap-2 align-items-center justify-content-end">
+      <Button severity="secondary" icon="pi pi-save" style="width: 32px" @click="saveFilter" />
+
+      <Divider layout="vertical" />
       <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
       <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="changFilter" />
     </div>
@@ -97,7 +100,7 @@ onMounted(async () => {
 const props = defineProps({
   currentFilter: { type: Object, default: () => {} },
 });
-const emit = defineEmits(['changeFilter']);
+const emit = defineEmits(['changeFilter', 'saveFilter']);
 
 const areaSelected = ref([]);
 const areaDefinitionId = ref([]);
@@ -130,6 +133,20 @@ const changFilter = () => {
     filtering: filterConjunction.value,
   };
   emit('changeFilter', newFilter);
+};
+
+const saveFilter = () => {
+  const newFilter = {
+    definition: definitionSubsystemSelected.value,
+    area: areaSelected.value.map((item) => item._id),
+    zone: zoneSelected.value.map((item) => item._id),
+    owner: ownerSelected.value.map((item) => item._id),
+    kv: kVSelected.value.map((item) => item._id),
+    station: stationSelected.value.map((item) => item._id),
+    powersystem: psSelected.value.map((item) => item._id),
+    filtering: filterConjunction.value,
+  };
+  emit('saveFilter', newFilter);
 };
 const clearFilterSelected = () => {
   areaSelected.value = [];

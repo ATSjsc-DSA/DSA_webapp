@@ -73,7 +73,11 @@
                 :size="20"
                 :minSize="10"
               >
-                <filterSubSystemView :current-filter="selectedItem.filterConditions" @changeFilter="changeFilter" />
+                <filterSubSystemView
+                  :current-filter="selectedItem.filterConditions"
+                  @changeFilter="changeFilter"
+                  @saveFilter="saveFilter"
+                />
               </SplitterPanel>
               <SplitterPanel
                 class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
@@ -246,6 +250,22 @@ const updateSubsytem = async () => {
     await ApiSubsystem.updateSubsystemData(selectedItem.value._id, selectedItem.value);
     updateSubsytemItem(selectedItem.value);
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Update successfully', life: 3000 });
+  } catch (error) {
+    console.log(error);
+
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const saveFilter = async (newfilter) => {
+  try {
+    await ApiSubsystem.updateSubsystemData(selectedItem.value._id, {
+      name: selectedItem.value.name,
+      listPowerSystemId: selectedItem.value.listPowerSystemId,
+      filterConditions: newfilter,
+      active: selectedItem.value.active,
+    });
+    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Saved successfully', life: 3000 });
   } catch (error) {
     console.log(error);
 

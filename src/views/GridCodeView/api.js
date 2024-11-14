@@ -2,7 +2,7 @@ import { get, post, put, _delete } from '@/utils/request';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectData} = storeToRefs(commonStore);
+const { projectData } = storeToRefs(commonStore);
 
 export class Api {
   static async getGridCodeList(page) {
