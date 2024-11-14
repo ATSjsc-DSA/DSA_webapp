@@ -96,10 +96,16 @@ const router = createRouter({
           component: () => import('@/views/ConfigurationView/ConfigurationView.vue'),
         },
         {
-          path: '/user_config',
+          path: '/user_config/profile',
+          name: 'Profile',
+          component: () => import('@/views/ProfileView/ProfileView.vue'),
+        },
+        {
+          path: '/user_config/config',
           name: 'User Configuration',
           component: () => import('@/views/UserConfigurationView/UserConfigurationView.vue'),
         },
+
         {
           path: '/SystemEvents/Disturbances',
           name: 'Disturbances',

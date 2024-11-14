@@ -7,8 +7,19 @@
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
         <Card style="height: 100%">
           <template #title>
-            <div class="flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-              <div>Project</div>
+            <div class="flex flex-nowrap justify-content-between align-items-center gap-2 mb-4">
+              <div class="flex flex-column flex-grow-1 justify-content-start gap-2">
+                <div>
+                  {{ profileData.name }}
+                </div>
+                <div
+                  v-if="profileData.desc"
+                  class="text-xs font-thin capitalize mt-1 text-gray-500 text-truncate"
+                  style="max-width: 25rem"
+                >
+                  {{ `(${profileData.desc})` }}
+                </div>
+              </div>
               <Button
                 type="button"
                 icon="pi pi-chevron-up"
@@ -21,7 +32,7 @@
             </div>
           </template>
           <template #content>
-            <div style="height: 48rem" aria-haspopup="true">
+            <div style="height: 47rem" aria-haspopup="true">
               <Tree
                 v-model:expandedKeys="expandedKeys"
                 :selectionKeys="keySelected"
@@ -301,7 +312,7 @@
     <monitorFormWidget :data="newMonitorData" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createMonitorVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" :disabled="!newMonitorData.name" @click="createMonitor"></Button>
+      <Button type="button" label="Submit" :disabled="!isMonitorValid(newMonitorData)" @click="createMonitor"></Button>
     </template>
   </Dialog>
 
@@ -319,7 +330,7 @@
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="createTaskDsaDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
+  <Dialog v-model:visible="createTaskDsaDialog" :style="{ width: '52rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Create new Task</span>
@@ -373,9 +384,11 @@ import Dropdown from 'primevue/dropdown';
 
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import router from '@/router';
 
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
+import { useCommonStore } from '@/store';
 
 import ContextMenu from 'primevue/contextmenu';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
@@ -398,6 +411,9 @@ import tsaDisturbanceCasesWidget from './tsaDisturbanceCasesWidget.vue';
 const toast = useToast();
 const confirm = useConfirm();
 const isLoadingUserConfig = ref(false);
+
+const commonStore = useCommonStore();
+const { profileData } = storeToRefs(commonStore);
 
 onMounted(async () => {
   await getTreeData();
@@ -434,7 +450,7 @@ const isLoadingContainer = ref(false);
 */
 const getTreeData = async () => {
   isLoadingContainer.value = true;
-  await getAppList();
+  const appList = await getAppList();
   const tree = [
     {
       key: 'root',
@@ -446,8 +462,8 @@ const getTreeData = async () => {
       leaf: false,
     },
   ];
-  for (let appIndex = 0; appIndex < appList.value.length; appIndex++) {
-    const app = appList.value[appIndex];
+  for (let appIndex = 0; appIndex < appList.length; appIndex++) {
+    const app = appList[appIndex];
     tree[0].children.push(await getAppLeaf(app, appIndex));
   }
   treeData.value = tree;
@@ -625,7 +641,6 @@ const addNewTaskLeaf = (appId, dsaId, taskData, taskType = 'VSA') => {
     if (dsaLeaf) {
       const newLeaf = getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length);
       dsaLeaf.children.push(newLeaf);
-      console.log('add', newLeaf);
       return newLeaf;
     }
   }
@@ -753,13 +768,22 @@ const projectContextMenu = ref([
       };
     },
   },
+  {
+    separator: true,
+  },
+  {
+    label: 'Change Profile',
+    icon: 'pi pi-caret-right',
+    command: () => {
+      router.push({ path: '/user_config/profile' });
+    },
+  },
 ]);
 
-const appList = ref([]);
 const getAppList = async () => {
   try {
     const res = await ApiApplication.getList();
-    appList.value = res.data;
+    return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -897,6 +921,21 @@ const createMonitor = async () => {
   }
 };
 
+const isMonitorValid = (data) => {
+  if (!data.name) {
+    return false;
+  }
+  if (!data.powersystemId) {
+    return false;
+  }
+  if (!data.listScadaMonitorId) {
+    return false;
+  }
+  if (!data.scadaMonitorPowerSytemId) {
+    return false;
+  }
+  return true;
+};
 // ------- Monitor - RUD
 
 const monitorData = ref();
@@ -1119,20 +1158,20 @@ const newVsaData = ref({
   active: true,
   maxChange: 0,
   stepChange: 0,
-  sourceId: '5eb7cf5a86d9755df3a6c593',
-  sinkId: '5eb7cf5a86d9755df3a6c593',
+  sourceId: '',
+  sinkId: '',
 
   monitor: {
-    monitorSubSystemId: '5eb7cf5a86d9755df3a6c593',
+    monitorSubSystemId: '',
     signalP: true,
     signalQ: true,
     signalV: true,
     active: true,
   },
-  contingencyId: '5eb7cf5a86d9755df3a6c593',
-  remedialActionId: '5eb7cf5a86d9755df3a6c593',
-  digsilentSettingId: '5eb7cf5a86d9755df3a6c593',
-  fixSubSystemId: '5eb7cf5a86d9755df3a6c593',
+  contingencyId: '',
+  remedialActionId: '',
+  digsilentSettingId: '',
+  fixSubSystemId: '',
 });
 
 const getVsaList = async (dsaId) => {
@@ -1225,12 +1264,12 @@ const delVsa = async () => {
 const tsaData = ref();
 const newTsaData = ref({
   name: 'string',
-  sourceId: '5eb7cf5a86d9755df3a6c593',
-  sinkId: '5eb7cf5a86d9755df3a6c593',
+  sourceId: '',
+  sinkId: '',
   maxChange: 0,
   stepChange: 0,
   monitor: {
-    monitorSubSystemId: '5eb7cf5a86d9755df3a6c593',
+    monitorSubSystemId: '',
     busConfig: {
       voltage: 0,
       freq: 0,
@@ -1252,10 +1291,10 @@ const newTsaData = ref({
     },
     active: true,
   },
-  disturbanceId: '5eb7cf5a86d9755df3a6c593',
-  remedialActionId: '5eb7cf5a86d9755df3a6c593',
-  digsilentSettingId: '5eb7cf5a86d9755df3a6c593',
-  fixSubSystemId: '5eb7cf5a86d9755df3a6c593',
+  // disturbanceId: '',
+  remedialActionId: '',
+  digsilentSettingId: '',
+  fixSubSystemId: '',
   active: true,
 });
 
@@ -1527,20 +1566,24 @@ const delOsl = async () => {
 };
 
 const confirmUpdate = async (event, updateFunc, header = '') => {
-  confirm.require({
-    group: 'updateDialog',
-    target: event.currentTarget,
-    header: header,
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Update',
-    accept: async () => {
-      await updateFunc();
-    },
-  });
+  if (profileData.value.runMode) {
+    confirm.require({
+      group: 'updateDialog',
+      target: event.currentTarget,
+      header: header,
+      message: 'Are you sure you want to proceed?',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+      acceptClass: 'p-button-sm p-button-danger',
+      rejectLabel: 'Cancel',
+      acceptLabel: 'Update',
+      accept: async () => {
+        await updateFunc();
+      },
+    });
+  } else {
+    await updateFunc();
+  }
 };
 
 const confirmDeleteDialog = async (event, delFunc, header = '') => {
@@ -1598,5 +1641,10 @@ const closeAllContextMenu = async () => {
 <style>
 .p-treenode-label {
   width: 100%;
+}
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

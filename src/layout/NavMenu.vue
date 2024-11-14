@@ -1,58 +1,61 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { profileData } = storeToRefs(commonStore);
 
 const router = useRouter();
-const items = ref([
-  {
-    label: 'Dashboard',
-    icon: 'pi pi-fw pi-home',
-    to: '/',
-    command: () => {
-      router.push('/');
+const items = computed(() => {
+  const userConfigPath = profileData.value._id ? '/user_config/config' : '/user_config/profile';
+  return [
+    {
+      label: 'Dashboard',
+      icon: 'pi pi-fw pi-home',
+      to: '/',
+      command: () => {
+        router.push('/');
+      },
     },
-  },
-  // {
-  //   label: 'Application View',
-  //   items: [
-  //     { label: 'SSR', icon: 'pi pi-fw pi-id-card', to: '/DSA/SSR' },
-  //     { label: 'TSA', icon: 'pi pi-fw pi-check-square', to: '/DSA/TSA' },
-  //     { label: 'VSA', icon: 'pi pi-fw pi-bookmark', to: '/DSA/VSA' },
-  //   ],
-  // },
-  {
-    label: 'Configuration',
-    items: [
-      { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
-      {
-        label: 'System Events',
-        icon: 'pi pi-fw pi-clone',
-        items: [
-          {
-            label: 'Contingencies',
-            to: '/SystemEvents/Contingencies',
-          },
-          {
-            label: 'Subsystems',
-            to: '/SystemEvents/Subsystems',
-          },
-          {
-            label: 'Dynamic Model Default',
-            to: '/SystemEvents/dynamicModelDefault',
-          },
-        ],
-      },
-      { label: 'User Configuration', icon: 'pi pi-file-edit', to: '/user_config' },
-      {
-        label: 'Grid Code',
-        icon: 'pi pi-fw pi-id-card',
-        to: '/gridcode/',
-      },
-      { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
-      { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
-    ],
-  },
-]);
+
+    {
+      label: 'Configuration',
+      items: [
+        { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
+        {
+          label: 'System Events',
+          icon: 'pi pi-fw pi-clone',
+          items: [
+            {
+              label: 'Contingencies',
+              to: '/SystemEvents/Contingencies',
+            },
+            {
+              label: 'Subsystems',
+              to: '/SystemEvents/Subsystems',
+            },
+            {
+              label: 'Dynamic Model Default',
+              to: '/SystemEvents/dynamicModelDefault',
+            },
+          ],
+        },
+        {
+          label: 'User Configuration' ,
+          icon: 'pi pi-file-edit',
+          to: userConfigPath,
+        },
+        {
+          label: 'Grid Code',
+          icon: 'pi pi-fw pi-id-card',
+          to: '/gridcode/',
+        },
+        { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
+        { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
+      ],
+    },
+  ];
+});
 
 const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 </script>

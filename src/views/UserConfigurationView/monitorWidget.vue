@@ -261,8 +261,6 @@ const definitionMonitor = ref();
 
 const getMonitorData = async () => {
   try {
-    console.log(monitorData.value, 'monitorData.value');
-
     const result = await PowerSystemParameterApi.getPowersystemMonitor(monitorData.value.powersystemId);
     psdSelected.value = {
       _id: result.data._id,

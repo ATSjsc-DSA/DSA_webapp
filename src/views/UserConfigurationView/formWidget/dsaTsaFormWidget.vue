@@ -43,22 +43,7 @@
     <div class="col-6">
       <searchSubsystemWidget v-model="sinkSelected" label="Sink" />
     </div>
-    <div class="col-6">
-      <div class="flex flex-column align-items-start gap-1">
-        <label for="ps" class="font-semibold"> Contingencies</label>
-        <AutoComplete
-          v-model="contingenciesSelected"
-          inputId="ps"
-          optionLabel="name"
-          optionValue="_id"
-          completeOnFocus
-          class="w-full psFilterAutoComplete"
-          :suggestions="contingenciesSuggestions"
-          name="psFilter"
-          @complete="searchContingenciesFilter"
-        />
-      </div>
-    </div>
+
     <div class="col-6">
       <searchSubsystemWidget v-model="fixSubPsSelected" label="Fix Sub System" />
     </div>
@@ -225,67 +210,33 @@
 import InputSwitch from 'primevue/inputswitch';
 
 import Checkbox from 'primevue/checkbox';
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
-import { ApiSubsystem, ApiContingencies } from '@/views/SystemEvents/api';
+import { ApiSubsystem } from '@/views/SystemEvents/api';
 
 import searchSubsystemWidget from './searchSubsystemWidget.vue';
 
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
 });
-const toast = useToast();
 
 onMounted(async () => {
-  if (data.value.contingenciesId) {
+  if (data.value) {
     await setDefaultData();
   }
 });
 const data = defineModel();
 watch(data, async (newVal, oldVal) => {
   if (newVal._id !== oldVal.__id) {
-    if (newVal.disturbanceId) {
+    if (newVal) {
       await setDefaultData();
     }
   }
 });
 
 const setDefaultData = async () => {
-  await getContingenciesData(data.value.contingenciesId);
   sourceSelected.value = await getSubSystemData(data.value.sourceId);
   sinkSelected.value = await getSubSystemData(data.value.sinkId);
   fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
-  monitorSubSystemSelected.value = await getSubSystemData(data.value.monitorSubSystemId);
-};
-
-// contingencies
-
-const contingenciesSelected = ref();
-const contingenciesSuggestions = ref();
-
-watch(contingenciesSelected, (newVal) => {
-  data.value.contingenciesId = newVal._id;
-});
-const searchContingenciesFilter = async (event) => {
-  const query = event ? event.query.trim() : '';
-  try {
-    const res = await ApiContingencies.searchSubsystem(query);
-    contingenciesSuggestions.value = res.data;
-  } catch (error) {
-    console.log('searchPsQueryFilter: error ', error);
-  }
-};
-
-const getContingenciesData = async (id) => {
-  try {
-    const res = await ApiContingencies.getContingenciesData(id);
-    contingenciesSelected.value = {
-      name: res.data.name,
-      _id: res.data._id,
-    };
-  } catch (error) {
-    console.log('getContingenciesData: error ', error);
-  }
+  monitorSubSystemSelected.value = await getSubSystemData(data.value.monitor.monitorSubSystemId);
 };
 
 // source
@@ -317,7 +268,7 @@ watch(fixSubPsSelected, (newVal) => {
 const monitorSubSystemSelected = ref();
 
 watch(monitorSubSystemSelected, (newVal) => {
-  data.value.monitorSubSystemId = newVal._id;
+  data.value.monitor.monitorSubSystemId = newVal._id;
 });
 
 const getSubSystemData = async (id) => {
@@ -328,7 +279,7 @@ const getSubSystemData = async (id) => {
       _id: res.data._id,
     };
   } catch (error) {
-    console.log('getContingenciesData: error ', error);
+    console.log('getSubSystemData: error ', error);
   }
 };
 </script>
