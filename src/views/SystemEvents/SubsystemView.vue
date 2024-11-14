@@ -1,6 +1,5 @@
 <template>
   <div class="card h-full">
-    <!-- <Toast></Toast> -->
     <ConfirmDialog group="dialog"></ConfirmDialog>
     <Splitter style="height: 100%">
       <SplitterPanel
@@ -11,7 +10,7 @@
         <div class="h-full w-full p-4 flex flex-column">
           <div class="py-4 flex justify-content-between align-items-center">
             <span class="text-xl font-semibold"> List Sub System</span>
-            <Button icon="pi pi-plus" text rounded aria-label="Filter" @click="handlerCreateThis" />
+            <Button icon="pi pi-plus" text rounded aria-label="Filter" @click="handlerCreate" />
           </div>
           <DataView
             :value="listSubSystem"
@@ -64,7 +63,7 @@
               </div>
             </div>
             <div class="card flex justify-content-end">
-              <Button label="Submit" @click="updateThis()" />
+              <Button label="Update" :disabled="!selectedItem.name" @click="confirmUpdate($event)" />
             </div>
           </TabPanel>
           <TabPanel header="List Power System">
@@ -147,10 +146,12 @@
 
         <div class="flex justify-content-end gap-2">
           <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-          <Button type="button" label="Save" @click="createThis()"></Button>
+          <Button type="button" label="Save" @click="createSubsystem()"></Button>
         </div>
       </div>
     </Dialog>
+    <confirmUpdateDialog />
+    <Toast />
   </div>
 </template>
 
@@ -162,6 +163,7 @@ import TabPanel from 'primevue/tabpanel';
 
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
+import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
 
 import filterSubSystemView from './filterSubSystemView.vue';
 import Toast from 'primevue/toast';
@@ -187,15 +189,15 @@ const getListSubSystem = async () => {
 };
 
 const selectedItem = ref({});
-const formItemSelect = ref({
-  active: false,
-  name: '',
-});
 
 const handleRowClick = async (item) => {
+  if (item._id === selectedItem.value._id) {
+    return;
+  }
   try {
     const res = await ApiSubsystem.getSubsystemData(item._id);
     selectedItem.value = res.data;
+    selectedItem.value._id = item._id;
     const newFilter = {
       area: selectedItem.value.filterConditions.area.map((item) => item._id),
       zone: selectedItem.value.filterConditions.zone.map((item) => item._id),
@@ -213,13 +215,40 @@ const handleRowClick = async (item) => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+const confirmUpdate = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Sub System',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateSubsytem();
+    },
+  });
+};
+const updateSubsytemItem = (newVal) => {
+  listSubSystem.value = listSubSystem.value.map((item) => {
+    if (item._id === newVal._id) {
+      return newVal;
+    } else {
+      return item;
+    }
+  });
+};
 
-const updateThis = async () => {
+const updateSubsytem = async () => {
   try {
-    await ApiSubsystem.updateContingenciesData(selectedItem.value._id, formItemSelect.value);
-    getListSubSystem();
+    await ApiSubsystem.updateSubsystemData(selectedItem.value._id, selectedItem.value);
+    updateSubsytemItem(selectedItem.value);
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Update successfully', life: 3000 });
   } catch (error) {
+    console.log(error);
+
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
@@ -229,7 +258,7 @@ const formItemCreate = ref({
   active: false,
 });
 
-const handlerCreateThis = () => {
+const handlerCreate = () => {
   formItemCreate.value = {
     name: '',
     active: false,
@@ -237,16 +266,18 @@ const handlerCreateThis = () => {
   visible.value = true;
 };
 
-const createThis = async () => {
+const createSubsystem = async () => {
   try {
-    await ApiSubsystem.createSubsystem(formItemCreate.value);
-    getListSubSystem();
+    const res = await ApiSubsystem.createSubsystem(formItemCreate.value);
+    listSubSystem.value.push(res.data);
     visible.value = false;
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Create successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
+// --- ps Data - parameter
 
 const filterData = ref([]);
 
@@ -255,7 +286,6 @@ const changeFilter = async (newfilter) => {
   await getParameterList();
 };
 
-// --- ps Data - parameter
 const pageRowNumber = ref(10);
 const parameterData = ref([]);
 const parameterTotal = ref(0);
@@ -299,7 +329,8 @@ const confirmDeleteThis = (id) => {
 const deleteThis = async (id) => {
   try {
     await ApiSubsystem.deleteSubsystem(id);
-    getListSubSystem();
+    // getListSubSystem();
+    listSubSystem.value = listSubSystem.value.filter((item) => item._id != id);
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Delete successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
