@@ -132,10 +132,7 @@ export class ApiDsa {
     });
   }
   static async createDependency(dependencyId, data) {
-    return post(
-      `/userconfig/${userConfigVersionId.value}/${dependencyId}/moduledependency`,
-      data,
-    );
+    return post(`/userconfig/${userConfigVersionId.value}/${dependencyId}/moduledependency`, data);
   }
   static async getDependency(dependencyId) {
     return get(`/userconfig/moduledependency/${dependencyId}`);

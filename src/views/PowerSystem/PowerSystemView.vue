@@ -108,7 +108,7 @@
                         />
                         <SplitButton
                           v-else-if="tab === 'EMS'"
-                          label="EMS"
+                          label="ATS Standard"
                           :model="emsFilterList"
                           :text="tabMenuPSActive !== index"
                           :disabled="isSublineNode"

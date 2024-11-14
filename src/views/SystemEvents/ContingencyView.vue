@@ -43,7 +43,7 @@
       ></Column>
       <Column :exportable="false" style="width: 8rem">
         <template #body="slotProps">
-          <Button icon="pi pi-pencil" rounded text class="mr-2" @click="handlerEditThis(slotProps.data)" />
+          <Button icon="pi pi-pencil" rounded text class="mr-2" @click="confirmUpdateThis($event, slotProps.data)" />
           <Button
             icon="pi pi-trash"
             rounded
@@ -276,7 +276,22 @@ const createThis = async () => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
-
+const confirmUpdateThis = async (event, data) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Contigency',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await handlerEditThis(data);
+    },
+  });
+};
 const handlerEditThis = async (data) => {
   contingencyModelData.value = JSON.parse(JSON.stringify(data)); // Tạo bản sao của data
   headerDialog.value = 'Edit';

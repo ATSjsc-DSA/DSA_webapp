@@ -2,7 +2,7 @@ import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 
 const commonStore = useCommonStore();
-const { psm_active, projectData, userConfigVersionId } = storeToRefs(commonStore);
+const { projectData } = storeToRefs(commonStore);
 
 export class commonApi {
   static async searchPowerSystemData(psdDefinition_id = '', query = '', exceptionArr = []) {
@@ -38,16 +38,13 @@ export class ApiContingency {
 
 export class ApiContingencies {
   static async getListContingencies() {
-    return get(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/contingencies`);
+    return get(`/seedconfig/${projectData.value._id}/contingencies`);
   }
   static async searchSubsystem(query = '', data = []) {
-    return post(
-      `/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/search/contingencies?query=${query}`,
-      data,
-    );
+    return post(`/seedconfig/${projectData.value._id}/search/contingencies?query=${query}`, data);
   }
   static async createContingencies(data) {
-    return post(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/contingencies`, data);
+    return post(`/seedconfig/${projectData.value._id}/contingencies`, data);
   }
   static async getContingenciesData(id) {
     return get(`/seedconfig/contingencies/${id}`);
@@ -62,14 +59,14 @@ export class ApiContingencies {
 
 export class ApiDisturbances {
   static async getList(tsaId, page) {
-    return get(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/${tsaId}/disturbances`, {
+    return get(`/seedconfig/${projectData.value._id}/${tsaId}/disturbances`, {
       page: page,
       page_size: 10,
     });
   }
 
   static async createDisturbances(tsaId, data) {
-    return post(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/${tsaId}/disturbances`, data);
+    return post(`/seedconfig/${projectData.value._id}/${tsaId}/disturbances`, data);
   }
   static async getDisturbances(id) {
     return get(`/seedconfig/disturbances/${id}`);
@@ -102,20 +99,17 @@ export class ApiDisturbance {
 
 export class ApiSubsystem {
   static async getListSubsystem(param) {
-    return get(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/subsystem`, param);
+    return get(`/seedconfig/${projectData.value._id}/subsystem`, param);
   }
   static async getListSubsystemOnlyName() {
-    return get(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/subsystemonlyname`);
+    return get(`/seedconfig/${projectData.value._id}/subsystemonlyname`);
   }
 
   static async searchSubsystem(query = '', data = []) {
-    return post(
-      `/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/search/subsystem?query=${query}`,
-      data,
-    );
+    return post(`/seedconfig/${projectData.value._id}/search/subsystem?query=${query}`, data);
   }
   static async createSubsystem(data) {
-    return post(`/seedconfig/${projectData.value._id}/${userConfigVersionId.value}/subsystem`, data);
+    return post(`/seedconfig/${projectData.value._id}/subsystem`, data);
   }
   static async getSubsystemData(id) {
     return get(`/seedconfig/subsystem/${id}`);

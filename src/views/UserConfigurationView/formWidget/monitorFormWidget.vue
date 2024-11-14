@@ -62,7 +62,7 @@
     </div>
   </div> -->
 
-  <div class="grid m-0 p-0 ">
+  <div class="grid m-0 p-0">
     <div class="col-12 md:col-4 flex flex-column gap-2 mb-3 pl-0">
       <label for="psdSelected" class="font-semibold">Type Element</label>
       <Dropdown
@@ -87,7 +87,6 @@
         @complete="searchPsQueryFilter"
       />
     </div>
-    
   </div>
   <div class="flex flex-column gap-3 mb-3">
     <label for="scadaMonitorPsSelected" class="font-semibold">Scada Monitor</label>
@@ -98,6 +97,7 @@
       optionValue="_id"
       class="w-full"
       @focus="getScadaMonitor()"
+      :loading="isLoadingScadaMonitor"
     />
   </div>
 
@@ -127,7 +127,7 @@ const props = defineProps({
   definitionMonitor: { type: String, default: null },
 });
 
-const data = ref(props.data)
+const data = ref(props.data);
 watch(
   () => props.data,
   (newValue, oldValue) => {
@@ -136,7 +136,7 @@ watch(
         data.value = newValue;
       });
     }
-  }
+  },
 );
 const typeOpts = ref([
   { name: 'Frequency', code: 1 },
@@ -179,12 +179,15 @@ const emit = defineEmits(['update:psdSelected']);
 //   get: () => props.psdSelected,
 //   set: (value) => emit('update:psdSelected', value),
 // });
-const psdSelected = ref(props.psdSelected)
-watch(()=>props.psdSelected, async (newValue, oldValue) => {
-  if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-    psdSelected.value = newValue
-  }
-});
+const psdSelected = ref(props.psdSelected);
+watch(
+  () => props.psdSelected,
+  async (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      psdSelected.value = newValue;
+    }
+  },
+);
 // const psdSelectedCreate = ref();
 const psFilterSuggestions = ref();
 const searchPsQueryFilter = async (event) => {
@@ -207,8 +210,9 @@ watch(
     listScadaMonitor.value = newVal;
   },
 );
-
+const isLoadingScadaMonitor = ref(false);
 const getScadaMonitor = async () => {
+  isLoadingScadaMonitor.value = true;
   try {
     const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelected.value._id);
     listScadaMonitor.value = res.data.data;
@@ -216,6 +220,7 @@ const getScadaMonitor = async () => {
     listScadaMonitor.value = undefined;
     console.log('getScadaMonitor: error ', error);
   }
+  isLoadingScadaMonitor.value = false;
 };
 
 watch(listScadaMonitor, (newVal) => {

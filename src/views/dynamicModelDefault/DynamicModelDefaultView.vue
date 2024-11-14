@@ -1,144 +1,185 @@
 <template>
-  <div style="height: 40rem">
-    <DataTable
-      id="psDynamicTable"
-      :value="tableData"
-      dataKey="_id"
-      tableStyle="min-width: 50rem;"
-      :lazy="true"
-      :sortOrder="1"
-      rowHover
-      scrollable
-      scrollHeight="38rem"
-      showGridlines
-      :loading="isLoadingData"
-      size="small"
-    >
-      <template #header>
-        <div class="flex align-items-center justify-content-end">
-          <Button type="button" icon="pi pi-plus" size="small" text @click="handleCreate()" />
-        </div>
-      </template>
-
-      <ColumnGroup type="header">
-        <Row>
-          <Column :rowspan="2">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Name</div>
-            </template>
-          </Column>
-          <Column :rowspan="2">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">pMax</div>
-            </template>
-          </Column>
-          <Column :rowspan="2">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">pMin</div>
-            </template>
-          </Column>
-          <Column :colspan="4">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Traditional</div>
-            </template>
-          </Column>
-          <Column :colspan="4" style="background-color: var(--surface-100)">
-            <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Renewable</div>
-            </template>
-          </Column>
-          <Column frozen header="" :rowspan="2" />
-        </Row>
-        <Row>
-          <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
-          <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
-          <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
-          <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
-
-          <Column
-            field="Generic.name"
-            header="Generic"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-          <Column
-            field="Renewable.name"
-            header="Renewable"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-          <Column
-            field="PlanControl.name"
-            header="PlanControl"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-          <Column
-            field="DriveTrain.name"
-            header="DriveTrain"
-            style="text-wrap: nowrap; background-color: var(--surface-100)"
-          />
-        </Row>
-      </ColumnGroup>
-
-      <Column field="name" frozen header="Name" style="text-wrap: nowrap">
-        <template #body="{ data }">
-          <div class="font-bold min-w-8rem text-left">
-            {{ data.name }}
+  <div class="card w-full h-full">
+    <div style="height: 52rem">
+      <DataTable
+        id="psDynamicTable"
+        :value="tableData"
+        dataKey="_id"
+        tableStyle="min-width: 50rem;"
+        :lazy="true"
+        :sortOrder="1"
+        rowHover
+        scrollable
+        scrollHeight="38rem"
+        showGridlines
+        :loading="isLoadingData"
+      >
+        <template #header>
+          <div class="flex align-items-center justify-content-between">
+            <div class="font-semibold text-xl py-3">Dynamic Model Default</div>
+            <div class="flex align-items-center justify-content-end">
+              <Button type="button" label="Upload" icon="pi pi-upload" text @click="uploadVisibleDialog = true" />
+              <Button type="button" label="Create" icon="pi pi-plus" text @click="handleCreate()" />
+            </div>
           </div>
         </template>
-      </Column>
-      <Column field="pMax" header="pMax" style="text-wrap: nowrap" />
-      <Column field="pMin" header="pMin" style="text-wrap: nowrap" />
 
-      <!-- Traditional -->
-      <Column field="Generator.modelName" header="Generator" style="text-wrap: nowrap" />
-      <Column field="Excitation.modelName" header="Excitation" style="text-wrap: nowrap" />
-      <Column field="Governor.modelName" header="Governor" style="text-wrap: nowrap" />
-      <Column field="Stabilizer.modelName" header="Stabilizer" style="text-wrap: nowrap" />
-      <!-- Renewable -->
-      <Column
-        field="Generic.modelName"
-        header="Generic"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-      <Column
-        field="Renewable.modelName"
-        header="Renewable"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-      <Column
-        field="PlanControl.modelName"
-        header="PlanControl"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
-      <Column
-        field="DriveTrain.modelName"
-        header="DriveTrain"
-        style="text-wrap: nowrap; background-color: var(--surface-100)"
-      />
+        <ColumnGroup type="header">
+          <Row>
+            <Column :rowspan="2">
+              <template #header>
+                <div class="flex align-items-center justify-content-center w-full">Name</div>
+              </template>
+            </Column>
+            <Column :rowspan="2">
+              <template #header>
+                <div class="flex align-items-center justify-content-center w-full">pMax</div>
+              </template>
+            </Column>
+            <Column :rowspan="2">
+              <template #header>
+                <div class="flex align-items-center justify-content-center w-full">pMin</div>
+              </template>
+            </Column>
+            <Column :colspan="4">
+              <template #header>
+                <div class="flex align-items-center justify-content-center w-full">Traditional</div>
+              </template>
+            </Column>
+            <Column :colspan="4" style="background-color: var(--surface-100)">
+              <template #header>
+                <div class="flex align-items-center justify-content-center w-full">Renewable</div>
+              </template>
+            </Column>
+            <Column frozen header="" :rowspan="2" />
+          </Row>
+          <Row>
+            <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
+            <Column field="Excitation.name" header="Excitation" style="text-wrap: nowrap" />
+            <Column field="Governor.name" header="Governor" style="text-wrap: nowrap" />
+            <Column field="Stabilizer.name" header="Stabilizer" style="text-wrap: nowrap" />
 
-      <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
-        <template #body="{ data }">
-          <div class="flex justify-content-between">
-            <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
-  </div>
-  <div class="flex justify-content-end align-items-center">
-    <Paginator
-      :rows="pageRowNumber"
-      :totalRecords="totalRecords"
-      :page="currentPage"
-      class="flex-grow-1"
-      @page="onPageChange"
-    ></Paginator>
-    <div class="mr-3">Total: {{ totalRecords }}</div>
+            <Column
+              field="Generic.name"
+              header="Generic"
+              style="text-wrap: nowrap; background-color: var(--surface-100)"
+            />
+            <Column
+              field="Renewable.name"
+              header="Renewable"
+              style="text-wrap: nowrap; background-color: var(--surface-100)"
+            />
+            <Column
+              field="PlanControl.name"
+              header="PlanControl"
+              style="text-wrap: nowrap; background-color: var(--surface-100)"
+            />
+            <Column
+              field="DriveTrain.name"
+              header="DriveTrain"
+              style="text-wrap: nowrap; background-color: var(--surface-100)"
+            />
+          </Row>
+        </ColumnGroup>
+
+        <Column field="name" frozen header="Name" style="text-wrap: nowrap">
+          <template #body="{ data }">
+            <div class="font-bold min-w-8rem text-left">
+              {{ data.name }}
+            </div>
+          </template>
+        </Column>
+        <Column field="pMax" header="pMax" style="text-wrap: nowrap" />
+        <Column field="pMin" header="pMin" style="text-wrap: nowrap" />
+
+        <!-- Traditional -->
+        <Column field="Generator.modelName" header="Generator" style="text-wrap: nowrap" />
+        <Column field="Excitation.modelName" header="Excitation" style="text-wrap: nowrap" />
+        <Column field="Governor.modelName" header="Governor" style="text-wrap: nowrap" />
+        <Column field="Stabilizer.modelName" header="Stabilizer" style="text-wrap: nowrap" />
+        <!-- Renewable -->
+        <Column
+          field="Generic.modelName"
+          header="Generic"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="Renewable.modelName"
+          header="Renewable"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="PlanControl.modelName"
+          header="PlanControl"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+        <Column
+          field="DriveTrain.modelName"
+          header="DriveTrain"
+          style="text-wrap: nowrap; background-color: var(--surface-100)"
+        />
+
+        <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+          <template #body="{ data }">
+            <div class="flex justify-content-between">
+              <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
+              <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete(data)" />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
+    <div v-if="totalRecords > pageRowNumber" class="flex justify-content-end align-items-center">
+      <Paginator
+        :rows="pageRowNumber"
+        :totalRecords="totalRecords"
+        :page="currentPage"
+        class="flex-grow-1"
+        @page="onPageChange"
+      ></Paginator>
+      <div class="mr-3">Total: {{ totalRecords }}</div>
+    </div>
   </div>
   <Toast />
+  <AppProgressSpinner :showSpinner="isImporting"></AppProgressSpinner>
 
-  <!-- create dialog data -->
-  <!-- create dialog data -->
+  <!-- delete confirm dialog -->
+  <ConfirmDialog group="deleteDynamicDefaultConfirm">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: var(--red-500)"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div>Do you want to delete this model?</div>
+          <div>Name: {{ slotProps.message.data.name }}</div>
+          <div>Type: {{ slotProps.message.data.isRenewableModel ? 'Traditional' : 'Renewable' }}</div>
+          <div class="text-red-500 font-semibold">This Action will affect the final calculation result.</div>
+          <div class="text-red-500 font-semibold">Are you sure you want to <b>Delete</b>?</div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
+
+  <!-- update confirm dialog -->
+  <ConfirmDialog group="updateDynamicDefaultConfirm">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div>Name: {{ slotProps.message.data.name }}</div>
+          <div>Type: {{ slotProps.message.data.isRenewableModel ? 'Traditional' : 'Renewable' }}</div>
+
+          <div class="text-red-500 font-semibold">This Action will affect the final calculation result.</div>
+          <div class="text-red-500 font-semibold">Are you sure you want to <b>Update</b>?</div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
+
+  <!-- create/update dialog data -->
   <Dialog v-model:visible="visibleChangeDialog" style="width: 64rem" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
@@ -178,7 +219,6 @@
             <Dropdown
               v-model="generatorModel"
               :options="traditionalGeneratorOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -199,7 +239,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
 
@@ -210,7 +257,6 @@
             <Dropdown
               v-model="excitationModel"
               :options="traditionalExcitationOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -230,7 +276,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
         <TabPanel header="Governor">
@@ -240,7 +293,6 @@
             <Dropdown
               v-model="governorModel"
               :options="traditionalGovernorOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -260,7 +312,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
         <TabPanel header="Stabilizer">
@@ -270,7 +329,6 @@
             <Dropdown
               v-model="stabilizerModel"
               :options="traditionalStabilizerOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -290,7 +348,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
       </TabView>
@@ -304,7 +369,6 @@
             <Dropdown
               v-model="genericModel"
               :options="renewableGenericOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -324,7 +388,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
         <TabPanel header="Renewable">
@@ -334,7 +405,6 @@
             <Dropdown
               v-model="renewableModel"
               :options="renewableRenewableOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -354,7 +424,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
         <TabPanel header="Plan Control">
@@ -364,7 +441,6 @@
             <Dropdown
               v-model="planControlModel"
               :options="renewablePlanControlOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -384,7 +460,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
         <TabPanel header=" Drive Train">
@@ -394,7 +477,6 @@
             <Dropdown
               v-model="driveTrainModel"
               :options="renewableDriveTrainOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -414,7 +496,14 @@
                 </div>
               </div>
             </div>
-            <div v-else>This Global Dynamic Model Definition does not have values.</div>
+            <div v-else>
+              <div>This Global Dynamic Model Definition does not have values.</div>
+              <div class="pt-3 flex align-items-center justify-content-start">
+                Go to "<router-link to="/globaldefinition">
+                  <Button class="px-0" label="Global Dynamic Model Definition" link /> </router-link
+                >" page?
+              </div>
+            </div>
           </template>
         </TabPanel>
       </TabView>
@@ -429,24 +518,19 @@
         :disabled="!dataChange.name"
         @click="createDynamicDefaultModel()"
       ></Button>
-      <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateDynamicModel()"></Button>
+      <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="confirmUpdate"></Button>
     </template>
   </Dialog>
 
-  <ConfirmDialog group="deleteDynamicDefaultConfirm">
-    <template #message="slotProps">
-      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
-        <div>
-          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
-        </div>
-        <div class="flex flex-column gap-3 p-3">
-          <div>Do you want to delete this model ?</div>
-          <div>Name: {{ slotProps.message.data.name }}</div>
-          <div>Type: {{ slotProps.message.data.isRenewableModel ? 'Traditional' : 'Renewable' }}</div>
-        </div>
-      </div>
-    </template>
-  </ConfirmDialog>
+  <!-- upload dialog  -->
+  <Dialog
+    v-model:visible="uploadVisibleDialog"
+    :style="{ width: '50rem' }"
+    header="Upload Dynamic Model Default"
+    :modal="true"
+  >
+    <uploadFileConfig @uploadFile="uploadFile" />
+  </Dialog>
 </template>
 
 <script setup>
@@ -454,50 +538,34 @@ import { computed, onMounted, watch } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import AutoComplete from 'primevue/autocomplete';
+import uploadFileConfig from '@/components/uploadFileConfig.vue';
+import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
-const confirm = useConfirm();
-
+import { Api } from './api';
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
-import { PowerSystemParameterApi, DynamicDefaultApi } from '@/views/PowerSystem/api';
 
 const toast = useToast();
-
-const props = defineProps({
-  showDefinitionFlatList: { type: Boolean },
-  nodeSelected: { type: Object },
-  definitionId: { type: String, required: true },
-});
-
-watch(
-  () => props.showDefinitionFlatList,
-  async (newData) => {
-    await getTableData();
-  },
-);
+const confirm = useConfirm();
 
 onMounted(async () => {
-  // await getTableData();
-  // // Traditional
+  await getTableData();
 });
 
+// Table Data
 const isLoadingData = ref(false);
 const modelDefinitionType = ref(globalDynamicModelApi.TypeGlobalDynamicModelDefinition);
 
-// Table Data
 const pageRowNumber = ref(10);
 const totalRecords = ref(0);
 const currentPage = ref(1);
 const dynamicModelList = ref([]);
-
 const onPageChange = async (event) => {
   currentPage.value = event.page + 1;
   await getTableData();
 };
 
 const tableData = ref([]);
-
 const getTableData = async () => {
   isLoadingData.value = true;
   await getDynamicDefaultModelList();
@@ -520,24 +588,9 @@ const getTableData = async () => {
 
 const getDynamicDefaultModelList = async () => {
   try {
-    let resData = {
-      items: [],
-      total: 0,
-    };
-    if (props.showDefinitionFlatList) {
-      const res = await DynamicDefaultApi.getDynamicDefaultList(currentPage.value);
-      resData = res.data;
-    } else {
-      if (props.nodeSelected) {
-        const res = await DynamicDefaultApi.getDynamicDefaultListWithTree(
-          props.nodeSelected.parentId,
-          currentPage.value,
-        );
-        resData = res.data;
-      }
-    }
-    dynamicModelList.value = resData.items;
-    totalRecords.value = resData.total;
+    const res = await Api.getList(currentPage.value);
+    dynamicModelList.value = res.data.items;
+    totalRecords.value = res.data.total;
   } catch (error) {
     dynamicModelList.value = [];
     console.log('getDynamicModelList: error ', error);
@@ -545,14 +598,6 @@ const getDynamicDefaultModelList = async () => {
   }
 };
 
-const getGlobalDynamicModelDefinitionById = async (id) => {
-  try {
-    const res = await globalDynamicModelApi.getGlobalDynamicModelDefinitionById(id);
-    return res.data;
-  } catch (error) {
-    return {};
-  }
-};
 // CRUD
 
 const visibleChangeDialog = ref(false);
@@ -598,7 +643,7 @@ const getModelTypeOptions = async () => {
 };
 const createDynamicDefaultModel = async () => {
   try {
-    await DynamicDefaultApi.createDynamicDefault(getValueModelInForm());
+    await Api.createDynamicDefault(getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
@@ -621,28 +666,32 @@ const getValueModelInForm = () => {
     if (generatorModel.value) {
       data.model.push({
         modelType: 'Generator',
-        modelId: generatorModel.value,
+        modelId: generatorModel.value._id,
+        modelName: generatorModel.value.name,
         values: Object.values(generatorTable.value),
       });
     }
     if (excitationModel.value) {
       data.model.push({
         modelType: 'Excitation',
-        modelId: excitationModel.value,
+        modelId: excitationModel.value._id,
+        modelName: excitationModel.value.name,
         values: Object.values(excitationTable.value),
       });
     }
     if (governorModel.value) {
       data.model.push({
         modelType: 'Governor',
-        modelId: governorModel.value,
+        modelId: governorModel.value._id,
+        modelName: governorModel.value.name,
         values: Object.values(governorTable.value),
       });
     }
     if (stabilizerModel.value) {
       data.model.push({
         modelType: 'Stabilizer',
-        modelId: stabilizerModel.value,
+        modelId: stabilizerModel.value._id,
+        modelName: stabilizerModel.value.name,
         values: Object.values(stabilizerTable.value),
       });
     }
@@ -650,28 +699,32 @@ const getValueModelInForm = () => {
     if (genericModel.value) {
       data.model.push({
         modelType: 'Generic',
-        modelId: genericModel.value,
+        modelId: genericModel.value._id,
+        modelName: genericModel.value.name,
         values: Object.values(genericTable.value),
       });
     }
     if (renewableModel.value) {
       data.model.push({
         modelType: 'Renewable',
-        modelId: renewableModel.value,
+        modelId: renewableModel.value._id,
+        modelName: renewableModel.value.name,
         values: Object.values(renewableTable.value),
       });
     }
     if (planControlModel.value) {
       data.model.push({
         modelType: 'PlanControl',
-        modelId: planControlModel.value,
+        modelId: planControlModel.value._id,
+        modelName: planControlModel.value.name,
         values: Object.values(planControlTable.value),
       });
     }
     if (driveTrainModel.value) {
       data.model.push({
         modelType: 'DriveTrain',
-        modelId: driveTrainModel.value,
+        modelId: driveTrainModel.value._id,
+        modelName: driveTrainModel.value.name,
         values: Object.values(driveTrainTable.value),
       });
     }
@@ -704,10 +757,17 @@ const getGlobalDynamicModelDefinitionByType = async (type) => {
   }
 };
 
+const getGlobalDynamicModelDefinitionById = async (id) => {
+  try {
+    const res = await globalDynamicModelApi.getGlobalDynamicModelDefinitionById(id);
+    return res.data;
+  } catch (error) {
+    return {};
+  }
+};
 // Traditional: {
 
 const getDynamicModelTableOfType = async (dynamicModel_id, values = []) => {
-  // console.log('generatorModelChange', dynamicModel_id);
   const dynamicModelDefinition = await getGlobalDynamicModelDefinitionById(dynamicModel_id);
   const table = {};
   for (let i = 0; i < dynamicModelDefinition.values.length; i++) {
@@ -719,50 +779,50 @@ const getDynamicModelTableOfType = async (dynamicModel_id, values = []) => {
 const generatorModel = ref();
 const generatorTable = ref([]);
 const generatorModelChange = async () => {
-  generatorTable.value = await getDynamicModelTableOfType(generatorModel.value);
+  generatorTable.value = await getDynamicModelTableOfType(generatorModel.value._id);
 };
 
 const excitationModel = ref();
 const excitationTable = ref([]);
 const excitationModelChange = async () => {
-  excitationTable.value = await getDynamicModelTableOfType(excitationModel.value);
+  excitationTable.value = await getDynamicModelTableOfType(excitationModel.value._id);
 };
 
 const governorModel = ref();
 const governorTable = ref([]);
 const governorModelChange = async () => {
-  governorTable.value = await getDynamicModelTableOfType(governorModel.value);
+  governorTable.value = await getDynamicModelTableOfType(governorModel.value._id);
 };
 
 const stabilizerModel = ref();
 const stabilizerTable = ref([]);
 const stabilizerModelChange = async () => {
-  stabilizerTable.value = await getDynamicModelTableOfType(stabilizerModel.value);
+  stabilizerTable.value = await getDynamicModelTableOfType(stabilizerModel.value._id);
 };
 
 // Renewable: {
 const genericModel = ref();
 const genericTable = ref([]);
 const genericModelChange = async () => {
-  genericTable.value = await getDynamicModelTableOfType(genericModel.value);
+  genericTable.value = await getDynamicModelTableOfType(genericModel.value._id);
 };
 
 const renewableModel = ref();
 const renewableTable = ref([]);
 const renewableModelChange = async () => {
-  renewableTable.value = await getDynamicModelTableOfType(renewableModel.value);
+  renewableTable.value = await getDynamicModelTableOfType(renewableModel.value._id);
 };
 
 const planControlModel = ref();
 const planControlTable = ref([]);
 const planControlModelChange = async () => {
-  planControlTable.value = await getDynamicModelTableOfType(planControlModel.value);
+  planControlTable.value = await getDynamicModelTableOfType(planControlModel.value._id);
 };
 
 const driveTrainModel = ref();
 const driveTrainTable = ref([]);
 const driveTrainModelChange = async () => {
-  driveTrainTable.value = await getDynamicModelTableOfType(driveTrainModel.value);
+  driveTrainTable.value = await getDynamicModelTableOfType(driveTrainModel.value._id);
 };
 
 const handleUpdate = async (data) => {
@@ -775,62 +835,79 @@ const handleUpdate = async (data) => {
 
   // traditional
   if (updateData.Generator) {
-    generatorModel.value = updateData.Generator.modelId;
+    generatorModel.value = { _id: updateData.Generator.modelId, name: updateData.Generator.modelName };
     generatorTable.value = updateData.Generator.values;
     console.log('generatorTable.value', generatorTable.value);
   }
   if (updateData.Excitation) {
-    excitationModel.value = updateData.Excitation.modelId;
+    excitationModel.value = { _id: updateData.Excitation.modelId, name: updateData.Excitation.modelName };
     excitationTable.value = updateData.Excitation.values;
   }
   if (updateData.Governor) {
-    governorModel.value = updateData.Governor.modelId;
+    governorModel.value = { _id: updateData.Governor.modelId, name: updateData.Governor.modelName };
     governorTable.value = updateData.Governor.values;
   }
 
   if (updateData.Stabilizer) {
-    stabilizerModel.value = updateData.Stabilizer.modelId;
+    stabilizerModel.value = { _id: updateData.Stabilizer.modelId, name: updateData.Stabilizer.modelName };
     stabilizerTable.value = updateData.Stabilizer.values;
   }
   // renewable;
   if (updateData.Generic) {
-    genericModel.value = updateData.Generic.modelId;
+    genericModel.value = { _id: updateData.Generic.modelId, name: updateData.Generic.modelName };
     genericTable.value = updateData.Generic.values;
   }
   if (updateData.Renewable) {
-    renewableModel.value = updateData.Renewable.modelId;
+    renewableModel.value = { _id: updateData.Renewable.modelId, name: updateData.Renewable.modelName };
     renewableTable.value = updateData.Renewable.values;
   }
   if (updateData.PlanControl) {
-    planControlModel.value = updateData.PlanControl.modelId;
+    planControlModel.value = { _id: updateData.PlanControl.modelId, name: updateData.PlanControl.modelName };
     planControlTable.value = updateData.PlanControl.values;
   }
   if (updateData.DriveTrain) {
-    driveTrainModel.value = updateData.DriveTrain.modelId;
-    driveTrainModel.value = updateData.DriveTrain.values;
+    driveTrainModel.value = { _id: updateData.DriveTrain.modelId, name: updateData.DriveTrain.modelName };
+    driveTrainTable.value = updateData.DriveTrain.values;
   }
   visibleChangeDialog.value = true;
   modeChange.value = 'Update';
 };
 
+const confirmUpdate = async () => {
+  confirm.require({
+    group: 'updateDynamicDefaultConfirm',
+    data: dataChange.value,
+    header: 'Update Dynamic Model Definition',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-warning',
+    accept: async () => {
+      await updateDynamicModel();
+    },
+    reject: () => {},
+  });
+};
+
 const updateDynamicModel = async () => {
   const dataUpdate = getValueModelInForm();
   try {
-    await DynamicDefaultApi.updateDynamicDefault(dataUpdate.id, getValueModelInForm());
+    await Api.updateDynamicDefault(dataUpdate.id, getValueModelInForm());
     toast.add({ severity: 'success', summary: 'Update successfully', life: 3000 });
     visibleChangeDialog.value = false;
     await getTableData();
     clearModelTypeSelected();
   } catch (error) {
-    console.log('getGlobalDynamicModelDefinitionByType: error ', error);
-    toast.add({ severity: 'error', summary: 'Create', detail: error.data.detail, life: 3000 });
+    console.log('updateDynamicModel: error ', error);
+    toast.add({ severity: 'error', summary: 'Update error', detail: error.data.detail, life: 3000 });
   }
 };
 const confirmDelete = (data) => {
   confirm.require({
     group: 'deleteDynamicDefaultConfirm',
     data: data,
-    header: 'Dynamic Model Definition',
+    header: 'Delete Dynamic Model Definition',
     icon: 'pi pi-info-circle',
     rejectLabel: 'Cancel',
     acceptLabel: 'Delete',
@@ -845,12 +922,30 @@ const confirmDelete = (data) => {
 
 const deleteDynamicModel = async (dynamicModel_id) => {
   try {
-    await DynamicDefaultApi.deleteDynamicDefault(dynamicModel_id);
+    await Api.deleteDynamicDefault(dynamicModel_id);
     toast.add({ severity: 'success', summary: 'Delete successfully', life: 3000 });
     await getTableData();
   } catch (error) {
     console.log('deletePSE: error ', error);
     toast.add({ severity: 'error', summary: 'Delete Power System', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const uploadVisibleDialog = ref(false);
+const isImporting = ref(false);
+const uploadFile = async (formData, callback) => {
+  try {
+    isImporting.value = true;
+    formData.value = formData;
+    await Api.importFile(formData);
+    toast.add({ severity: 'success', summary: 'Dynamic Model Default', detail: 'Imported Successfully', life: 3000 });
+    isImporting.value = false;
+    uploadVisibleDialog.value = false;
+    await getTableData();
+    // callback();
+  } catch (error) {
+    toast.add({ severity: 'danger', summary: 'Dynamic Model Default', detail: error.data.detail, life: 3000 });
+    isImporting.value = false;
   }
 };
 </script>
