@@ -87,7 +87,7 @@ import MultiSelect from 'primevue/multiselect';
 import ScrollPanel from 'primevue/scrollpanel';
 
 import { DefinitionListApi } from '@/views/PowerSystem/api';
-import { onMounted, watch } from 'vue';
+import { nextTick, onMounted, watch } from 'vue';
 import searchPsWidget from '../PowerSystem/searchPsWidget.vue';
 onMounted(async () => {
   await getDefinitionList();
@@ -98,19 +98,6 @@ const props = defineProps({
   currentFilter: { type: Object, default: () => {} },
 });
 const emit = defineEmits(['changeFilter']);
-watch(
-  () => props.currentFilter,
-  () => {
-    areaSelected.value = props.currentFilter.area;
-    zoneSelected.value = props.currentFilter.zone;
-    ownerSelected.value = props.currentFilter.owner;
-    kVSelected.value = props.currentFilter.kV;
-    stationSelected.value = props.currentFilter.station;
-    definitionSubsystemSelected.value = props.currentFilter.definition;
-    psSelected.value = props.currentFilter.powerSystem;
-    filterConjunction.value = props.currentFilter.filter || '';
-  },
-);
 
 const areaSelected = ref([]);
 const areaDefinitionId = ref([]);
@@ -153,6 +140,7 @@ const clearFilterSelected = () => {
   psSelected.value = [];
   definitionSubsystemSelected.value = [];
   filterConjunction.value = '';
+  psDefinitionType.value = undefined;
 };
 
 // definiton List
@@ -179,10 +167,6 @@ const setDefinitionfilterId = () => {
 const definitionSubsystemList = ref([]);
 const definitionSubsystemSelected = ref([]);
 
-watch(definitionSubsystemSelected, () => {
-  psSelected.value = [];
-});
-
 const getdefinitionSubsystemList = async () => {
   try {
     const res = await DefinitionListApi.getDefinitionSubsystem();
@@ -192,6 +176,28 @@ const getdefinitionSubsystemList = async () => {
     toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
+
+watch(
+  () => props.currentFilter,
+  async () => {
+    await nextTick(() => {
+      areaSelected.value = props.currentFilter.area;
+      zoneSelected.value = props.currentFilter.zone;
+      ownerSelected.value = props.currentFilter.owner;
+      kVSelected.value = props.currentFilter.kV;
+      stationSelected.value = props.currentFilter.station;
+      definitionSubsystemSelected.value = props.currentFilter.definition;
+      psSelected.value = props.currentFilter.powerSystem;
+
+      filterConjunction.value = props.currentFilter.filter || '';
+    });
+  },
+  { deep: true },
+);
+
+watch(psDefinitionType, () => {
+  psSelected.value = [];
+});
 </script>
 <style>
 .p-autocomplete-input,
