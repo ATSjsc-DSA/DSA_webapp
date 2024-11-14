@@ -9,7 +9,10 @@ export const useCommonStore = defineStore('common', () => {
   const measInfo_automatic = ref(true);
   const measInfoList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
+  const profileData = ref(JSON.parse(localStorage.getItem('profileData') || '{}'));
+
   const userConfigVersionId = ref(localStorage.getItem('userConfigVersionId') || '66decf1dcff005199529524b');
+
   const powerSystemVersionId = ref(localStorage.getItem('powerSystemVersionId') || '66decf1dcff005199529524b');
   const additionVersionId = ref(localStorage.getItem('additionVersionId') || '66decf1dcff005199529524b');
   const hmiTaskId = ref(localStorage.getItem('hmiTaskId') || '67175dd23a41cf97c7e4bd21');
@@ -146,5 +149,7 @@ export const useCommonStore = defineStore('common', () => {
     userConfigProfileIdActive,
     measInfoActiveId,
     measInfoList,
+
+    profileData,
   };
 });

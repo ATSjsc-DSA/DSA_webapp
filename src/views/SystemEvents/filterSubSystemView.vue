@@ -120,7 +120,7 @@ const psSelected = ref([]);
 const filterConjunction = ref('');
 const changFilter = () => {
   const newFilter = {
-    definitionList: definitionSubsystemSelected.value,
+    definition: definitionSubsystemSelected.value,
     area: areaSelected.value.map((item) => item._id),
     zone: zoneSelected.value.map((item) => item._id),
     owner: ownerSelected.value.map((item) => item._id),

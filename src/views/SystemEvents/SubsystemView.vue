@@ -205,7 +205,7 @@ const handleRowClick = async (item) => {
       kV: selectedItem.value.filterConditions.kV.map((item) => item._id),
       station: selectedItem.value.filterConditions.station.map((item) => item._id),
       // sub: selectedItem.value.filterConditions.station.map((item) => item._id),
-      definitionList: selectedItem.value.filterConditions.definition.map((item) => item._id),
+      definition: selectedItem.value.filterConditions.definition.map((item) => item._id),
       powersystem: selectedItem.value.filterConditions.powerSystem.map((item) => item._id),
     };
 
