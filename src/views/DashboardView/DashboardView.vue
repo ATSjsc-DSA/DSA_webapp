@@ -65,19 +65,19 @@
           <div class="flex flex-column gap-2 justify-content-center align-items-center sticky" style="top: 6rem">
             <div class="font-semibold" style="font-size: 0.8rem">DATA</div>
             <div
-              v-tooltip.left="stopReloadChartData ? 'Start Automatic Mode' : 'Stop Automatic Mode'"
+              v-tooltip.left="measInfo_automatic ? 'Stop Automatic Mode' : 'Start Automatic Mode'"
               class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
-              :class="stopReloadChartData ? 'bg-primary' : 'bg-red-400'"
+              :class="!measInfo_automatic ? 'bg-primary' : 'bg-red-400'"
               placeholder="Left"
-              @click="stopReloadChartData = !stopReloadChartData"
+              @click="changeMeasInfoMode"
             >
-              <i v-if="stopReloadChartData" class="pi pi-play cursor-pointer" style="font-size: 1rem" />
+              <i v-if="!measInfo_automatic" class="pi pi-play cursor-pointer" style="font-size: 1rem" />
               <i v-else class="pi pi-pause" style="font-size: 1rem" />
 
-              <div style="font-size: 0.7rem">{{ stopReloadChartData ? 'START' : 'STOP' }}</div>
+              <div style="font-size: 0.7rem">{{ measInfo_automatic ? 'STOP' : 'START' }}</div>
             </div>
             <Button
-              v-show="stopReloadChartData"
+              v-show="!measInfo_automatic"
               v-tooltip.left="'His HMI Data'"
               icon="pi  pi-ellipsis-h"
               aria-label="Filter"
@@ -231,6 +231,7 @@ import ScrollPanel from 'primevue/scrollpanel';
 import { useToast } from 'primevue/usetoast';
 import mapView from '@/components/mapView.vue';
 import projectTreeWidget from './projectTreeWidget.vue';
+import { useCommonStore } from '@/store';
 
 import chartComponent from './chartComponent.vue';
 import { GridStack } from 'gridstack';
@@ -240,20 +241,16 @@ import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
 
 const confirm = useConfirm();
+const commonStore = useCommonStore();
 
 const showTree = ref(localStorage.getItem('showTree') === 'true' || false);
 const gridStackComponentGrid = ref(null);
 const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
-const MeasInfoDialogVisible = ref(false);
 
-const changeMeasInfoActive = () => {
-  MeasInfoDialogVisible.value = true;
-};
+const { measInfo_automatic } = storeToRefs(commonStore);
 
 onMounted(async () => {
-  console.log('dashboard');
-
   gridStackComponentGrid.value = GridStack.init({
     float: false,
     cellHeight: '1rem', // row's height
@@ -471,6 +468,31 @@ const addMapComponent = async (oldConfig = {}) => {
 // --- control reload data
 
 const stopReloadChartData = ref(localStorage.getItem('stopReloadChartData') === 'true');
+const MeasInfoDialogVisible = ref(false);
+
+const changeMeasInfoActive = () => {
+  MeasInfoDialogVisible.value = true;
+};
+
+const changeMeasInfoMode = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Submit',
+    accept: () => {
+      // stopReloadChartData.value = !stopReloadChartData.value;
+      commonStore.updateMeasInfoAutomatic(!measInfo_automatic.value);
+      // measInfo_automatic.value = !measInfo_automatic.value;
+    },
+    reject: () => {
+      // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    },
+  });
+};
 const reloadData = () => {
   const oldStt = stopReloadChartData.value;
   stopReloadChartData.value = false;

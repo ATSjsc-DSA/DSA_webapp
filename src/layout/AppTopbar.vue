@@ -23,17 +23,19 @@ let logView = [];
 const interval = ref(null);
 const op = ref();
 const audioSrc = '@/public/img/Elevator Ding-SoundBible.com-685385892.mp3';
-
+const { measInfo_automatic } = storeToRefs(commonStore);
 onMounted(async () => {
   // await commonStore.getMeasInfoActive();
   // await commonStore
   // await commonStore.getListMeasInfo();
-  commonStore.startAutoUpdate();
-  bindOutsideClickListener();
+  if (measInfo_automatic.value) {
+    commonStore.startAutoUpdate();
+  }
   // getLogs();
-  // interval.value = setInterval(() => {
-  //   getLogs();
-  // }, intervalTime);
+  bindOutsideClickListener();
+  interval.value = setInterval(() => {
+    commonStore.getDsaServiceInfo();
+  }, intervalTime);
 });
 
 onBeforeUnmount(() => {

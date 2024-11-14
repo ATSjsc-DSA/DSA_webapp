@@ -62,16 +62,15 @@ const chartComposable = () => {
   };
   const convertDateTimeToString = (t) => {
     if (t !== null) {
-      let dateTimeConvert = new Date(t);
-      let date = dateTimeConvert.toLocaleDateString();
-      let options = { hour12: false };
-      let time = dateTimeConvert.toLocaleTimeString('es-AR', options);
-      let ms = dateTimeConvert.getMilliseconds();
-      let result = date + ' ' + time;
+      let dateTimeConvert = new Date(t * 1000);
+      if (isNaN(dateTimeConvert.getTime())) return 'Invalid Date';
+      const date = dateTimeConvert.toLocaleDateString('es-AR');
+      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const time = dateTimeConvert.toLocaleTimeString('es-AR', options);
+      const ms = dateTimeConvert.getMilliseconds();
 
-      if (ms !== 0) {
-        result += '.' + ms;
-      }
+      let result = `${date} ${time}`;
+      if (ms !== 0) result += `.${ms}`;
 
       return result;
     } else {
