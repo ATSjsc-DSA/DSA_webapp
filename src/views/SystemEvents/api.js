@@ -2,7 +2,7 @@ import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 
 const commonStore = useCommonStore();
-const { projectData } = storeToRefs(commonStore);
+const { projectData, profileData } = storeToRefs(commonStore);
 
 export class commonApi {
   static async searchPowerSystemData(psdDefinition_id = '', query = '', exceptionArr = []) {
@@ -81,10 +81,10 @@ export class ApiDisturbances {
 
 export class ApiDisturbance {
   static async getDisturbanceList(disturbanceCaseId, page) {
-    return get(`/seedconfig/${disturbanceCaseId}/disturbance`, { page: page, page_size: 10 });
+    return get(`/seedconfig/${profileData.value._id}/${disturbanceCaseId}/disturbance`, { page: page, page_size: 10 });
   }
   static async createDisturbance(disturbanceCaseId, data) {
-    return post(`/seedconfig/${disturbanceCaseId}/disturbance`, data);
+    return post(`/seedconfig/${profileData.value._id}/${disturbanceCaseId}/disturbance`, data);
   }
   static async getDisturbanceData(id) {
     return get(`/seedconfig/disturbance/${id}`);

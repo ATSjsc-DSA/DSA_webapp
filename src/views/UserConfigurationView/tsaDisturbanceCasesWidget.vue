@@ -107,7 +107,6 @@ onMounted(async () => {
 watch(
   () => props.tsaId,
   async (newVal, oldValue) => {
-    console.log(newVal, oldValue);
     if (newVal !== oldValue) {
       await getDisturbancesCaseList();
     }

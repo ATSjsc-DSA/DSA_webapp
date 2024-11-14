@@ -1,7 +1,7 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { userConfigVersionId, projectData } = storeToRefs(commonStore);
+const { projectData } = storeToRefs(commonStore);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class Api {
@@ -9,7 +9,7 @@ export class Api {
     return get(`/userconfig/${projectData.value._id}/profile`, { page: page, page_size: 10 });
   }
   static async createProfile(data) {
-    return post(`/userconfig/${userConfigVersionId.value}/profile`, data);
+    return post(`/userconfig/${projectData.value._id}/profile`, data);
   }
 
   static async updateProfileData(profileId, data) {

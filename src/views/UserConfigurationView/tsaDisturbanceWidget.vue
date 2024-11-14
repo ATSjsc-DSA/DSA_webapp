@@ -188,7 +188,7 @@ const changeVisibleDialog = ref(false);
 const disturbanceData = ref();
 const handleCreate = () => {
   modeChange.value = 'Create';
-
+  psSelected.value = {};
   disturbanceData.value = {
     active: true,
     name: '',
@@ -224,8 +224,8 @@ const handlerUpdate = (data) => {
   updateData.startTimestamp = new Date(data.startTimestamp);
   updateData.endTimestamp = new Date(data.endTimestamp);
   psSelected.value = {
-    _id: data._id,
-    name: data.name,
+    _id: data.powerSystemId._id,
+    name: data.powerSystemId.name,
   };
   disturbanceData.value = updateData;
   changeVisibleDialog.value = true;

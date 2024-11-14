@@ -1,9 +1,5 @@
 import { get, post, put, _delete } from '@/utils/request';
 
-import { useCommonStore } from '@/store';
-const commonStore = useCommonStore();
-const { projectData, userConfigVersionId } = storeToRefs(commonStore);
-
 export class ApiVsaCase {
   static async getList(gridcodeId) {
     return get(`/gridcode/${gridcodeId}/gridcodevsacase`);

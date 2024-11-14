@@ -35,33 +35,6 @@
     />
   </div>
 
-  <!-- <div v-if="isCreateForm" class="grid m-0">
-    <div class="col-12 md:col-8 flex flex-column gap-2 mb-3">
-      <label for="psdSelected" class="font-semibold">Power System</label>
-      <AutoComplete
-        v-model="psdSelectedCreate"
-        optionLabel="name"
-        optionValue="_id"
-        completeOnFocus
-        class="w-full"
-        :suggestions="psFilterSuggestions"
-        placeholder="Type Something to search ..."
-        name="psdSelected"
-        @complete="searchPsQueryFilter"
-      />
-    </div>
-    <div class="col-12 md:col-4 flex flex-column gap-2 mb-3">
-      <label for="psdSelected" class="font-semibold">Definition</label>
-      <Dropdown
-        v-model="selectedDefinition"
-        :options="listDefinition"
-        optionLabel="name"
-        optionValue="_id"
-        class="w-full"
-      />
-    </div>
-  </div> -->
-
   <div class="grid m-0 p-0">
     <div class="col-12 md:col-4 flex flex-column gap-2 mb-3 pl-0">
       <label for="psdSelected" class="font-semibold">Type Element</label>
@@ -96,21 +69,9 @@
       optionLabel="name"
       optionValue="_id"
       class="w-full"
-      @focus="getScadaMonitor()"
       :loading="isLoadingScadaMonitor"
     />
   </div>
-
-  <!-- <div v-else class="flex flex-column gap-2 mb-3">
-    <label for="scadaMonitorPowerSytemId" class="font-semibold"> Scada Monitor </label>
-    <InputText
-      id="scadaMonitorPowerSytemId"
-      v-model="data.scadaMonitorPowerSytemId"
-      disabled
-      class="flex-auto"
-      autocomplete="off"
-    />
-  </div> -->
 </template>
 
 <script setup>
@@ -216,8 +177,9 @@ const getScadaMonitor = async () => {
   try {
     const res = await PowerSystemParameterApi.getPowersystemMonitor(psdSelected.value._id);
     listScadaMonitor.value = res.data.data;
+    console.log(listScadaMonitor.value);
   } catch (error) {
-    listScadaMonitor.value = undefined;
+    listScadaMonitor.value = [];
     console.log('getScadaMonitor: error ', error);
   }
   isLoadingScadaMonitor.value = false;
@@ -228,10 +190,12 @@ watch(listScadaMonitor, (newVal) => {
     data.value.listScadaMonitorId = newVal.map((item) => item._id);
   }
 });
-watch(psdSelected, (newVal) => {
+watch(psdSelected, async (newVal) => {
   if (newVal && props.isCreateForm) {
     data.value.powersystemId = newVal._id;
   }
+
+  await getScadaMonitor();
 });
 onMounted(() => {
   getDefiniton();

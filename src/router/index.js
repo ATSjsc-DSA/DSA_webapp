@@ -105,7 +105,7 @@ const router = createRouter({
           name: 'User Configuration',
           component: () => import('@/views/UserConfigurationView/UserConfigurationView.vue'),
         },
-       
+
         {
           path: '/SystemEvents/Disturbances',
           name: 'Disturbances',

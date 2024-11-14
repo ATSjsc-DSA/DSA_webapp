@@ -127,25 +127,35 @@ const props = defineProps({
 const toast = useToast();
 
 onMounted(async () => {
-  if (data.value.contingenciesId) {
+  if (data.value) {
     await setDefaultData();
   }
 });
 const data = defineModel();
 watch(data, async (newVal, oldVal) => {
   if (newVal._id !== oldVal.__id) {
-    if (newVal.contingenciesId) {
+    if (newVal) {
       await setDefaultData();
     }
   }
 });
 
 const setDefaultData = async () => {
-  await getContingenciesData(data.value.contingenciesId);
-  sourceSelected.value = await getSubSystemData(data.value.sourceId);
-  sinkSelected.value = await getSubSystemData(data.value.sinkId);
-  fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
-  monitorSubSystemSelected.value = await getSubSystemData(data.value.monitorSubSystemId);
+  if (data.value.contingenciesId) {
+    await getContingenciesData(data.value.contingenciesId);
+  }
+  if (data.value.sourceId) {
+    sourceSelected.value = await getSubSystemData(data.value.sourceId);
+  }
+  if (data.value.sinkId) {
+    sinkSelected.value = await getSubSystemData(data.value.sinkId);
+  }
+  if (data.value.fixSubSystemId) {
+    fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
+  }
+  if (data.value.monitor.monitorSubSystemId) {
+    monitorSubSystemSelected.value = await getSubSystemData(data.value.monitor.monitorSubSystemId);
+  }
 };
 
 // contingencies
@@ -207,7 +217,7 @@ watch(fixSubPsSelected, (newVal) => {
 const monitorSubSystemSelected = ref();
 
 watch(monitorSubSystemSelected, (newVal) => {
-  data.value.monitorSubSystemId = newVal._id;
+  data.value.monitor.monitorSubSystemId = newVal._id;
 });
 
 const getSubSystemData = async (id) => {

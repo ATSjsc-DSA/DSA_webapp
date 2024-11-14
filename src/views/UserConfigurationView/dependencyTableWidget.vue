@@ -228,6 +228,8 @@ const getDependencyList = async () => {
     dependencyList.value = res.data.items;
     dependencyTotal.value = res.data.total;
   } catch (error) {
+    dependencyList.value = [];
+    dependencyTotal.value = 0;
     console.error('getDependencyList: error ', error);
   }
 };

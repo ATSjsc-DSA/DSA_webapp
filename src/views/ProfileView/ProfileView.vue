@@ -61,12 +61,35 @@
         <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
           <template #body="{ data }">
             <div class="flex justify-content-between">
-              <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
-              <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete($event, data)" />
-              <Button icon="pi pi-caret-right" text rounded @click="runProfile(data)" />
+              <Button
+                v-tooltip="'Copy and Run'"
+                icon="pi pi-copy "
+                severity="success"
+                text
+                rounded
+                @click="confirmClone($event, data)"
+              />
+              <Button
+                v-tooltip="'Edit'"
+                icon="pi pi-pencil "
+                severity="success"
+                text
+                rounded
+                @click="handleUpdate(data)"
+              />
+              <Button
+                v-tooltip="'Delete'"
+                icon="pi pi-trash"
+                severity="danger"
+                text
+                rounded
+                @click="confirmDelete($event, data)"
+              />
+              <Button v-tooltip="'Run'" icon="pi pi-caret-right" text rounded @click="runProfile($event, data)" />
             </div>
           </template>
         </Column>
+        <template #empty> No Data </template>
       </DataTable>
     </div>
     <div v-if="totalRecords > pageRowNumber" class="flex justify-content-end align-items-center">
@@ -81,6 +104,20 @@
     </div>
   </div>
 
+  <ConfirmDialog group="cloneProfileDialog">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: var(--primary-color)"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div>Create a Copy Profile and Run.</div>
+          <div class="font-semibold">Are you sure you want to Continue?</div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
+
   <Dialog v-model:visible="changeVisibleDialog" :style="{ width: '48rem' }" header="Change Dialog " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
@@ -92,13 +129,13 @@
       <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
           <label for="name" class="font-semibold"> Name</label>
-          <InputText v-model="profileData.name" />
+          <InputText v-model="profileChangeData.name" />
         </div>
       </div>
       <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
           <label for="desc" class="font-semibold"> Description</label>
-          <InputText v-model="profileData.desc" />
+          <InputText v-model="profileChangeData.desc" />
         </div>
       </div>
     </div>
@@ -108,7 +145,7 @@
         v-if="changeMode === 'Create'"
         type="button"
         label="Save"
-        :disabled="!profileData.name"
+        :disabled="!profileChangeData.name"
         @click="createProfile"
       ></Button>
       <Button
@@ -116,27 +153,45 @@
         severity="info"
         type="button"
         label="Update"
-        :disabled="!profileData.name"
+        :disabled="!profileChangeData.name"
         @click="updateProfile"
       ></Button>
     </template>
   </Dialog>
+
+  <ConfirmDialog group="runProfileDialog">
+    <template #message="slotProps">
+      <div class="flex align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div>
+          <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
+        </div>
+        <div class="flex flex-column gap-3 p-3">
+          <div class="font-semibold">Every Action will affect the final calculation result.</div>
+          <div class="text-orange-500 font-semibold">Are you sure you want to Continue?</div>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
   <ConfirmDialog />
   <Toast />
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue';
+import { onMounted } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import chartComposable from '@/combosables/chartData';
+import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 
-import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
+import router from '@/router';
+import { useCommonStore } from '@/store';
+
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 import { Api } from './api';
 const { convertDateTimeToString } = chartComposable();
-
+const commonStore = useCommonStore();
+const { profileData } = storeToRefs(commonStore);
 const toast = useToast();
 const confirm = useConfirm();
 
@@ -155,6 +210,7 @@ const onPageChange = async (event) => {
   await getList();
 };
 const getList = async () => {
+  isLoadingData.value = true;
   try {
     const res = await Api.getList(currentPage.value);
     profileList.value = res.data.items;
@@ -163,15 +219,16 @@ const getList = async () => {
     profileList.value = [];
     console.log('getList: error ', error);
   }
+  isLoadingData.value = false;
 };
 
 const changeMode = ref('Create');
 const changeVisibleDialog = ref(false);
-const profileData = ref({});
+const profileChangeData = ref({});
 
 const handleCreate = () => {
   changeMode.value = 'Create';
-  profileData.value = {
+  profileChangeData.value = {
     name: '',
     desc: '',
   };
@@ -179,9 +236,9 @@ const handleCreate = () => {
 };
 const createProfile = async () => {
   try {
-    const res = await Api.createProfile(profileData.value);
-    profileList.value.push(res.data);
-    totalRecords.value += 1;
+    await Api.createProfile(profileChangeData.value);
+    await getList();
+
     changeVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
   } catch (error) {
@@ -190,20 +247,41 @@ const createProfile = async () => {
   }
 };
 
+const confirmClone = (event, data) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Clone Profile - ' + data.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-copy',
+    group: 'cloneProfileDialog',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-success',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Run',
+    accept: async () => {
+      await cloneProfile();
+    },
+    reject: () => {},
+  });
+};
+
+const cloneProfile = async (data) => {
+  toast.add({ severity: 'warn', summary: 'Clone Message', detail: 'Coming Soon', life: 3000 });
+};
+
 const handleUpdate = (data) => {
   changeMode.value = 'Update';
-  profileData.value = JSON.parse(JSON.stringify(data));
+  profileChangeData.value = JSON.parse(JSON.stringify(data));
   changeVisibleDialog.value = true;
 };
 const updateProfile = async () => {
   try {
-    await Api.updateProfileData(profileData.value._id, {
-      name: profileData.value.name,
-      desc: profileData.value.desc,
+    await Api.updateProfileData(profileChangeData.value._id, {
+      name: profileChangeData.value.name,
+      desc: profileChangeData.value.desc,
     });
-    profileList.value = profileList.value.map((item) =>
-      item._id === profileData.value._id ? profileData.value : item,
-    );
+    await getList();
+
     changeVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
   } catch (error) {
@@ -237,5 +315,37 @@ const deleteProfile = async (data) => {
     toast.add({ severity: 'error', summary: 'Deleted Message', detail: error.data.detail, life: 3000 });
   }
 };
-const runProfile = () => {};
+
+const runProfile = (event, data) => {
+  if (data.runMode) {
+    confirm.require({
+      target: event.currentTarget,
+      header: ' Profile - ' + data.name,
+      group: 'runProfileDialog',
+      data: data,
+      message: 'Are you sure you want to Run this Profile?',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+      acceptClass: 'p-button-sm p-button-warning',
+      rejectLabel: 'Cancel',
+      acceptLabel: 'Run',
+      accept: async () => {
+        saveProfileDataAndRedirect(data);
+      },
+    });
+  } else {
+    saveProfileDataAndRedirect(data);
+  }
+};
+
+const saveProfileDataAndRedirect = (newProfile) => {
+  profileData.value = newProfile;
+  localStorage.setItem('profileData', JSON.stringify(newProfile));
+  router.push('/user_config/config').catch((failure) => {
+    if (isNavigationFailure(failure, NavigationFailureType.redirected)) {
+      // Handle the failure
+      console.log('Navigation was redirected');
+    }
+  });
+};
 </script>
