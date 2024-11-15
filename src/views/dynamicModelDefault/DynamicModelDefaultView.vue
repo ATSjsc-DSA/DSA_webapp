@@ -648,7 +648,7 @@ const createDynamicDefaultModel = async () => {
     visibleChangeDialog.value = false;
     await getTableData();
   } catch (error) {
-    console.log('createDynamicModel: error ', error);
+    console.log('createDynamicDefaultModel: error ', error);
     toast.add({ severity: 'error', summary: 'Create', detail: error.data.detail, life: 3000 });
   }
 };

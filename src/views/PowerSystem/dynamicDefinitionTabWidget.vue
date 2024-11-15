@@ -181,7 +181,6 @@
             <Dropdown
               v-model="generatorModel"
               :options="traditionalGeneratorOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -213,7 +212,6 @@
             <Dropdown
               v-model="excitationModel"
               :options="traditionalExcitationOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -243,7 +241,6 @@
             <Dropdown
               v-model="governorModel"
               :options="traditionalGovernorOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -273,7 +270,6 @@
             <Dropdown
               v-model="stabilizerModel"
               :options="traditionalStabilizerOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -307,7 +303,6 @@
             <Dropdown
               v-model="genericModel"
               :options="renewableGenericOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -337,7 +332,6 @@
             <Dropdown
               v-model="renewableModel"
               :options="renewableRenewableOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -367,7 +361,6 @@
             <Dropdown
               v-model="planControlModel"
               :options="renewablePlanControlOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -397,7 +390,6 @@
             <Dropdown
               v-model="driveTrainModel"
               :options="renewableDriveTrainOpts"
-              optionValue="_id"
               optionLabel="name"
               placeholder="Select a Dynamic Model"
               class="flex-grow-1"
@@ -631,28 +623,32 @@ const getValueModelInForm = () => {
     if (generatorModel.value) {
       data.model.push({
         modelType: 'Generator',
-        modelId: generatorModel.value,
+        modelId: generatorModel.value._id,
+        modelName: generatorModel.value.name,
         values: Object.values(generatorTable.value),
       });
     }
     if (excitationModel.value) {
       data.model.push({
         modelType: 'Excitation',
-        modelId: excitationModel.value,
+        modelId: excitationModel.value._id,
+        modelName: excitationModel.value.name,
         values: Object.values(excitationTable.value),
       });
     }
     if (governorModel.value) {
       data.model.push({
         modelType: 'Governor',
-        modelId: governorModel.value,
+        modelId: governorModel.value._id,
+        modelName: governorModel.value.name,
         values: Object.values(governorTable.value),
       });
     }
     if (stabilizerModel.value) {
       data.model.push({
         modelType: 'Stabilizer',
-        modelId: stabilizerModel.value,
+        modelId: stabilizerModel.value._id,
+        modelName: stabilizerModel.value.name,
         values: Object.values(stabilizerTable.value),
       });
     }
@@ -660,28 +656,32 @@ const getValueModelInForm = () => {
     if (genericModel.value) {
       data.model.push({
         modelType: 'Generic',
-        modelId: genericModel.value,
+        modelId: genericModel.value._id,
+        modelName: genericModel.value.name,
         values: Object.values(genericTable.value),
       });
     }
     if (renewableModel.value) {
       data.model.push({
         modelType: 'Renewable',
-        modelId: renewableModel.value,
+        modelId: renewableModel.value._id,
+        modelName: renewableModel.value.name,
         values: Object.values(renewableTable.value),
       });
     }
     if (planControlModel.value) {
       data.model.push({
         modelType: 'PlanControl',
-        modelId: planControlModel.value,
+        modelId: planControlModel.value._id,
+        modelName: planControlModel.value.name,
         values: Object.values(planControlTable.value),
       });
     }
     if (driveTrainModel.value) {
       data.model.push({
         modelType: 'DriveTrain',
-        modelId: driveTrainModel.value,
+        modelId: driveTrainModel.value._id,
+        modelName: driveTrainModel.value.name,
         values: Object.values(driveTrainTable.value),
       });
     }
@@ -729,50 +729,50 @@ const getDynamicModelTableOfType = async (dynamicModel_id, values = []) => {
 const generatorModel = ref();
 const generatorTable = ref([]);
 const generatorModelChange = async () => {
-  generatorTable.value = await getDynamicModelTableOfType(generatorModel.value);
+  generatorTable.value = await getDynamicModelTableOfType(generatorModel.value._id);
 };
 
 const excitationModel = ref();
 const excitationTable = ref([]);
 const excitationModelChange = async () => {
-  excitationTable.value = await getDynamicModelTableOfType(excitationModel.value);
+  excitationTable.value = await getDynamicModelTableOfType(excitationModel.value._id);
 };
 
 const governorModel = ref();
 const governorTable = ref([]);
 const governorModelChange = async () => {
-  governorTable.value = await getDynamicModelTableOfType(governorModel.value);
+  governorTable.value = await getDynamicModelTableOfType(governorModel.value._id);
 };
 
 const stabilizerModel = ref();
 const stabilizerTable = ref([]);
 const stabilizerModelChange = async () => {
-  stabilizerTable.value = await getDynamicModelTableOfType(stabilizerModel.value);
+  stabilizerTable.value = await getDynamicModelTableOfType(stabilizerModel.value._id);
 };
 
 // Renewable: {
 const genericModel = ref();
 const genericTable = ref([]);
 const genericModelChange = async () => {
-  genericTable.value = await getDynamicModelTableOfType(genericModel.value);
+  genericTable.value = await getDynamicModelTableOfType(genericModel.value._id);
 };
 
 const renewableModel = ref();
 const renewableTable = ref([]);
 const renewableModelChange = async () => {
-  renewableTable.value = await getDynamicModelTableOfType(renewableModel.value);
+  renewableTable.value = await getDynamicModelTableOfType(renewableModel.value._id);
 };
 
 const planControlModel = ref();
 const planControlTable = ref([]);
 const planControlModelChange = async () => {
-  planControlTable.value = await getDynamicModelTableOfType(planControlModel.value);
+  planControlTable.value = await getDynamicModelTableOfType(planControlModel.value._id);
 };
 
 const driveTrainModel = ref();
 const driveTrainTable = ref([]);
 const driveTrainModelChange = async () => {
-  driveTrainTable.value = await getDynamicModelTableOfType(driveTrainModel.value);
+  driveTrainTable.value = await getDynamicModelTableOfType(driveTrainModel.value._id);
 };
 
 const handleUpdate = async (data) => {
@@ -785,38 +785,38 @@ const handleUpdate = async (data) => {
 
   // traditional
   if (updateData.Generator) {
-    generatorModel.value = updateData.Generator.modelId;
+    generatorModel.value = { _id: updateData.Generator.modelId, name: updateData.Generator.modelName };
     generatorTable.value = updateData.Generator.values;
     console.log('generatorTable.value', generatorTable.value);
   }
   if (updateData.Excitation) {
-    excitationModel.value = updateData.Excitation.modelId;
+    excitationModel.value = { _id: updateData.Excitation.modelId, name: updateData.Excitation.modelName };
     excitationTable.value = updateData.Excitation.values;
   }
   if (updateData.Governor) {
-    governorModel.value = updateData.Governor.modelId;
+    governorModel.value = { _id: updateData.Governor.modelId, name: updateData.Governor.modelName };
     governorTable.value = updateData.Governor.values;
   }
 
   if (updateData.Stabilizer) {
-    stabilizerModel.value = updateData.Stabilizer.modelId;
+    stabilizerModel.value = { _id: updateData.Stabilizer.modelId, name: updateData.Stabilizer.modelName };
     stabilizerTable.value = updateData.Stabilizer.values;
   }
   // renewable;
   if (updateData.Generic) {
-    genericModel.value = updateData.Generic.modelId;
+    genericModel.value = { _id: updateData.Generic.modelId, name: updateData.Generic.modelName };
     genericTable.value = updateData.Generic.values;
   }
   if (updateData.Renewable) {
-    renewableModel.value = updateData.Renewable.modelId;
+    renewableModel.value = { _id: updateData.Renewable.modelId, name: updateData.Renewable.modelName };
     renewableTable.value = updateData.Renewable.values;
   }
   if (updateData.PlanControl) {
-    planControlModel.value = updateData.PlanControl.modelId;
+    planControlModel.value = { _id: updateData.PlanControl.modelId, name: updateData.PlanControl.modelName };
     planControlTable.value = updateData.PlanControl.values;
   }
   if (updateData.DriveTrain) {
-    driveTrainModel.value = updateData.DriveTrain.modelId;
+    driveTrainModel.value = { _id: updateData.DriveTrain.modelId, name: updateData.DriveTrain.modelName };
     driveTrainModel.value = updateData.DriveTrain.values;
   }
   visibleChangeDialog.value = true;

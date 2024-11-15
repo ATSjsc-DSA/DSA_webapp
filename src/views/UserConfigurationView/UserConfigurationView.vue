@@ -814,7 +814,7 @@ const createApplication = async () => {
     const dataLoad = {
       name: newAppData.value.name,
       active: newAppData.value.active,
-      startTimestamp: newAppData.value.startTimestamp.getTime(),
+      startTimestamp: newAppData.value.startTimestamp.getTime() / 1000,
     };
     const res = await ApiApplication.createApp(dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
@@ -834,7 +834,7 @@ const updateApplication = async () => {
     const res = await ApiApplication.updateAppData(appData.value._id, {
       name: appData.value.name,
       active: appData.value.active,
-      startTimestamp: appData.value.startTimestamp.getTime(),
+      startTimestamp: appData.value.startTimestamp.getTime() / 1000,
     });
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     treeData.value[0].children[nodeSelected.value.key].label = res.data.name;

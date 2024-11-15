@@ -247,8 +247,8 @@ const newData = ref({
 
 const createDependency = async () => {
   const data = JSON.parse(JSON.stringify(newData.value));
-  data.startTimestamp = new Date(data.startTimestamp).getTime();
-  data.endTimestamp = new Date(data.endTimestamp).getTime();
+  data.startTimestamp = new Date(data.startTimestamp).getTime() / 1000;
+  data.endTimestamp = new Date(data.endTimestamp).getTime() / 1000;
   try {
     await ApiDsa.createDependency(props.dependencyId, data);
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
@@ -271,8 +271,8 @@ const handleUpdateDependency = (data) => {
 };
 const updateDependency = async () => {
   const data = JSON.parse(JSON.stringify(updateData.value));
-  data.startTimestamp = new Date(data.startTimestamp).getTime();
-  data.endTimestamp = new Date(data.endTimestamp).getTime();
+  data.startTimestamp = new Date(data.startTimestamp).getTime() / 1000;
+  data.endTimestamp = new Date(data.endTimestamp).getTime() / 1000;
   try {
     await ApiDsa.updateDependency(data._id, data);
     await getDependencyList();

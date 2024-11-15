@@ -85,6 +85,7 @@
                 rounded
                 @click="confirmDelete($event, data)"
               />
+              <Divider layout="vertical" />
               <Button
                 v-tooltip="'Setting User configuration'"
                 severity="info"

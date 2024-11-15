@@ -248,7 +248,7 @@ const runProject = (project) => {
   projectData.value = project;
   console.log('project', project);
   localStorage.setItem('projectData', JSON.stringify(projectData.value));
-  router.push('/powersystem');
+  router.push('/powersystem/slot');
 };
 </script>
 

@@ -1,16 +1,9 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectData, additionVersionId, powerSystemVersionId } = storeToRefs(commonStore);
-
-console.log('projectId', projectData.value._id);
+const { projectData, additionVersionId, slotData } = storeToRefs(commonStore);
+console.log('slotData', slotData.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
-
-export class CommonApi {
-  static async importPowerSystemData(data) {
-    return put(`/powersystem/${projectData.value._id}/66fbc590ed4ab3c5440916e1/upload`, data);
-  }
-}
 
 export class api {
   // import ems
@@ -40,7 +33,7 @@ export class api {
   }
 
   static async openVersion(powerSystemVersionId) {
-    return put(`/powersystem/${projectData.value._id}/powersystemversion/${powerSystemVersionId.value}`);
+    return put(`/powersystem/${projectData.value._id}/powersystemversion/${slotData.value._id}`);
   }
 }
 
@@ -63,14 +56,14 @@ export class DefinitionListApi {
 
 export class PsTreeApi {
   static async getChild(data) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/child`, data);
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}/child`, data);
   }
 }
 
 export class PowerSystemParameterApi {
   static async getPsDataWithDefinition(definitionId, data = {}, page = 1) {
     return get(
-      `/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/definition/${definitionId}`,
+      `/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}/definition/${definitionId}`,
       {
         ...data,
         page: page,
@@ -79,7 +72,7 @@ export class PowerSystemParameterApi {
   }
 
   static async getPsDataWithTree(psId, parentId = undefined, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/${psId}`, {
+    return get(`/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}/${psId}`, {
       page: page,
       parentId: parentId,
     });
@@ -87,7 +80,7 @@ export class PowerSystemParameterApi {
 
   static async getPsDataWithSubsystem(data = {}, page = 1) {
     return post(
-      `/powersystem/${projectData.value._id}/subsystem/${powerSystemVersionId.value}/parameter?page=${page}&page_size=10`,
+      `/powersystem/${projectData.value._id}/subsystem/${slotData.value._id}/parameter?page=${page}&page_size=10`,
       {
         ...data,
       },
@@ -95,7 +88,7 @@ export class PowerSystemParameterApi {
   }
 
   static async searchPs(definitionList = [], query, exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/search`;
+    let url = `/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}/search`;
 
     if (query) {
       url += `?query=${query}`;
@@ -106,10 +99,14 @@ export class PowerSystemParameterApi {
     });
   }
   // CRUD
+  static async importPowerSystemData(data) {
+    return put(`/powersystem/${projectData.value._id}/${slotData.value._id}/upload`, data);
+  }
+
   static async create(data) {
     data.projectId = projectData.value._id;
-    data.currentPowerSystemVersionId = powerSystemVersionId.value;
-    return post(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}`, data);
+    data.currentPowerSystemVersionId = slotData.value._id;
+    return post(`/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}`, data);
   }
 
   static async update(data) {
@@ -126,16 +123,13 @@ export class PowerSystemParameterApi {
         skey: data.scadaInfo.skey,
         scadaName: data.scadaInfo.scadaName,
       },
-      currentPowerSystemVersionId: powerSystemVersionId.value,
+      currentPowerSystemVersionId: slotData.value._id,
     };
-    return put(
-      `/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/${data._id}`,
-      updateData,
-    );
+    return put(`/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}/${data._id}`, updateData);
   }
 
   static async delete(psId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/${psId}`);
+    return _delete(`/powersystem/${projectData.value._id}/powersystemedit/${slotData.value._id}/${psId}`);
   }
 
   static async getPowersystemMonitor(psde_id) {
@@ -150,7 +144,7 @@ export class PowerSystemParameterApi {
 export class PowerSystemEmsApi {
   static async getPsDataWithDefinition(definitionId, data = {}, page = 1) {
     return get(
-      `/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/definition/${definitionId}`,
+      `/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/definition/${definitionId}`,
       {
         ...data,
         page: page,
@@ -159,7 +153,7 @@ export class PowerSystemEmsApi {
   }
 
   static async getPsDataWithTree(psId, parentId = undefined, ems_definition_id, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/${psId}`, {
+    return get(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/${psId}`, {
       page: page,
       parentId: parentId,
       ems_definition_id: ems_definition_id,
@@ -167,13 +161,13 @@ export class PowerSystemEmsApi {
   }
 
   static async getPsDataWithSubsystem(data = {}, page = 1) {
-    return post(`/powersystem/${projectData.value._id}/subsystem/${powerSystemVersionId.value}/ems`, {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${slotData.value._id}/ems`, {
       ...data,
       page: page,
     });
   }
   static async searchPs(psdDefinition_id = '', query = '', exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/search`;
+    let url = `/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/search`;
     if (psdDefinition_id) {
       url += `?psdDefinition_id=${psdDefinition_id}`;
     }
@@ -185,9 +179,9 @@ export class PowerSystemEmsApi {
   // CRUD
   static async create(data) {
     data.projectId = projectData.value._id;
-    data.currentPowerSystemVersionId = powerSystemVersionId.value;
+    data.currentPowerSystemVersionId = slotData.value._id;
 
-    return post(`/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}`, data);
+    return post(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}`, data);
   }
 
   static async update(data) {
@@ -196,14 +190,11 @@ export class PowerSystemEmsApi {
         values: data.engineInfo.values,
       },
     };
-    return put(
-      `/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/${data._id}`,
-      updateData,
-    );
+    return put(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/${data._id}`, updateData);
   }
 
   static async delete(psId) {
-    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${powerSystemVersionId.value}/${psId}`);
+    return _delete(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/${psId}`);
   }
   static async getPowersystemEmsData(pss_id) {
     return get(`/powersystem/powersystems/${pss_id}`);
@@ -213,47 +204,47 @@ export class PowerSystemEmsApi {
 // pole
 export class SubLineApi {
   static async getData(psId, page = 1) {
-    return get(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine/${psId}`, {
+    return get(`/powersystem/${projectData.value._id}/${slotData.value._id}/PoleSubLine/${psId}`, {
       page: page,
     });
   }
   // CRUD
   static async create(data) {
     data.projectId = projectData.value._id;
-    return post(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine`, data);
+    return post(`/powersystem/${projectData.value._id}/${slotData.value._id}/PoleSubLine`, data);
   }
 
   static async update(data) {
     data.projectId = projectData.value._id;
-    return put(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine/${data._id}`, data);
+    return put(`/powersystem/${projectData.value._id}/${slotData.value._id}/PoleSubLine/${data._id}`, data);
   }
 
   static async delete(psId) {
-    return _delete(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/PoleSubLine/${psId}`);
+    return _delete(`/powersystem/${projectData.value._id}/${slotData.value._id}/PoleSubLine/${psId}`);
   }
 }
 
 export class DynamicModelApi {
   static async getDynamicModelList(page) {
-    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel`, { page: page });
+    return get(`/addition/${projectData.value._id}/${slotData.value._id}/dynamicModel`, { page: page });
   }
 
   static async getDynamicModelListWithTree(parent_id, page) {
-    return get(`/addition/${projectData.value._id}/${additionVersionId.value}/${parent_id}/dynamicModel`, {
+    return get(`/addition/${projectData.value._id}/${slotData.value._id}/${parent_id}/dynamicModel`, {
       page: page,
     });
   }
   static async createDynamicModel(data) {
-    return post(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel`, data);
+    return post(`addition/${projectData.value._id}/${slotData.value._id}/dynamicModel`, data);
   }
 
   static async updateDynamicModel(dynamicModel_id, data) {
-    return put(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel/${dynamicModel_id}`, data);
+    return put(`addition/${projectData.value._id}/${slotData.value._id}/dynamicModel/${dynamicModel_id}`, data);
   }
   static async deleteDynamicModel(dynamicModel_id) {
-    return _delete(`addition/${projectData.value._id}/${additionVersionId.value}/dynamicModel/${dynamicModel_id}`);
+    return _delete(`addition/${projectData.value._id}/${slotData.value._id}/dynamicModel/${dynamicModel_id}`);
   }
   static async importDynamicModel(data) {
-    return put(`addition/${projectData.value._id}/${additionVersionId.value}/import/dynamicModel`, data);
+    return put(`addition/${projectData.value._id}/${slotData.value._id}/import/dynamicModel`, data);
   }
 }

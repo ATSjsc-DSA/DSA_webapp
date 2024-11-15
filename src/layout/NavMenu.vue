@@ -3,11 +3,13 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { profileData } = storeToRefs(commonStore);
+const { profileData, slotData } = storeToRefs(commonStore);
 
 const router = useRouter();
 const items = computed(() => {
   const userConfigPath = profileData.value._id ? '/user_config/config' : '/user_config/profile';
+  const powerSystemPath = slotData.value._id ? '/powersystem/ps' : '/powersystem/slot';
+
   return [
     {
       label: 'Dashboard',
@@ -21,7 +23,7 @@ const items = computed(() => {
     {
       label: 'Configuration',
       items: [
-        { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: '/powersystem' },
+        { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: powerSystemPath },
         {
           label: 'System Events',
           icon: 'pi pi-fw pi-clone',
@@ -41,7 +43,7 @@ const items = computed(() => {
           ],
         },
         {
-          label: 'User Configuration' ,
+          label: 'User Configuration',
           icon: 'pi pi-file-edit',
           to: userConfigPath,
         },

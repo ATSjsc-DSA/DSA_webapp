@@ -204,8 +204,8 @@ const psSelected = ref();
 
 const createDisturbance = async () => {
   const data = JSON.parse(JSON.stringify(disturbanceData.value));
-  data.startTimestamp = new Date(data.startTimestamp).getTime();
-  data.endTimestamp = new Date(data.endTimestamp).getTime();
+  data.startTimestamp = new Date(data.startTimestamp).getTime() / 1000;
+  data.endTimestamp = new Date(data.endTimestamp).getTime() / 1000;
   data.powerSystemId = psSelected.value._id;
   try {
     await ApiDisturbance.createDisturbance(props.caseId, data);
@@ -234,8 +234,8 @@ const handlerUpdate = (data) => {
 const updateDisturbance = async () => {
   try {
     const data = JSON.parse(JSON.stringify(disturbanceData.value));
-    data.startTimestamp = new Date(data.startTimestamp).getTime();
-    data.endTimestamp = new Date(data.endTimestamp).getTime();
+    data.startTimestamp = new Date(data.startTimestamp).getTime() / 1000;
+    data.endTimestamp = new Date(data.endTimestamp).getTime() / 1000;
     data.powerSystemId = psSelected.value._id;
     await ApiDisturbance.updateDisturbanceData(data._id, data);
     await getDisturbanceList();

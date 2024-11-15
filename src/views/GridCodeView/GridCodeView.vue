@@ -31,14 +31,47 @@
             <span>{{ convertDateTimeToString(data.endTimestamp) }}</span>
           </template>
         </Column>
+        <Column field="createdTimestamp" header="Created At">
+          <template #body="{ data }">
+            <div class="flex justify-content-between">
+              {{ convertDateTimeToString(data.createdTimestamp) }}
+            </div>
+          </template>
+        </Column>
+        <Column field="createdUser" header="Created User" style="text-wrap: nowrap" />
+
+        <Column field="modifiedTimestamp" header="Modified At">
+          <template #body="{ data }">
+            <div class="flex justify-content-between">
+              {{ convertDateTimeToString(data.modifiedTimestamp) }}
+            </div>
+          </template>
+        </Column>
+        <Column field="modifiedUser" header="Modified User" style="text-wrap: nowrap" />
+
         <Column style="width: 1%; min-width: 5rem">
           <template #body="{ data }">
             <div class="flex justify-content-between">
-              <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdate(data)" />
+              <Button
+                v-tooltip="'Edit'"
+                icon="pi pi-pencil"
+                severity="success"
+                text
+                rounded
+                @click="handleUpdate(data)"
+              />
 
-              <Button icon="pi pi-trash" severity="danger" text rounded @click="confirmDelete($event, data)" />
+              <Button
+                v-tooltip="'Delete'"
+                icon="pi pi-trash"
+                severity="danger"
+                text
+                rounded
+                @click="confirmDelete($event, data)"
+              />
+
               <router-link :to="`/gridcode/element/${data._id}`">
-                <Button icon="pi pi-caret-right" text rounded />
+                <Button v-tooltip.left="'Config'" icon="pi pi-caret-right" text rounded />
               </router-link>
             </div>
           </template>
@@ -193,8 +226,8 @@ const getChangeData = () => {
   return {
     name: changeData.value.name,
     active: changeData.value.active,
-    endTimestamp: new Date(changeData.value.startTimestamp).getTime(),
-    startTimestamp: new Date(changeData.value.endTimestamp).getTime(),
+    endTimestamp: new Date(changeData.value.startTimestamp).getTime() / 1000,
+    startTimestamp: new Date(changeData.value.endTimestamp).getTime() / 1000,
   };
 };
 const createGridCode = async () => {

@@ -207,6 +207,24 @@ const createPs = async () => {
   formCreate.generalInfo.parrentId = formCreate.generalInfo.parrentData._id;
   delete formCreate.generalInfo.parrentData;
   formCreate.engineInfo.values = Object.values(definitionData.value).map((item) => item.value);
+  createForm.value = {
+    generalInfo: {
+      name: '',
+      parrentData: {},
+      uniqueId: '',
+      operationName: '',
+      operationUniqueId: '',
+    },
+    engineInfo: {
+      powerSystemDefinitionId: '',
+      values: [''],
+    },
+    scadaInfo: {
+      skey: '',
+      scadaName: '',
+      scadaUniqueId: '',
+    },
+  };
 
   try {
     await PowerSystemParameterApi.create(formCreate);

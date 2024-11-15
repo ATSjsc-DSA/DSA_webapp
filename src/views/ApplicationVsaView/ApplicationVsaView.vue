@@ -364,7 +364,7 @@ const getCurveChartData = async () => {
   try {
     const res = await VsaApi.getChartData(caseSelected.value._id, typeSelected.value);
     curveChartData.value = res.data;
-    modificationTime.value = new Date().getTime();
+    modificationTime.value = new Date().getTime() / 1000;
   } catch (error) {
     console.log('GetTypeList: error ', error);
     return [];

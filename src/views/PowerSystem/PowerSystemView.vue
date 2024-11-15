@@ -27,10 +27,14 @@
           @click="tabMenuOnTopActive = 2"
         />
       </div>
-      <div v-tooltip="'Current Version'" class="p-text-secondary font-semibold px-2">
-        {{ capitalizeFirstLetter(editVersionData.name) }}
-        <span v-show="isEditingVersion > 0">(Editing)</span>
-      </div>
+      <Tag
+        :value="slotData.name"
+        severity="secondary"
+        aria-haspopup="true"
+        class="px-6"
+        @contextmenu="onSlotRightClick"
+      />
+      <ContextMenu ref="slotContextMenuRef" :model="slotContextMenu" />
     </div>
     <Divider />
 
@@ -227,7 +231,7 @@
                           <TabPanel>
                             <div style="height: 36rem">
                               <poleTableWidget
-                                :data="sublineData"
+                                :data="sublineData || []"
                                 :nodeSelected="nodeSelected"
                                 :currentPage="sublineCurrentPage"
                                 :loading="isLoadingsubline"
@@ -351,7 +355,7 @@
                     <TabPanel :disabled="!isDefinitionGenerator">
                       <dynamicDefinitionTabWidget
                         v-if="isDefinitionGenerator"
-                        :definitionId="definitionSelected._id"
+                        :definitionId="definitionSelected._id || ''"
                         :showDefinitionFlatList="showDefinitionFlatList"
                         :nodeSelected="nodeSelected"
                       />
@@ -515,7 +519,7 @@
   >
     <TabView id="import-tab-view">
       <TabPanel header="EMS">
-        <uploadFileConfig @uploadFile="loadEmsFile" :multipleFile="true" :fileLimit="2" />
+        <uploadFileConfig :multipleFile="true" :fileLimit="2" @uploadFile="loadEmsFile" />
       </TabPanel>
       <TabPanel header="Dynamic Model">
         <uploadFileConfig @uploadFile="loadDynamicFile" />
@@ -574,15 +578,16 @@ import createEmsDialog from './createEmsDialog.vue';
 
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
+import router from '@/router';
 
-import { DynamicModelApi, CommonApi } from './api';
+import { DynamicModelApi } from './api';
 // graphic
 import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
 
 import { useCommonStore } from '@/store';
 
 const commonStore = useCommonStore();
-const { projectData, editVersionData } = storeToRefs(commonStore);
+const { editVersionData, slotData } = storeToRefs(commonStore);
 
 const toast = useToast();
 const isLoadingProgress = ref(false);
@@ -593,6 +598,21 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {});
+// slot
+const slotContextMenuRef = ref();
+const onSlotRightClick = async (event) => {
+  slotContextMenuRef.value.show(event);
+};
+const slotContextMenu = ref([
+  {
+    label: 'Change Slot',
+    icon: 'pi pi-cog',
+    command: () => {
+      router.push({ path: '/powersystem/slot' });
+    },
+  },
+]);
+// tab menu
 
 const tabMenuPSActive = ref(0);
 const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Graphics']);
@@ -828,7 +848,6 @@ const onNodeSelect = async (node) => {
   console.log(node, 'node');
   isDefinitionGenerator.value = node.label === 'Generator';
   isStation.value = node.engineLabel === 'Station';
-  console.log(isStation.value, 'isStation');
   nodeSelected.value = node;
   isLoadingContainer.value = true;
   psIdSelected.value = node._id;
@@ -1120,7 +1139,7 @@ const itemsMenuImportExport = computed(() => {
           },
         },
         {
-          label: 'EMS',
+          label: 'ATS Standard',
           icon: 'pi pi-plus',
           disabled: definitionList.value.length === 0,
           command: () => {
@@ -1149,7 +1168,7 @@ const loadEmsFile = async (formData, callback) => {
   try {
     isLoadingProgress.value = true;
     emsImportFormdata.value = formData;
-    await CommonApi.importPowerSystemData(formData);
+    await api.PowerSystemParameterApi.importPowerSystemData(formData);
     await delayImportExport();
     toast.add({ severity: 'success', summary: 'EMS', detail: 'Import Successfully', life: 3000 });
     isLoadingProgress.value = false;
