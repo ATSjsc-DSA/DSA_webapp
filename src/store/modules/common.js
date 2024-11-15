@@ -10,6 +10,7 @@ export const useCommonStore = defineStore('common', () => {
   const measInfo_automatic = ref(JSON.parse(localStorage.getItem('measInfo_automatic') || true));
   const measInfoList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
+  const profileData = ref(JSON.parse(localStorage.getItem('profileData') || '{}'));
   const measInfoActive = ref(JSON.parse(localStorage.getItem('measInfoActive')));
   const editVersionData = ref({});
 
@@ -121,5 +122,6 @@ export const useCommonStore = defineStore('common', () => {
     measInfoList,
     updateMeasInfoAutomatic,
     updateMeasInfoActive,
+    profileData,
   };
 });
