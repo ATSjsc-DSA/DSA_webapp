@@ -47,7 +47,7 @@
           <div v-if="voltageData._id" class="p-3">
             <voltageForm v-model:form-data="voltageData" />
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Update" @click="updateVoltage"></Button>
+              <Button type="button" label="Update" @click="confirmUpdate"></Button>
             </div>
           </div>
         </TabPanel>
@@ -82,7 +82,6 @@ import { onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import ScrollPanel from 'primevue/scrollpanel';
-
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
@@ -115,8 +114,10 @@ const getVoltageList = async () => {
 const voltageIndexSelected = ref();
 const voltageData = ref({});
 const voltageClick = async (index) => {
-  voltageIndexSelected.value = index;
-  await getVoltageData();
+  if (voltageIndexSelected.value !== index) {
+    voltageIndexSelected.value = index;
+    await getVoltageData();
+  }
 };
 
 const getVoltageData = async () => {
@@ -160,6 +161,23 @@ const createVoltage = async () => {
     console.log('createAngleStability error', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const confirmUpdate = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Voltage - ' + voltageData.value.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateVoltage();
+    },
+  });
 };
 const updateVoltage = async () => {
   try {

@@ -19,32 +19,45 @@
     <div class="col-12">
       <span class="p-text-secondary block">Stable </span>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="stableRangeLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.stableRangeLower" :max="formData.stableRangeUpper" />
+        <InputNumber v-model="formData.stableRangeLower" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="stableRangeUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.stableRangeUpper" :min="formData.stableRangeLower" />
+        <InputNumber v-model="formData.stableRangeUpper" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
-
+    <div class="col-2">
+      <div class="flex flex-column gap-2 mb-3 flex-1">
+        <label for="unitType" class="font-semibold"> Unit </label>
+        <Dropdown
+          id="unitType"
+          v-model="formData.unitType"
+          :options="typeUnitOpts"
+          optionLabel="label"
+          optionValue="value"
+          class="flex-auto w-full"
+          autocomplete="off"
+        />
+      </div>
+    </div>
     <div class="col-12">
       <span class="p-text-secondary block">Error </span>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="lowerError" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.lowerError" :max="formData.upperError" />
+        <InputNumber v-model="formData.lowerError" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="upperError" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.upperError" :min="formData.lowerError" />
+        <InputNumber v-model="formData.upperError" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
   </div>
@@ -52,11 +65,13 @@
 <script setup>
 const formData = defineModel('formData');
 
-const contingencyTypeOpts = ref([
-  { label: 'N-1', value: 0 },
-  { label: 'N-2', value: 1 },
-  { label: 'Base', value: 2 },
+const typeUnitOpts = ref([
+  { label: '%', value: 1 },
+  { label: 'Hz', value: 2 },
 ]);
+const unitLabel = computed(() => {
+  return ' ' + typeUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;
+});
 </script>
 <style>
 .p-autocomplete-input,

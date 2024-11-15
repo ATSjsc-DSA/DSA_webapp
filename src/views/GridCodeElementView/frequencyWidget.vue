@@ -47,7 +47,7 @@
           <div v-if="frequencyData._id" class="p-3">
             <frequencyForm v-model:form-data="frequencyData" />
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Update" @click="updateFrequency"></Button>
+              <Button type="button" label="Update" @click="confirmUpdateFrequency"></Button>
             </div>
           </div>
         </TabPanel>
@@ -115,8 +115,10 @@ const getFrequencyList = async () => {
 const frequencyIndexSelected = ref();
 const frequencyData = ref({});
 const frequencyClick = async (index) => {
-  frequencyIndexSelected.value = index;
-  await getFrequencyData();
+  if (frequencyIndexSelected.value !== index) {
+    frequencyIndexSelected.value = index;
+    await getFrequencyData();
+  }
 };
 
 const getFrequencyData = async () => {
@@ -155,6 +157,26 @@ const createFrequency = async () => {
     console.log('createAngleStability error', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const confirmUpdateFrequency = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Frequency - ' + frequencyData.value.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateFrequency();
+    },
+    reject: async () => {
+      await getFrequencyData();
+    },
+  });
 };
 const updateFrequency = async () => {
   try {

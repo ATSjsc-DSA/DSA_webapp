@@ -26,13 +26,13 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="volRangeLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.volRangeLower" :suffix="unitLabel" />
+        <InputNumber v-model="formData.volRangeLower" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="volRangeUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.volRangeUpper" :suffix="unitLabel" />
+        <InputNumber v-model="formData.volRangeUpper" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
 
@@ -42,13 +42,13 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="normalVolLimitLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.normalVolLimitLower" :suffix="unitLabel" />
+        <InputNumber v-model="formData.normalVolLimitLower" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="normalVolLimitUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.normalVolLimitUpper" :suffix="unitLabel" />
+        <InputNumber v-model="formData.normalVolLimitUpper" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
 
@@ -68,7 +68,7 @@
         <InputNumber
           v-model="formData.abnormalVolLimitLower"
           :disabled="!formData.abnormalActivation"
-          :suffix="unitLabel"
+          :suffix="unitLabel" :maxFractionDigits="10"
         />
       </div>
     </div>
@@ -78,7 +78,7 @@
         <InputNumber
           v-model="formData.abnormalVolLimitUpper"
           :disabled="!formData.abnormalActivation"
-          :suffix="unitLabel"
+          :suffix="unitLabel" :maxFractionDigits="10"
         />
       </div>
     </div>

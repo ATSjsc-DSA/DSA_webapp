@@ -8,13 +8,13 @@
           text
           rounded
           aria-label="create"
-          :disabled="vsaCaseList.length === 3"
+          :disabled="vsaCaseList.length >= 3"
           @click="handlerCreateVsaCase"
         />
       </div>
 
       <ScrollPanel style="width: 100%; height: 46rem">
-        <DataView :value="vsaCaseList" class="w-full flex-1">
+        <DataView :value="vsaCaseList" class="w-full flex-1" :class="{ 'p-3': vsaCaseList.length === 0 }">
           <template #list="slotProps">
             <div class="grid grid-nogutter">
               <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
@@ -87,7 +87,7 @@
         </div>
 
         <div class="flex justify-content-end gap-3">
-          <Button type="button" label="Update" @click="updateVsaCase"></Button>
+          <Button type="button" label="Update" @click="confirmUpdateVsaCase"></Button>
         </div>
       </div>
     </SplitterPanel>
@@ -248,6 +248,25 @@ const vsaCaseClick = (item) => {
   vsaCaseSelectedChange.value = JSON.parse(JSON.stringify(item));
 };
 
+const confirmUpdateVsaCase = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update VsaCase - ' + vsaCaseSelectedChange.value.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateVsaCase();
+    },
+    reject: async () => {
+      vsaCaseSelectedChange.value = JSON.parse(JSON.stringify(vsaCaseSelected.value));
+    },
+  });
+};
 const updateVsaCase = async () => {
   try {
     await ApiVsaCase.update(vsaCaseSelectedChange.value._id, vsaCaseSelectedChange.value);
@@ -279,7 +298,7 @@ const deleteVsaCaseData = async (id) => {
   try {
     await ApiVsaCase.deleteVsaCase(id);
     await getVsaCaseList();
-    vsaCaseUpdateData.value = {};
+    vsaCaseSelectedChange.value = {};
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('getVsaCaseList error', error);

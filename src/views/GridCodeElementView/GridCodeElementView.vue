@@ -1,8 +1,5 @@
 <template>
   <div class="card layout-content">
-    <Toast />
-    <ConfirmDialog />
-
     <TabView>
       <TabPanel header="Voltage">
         <voltageWidget :gridcode-id="gridCodeId" />
@@ -20,11 +17,16 @@
       </TabPanel>
     </TabView>
   </div>
+
+  <Toast />
+  <ConfirmDialog />
+  <confirmUpdateDialog />
 </template>
 
 <script setup>
 import { watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';

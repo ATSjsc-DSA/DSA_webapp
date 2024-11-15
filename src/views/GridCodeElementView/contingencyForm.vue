@@ -27,16 +27,30 @@
     <div class="col-12">
       <span class="p-text-secondary block">Critical</span>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="criticalLower" class="font-semibold"> Lower</label>
-        <InputNumber :maxFractionDigits="999" v-model="formData.criticalLower" :max="formData.criticalUpper" />
+        <InputNumber v-model="formData.criticalLower" :suffix="unitLabel" :maxFractionDigits="10" />
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="criticalUpper" class="font-semibold"> Upper</label>
-        <InputNumber :maxFractionDigits="999" v-model="formData.criticalUpper" :min="formData.criticalLower" />
+        <InputNumber v-model="formData.criticalUpper" :suffix="unitLabel" :maxFractionDigits="10" />
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="flex flex-column gap-2 mb-3 flex-1">
+        <label for="unitType" class="font-semibold"> Unit </label>
+        <Dropdown
+          id="unitType"
+          v-model="formData.unitType"
+          :options="contigencyUnitOpts"
+          optionLabel="label"
+          optionValue="value"
+          class="flex-auto w-full"
+          autocomplete="off"
+        />
       </div>
     </div>
   </div>
@@ -49,6 +63,14 @@ const contingencyTypeOpts = ref([
   { label: 'N-2', value: 1 },
   { label: 'Base', value: 2 },
 ]);
+
+const contigencyUnitOpts = ref([
+  { label: '%', value: 1 },
+  { label: 'Hz', value: 2 },
+]);
+const unitLabel = computed(() => {
+  return ' ' + contigencyUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;
+});
 </script>
 <style>
 .p-autocomplete-input,

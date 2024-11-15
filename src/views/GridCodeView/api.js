@@ -23,4 +23,8 @@ export class Api {
   static async deleteGridcode(gridcodeId) {
     return _delete(`/gridcode/group/${gridcodeId}`);
   }
+
+  static async activeGridcode(gridcodeId) {
+    return _active(`/gridcode/group/${gridcodeId}`);
+  }
 }

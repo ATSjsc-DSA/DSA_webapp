@@ -52,7 +52,7 @@
             <angleStabilityForm v-model:formData="angleStabilityData" />
 
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Update" @click="updateAngleStability"></Button>
+              <Button type="button" label="Update" @click="confirmUpdateAngleStability"></Button>
             </div>
           </div>
         </TabPanel>
@@ -156,14 +156,46 @@
               <Column field="dampingRequirement" header="Damping Requirement" style="text-wrap: nowrap" />
               <Column field="restoreTime" header="Restore Time" style="text-wrap: nowrap" />
 
-              <Column field="InstantaneousMin" header="Instantaneous Min" style="text-wrap: nowrap" />
-              <Column field="InstantaneousMax" header="Instantaneous Max" style="text-wrap: nowrap" />
+              <Column field="InstantaneousMin" header="Instantaneous Min" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.InstantaneousMin }} {{ getUnitLabel(data.unitType) }}
+                  </div>
+                </template>
+              </Column>
+              <Column field="InstantaneousMax" header="Instantaneous Max" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.InstantaneousMax }} {{ getUnitLabel(data.unitType) }}
+                  </div>
+                </template>
+              </Column>
 
-              <Column field="freqOscillationLower" header="Frequency Oscillation Lower" style="text-wrap: nowrap" />
-              <Column field="freqOscillationUpper" header="Frequency Oscillation Upper" style="text-wrap: nowrap" />
+              <Column field="freqOscillationLower" header="Frequency Oscillation Lower" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.freqOscillationLower }} {{ getUnitLabel(data.unitType) }}
+                  </div>
+                </template>
+              </Column>
+              <Column field="freqOscillationUpper" header="Frequency Oscillation Upper" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.freqOscillationUpper }} {{ getUnitLabel(data.unitType) }}
+                  </div>
+                </template>
+              </Column>
 
-              <Column field="stableLower" header="Stable Lower" style="text-wrap: nowrap" />
-              <Column field="stableUpper" header="Stable Upper" style="text-wrap: nowrap" />
+              <Column field="stableLower" header="Stable Lower" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">{{ data.stableLower }} {{ getUnitLabel(data.unitType) }}</div>
+                </template>
+              </Column>
+              <Column field="stableUpper" header="Stable Upper" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">{{ data.stableUpper }} {{ getUnitLabel(data.unitType) }}</div>
+                </template>
+              </Column>
               <Column style="width: 4rem; padding-top: 0; padding-bottom: 0">
                 <template #body="{ data }">
                   <div class="flex w-full justify-content-between align-items-center">
@@ -172,7 +204,7 @@
                       severity="success"
                       text
                       rounded
-                      @click="handleUpdateRestoreTime(data)"
+                      @click="confirmUpdateRestoreTime($event, data)"
                     />
                     <Button
                       icon="pi pi-trash"
@@ -318,9 +350,11 @@ const getAngleStabilityList = async () => {
 const angleStabilityKeySelected = ref();
 const angleStabilityData = ref({});
 const angleStabilityClick = async (index) => {
-  angleStabilityKeySelected.value = index;
-  await getAngleStabilityData();
-  await getAngleRestoreTimeList();
+  if (angleStabilityKeySelected.value !== index) {
+    angleStabilityKeySelected.value = index;
+    await getAngleStabilityData();
+    await getAngleRestoreTimeList();
+  }
 };
 // -- angleStability- crud
 
@@ -356,13 +390,33 @@ const createAngleStability = async () => {
     angleStabilityList.value.push(res.data);
     angleStabilityKeySelected.value = angleStabilityList.value.length - 1;
     angleStabilityData.value = res.data;
-
+    restoreTimeList.value = [];
     createAngleStabilityVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
   } catch (error) {
     console.log('createAngleStability error', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const confirmUpdateAngleStability = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Angle Stability - ' + angleStabilityData.value.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateAngleStability();
+    },
+    reject: async () => {
+      await getAngleStabilityData();
+    },
+  });
 };
 
 const updateAngleStability = async () => {
@@ -400,6 +454,7 @@ const deleteAngleStabilityData = async (angleStabilityId, delIndex) => {
     angleStabilityList.value.splice(delIndex, 1);
     angleStabilityKeySelected.value = undefined;
     angleStabilityData.value = {};
+    restoreTimeList.value = [];
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);
@@ -448,6 +503,7 @@ const handleCreateRestoreTime = () => {
     stableLower: -1,
     stableUpper: 1,
     unit: 1,
+    unitType: 3,
   };
   createRestoreTimeVisibleDialog.value = true;
 };
@@ -466,6 +522,23 @@ const createRestoreTime = async () => {
 
 const editRestoreTime = ref();
 const updateRestoreTimeVisibleDialog = ref(false);
+
+const confirmUpdateRestoreTime = async (event, data) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Angle Restore Time - ' + data.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Continue',
+    accept: () => {
+      handleUpdateRestoreTime(data);
+    },
+  });
+};
 const handleUpdateRestoreTime = (data) => {
   editRestoreTime.value = JSON.parse(JSON.stringify(data));
   updateRestoreTimeVisibleDialog.value = true;
@@ -506,6 +579,14 @@ const deleteRestoreTime = async (id) => {
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);
   }
+};
+
+const unitLabelOpts = ref([
+  { label: '%', value: 1 },
+  { label: 'Degree', value: 3 },
+]);
+const getUnitLabel = (unitLabel) => {
+  return ' ' + unitLabelOpts.value.filter((item) => item.value === unitLabel)[0].label;
 };
 </script>
 

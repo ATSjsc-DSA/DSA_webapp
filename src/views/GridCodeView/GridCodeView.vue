@@ -53,6 +53,16 @@
           <template #body="{ data }">
             <div class="flex justify-content-between">
               <Button
+                v-tooltip="'Active'"
+                icon="pi pi-check-square"
+                :severity="data.active ? 'success' : 'secondary'"
+                text
+                rounded
+                :disabled="data.active"
+                @click="confirmActive(data)"
+              />
+
+              <Button
                 v-tooltip="'Edit'"
                 icon="pi pi-pencil"
                 severity="success"
@@ -69,6 +79,7 @@
                 rounded
                 @click="confirmDelete($event, data)"
               />
+              <Divider layout="vertical" />
 
               <router-link :to="`/gridcode/element/${data._id}`">
                 <Button v-tooltip.left="'Config'" icon="pi pi-caret-right" text rounded />
@@ -110,7 +121,7 @@
       <div class="col-4">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="active" class="font-semibold w-6rem"> Active</label>
-          <InputSwitch id="active" v-model="changeData.active" autocomplete="off" />
+          <InputSwitch id="active" v-model="changeData.active" disabled autocomplete="off" />
         </div>
       </div>
       <div class="col-12">
@@ -143,6 +154,7 @@
         :disabled="!changeData.name"
         @click="createGridCode"
       ></Button>
+
       <Button
         v-if="changeMode === 'Update'"
         type="button"
@@ -286,6 +298,29 @@ const deleteGridCode = async (id) => {
   } catch (error) {
     console.error('deleteDependency: error ', error);
     toast.add({ severity: 'error', summary: 'Delete Message', detail: error.data.detail, life: 3000 });
+  }
+};
+const confirmActive = (event, data) => {
+  confirm.require({
+    target: event.currentTarget,
+    header: 'Active Grid Code',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-check',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-success',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Active',
+    accept: async () => {
+      await ActiveGridCode(data._id);
+    },
+  });
+};
+const ActiveGridCode = async (id) => {
+  try {
+    await Api.activeGridcode(id);
+    await getGridCodeList();
+  } catch (error) {
+    console.error('ActiveGridCode: error ', error);
   }
 };
 </script>

@@ -51,7 +51,7 @@
           <div v-if="contingencyData._id" class="p-3">
             <contingencyForm v-model:form-data="contingencyData" />
             <div class="flex justify-content-end gap-3">
-              <Button type="button" label="Update" @click="updateContingency"></Button>
+              <Button type="button" label="Update" @click="confirmUpdateContingency"></Button>
             </div>
           </div>
         </TabPanel>
@@ -136,15 +136,41 @@
 
               <Column field="restoreTime" header="Restore Time" style="text-wrap: nowrap" />
 
-              <Column field="lowerError" style="text-wrap: nowrap" />
-              <Column field="upperError" style="text-wrap: nowrap" />
+              <Column field="lowerError" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">{{ data.lowerError }} {{ getUnitLabel(data.unitType) }}</div>
+                </template>
+              </Column>
+              <Column field="upperError" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">{{ data.upperError }} {{ getUnitLabel(data.unitType) }}</div>
+                </template>
+              </Column>
 
-              <Column field="stableRangeLower" style="text-wrap: nowrap" />
-              <Column field="stableRangeUpper" style="text-wrap: nowrap" />
+              <Column field="stableRangeLower" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.stableRangeLower }} {{ getUnitLabel(data.unitType) }}
+                  </div>
+                </template>
+              </Column>
+              <Column field="stableRangeUpper" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.stableRangeUpper }} {{ getUnitLabel(data.unitType) }}
+                  </div>
+                </template>
+              </Column>
               <Column style="width: 4rem; padding-top: 0; padding-bottom: 0">
                 <template #body="{ data }">
                   <div class="flex w-full justify-content-between align-items-center">
-                    <Button icon="pi pi-pencil" severity="success" text rounded @click="handleUpdateDynamicStd(data)" />
+                    <Button
+                      icon="pi pi-pencil"
+                      severity="success"
+                      text
+                      rounded
+                      @click="confirmUpdateDynamicStd($event, data)"
+                    />
                     <Button
                       icon="pi pi-trash"
                       severity="danger"
@@ -284,9 +310,11 @@ const getContingencyList = async () => {
 const contingencyIndexSelected = ref({});
 const contingencyData = ref({});
 const contingencyClick = async (index) => {
-  contingencyIndexSelected.value = index;
-  await getContingencyData();
-  await getDynamicStdList();
+  if (contingencyIndexSelected.value !== index) {
+    contingencyIndexSelected.value = index;
+    await getContingencyData();
+    await getDynamicStdList();
+  }
 };
 
 const getContingencyData = async () => {
@@ -309,6 +337,7 @@ const handlerCreateContingency = () => {
     contingencyType: 0,
     criticalLower: 0,
     criticalUpper: 0,
+    unitType: 1,
   };
   createContingencyVisibleDialog.value = true;
 };
@@ -325,6 +354,26 @@ const createContingency = async () => {
     console.log('createAngleStability error', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const confirmUpdateContingency = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Conrigency - ' + contingencyData.value.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      await updateContingency();
+    },
+    reject: async () => {
+      await getContingencyData();
+    },
+  });
 };
 const updateContingency = async () => {
   try {
@@ -362,7 +411,7 @@ const deleteContingency = async (id, index) => {
     contingencyIndexSelected.value = undefined;
     contingencyData.value = {};
     contingencyList.value.splice(index, 1);
-
+    dynamicStdList.value = [];
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
     console.log('deleteAngleStabilityData error', error);
@@ -392,6 +441,14 @@ const getSeverityContingencyType = (typeValue) => {
     default:
       return 'primary';
   }
+};
+
+const typeUnitOpts = ref([
+  { label: '%', value: 1 },
+  { label: 'Hz', value: 2 },
+]);
+const getUnitLabel = (unitType) => {
+  return ' ' + typeUnitOpts.value.filter((item) => item.value === unitType)[0].label;
 };
 // DynacmicStd
 
@@ -429,6 +486,7 @@ const handleCreateDynamicStd = () => {
     upperError: 0.1,
     stableRangeLower: -1,
     stableRangeUpper: 1,
+    unitType: 1,
   };
   createDynamicStdVisibleDialog.value = true;
 };
@@ -447,6 +505,23 @@ const createDynamicStd = async () => {
 
 const editDynamicStd = ref();
 const updateDynamicStdVisibleDialog = ref(false);
+
+const confirmUpdateDynamicStd = async (event, data) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'updateDialog',
+    header: 'Update Contigency Dynamic - ' + data.name,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Continue',
+    accept: () => {
+      handleUpdateDynamicStd(data);
+    },
+  });
+};
 const handleUpdateDynamicStd = (data) => {
   editDynamicStd.value = JSON.parse(JSON.stringify(data));
   updateDynamicStdVisibleDialog.value = true;
