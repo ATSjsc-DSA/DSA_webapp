@@ -12,6 +12,7 @@
                 <div>
                   {{ profileData.name }}
                 </div>
+
                 <div
                   v-if="profileData.desc"
                   class="text-xs font-thin capitalize mt-1 text-gray-500 text-truncate"
@@ -20,12 +21,15 @@
                   {{ `(${profileData.desc})` }}
                 </div>
               </div>
+              <router-link to="/user_config/profile" rel="profile">
+                <Button title="Back to Profile Table" icon="pi pi-list" severity="secondary" text />
+              </router-link>
               <Button
+                title="Collapse All"
                 type="button"
                 icon="pi pi-chevron-up"
                 severity="secondary"
                 text
-                title="Collapse All"
                 :disabled="!treeData"
                 @click="expandedKeys = {}"
               />
@@ -766,16 +770,6 @@ const projectContextMenu = ref([
         active: true,
         startTimestamp: new Date(),
       };
-    },
-  },
-  {
-    separator: true,
-  },
-  {
-    label: 'Change Profile',
-    icon: 'pi pi-caret-right',
-    command: () => {
-      router.push({ path: '/user_config/profile' });
     },
   },
 ]);

@@ -1,10 +1,5 @@
 <template>
   <div class="flex flex-column h-full">
-    <div class="flex align-items-center justify-content-center gap-3 mb-1">
-      <div class="px-2 py-1 legend-rounded text-sm bg-primary-500">Online</div>
-      <div class="px-2 py-1 legend-rounded text-sm bg-gray-500">Offline</div>
-      <div class="px-2 py-1 legend-rounded text-sm bg-orange-500">Current</div>
-    </div>
     <Chart type="line" :data="chartData" :options="chartOptions" class="flex-grow-1" />
   </div>
 </template>
@@ -45,7 +40,6 @@ const chartData = ref();
 const chartOptions = ref();
 
 const setChartData = () => {
-  const documentStyle = getComputedStyle(document.documentElement);
   /*
   data = list of moduleData
   moduleData = {
@@ -65,16 +59,16 @@ const setChartData = () => {
     }
 
   */
+  const documentStyle = getComputedStyle(document.documentElement);
+
   const labels = [];
   // const datasets = [];
 
   const onlineRate1Data = [];
   const onlineRate2Data = [];
-  const onlineRate3Data = [];
 
   const offlineRate1Data = [];
   const offlineRate2Data = [];
-  const offlineRate3Data = [];
   const currentData = [];
   const currentColor = [];
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
@@ -84,21 +78,13 @@ const setChartData = () => {
 
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2']);
-    onlineRate3Data.push(moduleData.online['rateCritical3']);
 
     offlineRate1Data.push(moduleData.offline['rateCritical1']);
     offlineRate2Data.push(moduleData.offline['rateCritical2']);
-    offlineRate3Data.push(moduleData.offline['rateCritical3']);
     currentData.push(moduleData.current);
-
-    if (moduleData.current <= moduleData.online['rateCritical1']) {
-      currentColor.push(documentStyle.getPropertyValue('--primary-600'));
-    } else if (moduleData.current <= moduleData.online['rateCritical2']) {
-      currentColor.push(documentStyle.getPropertyValue('--yellow-600'));
-    } else {
-      currentColor.push(documentStyle.getPropertyValue('--red-600'));
-    }
+    currentColor.push(getCurrentColor(moduleData.current, moduleData.online));
   }
+
   const datasets = [
     // online
     {
@@ -117,14 +103,7 @@ const setChartData = () => {
       backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
       stack: 'Stack Online',
     },
-    {
-      type: 'bar',
-      datalabels: 'Online',
-      label: 'Rate Critical 3',
-      data: onlineRate3Data,
-      backgroundColor: documentStyle.getPropertyValue('--red-600'),
-      stack: 'Stack Online',
-    },
+
     // offline
     {
       type: 'bar',
@@ -142,14 +121,7 @@ const setChartData = () => {
       backgroundColor: documentStyle.getPropertyValue('--yellow-400'),
       stack: 'Stack Offline',
     },
-    {
-      type: 'bar',
-      datalabels: 'Offline',
-      label: 'Rate Critical 3',
-      data: offlineRate3Data,
-      backgroundColor: documentStyle.getPropertyValue('--red-400'),
-      stack: 'Stack Offline',
-    },
+
     // current
     {
       type: 'bar',
@@ -161,6 +133,18 @@ const setChartData = () => {
     },
   ];
   return { datasets: datasets, labels: labels };
+};
+
+const getCurrentColor = (current, rateArr) => {
+  const documentStyle = getComputedStyle(document.documentElement);
+
+  if (current <= rateArr['rateCritical1']) {
+    return documentStyle.getPropertyValue('--primary-600');
+  } else if (current <= rateArr['rateCritical2']) {
+    return documentStyle.getPropertyValue('--yellow-600');
+  } else {
+    return documentStyle.getPropertyValue('--red-600');
+  }
 };
 
 const setChartOptions = () => {

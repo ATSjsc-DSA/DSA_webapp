@@ -236,7 +236,7 @@ const searchPsParameterQueryFilter = async (event) => {
 const searchPsEmsQueryFilter = async (event) => {
   const query = event.query.trim();
   try {
-    const res = await PowerSystemEmsApi.searchPs('', query);
+    const res = await PowerSystemEmsApi.searchPs([], query);
     parrentEmsSuggestions.value = res.data;
     return res.data;
   } catch (error) {

@@ -207,30 +207,30 @@ const createPs = async () => {
   formCreate.generalInfo.parrentId = formCreate.generalInfo.parrentData._id;
   delete formCreate.generalInfo.parrentData;
   formCreate.engineInfo.values = Object.values(definitionData.value).map((item) => item.value);
-  createForm.value = {
-    generalInfo: {
-      name: '',
-      parrentData: {},
-      uniqueId: '',
-      operationName: '',
-      operationUniqueId: '',
-    },
-    engineInfo: {
-      powerSystemDefinitionId: '',
-      values: [''],
-    },
-    scadaInfo: {
-      skey: '',
-      scadaName: '',
-      scadaUniqueId: '',
-    },
-  };
 
   try {
     await PowerSystemParameterApi.create(formCreate);
     emit('reloadPsParameter');
     emit('unvisible');
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    createForm.value = {
+      generalInfo: {
+        name: '',
+        parrentData: {},
+        uniqueId: '',
+        operationName: '',
+        operationUniqueId: '',
+      },
+      engineInfo: {
+        powerSystemDefinitionId: '',
+        values: [''],
+      },
+      scadaInfo: {
+        skey: '',
+        scadaName: '',
+        scadaUniqueId: '',
+      },
+    };
   } catch (error) {
     console.log('createPsParameter: error ', error);
     toast.add({ severity: 'error', summary: 'Create Power System - Parameter', detail: error.data.detail, life: 3000 });

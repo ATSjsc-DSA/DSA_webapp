@@ -1143,7 +1143,7 @@ const itemsMenuImportExport = computed(() => {
           icon: 'pi pi-plus',
           disabled: definitionList.value.length === 0,
           command: () => {
-            createPsVisibleDialog.value = true;
+            createEmsVisibleDialog.value = true;
           },
         },
         {

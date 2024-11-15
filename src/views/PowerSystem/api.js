@@ -166,15 +166,15 @@ export class PowerSystemEmsApi {
       page: page,
     });
   }
-  static async searchPs(psdDefinition_id = '', query = '', exceptionArr = []) {
+  static async searchPs(definitionList = [], query = '', exceptionArr = []) {
     let url = `/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/search`;
-    if (psdDefinition_id) {
-      url += `?psdDefinition_id=${psdDefinition_id}`;
-    }
     if (query) {
-      url += (psdDefinition_id ? '&' : '?') + `query=${query}`;
+      url += `?query=${query}`;
     }
-    return post(url, exceptionArr);
+    return post(url, {
+      listDefinition: definitionList,
+      form_data: exceptionArr,
+    });
   }
   // CRUD
   static async create(data) {
