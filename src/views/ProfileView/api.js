@@ -12,6 +12,10 @@ export class Api {
     return post(`/userconfig/${projectData.value._id}/profile`, data);
   }
 
+  static async cloneProfile(profileId) {
+    return put(`/userconfig/profile/${profileId}/clone`);
+  }
+
   static async updateProfileData(profileId, data) {
     return put(`/userconfig/profile/${profileId}`, data);
   }

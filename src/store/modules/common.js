@@ -11,6 +11,7 @@ export const useCommonStore = defineStore('common', () => {
   const measInfoList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
   const profileData = ref(JSON.parse(localStorage.getItem('profileData') || '{}'));
+
   const measInfoActive = ref(JSON.parse(localStorage.getItem('measInfoActive')));
   const editVersionData = ref({});
 
@@ -34,8 +35,6 @@ export const useCommonStore = defineStore('common', () => {
   };
 
   const getMeasInfoActive = async () => {
-    console.log('getMeasInfoActive');
-
     try {
       const { data } = await DSA_api.getMeasInfoActive(projectData.value._id);
       if (measInfoActive.value?._id !== data._id) {
@@ -107,6 +106,7 @@ export const useCommonStore = defineStore('common', () => {
 
   return {
     projectData: projectData,
+    profileData,
     measInfo_automatic,
     isLoading,
     setLoading,
