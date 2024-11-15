@@ -85,7 +85,14 @@
                 rounded
                 @click="confirmDelete($event, data)"
               />
-              <Button v-tooltip="'Run'" icon="pi pi-caret-right" text rounded @click="runProfile($event, data)" />
+              <Button
+                v-tooltip="'Setting User configuration'"
+                severity="info"
+                icon="pi pi-cog"
+                text
+                rounded
+                @click="runProfile($event, data)"
+              />
             </div>
           </template>
         </Column>
@@ -111,7 +118,7 @@
           <i :class="slotProps.message.icon" class="text-6xl" style="color: var(--primary-color)"></i>
         </div>
         <div class="flex flex-column gap-3 p-3">
-          <div>Create a Copy Profile and Run.</div>
+          <div>Create a Copy Profile and Open User Configuration.</div>
           <div class="font-semibold">Are you sure you want to Continue?</div>
         </div>
       </div>
@@ -257,16 +264,26 @@ const confirmClone = (event, data) => {
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
     acceptClass: 'p-button-sm p-button-success',
     rejectLabel: 'Cancel',
-    acceptLabel: 'Run',
+    acceptLabel: 'Copy and Run',
     accept: async () => {
-      await cloneProfile();
+      await cloneProfile(data);
     },
     reject: () => {},
   });
 };
 
 const cloneProfile = async (data) => {
-  toast.add({ severity: 'warn', summary: 'Clone Message', detail: 'Coming Soon', life: 3000 });
+  try {
+    const res = await Api.cloneProfile(data._id);
+    toast.add({ severity: 'success', summary: 'Cloned Successfully', life: 3000 });
+
+    setTimeout(() => {
+      saveProfileDataAndRedirect(res.data);
+    }, 500);
+  } catch (error) {
+    console.log('updateProfile error', error);
+    toast.add({ severity: 'error', summary: 'Cloned Message', detail: error.data.detail, life: 3000 });
+  }
 };
 
 const handleUpdate = (data) => {
@@ -323,12 +340,12 @@ const runProfile = (event, data) => {
       header: ' Profile - ' + data.name,
       group: 'runProfileDialog',
       data: data,
-      message: 'Are you sure you want to Run this Profile?',
+      message: 'Are you sure you want to Open this Profile?',
       icon: 'pi pi-exclamation-triangle',
       rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
       acceptClass: 'p-button-sm p-button-warning',
       rejectLabel: 'Cancel',
-      acceptLabel: 'Run',
+      acceptLabel: 'Open',
       accept: async () => {
         saveProfileDataAndRedirect(data);
       },
@@ -342,6 +359,7 @@ const saveProfileDataAndRedirect = (newProfile) => {
   profileData.value = newProfile;
   localStorage.setItem('profileData', JSON.stringify(newProfile));
   router.push('/user_config/config').catch((failure) => {
+    console.log('router.push failure', failure);
     if (isNavigationFailure(failure, NavigationFailureType.redirected)) {
       // Handle the failure
       console.log('Navigation was redirected');
