@@ -124,5 +124,6 @@ export const useCommonStore = defineStore('common', () => {
     measInfoList,
     updateMeasInfoAutomatic,
     updateMeasInfoActive,
+    profileData,
   };
 });
