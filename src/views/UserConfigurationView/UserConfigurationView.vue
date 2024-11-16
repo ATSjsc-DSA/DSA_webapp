@@ -211,7 +211,7 @@
                   </div>
                 </ScrollPanel>
               </TabPanel>
-              <TabPanel header="Offline">
+              <TabPanel header="Offline Plan">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
                   <dependencyTableWidget :dependency-id="vsaData._id" />
                 </ScrollPanel>
@@ -230,7 +230,7 @@
                   </div>
                 </ScrollPanel>
               </TabPanel>
-              <TabPanel header="Offline">
+              <TabPanel header="Offline Plan">
                 <ScrollPanel style="padding-right: 1rem; width: 100%; height: 45rem">
                   <dependencyTableWidget :dependency-id="tsaData._id" />
                 </ScrollPanel>

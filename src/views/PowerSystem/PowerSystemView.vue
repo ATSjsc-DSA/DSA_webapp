@@ -27,14 +27,12 @@
           @click="tabMenuOnTopActive = 2"
         />
       </div>
-      <Tag
-        :value="slotData.name"
-        severity="secondary"
-        aria-haspopup="true"
-        class="px-6"
-        @contextmenu="onSlotRightClick"
-      />
-      <ContextMenu ref="slotContextMenuRef" :model="slotContextMenu" />
+      <div class="flex gap-2 justify-content-between align-items-center">
+        <router-link to="/powersystem/slot" rel="Slot">
+          <Button title="Back to Slot Table" icon="pi pi-list" severity="secondary" text />
+        </router-link>
+        <Tag :value="slotData.name" severity="secondary" class="px-6" />
+      </div>
     </div>
     <Divider />
 
@@ -383,24 +381,16 @@
 
       <!-- tab version  -->
       <TabPanel>
-        <versionTabWidget
-          :data="versionList"
-          :totalRecord="totalRecordVersion"
-          @getVersionList="getVersionData"
-          @reload-all="loadAllData"
-        />
+        <versionTabWidget />
       </TabPanel>
 
       <!-- tab compare -->
 
       <TabPanel>
         <div class="flex align-items-center justify-content-between gap-2 w-full mb-3">
-          <div
-            v-if="sampleVersion._id !== editVersionData._id"
-            class="flex align-items-center justify-content-start gap-2 w-full mx-2"
-          >
+          <div class="flex align-items-center justify-content-start gap-2 w-full mx-2">
             <label class="">Sample Version:</label>
-            <Tag severity="secondary" :value="sampleVersion.name" style="font-size: 16px"></Tag>
+            <Tag severity="secondary" value="sampleVersion.name" style="font-size: 16px"></Tag>
 
             <div class="px-3">
               <i class="pi pi-arrow-right" style="font-size: 18px" />
@@ -424,35 +414,6 @@
         </div>
       </TabPanel>
     </TabView>
-    <!-- create new version dialog  -->
-    <Dialog v-model:visible="createVersionVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
-      <template #header>
-        <div class="inline-flex align-items-center justify-content-center gap-2">
-          <span class="font-bold white-space-nowrap">Create new Version</span>
-        </div>
-      </template>
-
-      <div class="my-3">
-        <div class="flex flex-column gap-2 mb-3">
-          <label :for="nameVersion" class="font-semibold"> Name Version</label>
-          <InputText :id="nameVersion" v-model="nameVersion" class="flex-auto" autocomplete="off" />
-        </div>
-
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="scheduledOperationTime" class="font-semibold"> Scheduled Operation Time</label>
-          <Calendar id="scheduledOperationTime" v-model="scheduledOperationTime" showTime hourFormat="24" />
-        </div>
-      </div>
-      <template #footer>
-        <Button type="button" label="Cancel" severity="secondary" @click="createVersionVisibleDialog = false"></Button>
-        <Button
-          type="button"
-          label="Submit"
-          :disabled="!nameVersion || !scheduledOperationTime"
-          @click="createNewVersion"
-        ></Button>
-      </template>
-    </Dialog>
   </div>
 
   <createPsDialog
@@ -598,20 +559,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {});
-// slot
-const slotContextMenuRef = ref();
-const onSlotRightClick = async (event) => {
-  slotContextMenuRef.value.show(event);
-};
-const slotContextMenu = ref([
-  {
-    label: 'Change Slot',
-    icon: 'pi pi-cog',
-    command: () => {
-      router.push({ path: '/powersystem/slot' });
-    },
-  },
-]);
+
 // tab menu
 
 const tabMenuPSActive = ref(0);
@@ -1052,18 +1000,10 @@ const getPsEmsWithTree = async (getHeader = false) => {
 const psCompareData = ref({});
 const isEditingVersion = ref(false);
 const tabMenuOnTopActive = ref(0);
-watch(tabMenuOnTopActive, (newTab) => {
-  if (newTab === 1) {
-    getVersionData();
-  }
-  if (newTab === 2) {
-    getComparePSD();
-  }
-});
 
 const getComparePSD = async (reloadMsg = false) => {
   try {
-    const res = await api.api.getComparePSD();
+    const res = await api.ApiVersion.getComparePSD();
     psCompareData.value = res.data;
     if (reloadMsg) {
       isLoadingProgress.value = true;
@@ -1079,22 +1019,6 @@ const getComparePSD = async (reloadMsg = false) => {
   setTimeout(() => {
     isLoadingProgress.value = false;
   }, 500);
-};
-
-const createVersionVisibleDialog = ref(false);
-const nameVersion = ref('');
-const scheduledOperationTime = ref();
-const createNewVersion = async () => {
-  try {
-    await api.api.createNewVersion(nameVersion.value, scheduledOperationTime.value);
-    toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
-    getComparePSD();
-    createVersionVisibleDialog.value = false;
-  } catch (error) {
-    console.log('createPS: error ', error);
-    // progressSpinnerModal.value = false;
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
 };
 
 const createPsVisibleDialog = ref(false);
@@ -1316,32 +1240,6 @@ function capitalizeFirstLetter(string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
-
-// version
-const versionList = ref([]);
-const totalRecordVersion = ref(0);
-
-const sampleVersion = ref({});
-
-const getVersionData = async (page = 1) => {
-  try {
-    const res = await api.api.getVersionList(page);
-    versionList.value = res.data[0];
-    totalRecordVersion.value = res.data[1];
-
-    // set version init
-    if (!sampleVersion.value.name) {
-      sampleVersion.value = versionList.value[0];
-    }
-    if (!editVersionData.value.name) {
-      commonStore.editVersionData = versionList.value[0];
-    }
-  } catch (error) {
-    versionList.value = [];
-    console.log('getVersionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Version List', detail: error.data.detail, life: 3000 });
-  }
-};
 </script>
 
 <style>

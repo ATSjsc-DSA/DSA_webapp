@@ -6,8 +6,11 @@
           <i :class="slotProps.message.icon" class="text-6xl" style="color: #fb923c"></i>
         </div>
         <div class="flex flex-column gap-3 p-3">
-          <div class="font-semibold">This Action will affect the final calculation result.</div>
-          <div class="text-orange-500 font-semibold">Are you sure you want to <b>Update</b>?</div>
+          <div class="font-semibold">{{ message }}</div>
+          <div class="text-orange-500 font-semibold">
+            Are you sure you want to <b>{{ action }}</b
+            >?
+          </div>
         </div>
       </div>
     </template>
@@ -16,4 +19,15 @@
 
 <script setup>
 import ConfirmDialog from 'primevue/confirmdialog';
+
+const props = defineProps({
+  message: {
+    type: String,
+    default: 'This Action will affect the final calculation result.',
+  },
+  action: {
+    type: String,
+    default: 'Update',
+  },
+});
 </script>

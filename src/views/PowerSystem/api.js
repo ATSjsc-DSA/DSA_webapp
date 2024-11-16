@@ -5,12 +5,22 @@ const { projectData, additionVersionId, slotData } = storeToRefs(commonStore);
 console.log('slotData', slotData.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
-export class api {
-  // import ems
+export class ApiVersion {
+  // version
+  static async getList(page) {
+    return get(`/powersystem/${projectData.value._id}/powersystemversion`, {
+      page: page,
+      page_size: 10,
+    });
+  }
 
-  // tree - powersystem edit
+  static async rollbackVersion(versionId) {
+    return put(`/powersystem/${projectData.value._id}/powersystemversion/${slotData.value._id}`);
+  }
 
-  // compare
+  static async saveVersion(data) {
+    return post(`/powersystem/${projectData.value._id}/${slotData.value._id}/newversion_powersystem`, data);
+  }
 
   static async getComparePSD() {
     return get(`/powersystem/${projectData.value._id}/compare_powersystem`);
@@ -23,19 +33,9 @@ export class api {
       // scheduledOperationTime: convertTimeStringToInt(scheduledOperationTime),
     });
   }
-
-  // version
-  static async getVersionList(page) {
-    return get(`/powersystem/${projectData.value._id}/powersystemversion`, {
-      page: page,
-      page_size: 10,
-    });
-  }
-
-  static async openVersion(powerSystemVersionId) {
-    return put(`/powersystem/${projectData.value._id}/powersystemversion/${slotData.value._id}`);
-  }
 }
+
+export class ApiCompare {}
 
 export class DefinitionListApi {
   static async getParameterDefinitionList() {
