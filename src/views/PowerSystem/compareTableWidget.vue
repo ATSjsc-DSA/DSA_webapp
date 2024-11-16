@@ -2,11 +2,11 @@
   <!-- Add  -->
   <Panel toggleable>
     <template #header>
-      <div class="my-3 text-green-500">New Power System ({{ data.Add.length }})</div>
+      <div class="my-3 text-green-500">New Power System ({{ tableData.Add.length }})</div>
     </template>
     <div class="py-2">
       <DataTable
-        :value="data.Add"
+        :value="tableData.Add"
         dataKey="_id"
         tableStyle="min-width: 50rem"
         :lazy="true"
@@ -38,7 +38,7 @@
         </ColumnGroup>
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
-             <div class="font-bold" style="min-width: 6rem">
+            <div class="font-bold" style="min-width: 6rem">
               {{ slotProps.data.generalInfo.uniqueId }}
             </div>
           </template>
@@ -63,11 +63,11 @@
   <!-- Update  -->
   <Panel toggleable class="mt-3">
     <template #header>
-      <div class="my-3 text-yellow-500">Update Power System ({{ data.Update.length }})</div>
+      <div class="my-3 text-yellow-500">Update Power System ({{ tableData.Update.length }})</div>
     </template>
     <div class="py-2">
       <DataTable
-        :value="data.Update"
+        :value="tableData.Update"
         dataKey="_id"
         tableStyle="min-width: 50rem"
         :lazy="true"
@@ -99,7 +99,7 @@
         </ColumnGroup>
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
-             <div class="font-bold" style="min-width: 6rem">
+            <div class="font-bold" style="min-width: 6rem">
               {{ slotProps.data.emsUniqueId }}
             </div>
           </template>
@@ -206,11 +206,11 @@
   <!-- Delete  -->
   <Panel toggleable class="mt-3">
     <template #header>
-      <div class="my-3 text-red-500">Delete Power System ({{ data.Delete.length }})</div>
+      <div class="my-3 text-red-500">Delete Power System ({{ tableData.Delete.length }})</div>
     </template>
     <div class="py-2">
       <DataTable
-        :value="data.Delete"
+        :value="tableData.Delete"
         dataKey="_id"
         tableStyle="min-width: 50rem"
         :lazy="true"
@@ -242,7 +242,7 @@
         </ColumnGroup>
         <Column header="Unique Id" style="width: 15%">
           <template #body="slotProps">
-             <div class="font-bold" style="min-width: 6rem">
+            <div class="font-bold" style="min-width: 6rem">
               {{ slotProps.data.generalInfo.uniqueId }}
             </div>
           </template>
@@ -267,21 +267,35 @@
 
 <script setup>
 import { computed } from 'vue';
-
-const props = defineProps({
-  data: {
-    type: Object,
-    required: true,
-  },
+import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
+const toast = useToast();
+import { ApiCompare } from './api';
+// --- compare
+onMounted(async () => {
+  await getComparePSD();
 });
-const data = computed(() => {
-  if (!props.data.Add) {
+
+const psCompareData = ref({});
+
+const getComparePSD = async () => {
+  try {
+    const res = await ApiCompare.getComparePSD();
+    psCompareData.value = res.data;
+  } catch (error) {
+    psCompareData.value = {};
+    toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const tableData = computed(() => {
+  if (!psCompareData.value.Add) {
     return {
       Add: [],
       Update: [],
       Delete: [],
     };
   }
-  return props.data;
+  return psCompareData.value;
 });
 </script>

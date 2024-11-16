@@ -387,31 +387,7 @@
       <!-- tab compare -->
 
       <TabPanel>
-        <div class="flex align-items-center justify-content-between gap-2 w-full mb-3">
-          <div class="flex align-items-center justify-content-start gap-2 w-full mx-2">
-            <label class="">Sample Version:</label>
-            <Tag severity="secondary" value="sampleVersion.name" style="font-size: 16px"></Tag>
-
-            <div class="px-3">
-              <i class="pi pi-arrow-right" style="font-size: 18px" />
-            </div>
-
-            <label class="">Editing Version:</label>
-            <Tag severity="primary" :value="editVersionData.name" style="font-size: 16px"></Tag>
-          </div>
-          <div class="flex align-items-center justify-content-end gap-2 w-full mb-3">
-            <Button severity="secondary" icon="pi pi-sync" label="Reload" @click="getComparePSD(true)" />
-            <Button
-              severity="success"
-              icon="pi pi-save"
-              label="Create new Version"
-              @click="createVersionVisibleDialog = true"
-            />
-          </div>
-        </div>
-        <div style="overflow: auto">
-          <compareTabWidget :data="psCompareData" />
-        </div>
+        <compareTabWidget />
       </TabPanel>
     </TabView>
   </div>
@@ -548,7 +524,7 @@ import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
 import { useCommonStore } from '@/store';
 
 const commonStore = useCommonStore();
-const { editVersionData, slotData } = storeToRefs(commonStore);
+const { slotData } = storeToRefs(commonStore);
 
 const toast = useToast();
 const isLoadingProgress = ref(false);
@@ -561,7 +537,7 @@ onMounted(async () => {
 onUnmounted(() => {});
 
 // tab menu
-
+const tabMenuOnTopActive = ref(0);
 const tabMenuPSActive = ref(0);
 const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Graphics']);
 const showDefinitionFlatList = ref(false);
@@ -994,31 +970,6 @@ const getPsEmsWithTree = async (getHeader = false) => {
     console.log('getPsDataWithTree: error ', error);
     toast.add({ severity: 'error', summary: 'Power System Edit', detail: error.data.detail, life: 3000 });
   }
-};
-
-// --- compare
-const psCompareData = ref({});
-const isEditingVersion = ref(false);
-const tabMenuOnTopActive = ref(0);
-
-const getComparePSD = async (reloadMsg = false) => {
-  try {
-    const res = await api.ApiVersion.getComparePSD();
-    psCompareData.value = res.data;
-    if (reloadMsg) {
-      isLoadingProgress.value = true;
-      toast.add({ severity: 'success', summary: 'History', detail: 'Reload Successfully', life: 3000 });
-    }
-    isEditingVersion.value = Boolean(
-      psCompareData.value.Add.length + psCompareData.value.Update.length + psCompareData.value.Delete.length,
-    );
-  } catch (error) {
-    psCompareData.value = {};
-    toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
-  }
-  setTimeout(() => {
-    isLoadingProgress.value = false;
-  }, 500);
 };
 
 const createPsVisibleDialog = ref(false);

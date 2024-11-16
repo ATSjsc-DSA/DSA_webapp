@@ -22,10 +22,6 @@ export class ApiVersion {
     return post(`/powersystem/${projectData.value._id}/${slotData.value._id}/newversion_powersystem`, data);
   }
 
-  static async getComparePSD() {
-    return get(`/powersystem/${projectData.value._id}/compare_powersystem`);
-  }
-
   static async createNewVersion(nameVersion, scheduledOperationTime) {
     return post(`/powersystem/${projectData.value._id}/newversion_powersystem`, {
       name: nameVersion,
@@ -35,7 +31,11 @@ export class ApiVersion {
   }
 }
 
-export class ApiCompare {}
+export class ApiCompare {
+  static async getComparePSD() {
+    return get(`/powersystem/${projectData.value._id}/${slotData.value._id}/compare_powersystem`);
+  }
+}
 
 export class DefinitionListApi {
   static async getParameterDefinitionList() {
