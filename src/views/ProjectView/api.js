@@ -14,4 +14,8 @@ export default class api {
   static async deleteroject(id) {
     return _delete('/project/' + id);
   }
+
+  static async getOnlineModeId() {
+    return get('/common/env/online');
+  }
 }

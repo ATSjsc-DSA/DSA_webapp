@@ -48,30 +48,18 @@
       </Column>
 
       <Column style="width: 1%; min-width: 5rem">
-        <template #body="slotProps">
+        <template #body="{ data }">
           <div class="flex justify-content-between">
-            <Button
-              icon="pi pi-pencil            "
-              severity="success"
-              text
-              rounded
-              @click="handleEditProject(slotProps.data)"
-            />
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              @click="deleteProject($event, slotProps.data._id)"
-            />
+            <Button icon="pi pi-pencil" severity="success" text rounded @click="handleEditProject(data)" />
+            <Button icon="pi pi-trash" severity="danger" text rounded @click="deleteProject($event, data._id)" />
 
-            <Button icon="pi pi-caret-right" text rounded @click="runProject(slotProps.data)" />
+            <Button icon="pi pi-caret-right" text rounded @click="handleRunProject(data)" />
           </div>
         </template>
       </Column>
     </DataTable>
     <Toast />
-    <ConfirmPopup></ConfirmPopup>
+    <ConfirmPopup />
   </div>
   <!-- create dialog data -->
   <Dialog v-model:visible="createVisibleDialog" :style="{ width: '28rem' }" header="Create New " :modal="true">
@@ -119,6 +107,51 @@
       <Button type="button" label="Update" @click="editProject()"></Button>
     </template>
   </Dialog>
+
+  <!-- choode online offline mode dialog  -->
+  <Dialog
+    v-model:visible="chooseModeVisibleDialog"
+    :style="{ width: '48rem' }"
+    header="chooseModeVisibleDialog"
+    :modal="true"
+  >
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold white-space-nowrap text-xl">Run Project - {{ projectSelectedData.name }}</span>
+      </div>
+    </template>
+    <div class="flex justify-content-between align-items-center gap-6 my-3">
+      <div class="flex-grow-1">
+        <div class="text-lg font-semibold mb-3">Offline Mode</div>
+        <div class="py-3">Full permission.</div>
+        <div class="w-full flex justify-content-end">
+          <Button
+            class="float-right"
+            icon="pi pi-play"
+            type="button"
+            severity="info"
+            label="Run"
+            @click="runOfflineMode"
+          ></Button>
+        </div>
+      </div>
+      <Divider layout="vertical" class="h-10rem flex" />
+      <div class="flex-grow-1">
+        <div class="text-lg font-semibold mb-3">Online Mode</div>
+        <div class="py-3">Disable Update and Delete.</div>
+        <div class="w-full flex justify-content-end">
+          <Button
+            class="float-right"
+            icon="pi pi-play"
+            type="button"
+            severity="success"
+            label="Run"
+            @click="runOnlineMode"
+          ></Button>
+        </div>
+      </div>
+    </div>
+  </Dialog>
 </template>
 
 <script setup>
@@ -136,7 +169,7 @@ const { convertDateTimeToString } = chartComposable();
 const toast = useToast();
 const confirm = useConfirm();
 const commonStore = useCommonStore();
-const { projectData } = storeToRefs(commonStore);
+const { projectData, slotData } = storeToRefs(commonStore);
 
 const onLogout = () => {
   localStorage.removeItem('token');
@@ -244,7 +277,31 @@ const deleteProject = async (event, projectId) => {
     },
   });
 };
-const runProject = (project) => {
+
+const projectSelectedData = ref({});
+const chooseModeVisibleDialog = ref(false);
+const handleRunProject = (project) => {
+  projectSelectedData.value = project;
+  chooseModeVisibleDialog.value = true;
+};
+
+const runOnlineMode = async (project) => {
+  try {
+    projectData.value = project;
+    localStorage.setItem('projectData', JSON.stringify(projectData.value));
+
+    const res = await api.getOnlineModeId();
+    slotData.value = res.data;
+    console.log(res, res.data);
+    sessionStorage.setItem('slotData', JSON.stringify(res.data));
+    setTimeout(() => {
+      router.push('/');
+    }, 500);
+  } catch (error) {
+    console.log('runOnlineMode error: ', error);
+  }
+};
+const runOfflineMode = (project) => {
   projectData.value = project;
   console.log('project', project);
   localStorage.setItem('projectData', JSON.stringify(projectData.value));

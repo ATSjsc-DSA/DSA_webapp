@@ -8,7 +8,7 @@ const { profileData, slotData } = storeToRefs(commonStore);
 const router = useRouter();
 const items = computed(() => {
   const userConfigPath = profileData.value._id ? '/user_config/config' : '/user_config/profile';
-  const powerSystemPath = slotData.value._id ? '/powersystem/ps' : '/powersystem/slot';
+  const powerSystemPath = '/powersystem/ps';
 
   return [
     {
