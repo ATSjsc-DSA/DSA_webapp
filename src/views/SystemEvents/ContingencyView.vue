@@ -135,7 +135,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ApiContingency, commonApi } from './api';
+import { ApiContingency } from './api';
 import { PowerSystemParameterApi, DefinitionListApi } from '@/views/PowerSystem/api';
 
 import Toast from 'primevue/toast';

@@ -97,7 +97,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ApiContingencies, commonApi } from './api';
+import { ApiContingencies } from './api';
 import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';

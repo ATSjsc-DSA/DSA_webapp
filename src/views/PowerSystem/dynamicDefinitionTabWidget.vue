@@ -14,7 +14,7 @@
       :loading="isLoadingData"
       size="small"
     >
-      <template #header>
+      <template v-if="showChangeColumn" #header>
         <div class="flex justify-content-end">
           <Button type="button" icon="pi pi-plus" size="small" text @click="handleCreate()" />
         </div>
@@ -42,7 +42,7 @@
               <div class="flex align-items-center justify-content-center w-full">Renewable</div>
             </template>
           </Column>
-          <Column header="" :rowspan="2" />
+          <Column v-if="showChangeColumn" header="" :rowspan="2" />
         </Row>
         <Row>
           <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
@@ -109,7 +109,7 @@
         style="text-wrap: nowrap; background-color: var(--surface-100)"
       />
 
-      <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+      <Column v-if="showChangeColumn" class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
         <template #body="{ data }">
           <div class="flex justify-content-between">
             <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
@@ -464,6 +464,10 @@ const props = defineProps({
   showDefinitionFlatList: { type: Boolean },
   nodeSelected: { type: Object },
   definitionId: { type: String, required: true },
+  showChangeColumn: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 watch(

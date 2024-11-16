@@ -69,8 +69,9 @@
           <TabPanel header="List Contingency">
             <DisturbanceView :itemActive="selectedItem"></DisturbanceView>
             <!-- <ContingencyView :contingenciesActive="selectedItem"></ContingencyView> -->
-          </TabPanel> </TabView
-      ></SplitterPanel>
+          </TabPanel>
+        </TabView></SplitterPanel
+      >
     </Splitter>
 
     <Dialog v-model:visible="visible" modal header="Create Contingencies" :style="{ width: '25rem' }">
@@ -95,7 +96,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ApiDisturbances, commonApi } from './api';
+import { ApiDisturbances } from './api';
 import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useToast } from 'primevue/usetoast';

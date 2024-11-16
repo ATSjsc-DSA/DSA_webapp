@@ -7,7 +7,7 @@ export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
 export class DefinitionListApi {
   static async getDefinitionListInStation(parentId = undefined) {
-    return get(`/powersystem/${projectData.value._id}/powersystemedit/${powerSystemVersionId.value}/child?`, {
+    return get(`/powersystem/${projectData.value._id}/powersystemdata/${powerSystemVersionId.value}/child?`, {
       parent_id: parentId,
     });
   }

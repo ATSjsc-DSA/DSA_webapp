@@ -146,7 +146,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ApiDisturbance, commonApi } from './api';
+import { ApiDisturbance } from './api';
 import { DefinitionListApi, PowerSystemParameterApi } from '@/views/PowerSystem/api';
 
 import Toast from 'primevue/toast';

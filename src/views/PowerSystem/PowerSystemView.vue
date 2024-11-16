@@ -27,11 +27,18 @@
           @click="tabMenuOnTopActive = 2"
         />
       </div>
-      <div class="flex gap-2 justify-content-between align-items-center">
+
+      <div v-if="slotData.name != 'Online'" class="flex gap-2 justify-content-between align-items-center">
         <router-link to="/powersystem/slot" rel="Slot">
           <Button title="Back to Slot Table" icon="pi pi-list" severity="secondary" text />
         </router-link>
         <Tag :value="slotData.name" severity="secondary" class="px-6" />
+
+        <Tag value="Online" severity="primary" class="px-6" />
+      </div>
+
+      <div v-else class="flex gap-2 justify-content-between align-items-center">
+        <Tag value="Online" severity="primary" class="px-6" />
       </div>
     </div>
     <Divider />
@@ -204,10 +211,12 @@
                         <TabView id="parameter-pole-tab-view" v-model:activeIndex="tabParameterMenuActive">
                           <TabPanel>
                             <div style="height: 37rem">
+                              !slotData.name === 'Online'{{ !slotData.name === 'Online' }}
                               <parameterTabWidget
                                 :data="psParameterData"
                                 :headerData="parameterDefinitionData"
                                 :loading="isLoadingPsParameterData"
+                                :show-change-column="!slotData.name === 'Online'"
                                 @editData="updatePsParameter"
                                 @deleteData="deletePSParameter"
                               />
@@ -264,6 +273,7 @@
                             :data="psParameterData"
                             :headerData="parameterDefinitionData"
                             :loading="isLoadingPsParameterData"
+                            :show-change-column="!slotData.name === 'Online'"
                             @editData="updatePsParameter"
                             @deleteData="deletePSParameter"
                           />
@@ -295,6 +305,7 @@
                           :emsData="psEmsData"
                           :loading="isLoadingPsEmsData"
                           :headerData="emsDefinitionData"
+                          :show-change-column="!slotData.name === 'Online'"
                           @update="updatePsEms"
                           @delete="deletePsEms"
                         />
@@ -331,6 +342,7 @@
                         <scadaInfoTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
+                          :show-change-column="!slotData.name === 'Online'"
                           @editData="updatePsParameter"
                           @deleteData="deletePSParameter"
                         />
@@ -356,6 +368,7 @@
                         :definitionId="definitionSelected._id || ''"
                         :showDefinitionFlatList="showDefinitionFlatList"
                         :nodeSelected="nodeSelected"
+                        :show-change-column="!slotData.name === 'Online'"
                       />
                     </TabPanel>
                     <TabPanel :disabled="isStation">
@@ -996,6 +1009,7 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'Import',
           icon: 'pi pi-upload',
+          disabled: slotData.value.name === 'Online',
           command: () => {
             importVisibleDialog.value = true;
           },
@@ -1008,7 +1022,7 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'Parameter',
           icon: 'pi pi-plus',
-          disabled: definitionList.value.length === 0,
+          disabled: slotData.value.name === 'Online' || definitionList.value.length === 0,
           command: () => {
             createPsVisibleDialog.value = true;
           },
@@ -1016,7 +1030,7 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'ATS Standard',
           icon: 'pi pi-plus',
-          disabled: definitionList.value.length === 0,
+          disabled: slotData.value.name === 'Online' || definitionList.value.length === 0,
           command: () => {
             createEmsVisibleDialog.value = true;
           },
@@ -1024,7 +1038,7 @@ const itemsMenuImportExport = computed(() => {
         {
           label: 'Pole',
           icon: 'pi pi-plus',
-          disabled: !isSublineNode.value,
+          disabled: slotData.value.name === 'Online' || !isSublineNode.value,
           command: () => {
             handleCreatePole();
           },

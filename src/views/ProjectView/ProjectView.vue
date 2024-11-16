@@ -285,14 +285,13 @@ const handleRunProject = (project) => {
   chooseModeVisibleDialog.value = true;
 };
 
-const runOnlineMode = async (project) => {
+const runOnlineMode = async () => {
   try {
-    projectData.value = project;
-    localStorage.setItem('projectData', JSON.stringify(projectData.value));
+    projectData.value = projectSelectedData.value;
+    localStorage.setItem('projectData', JSON.stringify(projectSelectedData.value));
 
     const res = await api.getOnlineModeId();
     slotData.value = res.data;
-    console.log(res, res.data);
     sessionStorage.setItem('slotData', JSON.stringify(res.data));
     setTimeout(() => {
       router.push('/');
@@ -301,10 +300,10 @@ const runOnlineMode = async (project) => {
     console.log('runOnlineMode error: ', error);
   }
 };
-const runOfflineMode = (project) => {
-  projectData.value = project;
-  console.log('project', project);
-  localStorage.setItem('projectData', JSON.stringify(projectData.value));
+const runOfflineMode = () => {
+  projectData.value = projectSelectedData.value;
+  console.log('project', projectSelectedData.value);
+  localStorage.setItem('projectData', JSON.stringify(projectSelectedData.value));
   router.push('/powersystem/slot');
 };
 </script>

@@ -4,19 +4,6 @@ import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { projectData, profileData } = storeToRefs(commonStore);
 
-export class commonApi {
-  static async searchPowerSystemData(psdDefinition_id = '', query = '', exceptionArr = []) {
-    let url = `/powersystem/${projectData.value._id}/powersystemedit/66decf1dcff005199529524b/search`;
-    if (psdDefinition_id) {
-      url += `?psdDefinition_id=${psdDefinition_id}`;
-    }
-    if (query) {
-      url += (psdDefinition_id ? '&' : '?') + `query=${query}`;
-    }
-    return post(url, exceptionArr);
-  }
-}
-
 export class ApiContingency {
   static async getListContingency(contingenciesActiveId, param) {
     return get(`/seedconfig/${contingenciesActiveId}/contingency`, param);
