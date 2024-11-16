@@ -17,7 +17,7 @@
         <template #header>
           <div class="flex align-items-center justify-content-between">
             <div class="font-semibold text-xl py-3">Dynamic Model Default</div>
-            <div class="flex align-items-center justify-content-end">
+            <div v-if="canChangeData" class="flex align-items-center justify-content-end">
               <Button type="button" label="Upload" icon="pi pi-upload" text @click="uploadVisibleDialog = true" />
               <Button type="button" label="Create" icon="pi pi-plus" text @click="handleCreate()" />
             </div>
@@ -51,7 +51,7 @@
                 <div class="flex align-items-center justify-content-center w-full">Renewable</div>
               </template>
             </Column>
-            <Column frozen header="" :rowspan="2" />
+            <Column v-if="canChangeData" frozen header="" :rowspan="2" />
           </Row>
           <Row>
             <Column field="Generator.name" header="Generator" style="text-wrap: nowrap" />
@@ -119,7 +119,7 @@
           style="text-wrap: nowrap; background-color: var(--surface-100)"
         />
 
-        <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+        <Column v-if="canChangeData" class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
           <template #body="{ data }">
             <div class="flex justify-content-between">
               <Button icon="pi pi-pencil " severity="success" text rounded @click="handleUpdate(data)" />
@@ -127,6 +127,7 @@
             </div>
           </template>
         </Column>
+        <template #empty> No Data </template>
       </DataTable>
     </div>
     <div v-if="totalRecords > pageRowNumber" class="flex justify-content-end align-items-center">
@@ -544,12 +545,18 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 import { Api } from './api';
 import { default as globalDynamicModelApi } from '@/views/GlobalDynamicModelView/api.js';
-
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { slotData } = storeToRefs(commonStore);
 const toast = useToast();
 const confirm = useConfirm();
 
 onMounted(async () => {
   await getTableData();
+});
+
+const canChangeData = computed(() => {
+  return !slotData.value.name === 'Online';
 });
 
 // Table Data

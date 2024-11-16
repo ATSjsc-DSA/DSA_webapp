@@ -130,11 +130,7 @@ onMounted(async () => {
   await getList();
 });
 
-// this is for test
-// chưa rõ current version của slot là gì
-
-const versionCurrent = ref({ _id: '66d98d4ace51b4dce36b33c7' });
-// end test
+const versionCurrent = ref({});
 
 const versionList = ref([]);
 const isLoadingData = ref(false);

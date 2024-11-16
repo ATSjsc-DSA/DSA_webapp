@@ -108,26 +108,6 @@
       <Card class="h-full">
         <template #title><i class="pi pi-chart-line pr-3"></i>Curve </template>
         <template #content>
-          <!-- this is for test  -->
-          <!-- <div class="w-full flex gap-6">
-            <div>
-              monitorTypeSelected
-              <pre>{{ monitorTypeSelected }}</pre>
-            </div>
-            <div>
-              exportTypeSelected
-              <pre>{{ exportTypeSelected }}</pre>
-            </div>
-            <div>
-              typeSelected
-              <pre>{{ typeSelected }}</pre>
-            </div>
-            <div>
-              curveChartData
-              <pre>{{ curveChartData }}</pre>
-            </div>
-          </div> -->
-          <!-- end test  -->
           <div style="height: 52rem">
             <comboChartBase
               :chartData="curveChartData"
