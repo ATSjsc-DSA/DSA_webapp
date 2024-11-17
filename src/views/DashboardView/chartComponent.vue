@@ -95,7 +95,7 @@ const nodeSelected = defineModel('nodeSelected');
 const stopReloadChartData = defineModel('stopReloadChartData');
 
 const interval = ref(null);
-const intervalTime =1000 //1 * 60 * 1000;
+const intervalTime = 3000; //1 * 60 * 1000;
 onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
@@ -106,33 +106,14 @@ onMounted(() => {
     }
     getChartData();
     chartRadarDataKey.value = nodeSelected.value.dataKey;
-
-    if (!stopReloadChartData.value) {
-      interval.value = setInterval(() => {
-        getChartData();
-      }, intervalTime);
-    }
   } else {
     setInitTitle();
   }
   if (props.typeChart === 'projectRadar') {
     getChartData();
-    interval.value = setInterval(() => {
-      getChartData();
-    }, intervalTime);
   }
 });
 
-watch(stopReloadChartData, (stt) => {
-  if (stt) {
-    clearInterval(interval.value);
-  } else {
-    getChartData();
-    interval.value = setInterval(() => {
-      getChartData();
-    }, intervalTime);
-  }
-});
 onUnmounted(() => {
   clearInterval(interval.value);
 });
@@ -209,9 +190,6 @@ const onDropComponent = async () => {
         });
       }
       if (props.typeChart === 'tsa') {
-        console.log('tsa');
-        console.log('nodeSelectedInChart', nodeSelectedInChart.value);
-        console.log('props.nodeDrag:', props.nodeDrag);
         nodeSelectedInChart.value.push({
           curveInfoId: props.nodeDrag._id,
           curveType: props.nodeDrag.curveType,
@@ -236,9 +214,9 @@ const onDropComponent = async () => {
     await getChartData();
     canDropNode.value = false;
 
-    interval.value = setInterval(() => {
-      getChartData();
-    }, intervalTime);
+    // interval.value = setInterval(async () => {
+    //   await getChartData();
+    // }, intervalTime);
   }
 };
 
@@ -284,8 +262,14 @@ const getChartData = async () => {
       chartData.value = [];
       modificationTime.value = undefined;
     }
+
+    if (!stopReloadChartData.value) {
+      setTimeout(async () => {
+        await getChartData();
+      }, intervalTime);
+    }
   } catch (error) {
-    console.log('getAppliactionChartData: error ', error);
+    console.log('get chart data: error ', error);
     chartData.value = [];
     modificationTime.value = undefined;
   }

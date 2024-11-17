@@ -46,7 +46,6 @@
                 <div v-if="w.type === 'map'" class="h-full">
                   <mapView @onRemoveWidget="onRemoveGridStackComponent(w)" />
                 </div>
-
                 <chartComponent
                   v-if="w.type === 'chart'"
                   v-model:nodeSelected="w.nodeSelected"
@@ -347,10 +346,13 @@ const confirmRemoveAllComponent = () => {
 };
 
 const removeAllComponent = () => {
-  gridStackComponentArr.value.forEach((widget) => {
-    gridStackComponentGrid.value.removeWidget(`#${widget.id}`, false);
-  });
-  gridStackComponentArr.value = [];
+  stopReloadChartData.value = true;
+  setTimeout(() => {
+    gridStackComponentArr.value.forEach((widget) => {
+      gridStackComponentGrid.value.removeWidget(`#${widget.id}`, false);
+    });
+    gridStackComponentArr.value = [];
+  }, 1000);
   toast.add({ severity: 'success', summary: 'Removed Successfully', life: 3000 });
 };
 
@@ -484,7 +486,7 @@ const changeMeasInfoMode = (event) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Submit',
     accept: () => {
-      // stopReloadChartData.value = !stopReloadChartData.value;
+      stopReloadChartData.value = !stopReloadChartData.value;
       commonStore.updateMeasInfoAutomatic(!measInfo_automatic.value);
       // measInfo_automatic.value = !measInfo_automatic.value;
     },
