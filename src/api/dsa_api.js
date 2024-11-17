@@ -271,4 +271,8 @@ export default class DSA_api {
   static async getDsaService() {
     return get(`/common/dsa/service`);
   }
+
+  static async updateDsaService(data) {
+    return put(`/common/dsa/service`, data);
+  }
 }

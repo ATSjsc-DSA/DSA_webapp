@@ -60,8 +60,6 @@
 <script setup>
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 
-import MultiSelect from 'primevue/multiselect';
-import Menu from 'primevue/menu';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
@@ -93,9 +91,9 @@ const props = defineProps({
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
 const stopReloadChartData = defineModel('stopReloadChartData');
-
+const autoreloadChartData = ref(!stopReloadChartData.value);
 const interval = ref(null);
-const intervalTime = 3000; //1 * 60 * 1000;
+const intervalTime = 1 * 60 * 1000;
 onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
@@ -115,8 +113,13 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  clearInterval(interval.value);
+  clearTimeout(interval.value);
+  autoreloadChartData.value = false;
 });
+watch(stopReloadChartData, (newStt) => {
+  autoreloadChartData.value = !newStt;
+});
+
 const onRemoveWidget = () => {
   resetChart();
   emit('onRemoveWidget');
@@ -263,8 +266,8 @@ const getChartData = async () => {
       modificationTime.value = undefined;
     }
 
-    if (!stopReloadChartData.value) {
-      setTimeout(async () => {
+    if (autoreloadChartData.value) {
+      interval.value = setTimeout(async () => {
         await getChartData();
       }, intervalTime);
     }
@@ -276,7 +279,7 @@ const getChartData = async () => {
 };
 
 const resetChart = async () => {
-  clearInterval(interval.value);
+  clearTimeout(interval.value);
   chartData.value = [];
   setInitTitle();
   nodeSelected.value = props.muiltiSelect ? {} : undefined;

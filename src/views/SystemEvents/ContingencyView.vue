@@ -4,7 +4,7 @@
   <div class="card">
     <DataTable
       :value="contingencies"
-      paginator
+      :paginator="totalList >= 10"
       :rows="10"
       :totalRecords="totalList"
       rowGroupMode="rowspan"
