@@ -59,7 +59,7 @@ const prop = defineProps({
   dialogVisible: Boolean,
   typeOptions: {
     type: Array,
-    default: [],
+    default: () => [],
   },
 });
 
@@ -76,7 +76,7 @@ const MeasInfoSelect = ref(measInfoActive.value);
 const timeStart = ref();
 const timeEnd = ref();
 const loadingMeasInfo = ref(false);
-const emit = defineEmits(['update:dialogVisible']);
+const emit = defineEmits(['update:dialogVisible', 'reloadData']);
 
 const updateMeasInfoList = async () => {
   try {
@@ -92,9 +92,8 @@ const updateMeasInfo = async () => {
   console.log(MeasInfoSelect.value, 'MeasInfoSelect.value');
 
   commonStore.updateMeasInfoActive(MeasInfoSelect.value);
-  console.log('abc');
-
   emit('update:dialogVisible', false);
+  emit('reloadData');
 };
 
 const formatMeasInfo = (timestamp) => {

@@ -118,6 +118,7 @@ onUnmounted(() => {
 });
 watch(stopReloadChartData, (newStt) => {
   autoreloadChartData.value = !newStt;
+  getChartData();
 });
 
 const onRemoveWidget = () => {

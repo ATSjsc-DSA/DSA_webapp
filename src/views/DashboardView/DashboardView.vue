@@ -214,7 +214,7 @@
       </div>
     </div>
   </div>
-  <MeasInfoDialog v-model:dialogVisible="MeasInfoDialogVisible"></MeasInfoDialog>
+  <MeasInfoDialog v-model:dialogVisible="MeasInfoDialogVisible" @reloadData="reloadData"></MeasInfoDialog>
   <ConfirmDialog />
   <Toast />
 </template>
