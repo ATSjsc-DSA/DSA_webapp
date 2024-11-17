@@ -87,7 +87,7 @@
                 <div class="w-full mb-5 px-3 mt-1 flex justify-content-between align-items-center">
                   <span class="text-xl font-semibold"> Power System</span>
                 </div>
-                <div class="w-full px-3" style="height: 48rem">
+                <div class="w-full px-3" style="height: 47rem">
                   <DataTable
                     :value="parameterData"
                     dataKey="_id"

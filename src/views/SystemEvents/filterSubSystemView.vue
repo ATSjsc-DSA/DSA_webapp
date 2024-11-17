@@ -2,11 +2,11 @@
   <div class="w-full mb-3 pl-3 mt-1 flex justify-content-between align-items-center">
     <span class="text-xl font-semibold"> Filter</span>
     <div class="flex gap-2 align-items-center justify-content-end">
-      <Button severity="secondary" icon="pi pi-save" style="width: 32px" @click="saveFilter" />
+      <Button severity="secondary" label="Save Filter" icon="pi pi-save" @click="saveFilter" />
 
       <Divider layout="vertical" />
-      <Button severity="warning" icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
-      <Button severity="primary" icon="pi pi-filter" style="width: 32px" @click="changFilter" />
+      <Button severity="warning" text icon="pi pi-times" style="width: 32px" @click="clearFilterSelected" />
+      <Button severity="primary" text icon="pi pi-filter" style="width: 32px" @click="changFilter" />
     </div>
   </div>
   <ScrollPanel style="width: 100%; height: 46rem">
@@ -206,7 +206,7 @@ watch(
       definitionSubsystemSelected.value = props.currentFilter.definition;
       psSelected.value = props.currentFilter.powerSystem;
 
-      filterConjunction.value = props.currentFilter.filter || '';
+      filterConjunction.value = props.currentFilter.filtering || '';
     });
   },
   { deep: true },

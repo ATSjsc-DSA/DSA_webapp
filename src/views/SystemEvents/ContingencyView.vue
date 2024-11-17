@@ -54,11 +54,11 @@
           />
         </template>
       </Column>
+      <template #empty> No data </template>
     </DataTable>
     <!-- Dialog -->
 
     <Dialog v-model:visible="visible" modal :header="headerDialog + ' Contingency'" :style="{ width: '35rem' }">
-      <span class="p-text-secondary block mb-5">{{ contingencyModelData.name }}</span>
       <div class="p-fluid">
         <div class="field">
           <label for="name" class="font-semibold">Name</label>
