@@ -108,7 +108,7 @@ const confirmRunSlot = (event, data) => {
 
 const saveSlotDataAndRedirect = (newSlot) => {
   slotData.value = newSlot;
-  sessionStorage.setItem('slotData', JSON.stringify(newSlot));
+  localStorage.setItem('slotData', JSON.stringify(newSlot));
   router.push('/powersystem/ps').catch((failure) => {
     console.log('router.push failure', failure);
     if (isNavigationFailure(failure, NavigationFailureType.redirected)) {

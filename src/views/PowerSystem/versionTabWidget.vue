@@ -15,7 +15,7 @@
       <template #header>
         <div class="flex align-items-center justify-content-between">
           <div class="font-semibold text-xl py-3">Version</div>
-          <div class="flex align-items-center justify-content-end">
+          <div v-if="canChange" class="flex align-items-center justify-content-end">
             <Button type="button" label="Save" icon="pi pi-save" text @click="handleCreateVersion" />
           </div>
         </div>
@@ -45,7 +45,7 @@
           {{ convertDateTimeToString(data.createdTimestamp) }}
         </template>
       </Column>
-      <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
+      <Column v-if="canChange" class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
         <template #body="{ data }">
           <Button
             v-tooltip.left="'Rollback to this Version'"
@@ -126,6 +126,9 @@ const toast = useToast();
 const confirm = useConfirm();
 import { ApiVersion } from './api';
 
+const props = defineProps({
+  canChange: { type: Boolean, default: false },
+});
 onMounted(async () => {
   await getList();
 });

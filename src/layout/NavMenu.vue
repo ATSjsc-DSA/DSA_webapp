@@ -108,4 +108,7 @@ const checkActiveRoute = (item) => router.currentRoute.value.path === item.to;
 .p-menuitem .p-submenu-list {
   flex-direction: row; /* Đảm bảo menu xổ ngang */
 }
+.p-menubar .p-menuitem {
+  margin: 0;
+}
 </style>

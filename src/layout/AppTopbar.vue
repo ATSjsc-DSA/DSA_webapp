@@ -81,6 +81,7 @@ const onTopBarUserView = () => {
 };
 const onProjectView = () => {
   localStorage.removeItem('projectData');
+  localStorage.removeItem('slotData');
   router.push('/Project');
 };
 

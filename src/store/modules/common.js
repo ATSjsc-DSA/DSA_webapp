@@ -11,7 +11,7 @@ export const useCommonStore = defineStore('common', () => {
   const measInfoList = ref([]);
   const projectData = ref(JSON.parse(localStorage.getItem('projectData') || '{}'));
   const profileData = ref(JSON.parse(localStorage.getItem('profileData') || '{}'));
-  const slotData = ref(JSON.parse(sessionStorage.getItem('slotData') || '{}'));
+  const slotData = ref(JSON.parse(localStorage.getItem('slotData') || '{}'));
 
   const measInfoActive = ref(JSON.parse(localStorage.getItem('measInfoActive')));
   const editVersionData = ref({});

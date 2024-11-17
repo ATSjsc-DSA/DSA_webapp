@@ -268,12 +268,16 @@
 <script setup>
 import { computed } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
 import { ApiCompare } from './api';
 // --- compare
+const props = defineProps({
+  disabled: { type: Boolean, default: false },
+});
 onMounted(async () => {
-  await getComparePSD();
+  if (!props.disabled) {
+    await getComparePSD();
+  }
 });
 
 const psCompareData = ref({});

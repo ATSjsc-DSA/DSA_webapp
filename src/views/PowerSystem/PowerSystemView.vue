@@ -20,6 +20,7 @@
           @click="tabMenuOnTopActive = 1"
         />
         <Button
+          v-if="!slotData.name === 'Online'"
           icon="pi pi-history"
           label="Compare"
           text
@@ -394,13 +395,13 @@
 
       <!-- tab version  -->
       <TabPanel>
-        <versionTabWidget />
+        <versionTabWidget :canChange="!slotData.name === 'Online'" />
       </TabPanel>
 
       <!-- tab compare -->
 
       <TabPanel>
-        <compareTabWidget />
+        <compareTabWidget :disabled="slotData.name === 'Online'" />
       </TabPanel>
     </TabView>
   </div>

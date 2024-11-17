@@ -117,6 +117,7 @@
           </div>
         </template>
       </Column>
+      <template #empty> No Data </template>
     </DataTable>
   </div>
   <div class="flex justify-content-end align-items-center">

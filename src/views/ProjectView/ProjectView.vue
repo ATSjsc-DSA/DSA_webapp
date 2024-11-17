@@ -121,7 +121,7 @@
       </div>
     </template>
     <div class="flex justify-content-between align-items-center gap-6 my-3">
-      <div class="flex-grow-1">
+      <div style="width: 20rem">
         <div class="text-lg font-semibold mb-3">Offline Mode</div>
         <div class="py-3">Full permission.</div>
         <div class="w-full flex justify-content-end">
@@ -136,7 +136,7 @@
         </div>
       </div>
       <Divider layout="vertical" class="h-10rem flex" />
-      <div class="flex-grow-1">
+      <div style="width: 20rem">
         <div class="text-lg font-semibold mb-3">Online Mode</div>
         <div class="py-3">Disable Update and Delete.</div>
         <div class="w-full flex justify-content-end">
@@ -292,7 +292,7 @@ const runOnlineMode = async () => {
 
     const res = await api.getOnlineModeId();
     slotData.value = res.data;
-    sessionStorage.setItem('slotData', JSON.stringify(res.data));
+    localStorage.setItem('slotData', JSON.stringify(res.data));
     setTimeout(() => {
       router.push('/');
     }, 500);
