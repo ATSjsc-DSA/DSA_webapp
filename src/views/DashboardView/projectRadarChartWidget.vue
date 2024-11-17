@@ -46,7 +46,7 @@ const chartData = ref({
   data: {
     Rate1: [], //[90, 90, 90, 90, 90, 90, 90, 0],
     Rate2: [], //[95, 95, 95, 95, 95, 95, 95, 0],
-    Rate3: [], //[100, 100, 100, 100, 100, 100, 100, 0],
+    // Rate3: [], //[100, 100, 100, 100, 100, 100, 100, 0],
     CurentState: [], //[99, 81, 81, 81, 81, 81, 81, 0],
   },
   modificationTime: '',
@@ -66,7 +66,7 @@ const transformApiResponse = (data) => {
     data: {
       Rate1: data.data.Rate1.slice(0, 7),
       Rate2: data.data.Rate2.slice(0, 7),
-      Rate3: data.data.Rate3.slice(0, 7),
+      // Rate3: data.data.Rate3.slice(0, 7),
       CurentState: data.data.CurentState.slice(0, 7),
     },
   };
@@ -77,7 +77,7 @@ const transformApiResponse = (data) => {
     result.Key.push(`slot${i + 1}`);
     result.data.Rate1.push(90);
     result.data.Rate2.push(95);
-    result.data.Rate3.push(100);
+    // result.data.Rate3.push(100);
     result.data.CurentState.push(0);
   }
 
@@ -91,23 +91,23 @@ const setChartData = () => {
 
   const rate1 = radarData.data.Rate1;
   const rate2 = radarData.data.Rate2;
-  const rate3 = radarData.data.Rate3;
+  // const rate3 = radarData.data.Rate3;
   const current = radarData.data.CurentState;
 
   let reserve1Data = [];
   let reserve2Data = [];
-  let reserve3Data = [];
+  // let reserve3Data = [];
 
   for (let index = 0; index < numAxis; index++) {
-    const re1 = (-current[index] + rate1[index]) / rate3[index];
-    const re2 = (-current[index] + rate2[index]) / rate3[index];
-    const re3 = (-current[index] + rate3[index]) / rate3[index];
+    const re1 = (-current[index] + rate1[index]) / rate2[index];
+    const re2 = (-current[index] + rate2[index]) / rate2[index];
+    // const re3 = (-current[index] + rate3[index]) / rate3[index];
     reserve1Data.push(re1);
     reserve2Data.push(re2);
-    reserve3Data.push(re3);
+    // reserve3Data.push(re3);
   }
 
-  const maxDataValue = Math.max(...reserve1Data, ...reserve2Data, ...reserve3Data);
+  const maxDataValue = Math.max(...reserve1Data, ...reserve2Data);
   if (maxDataValue > maxAxisValue) maxAxisValue = maxDataValue;
   maxAxisValue = maxDataValue + 0.05;
   maxAxisValue = maxAxisValue > 0.2 ? 0.2 : maxAxisValue;
@@ -122,10 +122,10 @@ const setChartData = () => {
 
   reserve1Data = removeValueBellowZero(reserve1Data);
   reserve2Data = removeValueBellowZero(reserve2Data);
-  reserve3Data = removeValueBellowZero(reserve3Data);
+  // reserve3Data = removeValueBellowZero(reserve3Data);
   reserve1Data = removeValueExceed20(reserve1Data);
   reserve2Data = removeValueExceed20(reserve2Data);
-  reserve3Data = removeValueExceed20(reserve3Data);
+  // reserve3Data = removeValueExceed20(reserve3Data);
 
   const currentData = new Array(numAxis).fill(0);
   const boundData = new Array(numAxis).fill(maxAxisValue);
@@ -133,10 +133,10 @@ const setChartData = () => {
   const currentValue = getChartConfig(currentData, 'rgba(0,0,0,1)', colorStatus, 'start', 'current');
   const reserve1Value = getChartConfig(reserve1Data, 'rgba(0,128,0,1)', 'rgba(40,167,69,0.5)', '-1', 'rate1');
   const reserve2Value = getChartConfig(reserve2Data, 'rgba(255,255,0,1)', 'rgba(255,165,0,0.5)', '-1', 'rate2');
-  const reserve3Value = getChartConfig(reserve3Data, 'rgba(244,67,54,1)', 'rgba(244,67,54,0.6)', '-1', 'rate3');
+  // const reserve3Value = getChartConfig(reserve3Data, 'rgba(244,67,54,1)', 'rgba(244,67,54,0.6)', '-1', 'rate3');
   const boundValue = getChartConfig(boundData, 'rgba(255,0,0,1)', 'rgba(255,0,0,0.6)', '-1', 'bound');
 
-  chartValue.push(currentValue, reserve1Value, reserve2Value, reserve3Value, boundValue);
+  chartValue.push(currentValue, reserve1Value, reserve2Value, boundValue);
   return {
     labels: radarData.Key,
     datasets: chartValue,

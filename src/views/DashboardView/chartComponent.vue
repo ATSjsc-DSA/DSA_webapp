@@ -8,13 +8,30 @@
         </div>
         <div class="flex justify-content-between align-items-center">
           <div v-if="chartData.Key">
-            <MultiSelect
-              v-model="chartRadarDataKey"
-              :options="chartData.Key"
-              :disabled="chartData.Key.length === 0"
-              :maxSelectedLabels="3"
-              class="w-full"
+            <Button
+              type="button"
+              icon="pi pi-ellipsis-v"
+              aria-haspopup="true"
+              aria-controls="overlay_panel"
+              text
+              @click="toggleMenu"
             />
+            <OverlayPanel id="overlay_panel" ref="menuSelectDataKey">
+              <div class="font-semibold text-lg mb-2">{{ chartTitle }}: Select Keys</div>
+              <Divider />
+              <div class="flex flex-column gap-3 p-2">
+                <div v-for="item in chartData.Key" :key="item" class="flex align-items-center">
+                  <Checkbox
+                    v-model="chartRadarDataKey"
+                    :inputId="item"
+                    :name="item"
+                    :value="item"
+                    :disabled="chartData.Key.length < 8"
+                  />
+                  <label :for="item" class="ml-2"> {{ item }} </label>
+                </div>
+              </div>
+            </OverlayPanel>
           </div>
           <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
           <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="getChartData" />
@@ -44,7 +61,7 @@
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 
 import MultiSelect from 'primevue/multiselect';
-
+import Menu from 'primevue/menu';
 import appBarchartWidget from './appBarchartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
@@ -78,7 +95,7 @@ const nodeSelected = defineModel('nodeSelected');
 const stopReloadChartData = defineModel('stopReloadChartData');
 
 const interval = ref(null);
-const intervalTime = 3000;
+const intervalTime =1000 //1 * 60 * 1000;
 onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
@@ -122,6 +139,12 @@ onUnmounted(() => {
 const onRemoveWidget = () => {
   resetChart();
   emit('onRemoveWidget');
+};
+
+const menuSelectDataKey = ref(null);
+
+const toggleMenu = (event) => {
+  menuSelectDataKey.value.toggle(event);
 };
 
 const typeChartCanDrop = computed(() => {
@@ -186,6 +209,9 @@ const onDropComponent = async () => {
         });
       }
       if (props.typeChart === 'tsa') {
+        console.log('tsa');
+        console.log('nodeSelectedInChart', nodeSelectedInChart.value);
+        console.log('props.nodeDrag:', props.nodeDrag);
         nodeSelectedInChart.value.push({
           curveInfoId: props.nodeDrag._id,
           curveType: props.nodeDrag.curveType,

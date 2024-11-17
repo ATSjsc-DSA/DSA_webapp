@@ -65,7 +65,7 @@
 
           <template #TSA="slotProps">
             <div class="w-full flex align-items-center justify-content-start gap-3">
-              <Tag value="TSA" severity="contrast" rounded />
+              <Tag value="TSA" severity="secondary" rounded />
               <div :class="{ textUnActive: !slotProps.node.active }">
                 {{ slotProps.node.label }}
               </div>
