@@ -132,7 +132,7 @@ export class PowerSystemParameterApi {
   }
 
   static async getPowersystemMonitor(psde_id) {
-    return get(`/powersystem//${projectData.value._id}/${slotData.value._id}/powersystemdata/monitor/${psde_id}`);
+    return get(`/powersystem/${projectData.value._id}/${slotData.value._id}/powersystemdata/monitor/${psde_id}`);
   }
 
   static async getPowersystemData(psde_id) {
