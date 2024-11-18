@@ -132,11 +132,11 @@ export class PowerSystemParameterApi {
   }
 
   static async getPowersystemMonitor(psde_id) {
-    return get(`/powersystem/powersystemdata/monitor/${psde_id}`);
+    return get(`/powersystem//${projectData.value._id}/${slotData.value._id}/powersystemdata/monitor/${psde_id}`);
   }
 
   static async getPowersystemData(psde_id) {
-    return get(`/powersystem/${projectData.value._id}/powersystemdata/${slotData.value._id}/${psde_id}`);
+    return get(`/powersystem/${projectData.value._id}/powersystemdata/${slotData.value._id}/data/${psde_id}`);
   }
 }
 
@@ -196,7 +196,7 @@ export class PowerSystemEmsApi {
     return _delete(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/${psId}`);
   }
   static async getPowersystemEmsData(pss_id) {
-    return get(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/${pss_id} `);
+    return get(`/powersystem/${projectData.value._id}/powersystemems/${slotData.value._id}/data/${pss_id} `);
   }
 }
 

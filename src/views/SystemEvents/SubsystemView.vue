@@ -82,12 +82,12 @@
               <SplitterPanel
                 class="flex flex-column h-full align-items-start justify-content-start overflow-y-auto"
                 :size="20"
-                :minSize="10"
+                :minSize="20"
               >
                 <div class="w-full mb-5 px-3 mt-1 flex justify-content-between align-items-center">
                   <span class="text-xl font-semibold"> Power System</span>
                 </div>
-                <div class="w-full px-3" style="height: 47rem">
+                <div class="w-full pl-3" style="height: 42rem">
                   <DataTable
                     :value="parameterData"
                     dataKey="_id"
@@ -118,7 +118,7 @@
                   </DataTable>
                 </div>
                 <!-- ps table - Paginator -->
-                <div class="flex w-full justify-content-end align-items-center">
+                <div class="flex w-full justify-content-end align-items-center px-3">
                   <Paginator
                     v-if="parameterTotal > pageRowNumber"
                     v-model:first="parameterTotalPaginatorOffset"

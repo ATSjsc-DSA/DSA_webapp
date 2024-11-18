@@ -75,6 +75,7 @@
           </div>
         </template>
       </Column>
+      <template #empty> No Data </template>
     </DataTable>
     <div class="flex justify-content-end align-items-center mt-3">
       <Paginator

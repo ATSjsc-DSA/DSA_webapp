@@ -179,7 +179,7 @@ const updateSettingDSA = async () => {
   try {
     const dataUpdate = JSON.parse(JSON.stringify(dataSettingDSA.value));
     dataUpdate.dataVersion = {
-      powersystemVersionId: psVersionSelected.value._id,
+      powersystemDataVersion: psVersionSelected.value._id,
       powersystemDynVersionId: dynamicVersionSelected.value._id,
       userConfigProfileId: profileSelected.value._id,
       gridCodeId: gridCodeSelected.value._id,
@@ -196,7 +196,7 @@ const getDsaSystemSettingSelected = async () => {
   try {
     const res = await DSA_api.getDsaService();
     dataSettingDSA.value = res.data;
-    psVersionSelected.value = res.data.dataVersion.powersystemVersion;
+    psVersionSelected.value = res.data.dataVersion.powersystemDataVersion;
     profileSelected.value = res.data.dataVersion.userConfigProfile;
     gridCodeSelected.value = res.data.dataVersion.gridCode;
     dynamicVersionSelected.value = res.data.dataVersion.powersystemDynVersion;
