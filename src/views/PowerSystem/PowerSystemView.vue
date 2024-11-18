@@ -467,10 +467,10 @@
   >
     <TabView id="import-tab-view">
       <TabPanel header="EMS">
-        <uploadFileConfig :multipleFile="true" :fileLimit="2" @uploadFile="loadEmsFile" />
+        <uploadEmsFile @uploadFile="loadEmsFile" />
       </TabPanel>
       <TabPanel header="Dynamic Model">
-        <uploadFileConfig @uploadFile="loadDynamicFile" />
+        <uploadDynamicFile @uploadFile="loadDynamicFile" />
       </TabPanel>
     </TabView>
   </Dialog>
@@ -507,13 +507,13 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
 import uploadFileConfig from '../../components/uploadFileConfig.vue';
-
+import uploadEmsFile from './uploadEmsFile.vue';
+import uploadDynamicFile from '../dynamicModelDefault/uploadDynamicFile.vue';
 import compareTabWidget from './compareTableWidget.vue';
 import versionTabWidget from './versionTabWidget.vue';
 
 import flatListFilterWidget from './menuLeftWidget/flatListFilterWidget.vue';
 import hierarchicalListWidget from './menuLeftWidget/hierarchicalListWidget.vue';
-
 import scadaInfoTabWidget from './parameterTableTabWidget/scadaInfoTabWidget.vue';
 import parameterTabWidget from './parameterTableTabWidget/parameterTabWidget.vue';
 import poleTableWidget from './parameterTableTabWidget/poleTableWidget.vue';

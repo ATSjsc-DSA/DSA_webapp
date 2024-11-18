@@ -33,7 +33,7 @@
           <template #body="{ data }">
             <Button
               v-tooltip="'Setting Power System'"
-              icon="pi pi-cog"
+              icon="pi pi-caret-right"
               text
               rounded
               class="flex m-auto"

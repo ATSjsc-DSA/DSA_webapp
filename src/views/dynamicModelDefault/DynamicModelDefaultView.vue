@@ -530,7 +530,7 @@
     header="Upload Dynamic Model Default"
     :modal="true"
   >
-    <uploadFileConfig @uploadFile="uploadFile" />
+    <uploadDynamicFile @uploadFile="uploadFile" />
   </Dialog>
 </template>
 
@@ -538,8 +538,7 @@
 import { computed, onMounted, watch } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-
-import uploadFileConfig from '@/components/uploadFileConfig.vue';
+import uploadDynamicFile from './uploadDynamicFile.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
