@@ -1,6 +1,6 @@
 <template>
-  <div class="card w-full h-full">
-    <div style="height: 52rem" class="flex align-items-start justify-content-center">
+  <div class="card layout-content m-4 py-6">
+    <div class="flex align-items-start justify-content-center py-6">
       <DataTable
         id="slotList"
         :value="slotList"
@@ -15,6 +15,9 @@
         <template #header>
           <div class="flex align-items-center justify-content-between">
             <div class="font-semibold text-xl py-3">Power System Slot</div>
+            <router-link to="/Project">
+              <Button v-tooltip.bottom="'Project'" severity="secondary" icon="pi pi-sign-out" text />
+            </router-link>
           </div>
         </template>
         <Column field="name" frozen header="Name" style="text-wrap: nowrap; width: 8rem">

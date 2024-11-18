@@ -80,11 +80,7 @@ const router = createRouter({
           name: 'StudyMode',
           component: () => import('@/views/StudyModeView.vue'),
         },
-        {
-          path: '/powersystem/slot',
-          name: 'PowerSystemSlot',
-          component: () => import('@/views/SlotView/SlotView.vue'),
-        },
+
         {
           path: '/powersystem/ps',
           name: 'powersystem',
@@ -155,6 +151,12 @@ const router = createRouter({
       path: '/Project',
       name: 'Project',
       component: () => import('@/views/ProjectView/ProjectView.vue'),
+    },
+
+    {
+      path: '/powersystem/slot',
+      name: 'PowerSystemSlot',
+      component: () => import('@/views/SlotView/SlotView.vue'),
     },
     {
       meta: {

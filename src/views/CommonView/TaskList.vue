@@ -162,6 +162,9 @@ const forwardView = (data) => {
       case 100:
         router.push('/');
         break;
+
+      default:
+        return '';
     }
   }
 };
@@ -215,6 +218,9 @@ const getState = (state) => {
 
     case 6:
       return 'TIMEOUT';
+
+    default:
+      return '';
   }
 };
 
@@ -237,6 +243,9 @@ const getSeverity = (state) => {
 
     case 6:
       return 'secondary';
+
+    default:
+      return '';
   }
 };
 
@@ -282,9 +291,14 @@ const getCommandType = (command) => {
 
     case 1000:
       return 'CANCEL_CURRENT_CALCULATION';
+
+    default:
+      return '';
   }
 };
 
+const uploadDialog = ref(false);
+const onHide = () => {};
 const hideButton = (command) => {
   const specialCommands = [20, 21, 22, 100];
   return specialCommands.includes(command);

@@ -169,7 +169,7 @@ const getDefinitionList = async () => {
     setDefinitionfilterId();
   } catch (error) {
     console.log('getDefinitionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 

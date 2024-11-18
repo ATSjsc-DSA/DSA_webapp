@@ -2,7 +2,7 @@
   <div class="card layout-content m-4">
     <DataTable
       :value="listProject"
-      paginator
+      :paginator="totalList >= 10"
       :rows="10"
       :totalRecords="totalList"
       dataKey="_id"
@@ -257,9 +257,9 @@ const deleteProject = async (event, projectId) => {
     message: 'Are you sure you want to proceed?',
     icon: 'pi pi-exclamation-triangle',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
     rejectLabel: 'Cancel',
-    acceptLabel: 'Save',
+    acceptLabel: 'Submit',
     accept: async () => {
       try {
         const res = await api.deleteroject(projectId);
@@ -271,9 +271,6 @@ const deleteProject = async (event, projectId) => {
         progressSpinnerModal.value = false;
         toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
       }
-    },
-    reject: () => {
-      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
     },
   });
 };
@@ -298,6 +295,7 @@ const runOnlineMode = async () => {
     }, 500);
   } catch (error) {
     console.log('runOnlineMode error: ', error);
+    toast.add({ severity: 'error', summary: 'Online Mode', detail: error.data.detail, life: 3000 });
   }
 };
 const runOfflineMode = () => {

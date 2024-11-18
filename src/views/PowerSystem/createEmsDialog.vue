@@ -173,7 +173,7 @@ const getEmsfilterList = async () => {
     }
   } catch (error) {
     console.log('getEmsfilterList: error ', error);
-    toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
   }
 };
 

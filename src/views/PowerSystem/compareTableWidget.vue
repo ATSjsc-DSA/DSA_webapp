@@ -288,7 +288,7 @@ const getComparePSD = async () => {
     psCompareData.value = res.data;
   } catch (error) {
     psCompareData.value = {};
-    toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Compare Power System', detail: error.data.detail, life: 3000 });
   }
 };
 

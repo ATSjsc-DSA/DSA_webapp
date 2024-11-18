@@ -25,6 +25,6 @@ export class Api {
   }
 
   static async activeGridcode(gridcodeId) {
-    return _active(`/gridcode/group/${gridcodeId}`);
+    return put(`/gridcode/group/${gridcodeId}/active`);
   }
 }

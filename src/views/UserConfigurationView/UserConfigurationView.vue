@@ -796,7 +796,7 @@ const appData = ref({
 const getAppData = async (appId) => {
   try {
     const res = await ApiApplication.getAppData(appId);
-    res.data.startTimestamp = new Date(res.data.startTimestamp);
+    res.data.startTimestamp = new Date(res.data.startTimestamp * 1000);
     appData.value = res.data;
   } catch (error) {
     console.log('getAppData: error ', error);
@@ -808,7 +808,7 @@ const createApplication = async () => {
     const dataLoad = {
       name: newAppData.value.name,
       active: newAppData.value.active,
-      startTimestamp: newAppData.value.startTimestamp.getTime() / 1000,
+      startTimestamp: parseInt(newAppData.value.startTimestamp.getTime() / 1000),
     };
     const res = await ApiApplication.createApp(dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
@@ -828,7 +828,7 @@ const updateApplication = async () => {
     const res = await ApiApplication.updateAppData(appData.value._id, {
       name: appData.value.name,
       active: appData.value.active,
-      startTimestamp: appData.value.startTimestamp.getTime() / 1000,
+      startTimestamp: parseInt(appData.value.startTimestamp.getTime() / 1000),
     });
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     treeData.value[0].children[nodeSelected.value.key].label = res.data.name;

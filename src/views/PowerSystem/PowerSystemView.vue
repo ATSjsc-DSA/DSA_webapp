@@ -20,7 +20,7 @@
           @click="tabMenuOnTopActive = 1"
         />
         <Button
-          v-if="!slotData.name === 'Online'"
+          v-if="slotData.name !== 'Online'"
           icon="pi pi-history"
           label="Compare"
           text
@@ -28,14 +28,11 @@
           @click="tabMenuOnTopActive = 2"
         />
       </div>
-
-      <div v-if="slotData.name != 'Online'" class="flex gap-2 justify-content-between align-items-center">
+      <div v-if="slotData.name !== 'Online'" class="flex gap-2 justify-content-between align-items-center">
         <router-link to="/powersystem/slot" rel="Slot">
           <Button title="Back to Slot Table" icon="pi pi-list" severity="secondary" text />
         </router-link>
         <Tag :value="slotData.name" severity="secondary" class="px-6" />
-
-        <Tag value="Online" severity="primary" class="px-6" />
       </div>
 
       <div v-else class="flex gap-2 justify-content-between align-items-center">
@@ -212,12 +209,12 @@
                         <TabView id="parameter-pole-tab-view" v-model:activeIndex="tabParameterMenuActive">
                           <TabPanel>
                             <div style="height: 37rem">
-                              !slotData.name === 'Online'{{ !slotData.name === 'Online' }}
+                              slotData.name !== 'Online'{{ slotData.name !== 'Online' }}
                               <parameterTabWidget
                                 :data="psParameterData"
                                 :headerData="parameterDefinitionData"
                                 :loading="isLoadingPsParameterData"
-                                :show-change-column="!slotData.name === 'Online'"
+                                :show-change-column="slotData.name !== 'Online'"
                                 @editData="updatePsParameter"
                                 @deleteData="deletePSParameter"
                               />
@@ -274,7 +271,7 @@
                             :data="psParameterData"
                             :headerData="parameterDefinitionData"
                             :loading="isLoadingPsParameterData"
-                            :show-change-column="!slotData.name === 'Online'"
+                            :show-change-column="slotData.name !== 'Online'"
                             @editData="updatePsParameter"
                             @deleteData="deletePSParameter"
                           />
@@ -306,7 +303,7 @@
                           :emsData="psEmsData"
                           :loading="isLoadingPsEmsData"
                           :headerData="emsDefinitionData"
-                          :show-change-column="!slotData.name === 'Online'"
+                          :show-change-column="slotData.name !== 'Online'"
                           @update="updatePsEms"
                           @delete="deletePsEms"
                         />
@@ -343,7 +340,7 @@
                         <scadaInfoTabWidget
                           :data="psParameterData"
                           :loading="isLoadingPsParameterData"
-                          :show-change-column="!slotData.name === 'Online'"
+                          :show-change-column="slotData.name !== 'Online'"
                           @editData="updatePsParameter"
                           @deleteData="deletePSParameter"
                         />
@@ -369,7 +366,7 @@
                         :definitionId="definitionSelected._id || ''"
                         :showDefinitionFlatList="showDefinitionFlatList"
                         :nodeSelected="nodeSelected"
-                        :show-change-column="!slotData.name === 'Online'"
+                        :show-change-column="slotData.name !== 'Online'"
                       />
                     </TabPanel>
                     <TabPanel :disabled="isStation">
@@ -395,7 +392,7 @@
 
       <!-- tab version  -->
       <TabPanel>
-        <versionTabWidget :canChange="!slotData.name === 'Online'" />
+        <versionTabWidget :canChange="slotData.name !== 'Online'" />
       </TabPanel>
 
       <!-- tab compare -->
@@ -595,7 +592,7 @@ const getDefinitionList = async () => {
     definitionList.value = res.data;
   } catch (error) {
     console.log('getDefinitionList: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -743,7 +740,7 @@ const getEmsfilterList = async (definitionName = '') => {
     }
   } catch (error) {
     console.log('getEmsfilterList: error ', error);
-    toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
+    // toast.add({ severity: 'error', summary: 'EMS List', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -1076,9 +1073,11 @@ const loadDynamicFile = async (formData, callback) => {
     dynamicImportFormdata.value = formData;
     console.log('load Dynamic file', formData);
     await DynamicModelApi.importDynamicModel(formData);
-    await delayImportExport();
     toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
     isLoadingProgress.value = false;
+    importVisibleDialog.value = false;
+    await loadAllData();
+
     callback();
   } catch (error) {
     toast.add({ severity: 'danger', summary: 'Dynamic Model', detail: error, life: 3000 });

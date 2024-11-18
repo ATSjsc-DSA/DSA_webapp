@@ -122,7 +122,7 @@ onMounted(() => {
 
   // Kiểm tra xem theme có giá trị hay không trước khi thực hiện thay đổi
   if (theme !== null) {
-    const DarkMode = theme.includes('dark') ? true : false;
+    const DarkMode = !!theme.includes('dark');
 
     const linkElement = document.getElementById('theme-css');
 
@@ -150,10 +150,10 @@ onMounted(() => {
         <div class="flex align-items-center gap-2 border-1 surface-border py-1 px-2" style="border-radius: 30px">
           <Button
             icon="pi pi-minus"
-            @click="decrementScale"
             text
             rounded
             :disabled="layoutConfig.scale.value === scales[0]"
+            @click="decrementScale"
           />
           <i
             v-for="s in scales"
@@ -163,10 +163,10 @@ onMounted(() => {
 
           <Button
             icon="pi pi-plus"
-            @click="incrementScale"
             text
             rounded
             :disabled="layoutConfig.scale.value === scales[scales.length - 1]"
+            @click="incrementScale"
           />
         </div>
       </section>
@@ -176,7 +176,7 @@ onMounted(() => {
         <InputSwitch :modelValue="layoutConfig.darkTheme.value" @update:modelValue="onDarkModeChange" />
       </section>
 
-      <template v-if="!simple">
+      <!-- <template v-show="false">
         <section class="py-4 flex align-items-center justify-content-between border-bottom-1 surface-border">
           <span class="text-xl font-semibold">Menu Type</span>
           <SelectButton
@@ -200,7 +200,7 @@ onMounted(() => {
             :allowEmpty="false"
           />
         </section>
-      </template>
+      </template> -->
 
       <!-- <section class="py-4 flex align-items-center justify-content-between border-bottom-1 surface-border">
         <span class="text-xl font-semibold">Ripple Effect</span>

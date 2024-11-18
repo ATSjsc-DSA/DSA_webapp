@@ -53,14 +53,16 @@
           <template #body="{ data }">
             <div class="flex justify-content-between">
               <Button
+                v-if="!data.active"
                 v-tooltip="'Active'"
-                icon="pi pi-check-square"
-                :severity="data.active ? 'success' : 'secondary'"
+                icon="pi pi-caret-right"
+                severity="success"
                 text
                 rounded
-                :disabled="data.active"
-                @click="confirmActive(data)"
+                @click="confirmActive($event, data)"
               />
+
+              <Button v-else text />
 
               <Button
                 v-tooltip="'Edit'"
@@ -82,7 +84,7 @@
               <Divider layout="vertical" />
 
               <router-link :to="`/gridcode/element/${data._id}`">
-                <Button v-tooltip.left="'Config'" icon="pi pi-caret-right" text rounded />
+                <Button v-tooltip.left="'Config'" severity="info" icon="pi pi-cog" text rounded />
               </router-link>
             </div>
           </template>
@@ -105,25 +107,20 @@
     </div>
   </div>
 
-  <Dialog v-model:visible="changeVisibleDialog" :style="{ width: '48rem' }" header="Change Dialog " :modal="true">
+  <Dialog v-model:visible="changeVisibleDialog" :style="{ width: '32rem' }" header="Change Dialog " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Grid Code</span>
       </div>
     </template>
     <div class="grid align-items-center">
-      <div class="col-8">
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="areaname" class="font-semibold w-6rem"> Name</label>
+      <div class="col-12">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="startTimestamp" class="font-semibold"> Name </label>
           <InputText id="areaname" v-model="changeData.name" class="flex-auto" autocomplete="off" />
         </div>
       </div>
-      <div class="col-4">
-        <div class="flex align-items-center gap-3 mb-3">
-          <label for="active" class="font-semibold w-6rem"> Active</label>
-          <InputSwitch id="active" v-model="changeData.active" disabled autocomplete="off" />
-        </div>
-      </div>
+
       <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
           <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
@@ -219,7 +216,6 @@ const getGridCodeList = async () => {
 const changeVisibleDialog = ref(false);
 const changeMode = ref();
 const changeData = ref({
-  active: true,
   name: '',
   endTimestamp: new Date(),
   startTimestamp: new Date(),
@@ -227,7 +223,6 @@ const changeData = ref({
 const handleCreate = () => {
   changeMode.value = 'Create';
   changeData.value = {
-    active: true,
     name: '',
     endTimestamp: new Date(),
     startTimestamp: new Date(),
@@ -237,9 +232,9 @@ const handleCreate = () => {
 const getChangeData = () => {
   return {
     name: changeData.value.name,
-    active: changeData.value.active,
-    endTimestamp: new Date(changeData.value.startTimestamp).getTime() / 1000,
-    startTimestamp: new Date(changeData.value.endTimestamp).getTime() / 1000,
+    active: false,
+    endTimestamp: parseInt(new Date(changeData.value.startTimestamp).getTime() / 1000),
+    startTimestamp: parseInt(new Date(changeData.value.endTimestamp).getTime() / 1000),
   };
 };
 const createGridCode = async () => {
@@ -257,8 +252,8 @@ const createGridCode = async () => {
 const handleUpdate = (data) => {
   changeMode.value = 'Update';
   const oldData = JSON.parse(JSON.stringify(data));
-  oldData.startTimestamp = new Date(oldData.startTimestamp);
-  oldData.endTimestamp = new Date(oldData.endTimestamp);
+  oldData.startTimestamp = new Date(oldData.startTimestamp * 1000);
+  oldData.endTimestamp = new Date(oldData.endTimestamp * 1000);
   changeData.value = oldData;
   changeVisibleDialog.value = true;
 };

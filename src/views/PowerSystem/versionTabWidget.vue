@@ -216,7 +216,7 @@ const createVersion = async () => {
   try {
     await ApiVersion.saveVersion({
       name: newVersionData.value.name,
-      scheduledOperationTime: newVersionData.value.scheduledOperationTime.getTime() / 1000,
+      scheduledOperationTime: parseInt(newVersionData.value.scheduledOperationTime.getTime() / 1000),
     });
     toast.add({
       severity: 'success',
@@ -269,3 +269,16 @@ const rollbackVersion = async (data) => {
   isLoadingData.value = false;
 };
 </script>
+
+<style>
+#versionList,
+.p-datatable-table {
+  height: 100%;
+}
+#versionList .p-datatable-wrapper {
+  height: 86%;
+}
+tr.p-datatable-emptymessage {
+  vertical-align: top;
+}
+</style>

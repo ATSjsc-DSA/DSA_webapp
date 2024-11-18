@@ -46,7 +46,7 @@ export const useCommonStore = defineStore('common', () => {
         updateMeasInfoActive(MeasInfoActive);
       }
     } catch (error) {
-      console.error('Error fetching active measurement info:', error);
+      // console.error('Error fetching active measurement info:', error);
     }
   };
 

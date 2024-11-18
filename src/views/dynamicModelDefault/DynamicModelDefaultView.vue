@@ -556,7 +556,7 @@ onMounted(async () => {
 });
 
 const canChangeData = computed(() => {
-  return !slotData.value.name === 'Online';
+  return slotData.value.name !== 'Online';
 });
 
 // Table Data
