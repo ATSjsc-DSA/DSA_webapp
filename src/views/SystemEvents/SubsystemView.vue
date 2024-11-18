@@ -112,7 +112,6 @@
                       style="text-wrap: nowrap"
                     ></Column>
 
-
                     <template #empty> No Data </template>
                   </DataTable>
                 </div>
