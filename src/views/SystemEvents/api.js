@@ -2,7 +2,7 @@ import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 
 const commonStore = useCommonStore();
-const { projectData, profileData } = storeToRefs(commonStore);
+const { projectData, profileData, slotData } = storeToRefs(commonStore);
 
 export class ApiContingency {
   static async getListContingency(contingenciesActiveId, param) {
@@ -98,8 +98,9 @@ export class ApiSubsystem {
   static async createSubsystem(data) {
     return post(`/seedconfig/${projectData.value._id}/subsystem`, data);
   }
+
   static async getSubsystemData(id) {
-    return get(`/seedconfig/subsystem/${id}`);
+    return get(`/seedconfig/${projectData.value._id}/${slotData.value._id}/subsystem/${id}`);
   }
   static async updateSubsystemData(id, data) {
     return put(`/seedconfig/subsystem/${id}`, data);

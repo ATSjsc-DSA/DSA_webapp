@@ -112,7 +112,6 @@
                       style="text-wrap: nowrap"
                     ></Column>
 
-                    <Column field="stationName" header="Station" style="text-wrap: nowrap"></Column>
 
                     <template #empty> No Data </template>
                   </DataTable>
@@ -261,7 +260,6 @@ const saveFilter = async (newfilter) => {
   try {
     await ApiSubsystem.updateSubsystemData(selectedItem.value._id, {
       name: selectedItem.value.name,
-      listPowerSystemId: selectedItem.value.listPowerSystemId,
       filterConditions: newfilter,
       active: selectedItem.value.active,
     });
