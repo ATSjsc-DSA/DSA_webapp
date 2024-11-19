@@ -2,7 +2,7 @@ import { get, post, put } from '@/utils/request';
 
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { measInfoActive, projectData, userConfigProfileIdActive } = storeToRefs(commonStore);
+const { measInfoActive, projectData } = storeToRefs(commonStore);
 
 export class ApplicationApi {
   static async getBarChartData(appId = '') {
@@ -14,8 +14,11 @@ export class ApplicationApi {
 }
 
 export class CommonApi {
-  static async getAppList() {
-    return get(`/hmi/${userConfigProfileIdActive.value}/applications`);
+  static async getDsaService() {
+    return get(`/common/${projectData.value._id}/dsa/service`);
+  }
+  static async getAppList(userConfigProfileIdActive = '') {
+    return get(`/hmi/${userConfigProfileIdActive}/applications`);
   }
   static async getDsaModuleList(app_id) {
     return get(`hmi/dsamodule/${app_id}`);

@@ -15,7 +15,9 @@ export class DefinitionListApi {
 
 export class PowerSystemParameterApi {
   static async getPsDataWithDefinition(definitionId, stationId) {
-    return get(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/station/${stationId}/${definitionId}`);
+    return get(
+      `/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/station/${stationId}/${definitionId}`,
+    );
   }
   static async getNodeDataWithDefinition(stationId) {
     return get(`/powersystem/${projectData.value._id}/${powerSystemVersionId.value}/node/${stationId}`);

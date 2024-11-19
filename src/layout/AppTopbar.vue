@@ -25,7 +25,7 @@ const op = ref();
 const audioSrc = '@/public/img/Elevator Ding-SoundBible.com-685385892.mp3';
 const { measInfo_automatic } = storeToRefs(commonStore);
 onMounted(async () => {
-  // await commonStore.getMeasInfoActive();
+  await commonStore.getMeasInfoActive();
   // await commonStore
   // await commonStore.getListMeasInfo();
   if (measInfo_automatic.value) {
@@ -33,9 +33,6 @@ onMounted(async () => {
   }
   // getLogs();
   bindOutsideClickListener();
-  interval.value = setInterval(() => {
-    commonStore.getDsaServiceInfo();
-  }, intervalTime);
 });
 
 onBeforeUnmount(() => {

@@ -77,10 +77,10 @@ const setChartData = () => {
     labels.push(moduleData.name);
 
     onlineRate1Data.push(moduleData.online['rateCritical1']);
-    onlineRate2Data.push(moduleData.online['rateCritical2']);
+    onlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.online['rateCritical1']);
 
     offlineRate1Data.push(moduleData.offline['rateCritical1']);
-    offlineRate2Data.push(moduleData.offline['rateCritical2']);
+    offlineRate2Data.push(moduleData.offline['rateCritical2'] - moduleData.offline['rateCritical1']);
     currentData.push(moduleData.current);
     currentColor.push(getCurrentColor(moduleData.current, moduleData.online));
   }
@@ -140,7 +140,7 @@ const getCurrentColor = (current, rateArr) => {
 
   if (current <= rateArr['rateCritical1']) {
     return documentStyle.getPropertyValue('--primary-600');
-  } else if (current <= rateArr['rateCritical2']) {
+  } else if (current <= rateArr['rateCritical1'] + rateArr['rateCritical2']) {
     return documentStyle.getPropertyValue('--yellow-600');
   } else {
     return documentStyle.getPropertyValue('--red-600');
@@ -167,6 +167,17 @@ const setChartOptions = () => {
         callbacks: {
           title: function (tooltipItems) {
             return `${tooltipItems[0].label} - ${tooltipItems[0].dataset.datalabels}`;
+          },
+          label: function (context) {
+            const label = context.dataset.label || '';
+            if (label === 'Rate Critical 2') {
+              const rate2 =
+                chartData.value.datasets[context.datasetIndex - 1].data[context.dataIndex] +
+                chartData.value.datasets[context.datasetIndex].data[context.dataIndex];
+              return `${label}: ${rate2}`;
+            }
+
+            return `${label}: ${context.raw}`;
           },
         },
       },

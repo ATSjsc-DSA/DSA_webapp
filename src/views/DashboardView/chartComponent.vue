@@ -67,6 +67,9 @@ import projectRadarChartWidget from './projectRadarChartWidget.vue';
 import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { projectData } = storeToRefs(commonStore);
 
 const props = defineProps({
   nodeDrag: {
@@ -244,7 +247,7 @@ const getChartData = async () => {
       }
     }
     if (props.typeChart === 'projectRadar') {
-      res = await ApplicationApi.getRadarChartData('67063c04c8dfd984e9fe1f2e');
+      res = await ApplicationApi.getRadarChartData(projectData.value._id);
 
       // res = await CommonApi.getProjectRadarChartData();
       if (!chartRadarDataKey.value) {

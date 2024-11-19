@@ -151,6 +151,7 @@ import { useToast } from 'primevue/usetoast';
 const toast = useToast();
 
 import { VsaApi, TsaApi, CommonApi } from './api';
+import { DSA_api } from '../DSASettingView/api';
 const props = defineProps({
   applicationDraggable: {
     type: Boolean,
@@ -170,8 +171,19 @@ const onStartDragNode = (evt, node) => {
   emit('onStartDragNode', evt, node);
 };
 onMounted(async () => {
+  await getDsaService();
   await getTreeData();
 });
+
+const userConfigProfileId = ref('');
+const getDsaService = async () => {
+  try {
+    const res = await DSA_api.getDsaService();
+    userConfigProfileId.value = res.data.dataVersion.userConfigProfile._id;
+  } catch (error) {
+    console.log('getDsaService error', error);
+  }
+};
 const treeData = ref([]);
 const treeloading = ref(false);
 const treeExpandedKeys = ref({});
@@ -247,7 +259,7 @@ const getAppBranchData = async () => {
 
 const getAppList = async () => {
   try {
-    const res = await CommonApi.getAppList();
+    const res = await CommonApi.getAppList(userConfigProfileId.value);
     return res.data;
   } catch (error) {
     console.log('getAppList: error ', error);

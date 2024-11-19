@@ -16,23 +16,9 @@ export const useCommonStore = defineStore('common', () => {
   const measInfoActive = ref(JSON.parse(localStorage.getItem('measInfoActive')));
   const editVersionData = ref({});
 
-  const userConfigProfileIdActive = ref(localStorage.getItem('userConfigProfileIdActive'));
   let intervalId = null;
   const setLoading = (loading) => {
     isLoading.value = loading;
-  };
-  const getDsaServiceInfo = async () => {
-    try {
-      const res = await DSA_api.getDsaService();
-      updateUserConfigProfileIdActive(res.data.dataVersion.userConfigProfileId);
-    } catch (error) {}
-  };
-
-  const updateUserConfigProfileIdActive = (newId) => {
-    if (userConfigProfileIdActive.value != newId) {
-      userConfigProfileIdActive.value = newId;
-      localStorage.setItem('userConfigProfileIdActive', newId);
-    }
   };
 
   const getMeasInfoActive = async () => {
@@ -46,7 +32,7 @@ export const useCommonStore = defineStore('common', () => {
         updateMeasInfoActive(MeasInfoActive);
       }
     } catch (error) {
-      // console.error('Error fetching active measurement info:', error);
+      console.error('Error fetching active measurement info:', error);
     }
   };
 
@@ -117,9 +103,7 @@ export const useCommonStore = defineStore('common', () => {
     clearData,
     editVersionData,
     getMeasInfoActive,
-    getDsaServiceInfo,
     getListMeasInfo,
-    userConfigProfileIdActive,
     measInfoActive,
     measInfoList,
     updateMeasInfoAutomatic,
