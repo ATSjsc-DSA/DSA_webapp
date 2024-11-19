@@ -53,7 +53,7 @@ const router = createRouter({
         {
           path: '/DSA/Setting',
           name: 'Setting',
-          component: () => import('@/views/DSA_SettingView.vue'),
+          component: () => import('@/views/DSASettingView/DSA_SettingView.vue'),
         },
         {
           path: '/DSA/Initialize',

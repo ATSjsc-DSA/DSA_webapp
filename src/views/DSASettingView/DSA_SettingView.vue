@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import DSA_api from '@/api/dsa_api';
+import { DSA_api } from './api';
 import { onMounted } from 'vue';
 import Toast from 'primevue/toast';
 
@@ -145,9 +145,9 @@ import BreadcrumbCommon from '@/components/BreadcrumbCommon.vue';
 //
 import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
 
-import { ApiVersion } from './PowerSystem/api';
-import { Api as ApiProfile } from './ProfileView/api';
-import { Api as ApiGridcode } from './GridCodeView/api';
+import { ApiVersion } from '../PowerSystem/api';
+import { Api as ApiProfile } from '../ProfileView/api';
+import { Api as ApiGridcode } from '../GridCodeView/api';
 const items = ref([{ label: 'Config DSA Device', route: '/DSA/Setting' }]);
 //
 const toast = useToast();
@@ -179,7 +179,7 @@ const updateSettingDSA = async () => {
   try {
     const dataUpdate = JSON.parse(JSON.stringify(dataSettingDSA.value));
     dataUpdate.dataVersion = {
-      powersystemDataVersion: psVersionSelected.value._id,
+      powersystemDataVersionId: psVersionSelected.value._id,
       powersystemDynVersionId: dynamicVersionSelected.value._id,
       userConfigProfileId: profileSelected.value._id,
       gridCodeId: gridCodeSelected.value._id,
