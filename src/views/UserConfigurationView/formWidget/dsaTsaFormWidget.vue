@@ -233,10 +233,18 @@ watch(data, async (newVal, oldVal) => {
 });
 
 const setDefaultData = async () => {
-  sourceSelected.value = await getSubSystemData(data.value.sourceId);
-  sinkSelected.value = await getSubSystemData(data.value.sinkId);
-  fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
-  monitorSubSystemSelected.value = await getSubSystemData(data.value.monitor.monitorSubSystemId);
+  if (data.value.sourceId) {
+    sourceSelected.value = await getSubSystemData(data.value.sourceId);
+  }
+  if (data.value.sinkId) {
+    sinkSelected.value = await getSubSystemData(data.value.sinkId);
+  }
+  if (data.value.fixSubSystemId) {
+    fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
+  }
+  if (data.value.monitor.monitorSubSystemId) {
+    monitorSubSystemSelected.value = await getSubSystemData(data.value.monitor.monitorSubSystemId);
+  }
 };
 
 // source

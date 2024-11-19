@@ -280,7 +280,7 @@ const confirmUpdateMonitor = async (event) => {
     message: 'Are you sure you want to proceed?',
     icon: 'pi pi-exclamation-triangle',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-danger',
+    acceptClass: 'p-button-sm p-button-success',
     rejectLabel: 'Cancel',
     acceptLabel: 'Update',
     accept: async () => {

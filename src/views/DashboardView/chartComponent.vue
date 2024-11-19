@@ -93,7 +93,7 @@ const nodeSelected = defineModel('nodeSelected');
 const stopReloadChartData = defineModel('stopReloadChartData');
 const autoreloadChartData = ref(!stopReloadChartData.value);
 const interval = ref(null);
-const intervalTime = 1 * 60 * 1000;
+const intervalTime = 5 * 1000;
 onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;

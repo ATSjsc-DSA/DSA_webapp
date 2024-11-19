@@ -316,7 +316,7 @@
     <monitorFormWidget :data="newMonitorData" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="createMonitorVisibleDialog = false"></Button>
-      <Button type="button" label="Submit" :disabled="!isMonitorValid(newMonitorData)" @click="createMonitor"></Button>
+      <Button type="button" label="Submit" :disabled="!newMonitorData.name" @click="createMonitor"></Button>
     </template>
   </Dialog>
 
@@ -474,7 +474,7 @@ const getTreeData = async () => {
   isLoadingContainer.value = false;
 };
 
-const getAppLeaf = async (app, key = '') => {
+const getAppLeaf = async (app, key = '', newAppLeaf = false) => {
   return {
     key: key,
     label: app.name,
@@ -491,7 +491,7 @@ const getAppLeaf = async (app, key = '') => {
         icon: 'pi pi-list',
         appId: app._id,
         active: app.active,
-        leaf: false,
+        leaf: !!newAppLeaf,
       },
       {
         key: 'DSAGroup' + key,
@@ -500,7 +500,7 @@ const getAppLeaf = async (app, key = '') => {
         icon: 'pi pi-th-large',
         type: 'DSAGroup',
         active: app.active,
-        leaf: false,
+        leaf: !!newAppLeaf,
       },
     ],
     leaf: false,
@@ -537,10 +537,15 @@ const getMonitorLeaf = (appId, monitor, key = '') => {
 const addNewMonitorLeaf = (appId, monitor) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    console.log(appLeaf.children[0]);
-    const newLeaf = getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].children.length);
-    appLeaf.children[0].children.push(newLeaf);
-    return newLeaf;
+    if (appLeaf.children[0].children) {
+      const newLeaf = getMonitorLeaf(appId, monitor, appLeaf.key + '_' + appLeaf.children[0].children.length);
+      appLeaf.children[0].children.push(newLeaf);
+      return newLeaf;
+    } else {
+      const newLeaf = getMonitorLeaf(appId, monitor, appLeaf.key + '_0');
+      appLeaf.children[0].children = [newLeaf];
+      return newLeaf;
+    }
   }
 };
 
@@ -575,9 +580,15 @@ const getDsaBranch = async (parentNode) => {
 const addNewDsaLeaf = async (appId, dsa) => {
   const appLeaf = treeData.value[0].children.filter((item) => item._id === appId)[0];
   if (appLeaf) {
-    const newLeaf = await getDsaLeaf(appId, dsa, appLeaf.key + '_' + appLeaf.children[1].children.length);
-    appLeaf.children[1].children.push(newLeaf);
-    return newLeaf;
+    if (appLeaf.children[1].children) {
+      const newLeaf = await getDsaLeaf(appId, dsa, appLeaf.key + '_' + appLeaf.children[1].children.length, true);
+      appLeaf.children[1].children.push(newLeaf);
+      return newLeaf;
+    } else {
+      const newLeaf = await getDsaLeaf(appId, dsa, appLeaf.key + '_0', true);
+      appLeaf.children[1].children = [newLeaf];
+      return newLeaf;
+    }
   }
 };
 
@@ -598,7 +609,7 @@ const deleteDsaLeaf = (key) => {
     appLeaf.children[1].children = appLeaf.children[1].children.filter((item) => String(item.key) !== key);
   }
 };
-const getDsaLeaf = async (appId, dsa, key = '') => {
+const getDsaLeaf = async (appId, dsa, key = '', isNewDsaLeaf = false) => {
   return {
     key: 'dsa_' + key,
     label: dsa.name,
@@ -607,7 +618,7 @@ const getDsaLeaf = async (appId, dsa, key = '') => {
     type: 'DSA',
     icon: 'pi pi-clone',
     active: dsa.active,
-    leaf: false,
+    leaf: isNewDsaLeaf,
   };
 };
 
@@ -643,9 +654,15 @@ const addNewTaskLeaf = (appId, dsaId, taskData, taskType = 'VSA') => {
   if (appLeaf) {
     const dsaLeaf = appLeaf.children[1].children.filter((item) => item._id === dsaId)[0];
     if (dsaLeaf) {
-      const newLeaf = getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length);
-      dsaLeaf.children.push(newLeaf);
-      return newLeaf;
+      if (dsaLeaf.children) {
+        const newLeaf = getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_' + dsaLeaf.children.length);
+        dsaLeaf.children.push(newLeaf);
+        return newLeaf;
+      } else {
+        const newLeaf = getTaskLeaf(appId, dsaId, taskData, taskType, dsaLeaf.key + '_0');
+        dsaLeaf.children = [newLeaf];
+        return newLeaf;
+      }
     }
   }
 };
@@ -813,7 +830,7 @@ const createApplication = async () => {
     const res = await ApiApplication.createApp(dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
-    const newLeaf = await getAppLeaf(res.data, treeData.value[0].children.length);
+    const newLeaf = await getAppLeaf(res.data, treeData.value[0].children.length, true);
     treeData.value[0].children.push(newLeaf);
     await onNodeSelect(newLeaf);
   } catch (error) {
@@ -892,9 +909,9 @@ const monitorGroupContextMenu = computed(() => [
       newMonitorData.value = {
         monitorType: 1,
         name: '',
-        powersystemId: '',
+        powersystemId: null,
         priority: 1,
-        scadaMonitorPowerSytemId: '',
+        scadaMonitorPowerSytemId: null,
         listScadaMonitorId: [],
       };
       createMonitorVisibleDialog.value = true;
@@ -907,6 +924,7 @@ const createMonitor = async () => {
     const res = await ApiMonitor.createMonitor(monitorGroupRightClick.value.appId, newMonitorData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createMonitorVisibleDialog.value = false;
+    expandedKeys.value[monitorGroupRightClick.value.key] = true;
     const newLeaf = addNewMonitorLeaf(monitorGroupRightClick.value.appId, res.data);
     await onNodeSelect(newLeaf);
   } catch (error) {
@@ -915,21 +933,6 @@ const createMonitor = async () => {
   }
 };
 
-const isMonitorValid = (data) => {
-  if (!data.name) {
-    return false;
-  }
-  if (!data.powersystemId) {
-    return false;
-  }
-  if (!data.listScadaMonitorId) {
-    return false;
-  }
-  if (!data.scadaMonitorPowerSytemId) {
-    return false;
-  }
-  return true;
-};
 // ------- Monitor - RUD
 
 const monitorData = ref();
@@ -1019,7 +1022,9 @@ const createDsa = async () => {
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createDsaVisibleDialog.value = false;
     const newLeaf = await addNewDsaLeaf(dsaGroupRightClick.value.appId, res.data);
-    await onNodeSelect(newLeaf);
+    nodeSelected.value = newLeaf;
+    expandedKeys.value[dsaGroupRightClick.value.key] = true;
+    await getDsaData(newLeaf._id);
   } catch (error) {
     console.log('createDsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -1152,20 +1157,20 @@ const newVsaData = ref({
   active: true,
   maxChange: 0,
   stepChange: 0,
-  sourceId: '',
-  sinkId: '',
+  sourceId: null,
+  sinkId: null,
 
   monitor: {
-    monitorSubSystemId: '',
+    monitorSubSystemId: null,
     signalP: true,
     signalQ: true,
     signalV: true,
     active: true,
   },
-  contingencyId: '',
-  remedialActionId: '',
-  digsilentSettingId: '',
-  fixSubSystemId: '',
+  contingencyId: null,
+  remedialActionId: null,
+  digsilentSettingId: null,
+  fixSubSystemId: null,
 });
 
 const getVsaList = async (dsaId) => {
@@ -1191,6 +1196,7 @@ const createVsa = async () => {
   try {
     const res = await ApiDsa.createVsa(dsaModuleRightClick.value._id, newVsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    expandedKeys.value[dsaModuleRightClick.value.key] = true;
     const newLeaf = addNewTaskLeaf(dsaModuleRightClick.value.appId, dsaModuleRightClick.value._id, res.data, 'VSA');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
@@ -1258,12 +1264,12 @@ const delVsa = async () => {
 const tsaData = ref();
 const newTsaData = ref({
   name: 'string',
-  sourceId: '',
-  sinkId: '',
+  sourceId: null,
+  sinkId: null,
   maxChange: 0,
   stepChange: 0,
   monitor: {
-    monitorSubSystemId: '',
+    monitorSubSystemId: null,
     busConfig: {
       voltage: 0,
       freq: 0,
@@ -1285,10 +1291,10 @@ const newTsaData = ref({
     },
     active: true,
   },
-  // disturbanceId: '',
-  remedialActionId: '',
-  digsilentSettingId: '',
-  fixSubSystemId: '',
+  // disturbanceId: null,
+  remedialActionId: null,
+  digsilentSettingId: null,
+  fixSubSystemId: null,
   active: true,
 });
 
@@ -1315,6 +1321,7 @@ const createTsa = async () => {
   try {
     const res = await ApiDsa.createTsa(dsaModuleRightClick.value._id, newTsaData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    expandedKeys.value[dsaModuleRightClick.value.key] = true;
     const newLeaf = addNewTaskLeaf(dsaModuleRightClick.value.appId, dsaModuleRightClick.value._id, res.data, 'TSA');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
@@ -1380,9 +1387,9 @@ const delTsa = async () => {
 const ssrData = ref();
 const newSsrData = ref({
   active: true,
-  contingenciesId: '',
+  contingenciesId: null,
   name: '',
-  powerSytemId: '',
+  powerSytemId: null,
 });
 
 const getSsrList = async (dsaId) => {
@@ -1408,6 +1415,8 @@ const createSsr = async () => {
   try {
     const res = await ApiDsa.createSsr(dsaModuleRightClick.value._id, newSsrData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    expandedKeys.value[dsaModuleRightClick.value.key] = true;
+
     const newLeaf = addNewTaskLeaf(dsaModuleRightClick.value.appId, dsaModuleRightClick.value._id, res.data, 'SSR');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
@@ -1499,6 +1508,8 @@ const createOsl = async () => {
   try {
     const res = await ApiDsa.createOsl(dsaModuleRightClick.value._id, newOslData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
+    expandedKeys.value[dsaModuleRightClick.value.key] = true;
+
     const newLeaf = addNewTaskLeaf(dsaModuleRightClick.value.appId, dsaModuleRightClick.value._id, res.data, 'OSL');
     createTaskDsaDialog.value = false;
     await onNodeSelect(newLeaf);
@@ -1568,7 +1579,7 @@ const confirmUpdate = async (event, updateFunc, header = '') => {
       message: 'Are you sure you want to proceed?',
       icon: 'pi pi-exclamation-triangle',
       rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-      acceptClass: 'p-button-sm p-button-danger',
+      acceptClass: 'p-button-sm p-button-success',
       rejectLabel: 'Cancel',
       acceptLabel: 'Update',
       accept: async () => {

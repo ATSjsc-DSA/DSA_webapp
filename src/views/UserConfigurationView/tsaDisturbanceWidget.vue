@@ -68,7 +68,23 @@
         </div>
       </div>
       <div class="col-12">
-        <searchPsWidget v-model="psSelected" />
+        <div class="grid align-items-center">
+          <div class="col-4">
+            <div class="flex flex-column align-items-start gap-3 mb-3">
+              <label for="psdSelected" class="font-semibold">Type Element</label>
+              <Dropdown
+                v-model="selectedDefinition"
+                :options="listDefinition"
+                optionLabel="name"
+                optionValue="_id"
+                class="w-full"
+              />
+            </div>
+          </div>
+          <div class="col-8">
+            <searchPsWidget v-model="psSelected" label="Element" />
+          </div>
+        </div>
       </div>
       <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
@@ -112,26 +128,26 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
-          <Calendar v-model="disturbanceData.startTimestamp" showTime showIcon showSeconds />
+          <InputNumber v-model="disturbanceData.startTimestamp" />
         </div>
       </div>
 
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
-          <Calendar
-            v-model="disturbanceData.endTimestamp"
-            :minDate="disturbanceData.startTimestamp"
-            showTime
-            showIcon
-            showSeconds
-          />
+          <InputNumber v-model="disturbanceData.endTimestamp" />
         </div>
       </div>
     </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="changeVisibleDialog = false"></Button>
-      <Button v-if="modeChange === 'Create'" type="button" label="Save" @click="createDisturbance"></Button>
+      <Button
+        v-if="modeChange === 'Create'"
+        type="button"
+        :disabled="!disturbanceData.name || !psSelected"
+        label="Save"
+        @click="createDisturbance"
+      ></Button>
       <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateDisturbance"></Button>
     </template>
   </Dialog>
@@ -139,14 +155,15 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import Calendar from 'primevue/calendar';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
+import { DefinitionListApi } from '@/views/PowerSystem/api';
 
 import { ApiDisturbance } from '@/views/SystemEvents/api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import searchPsWidget from '../PowerSystem/searchPsWidget.vue';
+import InputNumber from 'primevue/inputnumber';
 const toast = useToast();
 const confirm = useConfirm();
 
@@ -159,6 +176,7 @@ const props = defineProps({
 
 onMounted(async () => {
   await getDisturbanceList();
+  await getDefiniton();
 });
 
 const data = ref([]);
@@ -188,13 +206,13 @@ const changeVisibleDialog = ref(false);
 const disturbanceData = ref();
 const handleCreate = () => {
   modeChange.value = 'Create';
-  psSelected.value = {};
+  psSelected.value = undefined;
   disturbanceData.value = {
     active: true,
     name: '',
     powerSystemId: '',
-    startTimestamp: new Date(),
-    endTimestamp: new Date(),
+    startTimestamp: 0,
+    endTimestamp: 0,
     disturbanceEvenType: 0,
     eventValue: 0,
   };
@@ -204,8 +222,6 @@ const psSelected = ref();
 
 const createDisturbance = async () => {
   const data = JSON.parse(JSON.stringify(disturbanceData.value));
-  data.startTimestamp = parseInt(new Date(data.startTimestamp).getTime() / 1000);
-  data.endTimestamp = parseInt(new Date(data.endTimestamp).getTime() / 1000);
   data.powerSystemId = psSelected.value._id;
   try {
     await ApiDisturbance.createDisturbance(props.caseId, data);
@@ -221,8 +237,6 @@ const createDisturbance = async () => {
 const handlerUpdate = (data) => {
   modeChange.value = 'Update';
   const updateData = JSON.parse(JSON.stringify(data));
-  updateData.startTimestamp = new Date(data.startTimestamp * 1000);
-  updateData.endTimestamp = new Date(data.endTimestamp * 1000);
   psSelected.value = {
     _id: data.powerSystemId._id,
     name: data.powerSystemId.name,
@@ -234,8 +248,6 @@ const handlerUpdate = (data) => {
 const updateDisturbance = async () => {
   try {
     const data = JSON.parse(JSON.stringify(disturbanceData.value));
-    data.startTimestamp = parseInt(new Date(data.startTimestamp).getTime() / 1000);
-    data.endTimestamp = parseInt(new Date(data.endTimestamp).getTime() / 1000);
     data.powerSystemId = psSelected.value._id;
     await ApiDisturbance.updateDisturbanceData(data._id, data);
     await getDisturbanceList();
@@ -359,4 +371,21 @@ const listEventValue = [
   { name: 'ON', value: 0 },
   { name: 'OFF', value: 1 },
 ];
+
+const listDefinition = ref();
+const selectedDefinition = ref();
+watch(
+  () => props.definitionMonitor,
+  (newVal) => {
+    psSelected.value = undefined;
+  },
+);
+const getDefiniton = async () => {
+  try {
+    const res = await DefinitionListApi.getDefinitionSubsystem();
+    listDefinition.value = res.data;
+  } catch (error) {
+    console.log('searchPsQueryFilter: error ', error);
+  }
+};
 </script>
