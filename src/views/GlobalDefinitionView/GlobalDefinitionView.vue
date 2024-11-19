@@ -4,7 +4,7 @@
 
     <DataTable
       :value="globaldefinitionList"
-      paginator
+      :paginator="globaldefinitionTotal > 10"
       :rows="10"
       :totalRecords="globaldefinitionTotal"
       dataKey="_id"

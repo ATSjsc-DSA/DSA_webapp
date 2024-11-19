@@ -3,7 +3,7 @@
     <Toast />
     <div class="flex justify-content-end align-items-center flex-wrap 2xl:flex-nowrap">
       <button
-        v-tooltip.bottom="'Global Definition'"
+        v-tooltip.left="'Global Definition'"
         class="p-link layout-topbar-button"
         type="text"
         @click="onGlobalDefinitionView()"
@@ -104,6 +104,11 @@
       <InputText id="Name" v-model="definitionData.name" class="w-full my-3" autocomplete="off" />
     </div>
 
+    <div>
+      <label for="digsName" class="font-semibold"> Digs Name</label>
+      <InputText id="digsName" v-model="definitionData.digsName" class="w-full my-3" autocomplete="off" />
+    </div>
+
     <div class="mt-3">
       <label for="modelType" class="font-semibold"> Type</label>
 
@@ -137,9 +142,45 @@
         <small>Press Enter to Add.</small>
       </div>
     </div>
+
+    <div v-if="modeChange === 'create'" class="mt-3">
+      <label for="mapOrder" class="font-semibold"> Map Order</label>
+      <Chips id="mapOrder" v-model="definitionData.mapOrder" class="w-full mt-3" autocomplete="off" />
+      <div class="p-1">
+        <small>Press Enter to Add.</small>
+      </div>
+    </div>
+
+    <div v-if="modeChange === 'create'" class="mt-3">
+      <label for="mapMatrix" class="font-semibold"> Map Matrix</label>
+      <Chips
+        id="mapMatrix"
+        v-model="definitionData.mapMatrix"
+        class="w-full mt-3"
+        autocomplete="off"
+        :invalid="isMapMatrixInValid"
+      >
+        <template #chip="slotProps">
+          <div v-if="isMatrixStringInvalid(slotProps.value)" class="text-red-500">
+            <span>[{{ slotProps.value }},]</span>
+          </div>
+          <div v-else>
+            <span>[{{ slotProps.value }}]</span>
+          </div>
+        </template>
+      </Chips>
+      <div class="p-1">
+        <small>Example: "1,2". Press Enter to Add. </small>
+      </div>
+    </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="definitionVisibleDialog = false"></Button>
-      <Button type="button" label="Save" @click="handleChangeDefinition()"></Button>
+      <Button
+        type="button"
+        label="Save"
+        :disabled="isChangeDefinitionFormInValid"
+        @click="handleChangeDefinition()"
+      ></Button>
     </template>
   </Dialog>
 
@@ -218,7 +259,7 @@
     :modal="true"
     @hide="onHide"
   >
-    <uploadFileConfig @uploadFile="uploadGlobalDynamicModelFile"></uploadFileConfig>
+    <uploadDynamicModelFile @uploadFile="uploadGlobalDynamicModelFile" />
   </Dialog>
   <Dialog
     v-model:visible="uploadDialogGlobalDynamicMapping"
@@ -227,7 +268,7 @@
     :modal="true"
     @hide="onHide"
   >
-    <uploadFileConfig @uploadFile="uploadGlobalDynamicModelMappingFile"></uploadFileConfig>
+    <uploadDynamicModelFile @uploadFile="uploadGlobalDynamicModelMappingFile" />
   </Dialog>
 </template>
 
@@ -240,6 +281,8 @@ import { useToast } from 'primevue/usetoast';
 import Dropdown from 'primevue/dropdown';
 import ConfirmDialog from 'primevue/confirmdialog';
 import uploadFileConfig from '../../components/uploadFileConfig.vue';
+
+import uploadDynamicModelFile from './uploadDynamicModelFile.vue';
 import router from '@/router';
 
 import { useRoute } from 'vue-router';
@@ -317,6 +360,10 @@ const handleCreateDynamicDefinition = () => {
     name: '',
     modelType: '',
     values: [],
+    digsName: '',
+    mapMatrix: [],
+    mapOrder: [],
+    globalDefinitionId: globaldefinitionId.value,
   };
   definitionVisibleDialog.value = true;
   modeChange.value = 'create';
@@ -336,7 +383,12 @@ const definitionTypeOptions = computed(() => [
 ]);
 const createDynamicDefinition = async () => {
   try {
-    const res = await api.createGlobalDynamicModelDefinitionList(definitionData.value);
+    const data = JSON.parse(JSON.stringify(definitionData.value));
+    data.mapMatrix = data.mapMatrix.map((item) => {
+      const [firstVal, secondVal] = item.split(',');
+      return [Number(firstVal), Number(secondVal)];
+    });
+    const res = await api.createGlobalDynamicModelDefinitionList(data);
     toast.add({ severity: 'success', summary: 'Created Successfully', detail: res.message, life: 3000 });
     definitionVisibleDialog.value = false;
     await getDynamicDefinitionList();
@@ -554,14 +606,18 @@ const handleImportMappingFile = () => {
 const uploadGlobalDynamicModelFile = async (formData, callback) => {
   try {
     await api.uploadGlobalDynamicModelDefinitionFile(formData);
+    await getDynamicDefinitionList();
     callback();
   } catch (error) {
+    console.log('error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 const uploadGlobalDynamicModelMappingFile = async (formData, callback) => {
   try {
     await api.uploadGlobalDynamicModelMappingFile(formData);
+    await getGlobalDynamicModelMappingList();
+
     callback();
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -617,6 +673,39 @@ const handleExportMappingFile = async () => {
 const onGlobalDefinitionView = () => {
   router.push({ name: 'Global Definition' });
 };
+
+const isChangeDefinitionFormInValid = computed(() => {
+  if (!definitionData.value) {
+    return true;
+  }
+  return (
+    isMapMatrixInValid.value ||
+    !definitionData.value.name ||
+    !definitionData.value.digsName ||
+    !definitionData.value.modelType
+  );
+});
+const isMatrixStringInvalid = (str) => {
+  if (!str.includes(',')) {
+    return true;
+  } else {
+    const [firstVal, secondVal] = str.split(',');
+    if (!firstVal || !secondVal) {
+      return true;
+    }
+    if (isNaN(firstVal) || isNaN(secondVal)) {
+      return true;
+    }
+  }
+  return false;
+};
+const isMapMatrixInValid = computed(() => {
+  let isInvalid = false;
+  definitionData.value.mapMatrix.forEach((item) => {
+    isInvalid = isMatrixStringInvalid(item);
+  });
+  return isInvalid;
+});
 </script>
 
 <style>
