@@ -48,7 +48,6 @@
           display="chip"
           :options="definitionSubsystemList"
           optionLabel="name"
-          optionValue="_id"
           placeholder="Select Types"
           class="w-full psFilterAutoComplete"
         />
@@ -123,7 +122,7 @@ const psSelected = ref([]);
 const filterConjunction = ref('');
 const changFilter = () => {
   const newFilter = {
-    definition: definitionSubsystemSelected.value,
+    definition: definitionSubsystemSelected.value.map((item) => item._id),
     area: areaSelected.value.map((item) => item._id),
     zone: zoneSelected.value.map((item) => item._id),
     owner: ownerSelected.value.map((item) => item._id),
@@ -137,7 +136,7 @@ const changFilter = () => {
 
 const saveFilter = () => {
   const newFilter = {
-    definition: definitionSubsystemSelected.value,
+    definition: definitionSubsystemSelected.value.map((item) => item._id),
     area: areaSelected.value.map((item) => item._id),
     zone: zoneSelected.value.map((item) => item._id),
     owner: ownerSelected.value.map((item) => item._id),

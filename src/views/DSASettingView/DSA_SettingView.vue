@@ -185,7 +185,7 @@ const updateSettingDSA = async () => {
       gridCodeId: gridCodeSelected.value._id,
     };
     const res = await DSA_api.updateDsaService(dataUpdate);
-    dataSettingDSA.value = res.data;
+    await getDsaSystemSettingSelected();
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'update setting successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });

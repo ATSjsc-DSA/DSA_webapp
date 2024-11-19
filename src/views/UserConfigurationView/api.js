@@ -4,7 +4,6 @@ const commonStore = useCommonStore();
 const { profileData } = storeToRefs(commonStore);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
 
-console.log('profileData.value._id', profileData.value._id);
 export class ApiApplication {
   static async getList() {
     return get(`/userconfig/${profileData.value._id}/applications`);
