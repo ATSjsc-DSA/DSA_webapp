@@ -7,10 +7,9 @@
         :is-create-form="false"
         :listScadaMonitor="listScadaMonitor"
         :definitionMonitor="definitionMonitor"
+        @updateMonitor="updateMonitor"
       />
-      <div class="flex justify-content-end gap-3">
-        <Button type="button" label="Update" @click="confirmUpdateMonitor"></Button>
-      </div>
+      
     </TabPanel>
 
     <TabPanel header="Scada">
@@ -269,28 +268,18 @@ const getMonitorData = async () => {
     listScadaMonitor.value = result.data.data;
     definitionMonitor.value = result.data.definitionId;
   } catch (error) {
-    console.log('getMonitorData: error ', error);
+    psdSelected.value = {
+      _id: '',
+      name: ''
+    };
+    listScadaMonitor.value = [];
+    definitionMonitor.value = ''
   }
 };
-const confirmUpdateMonitor = async (event) => {
-  confirm.require({
-    group: 'updateDialog',
-    target: event.currentTarget,
-    header: 'Update Monitor',
-    message: 'Are you sure you want to proceed?',
-    icon: 'pi pi-exclamation-triangle',
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm p-button-success',
-    rejectLabel: 'Cancel',
-    acceptLabel: 'Update',
-    accept: async () => {
-      await updateMonitor();
-    },
-  });
-};
-const updateMonitor = async () => {
+
+const updateMonitor = async (data) => {
   try {
-    const res = await ApiMonitor.updateMonitor(monitorData.value._id, monitorData.value);
+    const res = await ApiMonitor.updateMonitor(monitorData.value._id, data);
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
     emit(
       'updateLabelMonitorLeaf',

@@ -73,6 +73,9 @@
       :emptyMessage="getScadaEmptyMessage()"
     />
   </div>
+  <div v-if="!isCreateForm" class="flex justify-content-end gap-3">
+        <Button type="button" label="Update" @click="confirmUpdateMonitor"></Button>
+      </div>
 </template>
 
 <script setup>
@@ -80,7 +83,9 @@ import { PowerSystemParameterApi, DefinitionListApi } from '@/views/PowerSystem/
 import AutoComplete from 'primevue/autocomplete';
 import Dropdown from 'primevue/dropdown';
 import { watch } from 'vue';
+import { useConfirm } from 'primevue/useconfirm';
 
+const confirm = useConfirm();
 const props = defineProps({
   data: { type: Object, default: null },
   isCreateForm: { type: Boolean, default: true },
@@ -88,18 +93,12 @@ const props = defineProps({
   listScadaMonitor: { type: Array, default: null },
   definitionMonitor: { type: String, default: null },
 });
+const emit = defineEmits(['update:psdSelected', 'updateMonitor']);
 
+
+const isCreateForm = computed(() => props.isCreateForm)
 const data = ref(props.data);
-watch(
-  () => props.data,
-  (newValue, oldValue) => {
-    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-      nextTick(() => {
-        data.value = newValue;
-      });
-    }
-  },
-);
+
 const typeOpts = ref([
   { name: 'Frequency', code: 1 },
   { name: 'Voltage', code: 2 },
@@ -116,14 +115,21 @@ const priorityOpts = ref([
   { name: 'BOTH', code: 3 },
 ]);
 
-const listDefinition = ref();
-const selectedDefinition = ref(props.definitionMonitor);
 watch(
-  () => props.definitionMonitor,
-  (newVal) => {
-    selectedDefinition.value = newVal;
+  () => props.data,
+  
+  
+  (newValue, oldValue) => {
+    console.log(newValue, "newValue");
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      nextTick(() => {
+        data.value = newValue;
+      });
+    }
   },
 );
+// definition
+const listDefinition = ref();
 const getDefiniton = async () => {
   try {
     const res = await DefinitionListApi.getDefinitionSubsystem();
@@ -133,14 +139,32 @@ const getDefiniton = async () => {
   }
 };
 
-// Define the emit event
-const emit = defineEmits(['update:psdSelected']);
+const selectedDefinition = ref(props.definitionMonitor);
+watch(
+  () => props.definitionMonitor,
+  (newVal) => {
+    selectedDefinition.value = newVal;
+  },
+);
 
-// Computed property for two-way binding
-// const psdSelected = computed({
-//   get: () => props.psdSelected,
-//   set: (value) => emit('update:psdSelected', value),
-// });
+// Define the emit event
+
+const confirmUpdateMonitor = async (event) => {
+  confirm.require({
+    group: 'updateDialog',
+    target: event.currentTarget,
+    header: 'Update Monitor',
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-success',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Update',
+    accept: async () => {
+      emit('updateMonitor', data.value)
+    },
+  });
+};
 const psdSelected = ref(props.psdSelected);
 watch(
   () => props.psdSelected,
@@ -187,12 +211,12 @@ const getScadaMonitor = async () => {
 };
 
 watch(listScadaMonitor, (newVal) => {
-  if (newVal && props.isCreateForm) {
+  if (newVal) {
     data.value.listScadaMonitorId = newVal.map((item) => item._id);
   }
 });
 watch(psdSelected, async (newVal) => {
-  if (newVal && props.isCreateForm) {
+  if (newVal) {
     data.value.powersystemId = newVal._id;
   }
 
