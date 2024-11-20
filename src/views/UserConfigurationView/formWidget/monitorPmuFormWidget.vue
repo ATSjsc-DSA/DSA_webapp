@@ -62,7 +62,13 @@
     <div class="col-4">
       <div class="flex flex-column gap-2 pl-3">
         <label for="kFactorCur" class="font-semibold"> K factor Curr</label>
-        <InputNumber id="kFactorCur" v-model="data.current.kFactorCur" class="flex-auto" autocomplete="off" />
+        <InputNumber
+          id="kFactorCur"
+          v-model="data.current.kFactorCur"
+          :maxFractionDigits="5"
+          class="flex-auto"
+          autocomplete="off"
+        />
       </div>
     </div>
   </div>
@@ -79,7 +85,13 @@
     <div class="col-4">
       <div class="flex flex-column gap-2 pl-3">
         <label for="kFactorPower" class="font-semibold"> K Factor Power </label>
-        <InputNumber id="kFactorPower" v-model="data.power.kFactorPower" class="flex-auto" autocomplete="off" />
+        <InputNumber
+          id="kFactorPower"
+          v-model="data.power.kFactorPower"
+          :maxFractionDigits="5"
+          class="flex-auto"
+          autocomplete="off"
+        />
       </div>
     </div>
     <div class="col-4">

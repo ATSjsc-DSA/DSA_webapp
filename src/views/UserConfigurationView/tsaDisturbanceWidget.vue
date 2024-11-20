@@ -128,14 +128,14 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
-          <InputNumber v-model="disturbanceData.startTimestamp" />
+          <InputNumber v-model="disturbanceData.startTimestamp" :maxFractionDigits="5" />
         </div>
       </div>
 
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
-          <InputNumber v-model="disturbanceData.endTimestamp" />
+          <InputNumber v-model="disturbanceData.endTimestamp" :maxFractionDigits="5" />
         </div>
       </div>
     </div>

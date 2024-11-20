@@ -86,25 +86,49 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateAbnormal" class="font-semibold"> Rate Abnormal </label>
-          <InputNumber id="rateAbnormal" v-model="newData.rateAbnormal" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateAbnormal"
+            v-model="newData.rateAbnormal"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateCritical1" class="font-semibold"> Rate Critical1 </label>
-          <InputNumber id="rateCritical1" v-model="newData.rateCritical1" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateCritical1"
+            v-model="newData.rateCritical1"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateCritical2" class="font-semibold"> Rate Critical2 </label>
-          <InputNumber id="rateCritical2" v-model="newData.rateCritical2" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateCritical2"
+            v-model="newData.rateCritical2"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateCritical3" class="font-semibold"> Rate Critical3 </label>
-          <InputNumber id="rateCritical3" v-model="newData.rateCritical3" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateCritical3"
+            v-model="newData.rateCritical3"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
     </div>
@@ -151,25 +175,49 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateAbnormal" class="font-semibold"> Rate Abnormal </label>
-          <InputNumber id="rateAbnormal" v-model="updateData.rateAbnormal" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateAbnormal"
+            v-model="updateData.rateAbnormal"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateCritical1" class="font-semibold"> Rate Critical1 </label>
-          <InputNumber id="rateCritical1" v-model="updateData.rateCritical1" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateCritical1"
+            v-model="updateData.rateCritical1"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateCritical2" class="font-semibold"> Rate Critical2 </label>
-          <InputNumber id="rateCritical2" v-model="updateData.rateCritical2" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateCritical2"
+            v-model="updateData.rateCritical2"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="rateCritical3" class="font-semibold"> Rate Critical3 </label>
-          <InputNumber id="rateCritical3" v-model="updateData.rateCritical3" class="flex-auto" autocomplete="off" />
+          <InputNumber
+            id="rateCritical3"
+            v-model="updateData.rateCritical3"
+            :maxFractionDigits="5"
+            class="flex-auto"
+            autocomplete="off"
+          />
         </div>
       </div>
     </div>

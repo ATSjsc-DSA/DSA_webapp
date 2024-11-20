@@ -13,11 +13,11 @@
   </div>
   <div class="flex flex-column gap-2 mb-3">
     <label for="scadakFactorCur" class="font-semibold"> K Factor Cur</label>
-    <InputNumber id="scadakFactorCur" v-model="data.kFactorCur" autocomplete="off" />
+    <InputNumber id="scadakFactorCur" v-model="data.kFactorCur" :maxFractionDigits="5" autocomplete="off" />
   </div>
   <div class="flex flex-column gap-2 mb-3">
     <label for="scadakFactorPower" class="font-semibold"> K Factor Power</label>
-    <InputNumber id="scadakFactorPower" v-model="data.kFactorPower" autocomplete="off" />
+    <InputNumber id="scadakFactorPower" v-model="data.kFactorPower" :maxFractionDigits="5" autocomplete="off" />
   </div>
 </template>
 

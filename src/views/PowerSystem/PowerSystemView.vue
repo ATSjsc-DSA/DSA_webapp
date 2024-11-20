@@ -443,7 +443,13 @@
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="poleOrder" class="font-semibold w-12rem"> Order</label>
-      <InputNumber id="poleOrder" v-model="createPoleData.poleOrder" class="flex-auto" autocomplete="off" />
+      <InputNumber
+        id="poleOrder"
+        v-model="createPoleData.poleOrder"
+        :maxFractionDigits="5"
+        class="flex-auto"
+        autocomplete="off"
+      />
     </div>
     <div class="flex align-items-center gap-3 mb-3">
       <label for="Longitude" class="font-semibold w-12rem"> Longitude</label>

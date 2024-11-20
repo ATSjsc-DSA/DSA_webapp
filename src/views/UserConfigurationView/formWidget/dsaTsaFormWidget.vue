@@ -25,14 +25,26 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="maxChange" class="font-semibold"> Max Change </label>
-        <InputNumber id="maxChange" v-model="data.maxChange" class="flex-auto" autocomplete="off" />
+        <InputNumber
+          id="maxChange"
+          v-model="data.maxChange"
+          :maxFractionDigits="5"
+          class="flex-auto"
+          autocomplete="off"
+        />
       </div>
     </div>
 
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="stepChange" class="font-semibold"> Step Change </label>
-        <InputNumber id="stepChange" v-model="data.stepChange" class="flex-auto" autocomplete="off" />
+        <InputNumber
+          id="stepChange"
+          v-model="data.stepChange"
+          :maxFractionDigits="5"
+          class="flex-auto"
+          autocomplete="off"
+        />
       </div>
     </div>
 

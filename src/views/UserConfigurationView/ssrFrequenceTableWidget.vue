@@ -50,19 +50,37 @@
       <div class="col-12">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="fMax" class="font-semibold w-6rem"> Max</label>
-          <InputNumber id="fMax" v-model="newData.fMax" class="flex-auto w-full" autocomplete="off" />
+          <InputNumber
+            id="fMax"
+            v-model="newData.fMax"
+            :maxFractionDigits="5"
+            class="flex-auto w-full"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-12">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="fMin" class="font-semibold w-6rem"> Min</label>
-          <InputNumber id="fMin" v-model="newData.fMin" class="flex-auto w-full" autocomplete="off" />
+          <InputNumber
+            id="fMin"
+            v-model="newData.fMin"
+            :maxFractionDigits="5"
+            class="flex-auto w-full"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-12">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="step" class="font-semibold w-6rem"> Step</label>
-          <InputNumber id="step" v-model="newData.step" class="flex-auto w-full" autocomplete="off" />
+          <InputNumber
+            id="step"
+            v-model="newData.step"
+            :maxFractionDigits="5"
+            class="flex-auto w-full"
+            autocomplete="off"
+          />
         </div>
       </div>
     </div>
@@ -89,19 +107,37 @@
       <div class="col-12">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="fMax" class="font-semibold w-6rem"> Max</label>
-          <InputNumber id="fMax" v-model="updateData.fMax" class="flex-auto w-full" autocomplete="off" />
+          <InputNumber
+            id="fMax"
+            v-model="updateData.fMax"
+            :maxFractionDigits="5"
+            class="flex-auto w-full"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-12">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="fMin" class="font-semibold w-6rem"> Min</label>
-          <InputNumber id="fMin" v-model="updateData.fMin" class="flex-auto w-full" autocomplete="off" />
+          <InputNumber
+            id="fMin"
+            v-model="updateData.fMin"
+            :maxFractionDigits="5"
+            class="flex-auto w-full"
+            autocomplete="off"
+          />
         </div>
       </div>
       <div class="col-12">
         <div class="flex align-items-center gap-3 mb-3">
           <label for="step" class="font-semibold w-6rem"> Step</label>
-          <InputNumber id="step" v-model="updateData.step" class="flex-auto w-full" autocomplete="off" />
+          <InputNumber
+            id="step"
+            v-model="updateData.step"
+            :maxFractionDigits="5"
+            class="flex-auto w-full"
+            autocomplete="off"
+          />
         </div>
       </div>
     </div>

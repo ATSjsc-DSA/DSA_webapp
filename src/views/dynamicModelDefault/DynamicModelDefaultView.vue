@@ -194,11 +194,11 @@
       </div>
       <div class="flex align-items-center gap-3 mb-3">
         <label for="pMax" class="font-semibold w-12rem">pMax </label>
-        <InputNumber id="pMax" v-model="dataChange.pMax" class="flex-auto" autocomplete="off" />
+        <InputNumber id="pMax" v-model="dataChange.pMax" :maxFractionDigits="5" class="flex-auto" autocomplete="off" />
       </div>
       <div class="flex align-items-center gap-3 mb-3">
         <label for="pMin" class="font-semibold w-12rem">pMin </label>
-        <InputNumber id="pMin" v-model="dataChange.pMin" class="flex-auto" autocomplete="off" />
+        <InputNumber id="pMin" v-model="dataChange.pMin" :maxFractionDigits="5" class="flex-auto" autocomplete="off" />
       </div>
 
       <div class="flex align-items-center gap-3 mb-5">
