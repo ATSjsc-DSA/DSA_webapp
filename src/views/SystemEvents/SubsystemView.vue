@@ -87,14 +87,14 @@
                 <div class="w-full mb-5 px-3 mt-1 flex justify-content-between align-items-center">
                   <span class="text-xl font-semibold"> Power System</span>
                 </div>
-                <div class="w-full pl-3" style="height: 42rem">
+                <div class="w-full pl-3" style="height: 46rem">
                   <DataTable
+                    id="subsystemTable"
                     :value="parameterData"
                     dataKey="_id"
                     :lazy="true"
                     :sortOrder="1"
                     rowHover
-                    scrollable
                     showGridlines
                     :loading="isParameterLoading"
                   >
@@ -200,15 +200,31 @@ const handleRowClick = async (item) => {
     const res = await ApiSubsystem.getSubsystemData(item._id);
     selectedItem.value = res.data;
     selectedItem.value._id = item._id;
+
+    const { filterConditions } = selectedItem.value;
+
     const newFilter = {
-      area: selectedItem.value.filterConditions.area.map((item) => item._id),
-      zone: selectedItem.value.filterConditions.zone.map((item) => item._id),
-      owner: selectedItem.value.filterConditions.owner.map((item) => item._id),
-      kV: selectedItem.value.filterConditions.kV.map((item) => item._id),
-      station: selectedItem.value.filterConditions.station.map((item) => item._id),
-      // sub: selectedItem.value.filterConditions.station.map((item) => item._id),
-      definition: selectedItem.value.filterConditions.definition.map((item) => item._id),
-      powersystem: selectedItem.value.filterConditions.powerSystem.map((item) => item._id),
+      area: {
+        value: filterConditions.area.value.map((item) => item._id),
+        type: filterConditions.area.type.map((item) => item._id),
+      },
+      zone: {
+        value: filterConditions.zone.value.map((item) => item._id),
+        type: filterConditions.zone.type.map((item) => item._id),
+      },
+      owner: {
+        value: filterConditions.owner.value.map((item) => item._id),
+        type: filterConditions.owner.type.map((item) => item._id),
+      },
+      kV: {
+        value: filterConditions.kV.value.map((item) => item._id),
+        type: filterConditions.kV.type.map((item) => item._id),
+      },
+      station: {
+        value: filterConditions.station.value.map((item) => item._id),
+        type: filterConditions.station.type.map((item) => item._id),
+      },
+      powersystem: filterConditions.powerSystem.map((item) => item._id),
     };
 
     await changeFilter(newFilter);
@@ -217,6 +233,7 @@ const handleRowClick = async (item) => {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
+
 const confirmUpdate = async (event) => {
   confirm.require({
     target: event.currentTarget,
@@ -352,6 +369,20 @@ const deleteThis = async (id) => {
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+};
+
+const x = {
+  name: 'subSystem',
+  filterConditions: {
+    area: { value: [], type: [] },
+    zone: { value: [], type: [] },
+    owner: { value: [], type: [] },
+    kv: { value: [], type: [] },
+    station: { value: [], type: [] },
+    powersystem: [],
+    filtering: '',
+  },
+  active: true,
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full mb-3 pl-3 mt-1 flex justify-content-between align-items-center">
+  <div class="w-full mb-5 mt-1 flex justify-content-between align-items-center">
     <span class="text-xl font-semibold"> Filter</span>
     <div class="flex gap-2 align-items-center justify-content-end">
       <Button severity="secondary" label="Save Filter" icon="pi pi-save" @click="saveFilter" />
@@ -11,68 +11,157 @@
   </div>
   <ScrollPanel style="width: 100%; height: 46rem">
     <div class="flex flex-column gap-3 pl-1">
-      <searchPsWidget
-        v-model="areaSelected"
-        label="Area"
-        :definitionId="[areaDefinitionId]"
-        :multipleSelection="true"
-      />
-
-      <searchPsWidget
-        v-model="zoneSelected"
-        label="Zone"
-        :definitionId="[zoneDefinitionId]"
-        :multipleSelection="true"
-      />
-
-      <searchPsWidget
-        v-model="ownerSelected"
-        label="Owner"
-        :definitionId="[ownerDefinitionId]"
-        :multipleSelection="true"
-      />
-
-      <searchPsWidget v-model="kVSelected" label="kV" :definitionId="[kVDefinitionId]" :multipleSelection="true" />
-
-      <searchPsWidget
-        v-model="stationSelected"
-        label="Station"
-        :definitionId="[stationDefinitionId]"
-        :multipleSelection="true"
-      />
-
-      <div class="flex flex-column align-items-start gap-1">
-        <label for="type" class="font-semibold"> Definition </label>
-        <MultiSelect
-          v-model="definitionSubsystemSelected"
-          display="chip"
-          :options="definitionSubsystemList"
-          optionLabel="name"
-          placeholder="Select Types"
-          class="w-full psFilterAutoComplete"
-        />
-      </div>
-
-      <div class="flex flex-column align-items-start gap-1">
-        <label for="ps" class="font-semibold"> Power System </label>
-        <div class="input-group">
-          <Dropdown
-            v-model="psDefinitionType"
-            :options="definitionSubsystemList"
-            optionLabel="name"
-            optionValue="_id"
-            class="w-20rem"
-          />
-
+      <div class="grid">
+        <div class="col-8">
           <searchPsWidget
-            v-model="psSelected"
-            label=""
-            :definitionId="psDefinitionType ? [psDefinitionType] : []"
+            v-model="areaSelected"
+            label="Area"
+            :definitionId="[areaDefinitionId]"
             :multipleSelection="true"
             :showViaDotAtTenChild="true"
           />
         </div>
+        <div class="col-4">
+          <div class="flex flex-column align-items-start gap-1">
+            <label for="type" class="font-semibold"> Element Type </label>
+            <MultiSelect
+              v-model="areaDefinitionSelected"
+              display="chip"
+              :options="definitionSubsystemList"
+              :disabled="areaSelected.length === 0"
+              optionLabel="name"
+              :placeholder="areaSelected.length === 0 ? 'Select Area' : 'Select Types'"
+              class="w-full psFilterAutoComplete"
+            />
+          </div>
+        </div>
       </div>
+
+      <div class="grid">
+        <div class="col-8">
+          <searchPsWidget
+            v-model="zoneSelected"
+            label="Zone"
+            :definitionId="[zoneDefinitionId]"
+            :multipleSelection="true"
+            :showViaDotAtTenChild="true"
+          />
+        </div>
+        <div class="col-4">
+          <div class="flex flex-column align-items-start gap-1">
+            <label for="type" class="font-semibold"> Element Type </label>
+            <MultiSelect
+              v-model="zoneDefinitionSelected"
+              display="chip"
+              :options="definitionSubsystemList"
+              :disabled="zoneSelected.length === 0"
+              optionLabel="name"
+              :placeholder="zoneSelected.length === 0 ? 'Select Zone' : 'Select Types'"
+              class="w-full psFilterAutoComplete"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-8">
+          <searchPsWidget
+            v-model="ownerSelected"
+            label="Owner"
+            :definitionId="[ownerDefinitionId]"
+            :multipleSelection="true"
+            :showViaDotAtTenChild="true"
+          />
+        </div>
+        <div class="col-4">
+          <div class="flex flex-column align-items-start gap-1">
+            <label for="type" class="font-semibold"> Element Type </label>
+            <MultiSelect
+              v-model="ownerDefinitionSelected"
+              display="chip"
+              :options="definitionSubsystemList"
+              :disabled="ownerSelected.length === 0"
+              optionLabel="name"
+              :placeholder="ownerSelected.length === 0 ? 'Select Owner' : 'Select Types'"
+              class="w-full psFilterAutoComplete"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-8">
+          <searchPsWidget v-model="kVSelected" label="kV" :definitionId="[kVDefinitionId]" :multipleSelection="true" />
+        </div>
+        <div class="col-4">
+          <div class="flex flex-column align-items-start gap-1">
+            <label for="type" class="font-semibold"> Element Type </label>
+            <MultiSelect
+              v-model="kVDefinitionSelected"
+              display="chip"
+              :options="definitionSubsystemList"
+              :disabled="kVSelected.length === 0"
+              optionLabel="name"
+              :placeholder="kVSelected.length === 0 ? 'Select kV' : 'Select Types'"
+              class="w-full psFilterAutoComplete"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-8">
+          <searchPsWidget
+            v-model="stationSelected"
+            label="Station"
+            :definitionId="[stationDefinitionId]"
+            :multipleSelection="true"
+            :showViaDotAtTenChild="true"
+          />
+        </div>
+        <div class="col-4">
+          <div class="flex flex-column align-items-start gap-1">
+            <label for="type" class="font-semibold"> Element Type </label>
+            <MultiSelect
+              v-model="stationDefinitionSelected"
+              display="chip"
+              :options="definitionSubsystemList"
+              :disabled="stationSelected.length === 0"
+              optionLabel="name"
+              :placeholder="stationSelected.length === 0 ? 'Select Station' : 'Select Types'"
+              class="w-full psFilterAutoComplete"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-4">
+          <div class="flex flex-column align-items-start gap-1">
+            <label for="type" class="font-semibold"> Element Type </label>
+            <MultiSelect
+              v-model="psDefinitionType"
+              display="chip"
+              :options="definitionSubsystemList"
+              optionLabel="name"
+              :placeholder="stationSelected.length === 0 ? 'Select Station' : 'Select Types'"
+              class="w-full psFilterAutoComplete"
+            />
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="flex flex-column align-items-start gap-1">
+            <searchPsWidget
+              v-model="psSelected"
+              label="Power System"
+              :definitionId="psDefinitionType.map((item) => item._id)"
+              :multipleSelection="true"
+              :showViaDotAtTenChild="true"
+            />
+          </div>
+        </div>
+      </div>
+
       <Divider />
 
       <div class="flex flex-column gap-2 mb-3">
@@ -102,61 +191,85 @@ const props = defineProps({
 const emit = defineEmits(['changeFilter', 'saveFilter']);
 
 const areaSelected = ref([]);
+const areaDefinitionSelected = ref([]);
 const areaDefinitionId = ref([]);
 
 const zoneSelected = ref([]);
+const zoneDefinitionSelected = ref([]);
 const zoneDefinitionId = ref([]);
 
 const ownerSelected = ref([]);
+const ownerDefinitionSelected = ref([]);
 const ownerDefinitionId = ref([]);
 
 const kVSelected = ref([]);
+const kVDefinitionSelected = ref([]);
 const kVDefinitionId = ref([]);
 
 const stationSelected = ref([]);
+const stationDefinitionSelected = ref([]);
 const stationDefinitionId = ref([]);
 
-const psDefinitionType = ref();
+const psDefinitionType = ref([]);
 const psSelected = ref([]);
 
 const filterConjunction = ref('');
-const changFilter = () => {
-  const newFilter = {
-    definition: definitionSubsystemSelected.value.map((item) => item._id),
-    area: areaSelected.value.map((item) => item._id),
-    zone: zoneSelected.value.map((item) => item._id),
-    owner: ownerSelected.value.map((item) => item._id),
-    kv: kVSelected.value.map((item) => item._id),
-    station: stationSelected.value.map((item) => item._id),
-    powersystem: psSelected.value.map((item) => item._id),
-    filtering: filterConjunction.value,
-  };
-  emit('changeFilter', newFilter);
-};
 
-const saveFilter = () => {
-  const newFilter = {
-    definition: definitionSubsystemSelected.value.map((item) => item._id),
-    area: areaSelected.value.map((item) => item._id),
-    zone: zoneSelected.value.map((item) => item._id),
-    owner: ownerSelected.value.map((item) => item._id),
-    kv: kVSelected.value.map((item) => item._id),
-    station: stationSelected.value.map((item) => item._id),
-    powersystem: psSelected.value.map((item) => item._id),
+const getFilterSelected = () => {
+  return {
+    area: {
+      value: areaSelected.value.map((item) => item._id),
+      type: areaSelected.value.length > 0 ? areaDefinitionSelected.value.map((item) => item._id) : [],
+    },
+    zone: {
+      value: zoneSelected.value.map((item) => item._id),
+      type: zoneSelected.value.length > 0 ? zoneDefinitionSelected.value.map((item) => item._id) : [],
+    },
+    owner: {
+      value: ownerSelected.value.map((item) => item._id),
+      type: ownerSelected.value.length > 0 ? ownerDefinitionSelected.value.map((item) => item._id) : [],
+    },
+
+    kV: {
+      value: kVSelected.value.map((item) => item._id),
+      type: kVSelected.value.length > 0 ? kVDefinitionSelected.value.map((item) => item._id) : [],
+    },
+
+    station: {
+      value: stationSelected.value.map((item) => item._id),
+      type: stationSelected.value.length > 0 ? stationDefinitionSelected.value.map((item) => item._id) : [],
+    },
+
+    powersystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
     filtering: filterConjunction.value,
   };
-  emit('saveFilter', newFilter);
+};
+const changFilter = () => {
+  emit('changeFilter', getFilterSelected());
+};
+const saveFilter = () => {
+  emit('saveFilter', getFilterSelected());
 };
 const clearFilterSelected = () => {
   areaSelected.value = [];
+  areaDefinitionSelected.value = [];
+
   zoneSelected.value = [];
+  zoneDefinitionSelected.value = [];
+
   ownerSelected.value = [];
+  ownerDefinitionSelected.value = [];
+
   kVSelected.value = [];
+  kVDefinitionSelected.value = [];
+
   stationSelected.value = [];
+  stationDefinitionSelected.value = [];
+
   psSelected.value = [];
-  definitionSubsystemSelected.value = [];
+  psDefinitionType.value = [];
+
   filterConjunction.value = '';
-  psDefinitionType.value = undefined;
 };
 
 // definiton List
@@ -181,7 +294,6 @@ const setDefinitionfilterId = () => {
 };
 
 const definitionSubsystemList = ref([]);
-const definitionSubsystemSelected = ref([]);
 
 const getdefinitionSubsystemList = async () => {
   try {
@@ -197,13 +309,23 @@ watch(
   () => props.currentFilter,
   async () => {
     await nextTick(() => {
-      areaSelected.value = props.currentFilter.area;
-      zoneSelected.value = props.currentFilter.zone;
-      ownerSelected.value = props.currentFilter.owner;
-      kVSelected.value = props.currentFilter.kV;
-      stationSelected.value = props.currentFilter.station;
-      definitionSubsystemSelected.value = props.currentFilter.definition;
-      psSelected.value = props.currentFilter.powerSystem;
+      areaSelected.value = props.currentFilter.area.value;
+      areaDefinitionSelected.value = props.currentFilter.area.type;
+
+      zoneSelected.value = props.currentFilter.zone.value;
+      zoneDefinitionSelected.value = props.currentFilter.zone.type;
+
+      ownerSelected.value = props.currentFilter.owner.value;
+      ownerDefinitionSelected.value = props.currentFilter.owner.type;
+
+      kVSelected.value = props.currentFilter.kV.value;
+      kVDefinitionSelected.value = props.currentFilter.kV.type;
+
+      stationSelected.value = props.currentFilter.station.value;
+      stationDefinitionSelected.value = props.currentFilter.station.type;
+
+      psSelected.value = props.currentFilter.powerSystem.value;
+      psDefinitionType.value = definitionSubsystemList.value;
 
       filterConjunction.value = props.currentFilter.filtering || '';
     });
@@ -211,8 +333,29 @@ watch(
   { deep: true },
 );
 
-watch(psDefinitionType, () => {
-  psSelected.value = [];
+const filterNameSelected = computed(() => {
+  const suggestion = [];
+  if (areaSelected.value.length > 0) {
+    suggestion.push('area');
+  }
+  if (zoneSelected.value.length > 0) {
+    suggestion.push('zone');
+  }
+  if (ownerSelected.value.length > 0) {
+    suggestion.push('owner');
+  }
+  if (kVSelected.value.length > 0) {
+    suggestion.push('kV');
+  }
+  if (stationSelected.value.length > 0) {
+    suggestion.push('station');
+  }
+  if (psSelected.value.length > 0) {
+    suggestion.push('powerSystem');
+  }
+
+  return ['area', 'zone', 'owner'];
+  return suggestion;
 });
 </script>
 <style>
