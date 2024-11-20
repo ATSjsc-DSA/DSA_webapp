@@ -6,9 +6,11 @@ const { projectData, profileData, slotData } = storeToRefs(commonStore);
 
 export class ApiContingency {
   static async getListContingency(contingenciesActiveId, param) {
-    return get(`/seedconfig/${contingenciesActiveId}/contingency`, param);
+    return get(
+      `/seedconfig/${projectData.value._id}/${slotData.value._id}/${contingenciesActiveId}/contingency`,
+      param,
+    );
   }
-
   static async createContingency(contingenciesActiveId, data) {
     return post(`/seedconfig/${contingenciesActiveId}/contingency`, data);
   }
@@ -46,14 +48,14 @@ export class ApiContingencies {
 
 export class ApiDisturbances {
   static async getList(tsaId, page) {
-    return get(`/seedconfig/${projectData.value._id}/${tsaId}/disturbances`, {
+    return get(`/seedconfig/${profileData.value._id}/${tsaId}/disturbances`, {
       page: page,
       page_size: 10,
     });
   }
 
   static async createDisturbances(tsaId, data) {
-    return post(`/seedconfig/${projectData.value._id}/${tsaId}/disturbances`, data);
+    return post(`/seedconfig/${profileData.value._id}/${tsaId}/disturbances`, data);
   }
   static async getDisturbances(id) {
     return get(`/seedconfig/disturbances/${id}`);
@@ -68,8 +70,12 @@ export class ApiDisturbances {
 
 export class ApiDisturbance {
   static async getDisturbanceList(disturbanceCaseId, page) {
-    return get(`/seedconfig/${profileData.value._id}/${disturbanceCaseId}/disturbance`, { page: page, page_size: 10 });
+    return get(`/seedconfig/${projectData.value._id}/${slotData.value._id}/${disturbanceCaseId}/disturbance`, {
+      page: page,
+      page_size: 10,
+    });
   }
+
   static async createDisturbance(disturbanceCaseId, data) {
     return post(`/seedconfig/${profileData.value._id}/${disturbanceCaseId}/disturbance`, data);
   }
