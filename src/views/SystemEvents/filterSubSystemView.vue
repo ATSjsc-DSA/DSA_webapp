@@ -165,9 +165,25 @@
       <Divider />
 
       <div class="flex flex-column gap-2 mb-3">
-        <label for="appName" class="font-semibold"> Conjunction </label>
-        <Textarea id="filterConjunction" v-model="filterConjunction" class="flex-auto" autocomplete="off" />
-        <small>Example: "Area and Zone or (kV and Station)"</small>
+        <div class="flex align-items-center justify-content-between">
+          <label for="appName" class="font-semibold"> Conjunction </label>
+          <div class="flex align-items-center">
+            <label for="conjunctionCanDuplicate" class="mr-2"> Duplicate </label>
+            <Checkbox
+              v-model="conjunctionCanDuplicate"
+              inputId="conjunctionCanDuplicate"
+              name="conjunctionCanDuplicate"
+              :binary="true"
+            />
+          </div>
+        </div>
+        <!-- <Textarea id="filterConjunction" v-model="filterConjunction" class="flex-auto" autocomplete="off" /> -->
+        <conjunctionInputWidget
+          v-model:filterConjunction="filterConjunction"
+          v-model:canDuplicate="conjunctionCanDuplicate"
+          :filter-name-selected="filterNameSelected"
+        />
+        <small>Example: "Area and Zone or (kV and Station) not PowerSystem"</small>
       </div>
     </div>
   </ScrollPanel>
@@ -176,7 +192,7 @@
 <script setup>
 import MultiSelect from 'primevue/multiselect';
 import ScrollPanel from 'primevue/scrollpanel';
-
+import conjunctionInputWidget from './conjunctionInputWidget.vue';
 import { DefinitionListApi } from '@/views/PowerSystem/api';
 import { nextTick, onMounted, watch } from 'vue';
 import searchPsWidget from '../PowerSystem/searchPsWidget.vue';
@@ -350,13 +366,13 @@ const filterNameSelected = computed(() => {
   if (stationSelected.value.length > 0) {
     suggestion.push('station');
   }
-  if (psSelected.value.length > 0) {
+  if (psSelected.value && psSelected.value.length > 0) {
     suggestion.push('powerSystem');
   }
 
-  return ['area', 'zone', 'owner'];
   return suggestion;
 });
+const conjunctionCanDuplicate = ref(false);
 </script>
 <style>
 .p-autocomplete-input,
