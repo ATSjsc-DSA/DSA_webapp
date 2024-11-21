@@ -14,15 +14,26 @@ const props = defineProps({
     default: () => [],
   },
 });
-onMounted(() => {
-  chartData.value = setChartData();
+const projectRadarChartWrap = ref();
+const getChartWidth = async () => {
+  if (projectRadarChartWrap.value) {
+    let w = 0;
+    await nextTick(() => {
+      w = projectRadarChartWrap.value.getBoundingClientRect().width;
+    });
+    return w;
+  }
+  return 0;
+};
+onMounted(async () => {
+  chartData.value = await setChartData();
   chartOptions.value = setChartOptions();
 });
 
 watch(
   () => props.data,
   async () => {
-    chartData.value = setChartData();
+    chartData.value = await setChartData();
     chartOptions.value = setChartOptions();
   },
 );
@@ -30,7 +41,7 @@ watch(
 watch(
   () => props.dataKey,
   async () => {
-    chartData.value = setChartData();
+    chartData.value = await setChartData();
     chartOptions.value = setChartOptions();
   },
 );
@@ -84,7 +95,7 @@ const transformApiResponse = (data) => {
   return result;
 };
 
-const setChartData = () => {
+const setChartData = async () => {
   const radarData = transformApiResponse(props.data);
   const chartValue = [];
   const numAxis = radarData.Key.length;
@@ -138,11 +149,38 @@ const setChartData = () => {
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, boundValue);
   return {
-    labels: radarData.Key,
+    labels: await breakLabels(radarData.Key),
     datasets: chartValue,
   };
 };
-
+const breakLabels = async (labelArr) => {
+  const labels = [];
+  const chartWidth = await getChartWidth();
+  const isSmallChart = chartWidth < 500;
+  labelArr.forEach((item) => {
+    const splitAtHyphen = item.split('-');
+    let label = [];
+    if (splitAtHyphen.length > 1) {
+      if (isSmallChart) {
+        splitAtHyphen.forEach((itemBreak) => {
+          if (itemBreak.split('_').length > 3) {
+            const splitAtUnderscore = itemBreak.split('_');
+            label.push(splitAtUnderscore.slice(0, 2).join('_') + '_');
+            label.push(splitAtUnderscore.slice(2).join('_'));
+          } else {
+            label.push(itemBreak);
+          }
+        });
+      } else {
+        label = label.concat(splitAtHyphen);
+      }
+    } else {
+      label.push(item);
+    }
+    labels.push(label);
+  });
+  return labels;
+};
 const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
@@ -152,7 +190,7 @@ const setChartOptions = () => {
   return {
     animation: false,
     maintainAspectRatio: false,
-
+    responsive: true,
     scales: {
       r: {
         startAngle: 0,
@@ -316,7 +354,7 @@ const removeValueExceed20 = (reserveData) => {
 </script>
 
 <template>
-  <div class="h-full">
+  <div ref="projectRadarChartWrap" class="h-full">
     <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full h-full" />
   </div>
 </template>

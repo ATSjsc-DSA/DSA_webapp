@@ -140,7 +140,7 @@ const getCurrentColor = (current, rateArr) => {
 
   if (current <= rateArr['rateCritical1']) {
     return documentStyle.getPropertyValue('--primary-600');
-  } else if (current <= rateArr['rateCritical1'] + rateArr['rateCritical2']) {
+  } else if (current <= rateArr['rateCritical2']) {
     return documentStyle.getPropertyValue('--yellow-600');
   } else {
     return documentStyle.getPropertyValue('--red-600');

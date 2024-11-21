@@ -77,7 +77,7 @@
         </div>
         <div class="grid">
           <div class="field col-12 md:col-8">
-            <label for="name" class="font-semibold">Power System 1</label>
+            <label for="name" class="font-semibold">Element</label>
             <AutoComplete
               v-model="autoCompleteValue1"
               completeOnFocus
@@ -87,7 +87,7 @@
             />
           </div>
           <div class="field col-12 md:col-4">
-            <label for="name" class="font-semibold">Definition</label>
+            <label for="name" class="font-semibold">Type Element</label>
             <Dropdown
               v-model="selectedDefinition1"
               :options="listDefinition"

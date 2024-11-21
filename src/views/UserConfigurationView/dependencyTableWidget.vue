@@ -53,7 +53,7 @@
   <Dialog v-model:visible="createVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Dependency Plan</span>
+        <span class="font-bold white-space-nowrap">Offline Plan</span>
       </div>
     </template>
     <div class="grid">
@@ -142,7 +142,7 @@
   <Dialog v-model:visible="updateVisibleDialog" :style="{ width: '48rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap">Dependency Plan</span>
+        <span class="font-bold white-space-nowrap">Offline Plan</span>
       </div>
     </template>
     <div class="grid">
