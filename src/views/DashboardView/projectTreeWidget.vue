@@ -644,7 +644,6 @@ const getTsaCurveTypeValue = (curveType) => {
   }
 };
 const getTsaCurveTypeSeverity = (curveType) => {
-  console.log('getTsaCurveTypeSeverity', curveType);
   if (curveType === undefined) {
     return '';
   }
@@ -686,7 +685,6 @@ const onVsaCaseRightClick = async (event, node) => {
         label: 'Unactive',
         icon: 'pi pi-times',
         command: async () => {
-          console.log(node);
           await updateVsaCaseActiveStatus(node._id, false);
         },
       },
@@ -724,7 +722,6 @@ const onTsaCaseRightClick = async (event, node) => {
         label: 'Unactive',
         icon: 'pi pi-times',
         command: async () => {
-          console.log(node);
           await updateTsaCaseActiveStatus(node._id, false);
         },
       },

@@ -74,13 +74,12 @@ const setChartData = async () => {
   const currentColor = [];
 
   const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isBreakLabel = props.data.length > 0 ? chartWidth / props.data.length < 200 : false;
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
     // vsa / tsa data F
     const moduleData = props.data[moduleIndex];
     const timeLabel = convertDateTimeToString(moduleData.timestamp);
-    labels.push(isSmallChart ? timeLabel.split(' ') : timeLabel);
-
+    labels.push(isBreakLabel ? timeLabel.split(' ') : timeLabel);
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.online['rateCritical1']);
 

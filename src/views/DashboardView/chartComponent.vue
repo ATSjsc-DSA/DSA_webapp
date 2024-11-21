@@ -38,7 +38,7 @@
             </OverlayPanel>
           </div>
 
-          <div v-if="typeChart === 'appTimeSeries' && nodeSelectedInChart !== undefined">
+          <div v-if="typeChart === 'appTimeSeries'">
             <Button
               type="button"
               icon="pi pi-ellipsis-v"

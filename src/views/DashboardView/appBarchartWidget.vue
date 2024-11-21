@@ -133,8 +133,6 @@ const setChartData = async () => {
       stack: 'Stack Current',
     },
   ];
-  console.log(labels);
-
   return { datasets: datasets, labels: labels };
 };
 

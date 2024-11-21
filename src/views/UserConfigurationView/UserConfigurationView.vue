@@ -741,7 +741,8 @@ const onNodeSelect = async (node) => {
     await getOslData(node._id);
   }
   if (keyCanSelected.includes(node.type)) {
-    keySelected.value = node.key;
+    keySelected.value = {};
+    keySelected.value[node.key] = true;
   }
 
   expandedKeys.value[node.key] = true;
@@ -1651,5 +1652,14 @@ const closeAllContextMenu = async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.item-data:hover {
+  cursor: pointer;
+  background-color: var(--highlight-bg);
+}
+
+.selected-item {
+  background-color: var(--highlight-bg);
 }
 </style>
