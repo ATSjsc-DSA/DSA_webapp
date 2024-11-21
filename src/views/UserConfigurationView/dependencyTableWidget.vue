@@ -3,7 +3,11 @@
     <DataTable :value="dependencyList" tableStyle="min-width: 50rem" size="small">
       <template #header>
         <div class="flex justify-content-end">
-          <Button type="button" icon="pi pi-plus" size="small" text @click="createVisibleDialog = true" />
+          <Button type="button" label="Import" icon="pi pi-upload" text @click="importVisibleDialog = true" />
+          <Button type="button" label="Export" icon="pi pi-download" text @click="handleExport" />
+
+          <Divider layout="vertical" />
+          <Button type="button" icon="pi pi-plus" @click="createVisibleDialog = true" />
         </div>
       </template>
       <Column field="name" header="Name" frozen style="width: 15%; text-wrap: nowrap"> </Column>
@@ -227,13 +231,20 @@
       <Button type="button" label="Update" @click="updateDependency"></Button>
     </template>
   </Dialog>
+
+  <Dialog v-model:visible="importVisibleDialog" :style="{ width: '50rem' }" header="UploadFile" :modal="true">
+    <uploadDependencyForm @uploadFile="importDependency" />
+  </Dialog>
+
+  <Loading v-if="isImporting || isExporting" />
 </template>
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import InputSwitch from 'primevue/inputswitch';
 import Calendar from 'primevue/calendar';
-
+import Loading from '@/components/Loading.vue';
+import uploadDependencyForm from './uploadDependencyForm.vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
@@ -355,6 +366,43 @@ const deleteDependency = async (id) => {
   } catch (error) {
     console.error('deleteDependency: error ', error);
     toast.add({ severity: 'error', summary: 'Delete Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+// import export
+const importVisibleDialog = ref(false);
+
+const isImporting = ref(false);
+const importDependency = async (formData, callback) => {
+  isImporting.value = true;
+  try {
+    // await ApiDsa.importDependency(formData);
+    setTimeout(() => {
+      toast.add({ severity: 'success', summary: 'Dependency', detail: 'Import Successfully', life: 3000 });
+      importVisibleDialog.value = false;
+      isImporting.value = false;
+      callback();
+    }, 1000);
+    // await getDependencyList();
+  } catch (error) {
+    isImporting.value = false;
+    toast.add({ severity: 'danger', summary: 'Dependency', detail: error, life: 3000 });
+  }
+};
+const isExporting = ref(false);
+const handleExport = () => {
+  isExporting.value = true;
+  try {
+    // await ApiDsa.exportDependency();
+    setTimeout(() => {
+      toast.add({ severity: 'success', summary: 'Dependency', detail: 'Export Successfully', life: 3000 });
+      isExporting.value = false;
+      callback();
+    }, 1000);
+    // await getDependencyList();
+  } catch (error) {
+    isExporting.value = false;
+    toast.add({ severity: 'danger', summary: 'Dependency', detail: error, life: 3000 });
   }
 };
 </script>

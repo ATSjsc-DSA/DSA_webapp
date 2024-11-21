@@ -82,7 +82,7 @@
             </div>
           </div>
           <div class="col-8">
-            <searchPsWidget v-model="psSelected" label="Element" />
+            <searchPsWidget v-model="psSelected" label="Element" :definitionId="[selectedDefinition]" />
           </div>
         </div>
       </div>

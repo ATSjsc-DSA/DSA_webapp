@@ -143,6 +143,12 @@ export class ApiDsa {
   static async delDependency(dependencyId) {
     return _delete(`/userconfig/moduledependency/${dependencyId}`);
   }
+  static async importDependency(dependencyId) {
+    return put(`/userconfig/${profileData.value._id}/${dependencyId}/import/moduledependency`);
+  }
+  static async exportDependency(dependencyId) {
+    return put(`/userconfig/${profileData.value._id}/${dependencyId}/export/moduledependency`);
+  }
   // SSR
   static async getSsrList(dsaId) {
     return get(`/userconfig/${profileData.value._id}/${dsaId}/ssrinformations`);
