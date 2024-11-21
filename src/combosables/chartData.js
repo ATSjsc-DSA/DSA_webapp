@@ -62,7 +62,7 @@ const chartComposable = () => {
   };
   const convertDateTimeToString = (t) => {
     if (t !== null) {
-      let dateTimeConvert = new Date(t * 1000);
+      const dateTimeConvert = new Date(parseInt(t) * 1000);
       if (isNaN(dateTimeConvert.getTime())) return 'Invalid Date';
       const date = dateTimeConvert.toLocaleDateString('es-AR');
       const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };

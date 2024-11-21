@@ -11,7 +11,9 @@
             text
             @click="treeExpandedKeys = {}"
           />
-          <Button icon="pi pi-times" text severity="secondary" title="Remove Tree" @click="emit('onRemoveWidget')" />
+          <Button icon="pi pi-refresh" text severity="secondary" title="Reload Tree" @click="reloadTree" />
+
+          <Button icon="pi pi-times" text severity="secondary" title="Close Tree" @click="emit('onRemoveWidget')" />
         </div>
       </div>
     </template>
@@ -176,6 +178,12 @@ onMounted(async () => {
 });
 
 const userConfigProfileId = ref('');
+
+const reloadTree = async () => {
+  treeData.value = [];
+  await getDsaService();
+  await getTreeData();
+};
 const getDsaService = async () => {
   try {
     const res = await DSA_api.getDsaService();

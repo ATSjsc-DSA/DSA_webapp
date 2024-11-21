@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 42rem">
+  <div style="height: 41rem">
     <DataTable :value="dependencyList" tableStyle="min-width: 50rem" size="small">
       <template #header>
         <div class="flex justify-content-end">
@@ -7,7 +7,7 @@
           <Button type="button" label="Export" icon="pi pi-download" text @click="handleExport" />
 
           <Divider layout="vertical" />
-          <Button type="button" icon="pi pi-plus" @click="createVisibleDialog = true" />
+          <Button type="button" icon="pi pi-plus" @click="handleCreate" />
         </div>
       </template>
       <Column field="name" header="Name" frozen style="width: 15%; text-wrap: nowrap"> </Column>
@@ -304,6 +304,19 @@ const newData = ref({
   active: true,
 });
 
+const handleCreate = () => {
+  newData.value = {
+    name: '',
+    startTimestamp: new Date(),
+    endTimestamp: new Date(),
+    rateAbnormal: 0,
+    rateCritical1: 0,
+    rateCritical2: 0,
+    rateCritical3: 0,
+    active: true,
+  };
+  createVisibleDialog.value = true;
+};
 const createDependency = async () => {
   const data = JSON.parse(JSON.stringify(newData.value));
   data.startTimestamp = parseInt(new Date(data.startTimestamp).getTime() / 1000);

@@ -25,7 +25,7 @@ const items = computed(() => {
       items: [
         { label: 'PowerSystem ', icon: 'pi pi-fw pi-list', to: powerSystemPath },
         {
-          label: 'System Events',
+          label: 'Global Configuration ',
           icon: 'pi pi-fw pi-clone',
           items: [
             {
@@ -52,7 +52,7 @@ const items = computed(() => {
           icon: 'pi pi-fw pi-id-card',
           to: '/gridcode/',
         },
-        { label: 'DSA Device', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
+        { label: 'DSA Online Setting', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
         { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
       ],
     },

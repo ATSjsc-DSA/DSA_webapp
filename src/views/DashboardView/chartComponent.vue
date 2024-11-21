@@ -5,18 +5,22 @@
         <div class="flex flex-column justify-content-start align-items-start">
           <div><i class="pi pi-folder-open pr-3"></i>{{ chartTitle }}</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
+          <div style="font-size: 0.7rem; padding-top: 0.5rem">
+            {{ rangeTimeOfTimeSeriesChart }}
+          </div>
         </div>
         <div class="flex justify-content-between align-items-center">
+          <!-- choose label for radar chart  -->
           <div v-if="chartData.Key">
             <Button
               type="button"
               icon="pi pi-ellipsis-v"
               aria-haspopup="true"
-              aria-controls="overlay_panel"
+              aria-controls="overlay_panel_radarchart"
               text
-              @click="toggleMenu"
+              @click="toggleMenuSelectKeyRadarChart"
             />
-            <OverlayPanel id="overlay_panel" ref="menuSelectDataKey">
+            <OverlayPanel id="overlay_panel_radarchart" ref="menuSelectDataKey">
               <div class="font-semibold text-lg mb-2">{{ chartTitle }}: Select Keys</div>
               <Divider />
               <div class="flex flex-column gap-3 p-2">
@@ -29,6 +33,40 @@
                     :disabled="chartData.Key.length < 8"
                   />
                   <label :for="item" class="ml-2"> {{ item }} </label>
+                </div>
+              </div>
+            </OverlayPanel>
+          </div>
+
+          <div v-if="typeChart === 'appTimeSeries' && nodeSelectedInChart !== undefined">
+            <Button
+              type="button"
+              icon="pi pi-ellipsis-v"
+              aria-haspopup="true"
+              aria-controls="overlay_panel_timeSeriesChart"
+              text
+              @click="toggleMenuSelectRangeTimeSeriesChart"
+            />
+            <OverlayPanel id="overlay_panel_timeSeriesChart" ref="menuSelectRangTime">
+              <div class="font-semibold text-lg mb-2">{{ chartTitle }}: Choose Range Time</div>
+              <Divider />
+              <div class="grid px-3 mt-3">
+                <div class="col-6">
+                  <div class="flex flex-column gap-2 mb-3">
+                    <label for="startTimeSeries" class="font-semibold"> Start Timestamp </label>
+                    <Calendar v-model="startTimeSeries" showTime showIcon showButtonBar showSeconds />
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="flex flex-column gap-2 mb-3">
+                    <label for="endTimeSeries" class="font-semibold"> End Timestamp </label>
+                    <Calendar v-model="endTimeSeries" showTime showIcon showButtonBar showSeconds />
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="flex justify-content-end my-3">
+                    <Button label="Submit" @click="changeRangeTimeOfSeriesChart" />
+                  </div>
                 </div>
               </div>
             </OverlayPanel>
@@ -49,6 +87,8 @@
         @drop.prevent="onDropComponent"
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
+        <appBarTimeSerieschartWidget v-if="typeChart === 'appTimeSeries'" :data="chartData" />
+
         <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
         <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
         <projectRadarChartWidget v-if="typeChart === 'projectRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
@@ -59,8 +99,10 @@
 
 <script setup>
 import { computed, onUnmounted, onMounted, watch } from 'vue';
+import Calendar from 'primevue/calendar';
 
 import appBarchartWidget from './appBarchartWidget.vue';
+import appBarTimeSerieschartWidget from './appBarTimeSerieschartWidget.vue';
 import curveLinechartWidget from './curveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import projectRadarChartWidget from './projectRadarChartWidget.vue';
@@ -105,6 +147,9 @@ onMounted(() => {
     } else {
       setInitTitle();
     }
+    if (props.typeChart === 'appTimeSeries') {
+      setInitRangeTimeOfSeriesChart();
+    }
     getChartData();
     chartRadarDataKey.value = nodeSelected.value.dataKey;
   } else {
@@ -131,12 +176,43 @@ const onRemoveWidget = () => {
 
 const menuSelectDataKey = ref(null);
 
-const toggleMenu = (event) => {
+const toggleMenuSelectKeyRadarChart = (event) => {
   menuSelectDataKey.value.toggle(event);
 };
 
+const startTimeSeries = ref(new Date());
+const endTimeSeries = ref(new Date());
+const rangeTimeOfTimeSeriesChart = ref('Choose a Range Time');
+const menuSelectRangTime = ref();
+const toggleMenuSelectRangeTimeSeriesChart = (event) => {
+  menuSelectRangTime.value.toggle(event);
+};
+
+const changeRangeTimeOfSeriesChart = async () => {
+  menuSelectRangTime.value.hide();
+  await getChartData();
+  rangeTimeOfTimeSeriesChart.value =
+    convertDateTimeToString(startTimeSeries.value / 1000) + ' - ' + convertDateTimeToString(endTimeSeries.value / 1000);
+  nodeSelected.value.startTimeSeries = startTimeSeries.value.getTime();
+  nodeSelected.value.endTimeSeries = endTimeSeries.value.getTime();
+};
+
+const setInitRangeTimeOfSeriesChart = () => {
+  startTimeSeries.value = new Date(nodeSelected.value.startTimeSeries);
+  endTimeSeries.value = new Date(nodeSelected.value.endTimeSeries);
+  if (startTimeSeries.value !== undefined && endTimeSeries.value !== undefined) {
+    rangeTimeOfTimeSeriesChart.value =
+      convertDateTimeToString(startTimeSeries.value / 1000) +
+      ' - ' +
+      convertDateTimeToString(endTimeSeries.value / 1000);
+  } else {
+    startTimeSeries.value = new Date();
+    endTimeSeries.value = new Date();
+  }
+};
+
 const typeChartCanDrop = computed(() => {
-  if (props.typeChart === 'appRadar' || props.typeChart === 'appBar') {
+  if (props.typeChart.includes('app')) {
     return 'Application';
   }
 
@@ -157,6 +233,9 @@ const setInitTitle = () => {
   }
   if (props.typeChart === 'appBar') {
     chartTitle.value = 'Application';
+  }
+  if (props.typeChart === 'appTimeSeries') {
+    chartTitle.value = 'Time Series';
   }
   if (props.typeChart === 'projectRadar') {
     chartTitle.value = 'Project';
@@ -216,6 +295,8 @@ const onDropComponent = async () => {
       title: props.nodeDrag.label,
       data: nodeSelectedInChart.value,
       dataKey: [],
+      startTimeSeries: 0,
+      endTimeSeries: 0,
     };
 
     await getChartData();
@@ -234,11 +315,19 @@ watch(chartRadarDataKey, (keyArr) => {
 
 const chartData = ref([]);
 const modificationTime = ref();
+
 const getChartData = async () => {
   try {
     let res = {};
     if (props.typeChart === 'appBar') {
       res = await ApplicationApi.getBarChartData(nodeSelectedInChart.value);
+    }
+    if (props.typeChart === 'appTimeSeries') {
+      res = await ApplicationApi.getBarTimeSeriesChartData(
+        nodeSelectedInChart.value,
+        new Date(startTimeSeries.value).getTime() / 1000,
+        new Date(endTimeSeries.value).getTime() / 1000,
+      );
     }
     if (props.typeChart === 'appRadar') {
       res = await ApplicationApi.getRadarChartData(nodeSelectedInChart.value);
@@ -276,7 +365,7 @@ const getChartData = async () => {
       }, intervalTime);
     }
   } catch (error) {
-    console.log('get chart data: error ', error);
+    console.log('get chart data: error ', props.typeChart, error);
     chartData.value = [];
     modificationTime.value = undefined;
   }

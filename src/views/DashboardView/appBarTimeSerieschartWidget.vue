@@ -1,5 +1,5 @@
 <template>
-  <div ref="appBarChartWrap" class="flex flex-column h-full">
+  <div ref="appTimeSeriesChartWrap" class="flex flex-column h-full">
     <Chart type="line" :data="chartData" :options="chartOptions" class="flex-grow-1" />
   </div>
 </template>
@@ -9,7 +9,7 @@ import Chart from 'primevue/chart';
 import { watch } from 'vue';
 
 import chartComposable from '@/combosables/chartData';
-const { zoomOptions, nodataAnnotationOption } = chartComposable();
+const { zoomOptions, nodataAnnotationOption, convertDateTimeToString } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
 const { isDarkTheme } = useLayout();
 const props = defineProps({
@@ -38,7 +38,8 @@ watch(
 );
 const chartData = ref();
 const chartOptions = ref();
-const appBarChartWrap = ref();
+
+const appTimeSeriesChartWrap = ref();
 const setChartData = async () => {
   /*
   data = list of moduleData
@@ -77,7 +78,9 @@ const setChartData = async () => {
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
     // vsa / tsa data F
     const moduleData = props.data[moduleIndex];
-    labels.push(isSmallChart ? moduleData.name.split('-') : moduleData.name);
+    const timeLabel = convertDateTimeToString(moduleData.timestamp);
+    labels.push(isSmallChart ? timeLabel.split(' ') : timeLabel);
+
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.online['rateCritical1']);
 
@@ -86,6 +89,7 @@ const setChartData = async () => {
     currentData.push(moduleData.current);
     currentColor.push(getCurrentColor(moduleData.current, moduleData.online));
   }
+
   const datasets = [
     // online
     {
@@ -93,7 +97,7 @@ const setChartData = async () => {
       type: 'bar',
       label: 'Rate Critical 1',
       data: onlineRate1Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-600'),
+      backgroundColor: documentStyle.getPropertyValue('--primary-400'),
       stack: 'Stack Online',
     },
     {
@@ -101,7 +105,7 @@ const setChartData = async () => {
       datalabels: 'Online',
       label: 'Rate Critical 2',
       data: onlineRate2Data,
-      backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
+      backgroundColor: documentStyle.getPropertyValue('--yellow-400'),
       stack: 'Stack Online',
     },
 
@@ -111,7 +115,7 @@ const setChartData = async () => {
       datalabels: 'Offline',
       label: 'Rate Critical 1',
       data: offlineRate1Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-400'),
+      backgroundColor: documentStyle.getPropertyValue('--primary-700'),
       stack: 'Stack Offline',
     },
     {
@@ -119,7 +123,7 @@ const setChartData = async () => {
       datalabels: 'Offline',
       label: 'Rate Critical 2',
       data: offlineRate2Data,
-      backgroundColor: documentStyle.getPropertyValue('--yellow-400'),
+      backgroundColor: documentStyle.getPropertyValue('--yellow-700'),
       stack: 'Stack Offline',
     },
 
@@ -133,8 +137,6 @@ const setChartData = async () => {
       stack: 'Stack Current',
     },
   ];
-  console.log(labels);
-
   return { datasets: datasets, labels: labels };
 };
 
@@ -142,11 +144,11 @@ const getCurrentColor = (current, rateArr) => {
   const documentStyle = getComputedStyle(document.documentElement);
 
   if (current <= rateArr['rateCritical1']) {
-    return documentStyle.getPropertyValue('--primary-600');
+    return documentStyle.getPropertyValue('--primary-400');
   } else if (current <= rateArr['rateCritical2']) {
-    return documentStyle.getPropertyValue('--yellow-600');
+    return documentStyle.getPropertyValue('--yellow-400');
   } else {
-    return documentStyle.getPropertyValue('--red-600');
+    return documentStyle.getPropertyValue('--red-400');
   }
 };
 
@@ -222,10 +224,10 @@ const setChartOptions = async () => {
 };
 
 const getChartWidth = async () => {
-  if (appBarChartWrap.value) {
+  if (appTimeSeriesChartWrap.value) {
     let w = 0;
     await nextTick(() => {
-      w = appBarChartWrap.value.getBoundingClientRect().width;
+      w = appTimeSeriesChartWrap.value.getBoundingClientRect().width;
     });
     return w;
   }

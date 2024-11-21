@@ -188,7 +188,16 @@
               <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">BAR</div>
             </div>
-
+            <div
+              v-tooltip.left="'Appplication Bar Time Series'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragStart('appTimeSeries')"
+            >
+              <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">TIME</div>
+            </div>
             <div
               v-tooltip.left="'VSA Line'"
               class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
@@ -267,13 +276,20 @@ onMounted(async () => {
           addMapComponent(widget);
         }
         if (widget.type === 'chart') {
-          if (widget.typeChart === 'appBar') {
-            applicationDraggable.value = true;
-            addNewChartComponent('appBar', false, widget);
+          if (widget.typeChart === 'projectRadar') {
+            addNewChartComponent('projectRadar', true, widget);
           }
           if (widget.typeChart === 'appRadar') {
             applicationDraggable.value = true;
             addNewChartComponent('appRadar', false, widget);
+          }
+          if (widget.typeChart === 'appBar') {
+            applicationDraggable.value = true;
+            addNewChartComponent('appBar', false, widget);
+          }
+          if (widget.typeChart === 'appTimeSeries') {
+            applicationDraggable.value = true;
+            addNewChartComponent('appTimeSeries', false, widget);
           }
           if (widget.typeChart === 'vsa') {
             vsaCurveDraggable.value = true;
@@ -282,9 +298,6 @@ onMounted(async () => {
           if (widget.typeChart === 'tsa') {
             tsaCurveDraggable.value = true;
             addNewChartComponent('tsa', true, widget);
-          }
-          if (widget.typeChart === 'projectRadar') {
-            addNewChartComponent('projectRadar', true, widget);
           }
         }
       });
@@ -400,6 +413,10 @@ const onDropGridStackComponent = () => {
   canDropGridStackComponent.value = false;
 
   if (componentSelected.value === 'appBar') {
+    applicationDraggable.value = true;
+    addNewChartComponent(componentSelected.value, false);
+  }
+  if (componentSelected.value === 'appTimeSeries') {
     applicationDraggable.value = true;
     addNewChartComponent(componentSelected.value, false);
   }
