@@ -131,8 +131,9 @@
               <Tag
                 class="mr-3"
                 :value="getTsaCurveTypeValue(slotProps.node.curveType)"
-                :severity="getTsaCurveTypeSeverity(slotProps.node.curveType)"
+                :style="getTsaCurveTypeSeverity(slotProps.node.curveType)"
               />
+
               <div>{{ slotProps.node.label }}</div>
             </div>
           </template>
@@ -579,7 +580,7 @@ const getVsaCaseTypeSeverity = (caseType) => {
 
 // ---- tsa vsa type curve
 const getVsaCurveTypeValue = (curveType) => {
-  if (!curveType) {
+  if (curveType === undefined) {
     return '';
   }
   switch (curveType) {
@@ -596,7 +597,7 @@ const getVsaCurveTypeValue = (curveType) => {
   }
 };
 const getVsaCurveTypeSeverity = (curveType) => {
-  if (!curveType) {
+  if (curveType === undefined) {
     return '';
   }
   switch (curveType) {
@@ -614,61 +615,64 @@ const getVsaCurveTypeSeverity = (curveType) => {
 };
 
 const getTsaCurveTypeValue = (curveType) => {
-  if (!curveType) {
+  if (curveType === undefined) {
     return '';
   }
   switch (curveType) {
     case 0:
-      return 'Voltage';
-    case 1:
-      return 'Frequency';
-    case 2:
-      return 'ASngle';
-    case 3:
       return 'ActivePower';
-    case 4:
+    case 1:
       return 'ReactivePower';
+    case 2:
+      return 'Voltage';
+    case 3:
+      return 'Frequency';
     case 5:
-      return 'RotorAngle';
+      return 'Angle';
     case 6:
-      return 'Elect P';
+      return 'RotorAngle';
     case 7:
-      return 'Elect Q';
+      return 'Elect P';
     case 8:
-      return 'MechQ';
+      return 'Elect Q';
     case 9:
+      return 'MechQ';
+    case 10:
       return 'Efd';
     default:
       return curveType;
   }
 };
 const getTsaCurveTypeSeverity = (curveType) => {
-  if (!curveType) {
+  console.log('getTsaCurveTypeSeverity', curveType);
+  if (curveType === undefined) {
     return '';
   }
   switch (curveType) {
     case 0:
-      return 'primary';
+      return 'backgroundColor:var(--teal-100)';
     case 1:
-      return 'secondary';
+      return 'backgroundColor:var(--teal-200)';
     case 2:
-      return 'info';
+      return 'backgroundColor:var(--teal-300)';
     case 3:
-      return 'warning';
+      return 'backgroundColor:var(--teal-400);color:var(--surface-100)';
     case 4:
-      return 'contrast';
+      return 'backgroundColor:var(--teal-500);color:var(--surface-100)';
     case 5:
-      return 'danger';
+      return 'backgroundColor:var(--teal-600);color:var(--surface-100)';
     case 6:
-      return 'success';
+      return 'backgroundColor:var(--cyan-100)';
     case 7:
-      return 'success';
+      return 'backgroundColor:var(--cyan-200)';
     case 8:
-      return 'secondary';
+      return 'backgroundColor:var(--cyan-300)';
     case 9:
-      return 'info';
+      return 'backgroundColor:var(--cyan-400);color:var(--surface-100)';
+    case 10:
+      return 'backgroundColor:var(--cyan-500) ;color:var(--surface-100)';
     default:
-      return '';
+      return 'backgroundColor:var(--graygray-600);color:var(--surface-100)';
   }
 };
 
