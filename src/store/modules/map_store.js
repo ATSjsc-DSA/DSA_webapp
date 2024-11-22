@@ -11,13 +11,14 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import View from 'ol/View';
-
 import LineString from 'ol/geom/LineString';
 import { useLayout } from '@/layout/composables/layout';
-
+import { useCommonStore } from './common';
 const { isDarkTheme } = useLayout();
 export const useMapStore = defineStore('map_Store', () => {
   // setup data map
+  const commonStore = useCommonStore();
+  const { projectData, profileData, slotData } = storeToRefs(commonStore);
 
   const subData = ref();
 
@@ -259,7 +260,11 @@ export const useMapStore = defineStore('map_Store', () => {
   //subData get API
   async function getListSub() {
     try {
-      const res = await DSA_api.getListSub();
+      console.log('AMMM');
+
+      console.log(projectData, 'projectData');
+      console.log(slotData, 'slotData');
+      const res = await DSA_api.getListSub(projectData.value._id, slotData.value._id);
       // console.log(res.data, 'res');
 
       const newFeaturesArray = [

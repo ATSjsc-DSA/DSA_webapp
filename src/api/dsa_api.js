@@ -7,8 +7,8 @@ export default class DSA_api {
   // static async getRadarChartData(appId = '') {
   //   return get(`/hmi/task/${hmiTaskId.value}/app/${appId}`);
   // }
-  static async getListSub() {
-    return get('/geographic/sub');
+  static async getListSub(project_id, slot_id) {
+    return get(`/geographic/${project_id}/${slot_id}/sub`);
   }
   static async getListLine() {
     return get('/geographic/line');
