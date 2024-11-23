@@ -41,7 +41,7 @@ instance.interceptors.response.use(
   async (error) => {
     const { response } = error;
     if (!response) {
-      console.log('SERVER ERROR 500');
+      // console.log('SERVER ERROR 500');
       return Promise.reject({
         data: {
           detail: 'SERVER ERROR NO DATA',

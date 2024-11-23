@@ -20,7 +20,7 @@ import { ref } from 'vue';
 import { ApiSubsystem } from '@/views/SystemEvents/api';
 
 const props = defineProps({
-  label: { type: String, default: 'Subsystem' },
+  label: { type: String, default: 'Sub System' },
 });
 const subsytemSelected = defineModel();
 

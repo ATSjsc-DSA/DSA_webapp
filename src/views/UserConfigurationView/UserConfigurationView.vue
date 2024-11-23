@@ -1390,7 +1390,8 @@ const newSsrData = ref({
   active: true,
   contingenciesId: null,
   name: '',
-  powerSytemId: null,
+  fixSubSystemId: null,
+  generatorReactance: 0,
 });
 
 const getSsrList = async (dsaId) => {

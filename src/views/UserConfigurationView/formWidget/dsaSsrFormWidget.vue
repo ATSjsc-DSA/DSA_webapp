@@ -14,12 +14,26 @@
         </div>
       </div>
     </template>
-    <div class="col-6">
+    <div class="col-12">
       <searchContingenciesWidget v-model="contingenciesSelected" />
     </div>
 
-    <div class="col-6">
-      <searchPsWidget v-model="psSelected" />
+    <div class="col-12">
+      <searchSubsystemWidget v-model="subsytemSelected" />
+    </div>
+    <div class="col-12">
+      <div class="flex flex-column gap-2 mb-3 flex-1">
+        <label for="generatorReactanceOpts" class="font-semibold"> Generator Reactance </label>
+        <Dropdown
+          id="generatorReactanceOpts"
+          v-model="data.generatorReactance"
+          :options="generatorReactanceOpts"
+          optionLabel="label"
+          optionValue="value"
+          class="flex-auto w-full"
+          autocomplete="off"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -27,9 +41,8 @@
 <script setup>
 import InputSwitch from 'primevue/inputswitch';
 import searchContingenciesWidget from './searchContingenciesWidget.vue';
-import searchPsWidget from '@/views/PowerSystem/searchPsWidget.vue';
-import { ApiContingencies } from '@/views/SystemEvents/api';
-import { PowerSystemParameterApi } from '@/views/PowerSystem/api';
+import searchSubsystemWidget from './searchSubsystemWidget.vue';
+import { ApiContingencies, ApiSubsystem } from '@/views/SystemEvents/api';
 
 const props = defineProps({
   isCreateForm: { type: Boolean, default: true },
@@ -39,14 +52,14 @@ const data = defineModel();
 onMounted(async () => {
   if (data.value.contingenciesId) {
     await getContingenciesData();
-    await getPsData();
+    await getSubsystemData();
   }
 });
 watch(data, async (newVal, oldVal) => {
   if (newVal._id !== oldVal.__id) {
     if (newVal.contingenciesId) {
       await getContingenciesData();
-      await getPsData();
+      await getSubsystemData();
     }
   }
 });
@@ -57,10 +70,10 @@ watch(contingenciesSelected, (newVal) => {
   data.value.contingenciesId = newVal._id;
 });
 
-const psSelected = ref();
+const subsytemSelected = ref();
 
-watch(psSelected, (newVal) => {
-  data.value.powerSytemId = newVal._id;
+watch(subsytemSelected, (newVal) => {
+  data.value.fixSubSystemId = newVal._id;
 });
 const getContingenciesData = async () => {
   try {
@@ -73,16 +86,23 @@ const getContingenciesData = async () => {
     console.log('getContingenciesData: error ', error);
   }
 };
-
-const getPsData = async (id) => {
+const getSubsystemData = async () => {
   try {
-    const res = await PowerSystemParameterApi.getPowersystemData(data.value.powerSytemId);
-    psSelected.value = {
-      name: res.data.generalInfo.name,
-      _id: res.data._id,
+    const res = await ApiSubsystem.getSubsystemData(data.value.fixSubSystemId);
+    console.log('getSubsystemData', res.data);
+
+    subsytemSelected.value = {
+      name: res.data.name,
+      _id: data.value.fixSubSystemId,
     };
   } catch (error) {
-    console.log('getContingenciesData: error ', error);
+    console.log('getSubsystemData: error ', error);
   }
 };
+
+const generatorReactanceOpts = ref([
+  { label: 'SubTransient', value: 0 },
+  { label: 'Transient', value: 1 },
+  { label: 'Synchoronous', value: 2 },
+]);
 </script>
