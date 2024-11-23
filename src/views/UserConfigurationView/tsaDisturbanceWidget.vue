@@ -16,13 +16,14 @@
           </div>
         </template>
       </Column>
+
+      <Column field="startTimestamp" header="Start Time" sortable style="width: 18%"> </Column>
+      <Column field="endTimestamp" header="End Time" sortable style="width: 18%" />
       <Column field="disturbanceEvenType" header="Event Type">
         <template #body="{ data }">
           <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
         </template>
       </Column>
-      <Column field="startTimestamp" header="Start Time" sortable style="width: 18%"> </Column>
-      <Column field="endTimestamp" header="End Time" sortable style="width: 18%" />
       <Column field="eventValue" header="Event Value">
         <template #body="{ data }">
           <Chip :label="getEventValue(data.eventValue)" />
@@ -72,20 +73,42 @@
           <div class="col-4">
             <div class="flex flex-column align-items-start gap-3 mb-3">
               <label for="psdSelected" class="font-semibold">Type Element</label>
-              <Dropdown
+              <MultiSelect
                 v-model="selectedDefinition"
+                display="chip"
                 :options="listDefinition"
                 optionLabel="name"
-                optionValue="_id"
-                class="w-full"
+                class="w-full psFilterAutoComplete"
               />
             </div>
           </div>
           <div class="col-8">
-            <searchPsWidget v-model="psSelected" label="Element" :definitionId="[selectedDefinition]" />
+            <searchPsWidget
+              v-model="psSelected"
+              label="Element"
+              :definitionId="selectedDefinition.map((item) => item._id)"
+            />
           </div>
         </div>
       </div>
+      <div class="col-6">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
+          <InputNumber v-model="disturbanceData.startTimestamp" :maxFractionDigits="5" />
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
+          <InputNumber v-model="disturbanceData.endTimestamp" :maxFractionDigits="5" />
+        </div>
+      </div>
+
+      <div class="col-12">
+        <span class="p-text-secondary block"> Type Configuration</span>
+      </div>
+
       <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
           <label for="disturbanceType" class="font-semibold">Disturbance Type</label>
@@ -112,11 +135,34 @@
           />
         </div>
       </div>
-      <div class="col-6">
+      <!-- Short Circuit -->
+      <template v-if="disturbanceType === 0">
+        <div class="col-6">
+          <div class="flex flex-column gap-2 mb-3">
+            <label for="shcLocation" class="font-semibold">SHC Location </label>
+            <InputNumber v-model="disturbanceData.shcLocation" suffix=" Ohm" :maxFractionDigits="5" />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="flex flex-column gap-2 mb-3">
+            <label for="resistance" class="font-semibold"> Resistance </label>
+            <InputNumber v-model="disturbanceData.resistance" suffix=" Ohm" :maxFractionDigits="5" />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="flex flex-column gap-2 mb-3">
+            <label for="reactance" class="font-semibold">Reactance </label>
+            <InputNumber v-model="disturbanceData.reactance" suffix=" Ohm" :maxFractionDigits="5" />
+          </div>
+        </div>
+      </template>
+
+      <!-- Switch -->
+      <div v-else class="col-6">
         <div class="flex flex-column gap-2 mb-3">
-          <label for="eventValue" class="font-semibold">Event Value</label>
+          <label for="action" class="font-semibold">Event Value</label>
           <Dropdown
-            v-model="disturbanceData.eventValue"
+            v-model="disturbanceData.action"
             :options="listEventValue"
             optionLabel="name"
             option-value="value"
@@ -125,26 +171,13 @@
           />
         </div>
       </div>
-      <div class="col-6">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
-          <InputNumber v-model="disturbanceData.startTimestamp" :maxFractionDigits="5" />
-        </div>
-      </div>
-
-      <div class="col-6">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
-          <InputNumber v-model="disturbanceData.endTimestamp" :maxFractionDigits="5" />
-        </div>
-      </div>
     </div>
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="changeVisibleDialog = false"></Button>
       <Button
         v-if="modeChange === 'Create'"
         type="button"
-        :disabled="!disturbanceData.name || !psSelected"
+        :disabled="!disturbanceData.name || !psSelected || !disturbanceData.disturbanceEvenType"
         label="Save"
         @click="createDisturbance"
       ></Button>
@@ -213,9 +246,15 @@ const handleCreate = () => {
     powerSystemId: '',
     startTimestamp: 0,
     endTimestamp: 0,
-    disturbanceEvenType: 0,
-    eventValue: 0,
+    disturbanceEvenType: 0, // 0: Short Circuit, 1:Switch
+
+    action: 0,
+    reactance: 0,
+    resistance: 0,
+    shcLocation: 0,
   };
+  selectedDefinition.value = listDefinition.value;
+
   changeVisibleDialog.value = true;
 };
 const psSelected = ref();
@@ -373,17 +412,13 @@ const listEventValue = [
 ];
 
 const listDefinition = ref();
-const selectedDefinition = ref();
-watch(
-  () => props.definitionMonitor,
-  (newVal) => {
-    psSelected.value = undefined;
-  },
-);
+const selectedDefinition = ref([]);
+
 const getDefiniton = async () => {
   try {
     const res = await DefinitionListApi.getDefinitionSubsystem();
     listDefinition.value = res.data;
+    selectedDefinition.value = res.data;
   } catch (error) {
     console.log('searchPsQueryFilter: error ', error);
   }
