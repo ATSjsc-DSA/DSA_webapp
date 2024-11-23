@@ -246,6 +246,7 @@ import { GridStack } from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
 import MeasInfoDialog from './MeasInfoDialog.vue';
 import { useConfirm } from 'primevue/useconfirm';
+import ApiAuth from '@/api/user';
 const toast = useToast();
 
 const confirm = useConfirm();
@@ -369,7 +370,7 @@ const removeAllComponent = () => {
   toast.add({ severity: 'success', summary: 'Removed Successfully', life: 3000 });
 };
 
-const saveGrid = () => {
+const saveGrid = async () => {
   const { nodes } = gridStackComponentGrid.value.engine;
   nodes.forEach((node) => {
     gridStackComponentArr.value.map((w) => {
@@ -383,8 +384,17 @@ const saveGrid = () => {
   localStorage.setItem('showTree', JSON.stringify(showTree.value));
   localStorage.setItem('stopReloadChartData', stopReloadChartData.value);
   toast.add({ severity: 'success', summary: 'Saved Successfully', life: 3000 });
+
+  await updateGridInAuth(JSON.stringify(gridStackComponentArr.value));
 };
 
+const updateGridInAuth = async (data) => {
+  try {
+    await ApiAuth.updateHMILayout(data);
+  } catch (error) {
+    console.log('updateGridInAuth error', error);
+  }
+};
 // -- drag drop ---
 const nodeDrag = ref({});
 const onStartDragNode = (evt, node) => {

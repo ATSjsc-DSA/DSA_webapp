@@ -138,7 +138,7 @@
       <Divider layout="vertical" class="h-10rem flex" />
       <div style="width: 20rem">
         <div class="text-lg font-semibold mb-3">Online Mode</div>
-        <div class="py-3">Disable Update and Delete.</div>
+        <div class="py-3">Only View.</div>
         <div class="w-full flex justify-content-end">
           <Button
             class="float-right"

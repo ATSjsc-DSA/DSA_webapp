@@ -37,4 +37,12 @@ export default class User {
   static async updateOperatorPassword(data) {
     return put('/auth/user/active', data);
   }
+
+  // save HMI dashboard layout
+  static async updateHMILayout(data) {
+    const user = await User.getUserActive();
+    return put(`/auth/user/${user.data.id}`, {
+      dataLayout: data,
+    });
+  }
 }
