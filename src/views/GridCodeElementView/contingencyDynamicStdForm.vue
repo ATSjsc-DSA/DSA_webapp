@@ -22,22 +22,30 @@
     <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="stableRangeLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.stableRangeLower" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber
+          v-model="formData.stableRangeLower"
+          :suffix="getUnitLabel(formData.unitTypeStable)"
+          :maxFractionDigits="10"
+        />
       </div>
     </div>
     <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="stableRangeUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.stableRangeUpper" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber
+          v-model="formData.stableRangeUpper"
+          :suffix="getUnitLabel(formData.unitTypeStable)"
+          :maxFractionDigits="10"
+        />
       </div>
     </div>
     <div class="col-2">
       <div class="flex flex-column gap-2 mb-3 flex-1">
-        <label for="unitType" class="font-semibold"> Unit </label>
+        <label for="unitTypeStable" class="font-semibold"> Unit </label>
         <Dropdown
-          id="unitType"
-          v-model="formData.unitType"
-          :options="typeUnitOpts"
+          id="unitTypeStable"
+          v-model="formData.unitTypeStable"
+          :options="unitLabelOpts"
           optionLabel="label"
           optionValue="value"
           class="flex-auto w-full"
@@ -48,16 +56,38 @@
     <div class="col-12">
       <span class="p-text-secondary block">Error </span>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="lowerError" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.lowerError" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber
+          v-model="formData.lowerError"
+          :suffix="getUnitLabel(formData.unitTypeError)"
+          :maxFractionDigits="10"
+        />
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="upperError" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.upperError" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber
+          v-model="formData.upperError"
+          :suffix="getUnitLabel(formData.unitTypeError)"
+          :maxFractionDigits="10"
+        />
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="flex flex-column gap-2 mb-3 flex-1">
+        <label for="unitTypeError" class="font-semibold"> Unit </label>
+        <Dropdown
+          id="unitTypeError"
+          v-model="formData.unitTypeError"
+          :options="unitLabelOpts"
+          optionLabel="label"
+          optionValue="value"
+          class="flex-auto w-full"
+          autocomplete="off"
+        />
       </div>
     </div>
   </div>
@@ -65,13 +95,13 @@
 <script setup>
 const formData = defineModel('formData');
 
-const typeUnitOpts = ref([
+const unitLabelOpts = ref([
   { label: '%', value: 1 },
   { label: 'Hz', value: 2 },
 ]);
-const unitLabel = computed(() => {
-  return ' ' + typeUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;
-});
+const getUnitLabel = (unitLabel) => {
+  return ' ' + unitLabelOpts.value.filter((item) => item.value === unitLabel)[0].label;
+};
 </script>
 <style>
 .p-autocomplete-input,

@@ -135,16 +135,20 @@ const createVoltageVisibleDialog = ref(false);
 
 const handlerCreateVoltage = () => {
   newVoltage.value = {
+    active: true,
+    name: '',
     abnormalActivation: true,
     abnormalVolLimitLower: 0,
     abnormalVolLimitUpper: 0,
-    active: true,
-    name: '',
-    unitType: 0,
+    unitTypeAbnormalVolLimit: 0,
+
     normalVolLimitLower: 0,
     normalVolLimitUpper: 0,
+    unitTypeNormalVolLimit: 0,
+
     volRangeLower: 0,
     volRangeUpper: 0,
+    unitTypeVolRange: 0,
   };
   createVoltageVisibleDialog.value = true;
 };

@@ -48,7 +48,7 @@
 const formData = defineModel('formData');
 const angleUnitOpts = ref([
   { label: '%', value: 1 },
-  { label: 'Degree', value: 3 },
+  { label: '\u00B0', value: 3 },
 ]);
 const unitLabel = computed(() => {
   return ' ' + angleUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;

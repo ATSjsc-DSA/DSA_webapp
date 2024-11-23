@@ -153,20 +153,26 @@
                 </template>
               </Column>
               <Column field="unit" header="Unit" style="text-wrap: nowrap" />
-              <Column field="dampingRequirement" header="Damping Requirement" style="text-wrap: nowrap" />
+              <Column field="dampingRequirement" header="Damping Requirement" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div>
+                    {{ data.dampingRequirement + ' %' }}
+                  </div>
+                </template>
+              </Column>
               <Column field="restoreTime" header="Restore Time" style="text-wrap: nowrap" />
 
               <Column field="InstantaneousMin" header="Instantaneous Min" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
-                    {{ data.InstantaneousMin }} {{ getUnitLabel(data.unitType) }}
+                    {{ data.InstantaneousMin }} {{ getUnitLabel(data.unitTypeInstantaneous) }}
                   </div>
                 </template>
               </Column>
               <Column field="InstantaneousMax" header="Instantaneous Max" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
-                    {{ data.InstantaneousMax }} {{ getUnitLabel(data.unitType) }}
+                    {{ data.InstantaneousMax }} {{ getUnitLabel(data.unitTypeInstantaneous) }}
                   </div>
                 </template>
               </Column>
@@ -174,26 +180,30 @@
               <Column field="freqOscillationLower" header="Frequency Oscillation Lower" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
-                    {{ data.freqOscillationLower }} {{ getUnitLabel(data.unitType) }}
+                    {{ data.freqOscillationLower }} {{ getUnitLabel(data.unitTypeSFrequencyOscillation) }}
                   </div>
                 </template>
               </Column>
               <Column field="freqOscillationUpper" header="Frequency Oscillation Upper" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
-                    {{ data.freqOscillationUpper }} {{ getUnitLabel(data.unitType) }}
+                    {{ data.freqOscillationUpper }} {{ getUnitLabel(data.unitTypeSFrequencyOscillation) }}
                   </div>
                 </template>
               </Column>
 
               <Column field="stableLower" header="Stable Lower" style="text-wrap: nowrap">
                 <template #body="{ data }">
-                  <div class="block w-full text-center">{{ data.stableLower }} {{ getUnitLabel(data.unitType) }}</div>
+                  <div class="block w-full text-center">
+                    {{ data.stableLower }} {{ getUnitLabel(data.unitTypeStable) }}
+                  </div>
                 </template>
               </Column>
               <Column field="stableUpper" header="Stable Upper" style="text-wrap: nowrap">
                 <template #body="{ data }">
-                  <div class="block w-full text-center">{{ data.stableUpper }} {{ getUnitLabel(data.unitType) }}</div>
+                  <div class="block w-full text-center">
+                    {{ data.stableUpper }} {{ getUnitLabel(data.unitTypeStable) }}
+                  </div>
                 </template>
               </Column>
               <Column style="width: 4rem; padding-top: 0; padding-bottom: 0">
@@ -496,14 +506,20 @@ const handleCreateRestoreTime = () => {
     active: true,
     InstantaneousMax: 1,
     InstantaneousMin: -1,
+    unitTypeInstantaneous: 3,
+
     dampingRequirement: 0.5,
+
     freqOscillationLower: 0.5,
     freqOscillationUpper: 1.5,
+    unitTypeSFrequencyOscillation: 3,
+
     restoreTime: 5,
     stableLower: -1,
     stableUpper: 1,
+    unitTypeStable: 3,
+
     unit: 1,
-    unitType: 3,
   };
   createRestoreTimeVisibleDialog.value = true;
 };
@@ -583,7 +599,7 @@ const deleteRestoreTime = async (id) => {
 
 const unitLabelOpts = ref([
   { label: '%', value: 1 },
-  { label: 'Degree', value: 3 },
+  { label: '\u00B0', value: 3 },
 ]);
 const getUnitLabel = (unitLabel) => {
   return ' ' + unitLabelOpts.value.filter((item) => item.value === unitLabel)[0].label;

@@ -138,26 +138,30 @@
 
               <Column field="lowerError" style="text-wrap: nowrap">
                 <template #body="{ data }">
-                  <div class="block w-full text-center">{{ data.lowerError }} {{ getUnitLabel(data.unitType) }}</div>
+                  <div class="block w-full text-center">
+                    {{ data.lowerError }} {{ getUnitLabel(data.unitTypeError) }}
+                  </div>
                 </template>
               </Column>
               <Column field="upperError" style="text-wrap: nowrap">
                 <template #body="{ data }">
-                  <div class="block w-full text-center">{{ data.upperError }} {{ getUnitLabel(data.unitType) }}</div>
+                  <div class="block w-full text-center">
+                    {{ data.upperError }} {{ getUnitLabel(data.unitTypeError) }}
+                  </div>
                 </template>
               </Column>
 
               <Column field="stableRangeLower" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
-                    {{ data.stableRangeLower }} {{ getUnitLabel(data.unitType) }}
+                    {{ data.stableRangeLower }} {{ getUnitLabel(data.unitTypeStable) }}
                   </div>
                 </template>
               </Column>
               <Column field="stableRangeUpper" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
-                    {{ data.stableRangeUpper }} {{ getUnitLabel(data.unitType) }}
+                    {{ data.stableRangeUpper }} {{ getUnitLabel(data.unitTypeStable) }}
                   </div>
                 </template>
               </Column>
@@ -484,9 +488,11 @@ const handleCreateDynamicStd = () => {
     restoreTime: 5,
     lowerError: 0.1,
     upperError: 0.1,
+    unitTypeError: 1,
+
     stableRangeLower: -1,
     stableRangeUpper: 1,
-    unitType: 1,
+    unitTypeStable: 1,
   };
   createDynamicStdVisibleDialog.value = true;
 };

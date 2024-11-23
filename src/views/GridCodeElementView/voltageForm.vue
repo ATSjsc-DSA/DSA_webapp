@@ -1,18 +1,43 @@
 <template>
   <div class="grid align-items-center">
-    <div class="col-10">
+    <div class="col-12">
       <div class="flex flex-column gap-2 mb-3 flex-1">
         <label for="name" class="font-semibold"> Name </label>
         <InputText id="name" v-model="formData.name" class="flex-auto w-full" autocomplete="off" />
       </div>
     </div>
+
+    <div class="col-12">
+      <span class="p-text-secondary block"> Voltage Range</span>
+    </div>
+    <div class="col-5">
+      <div class="flex flex-column gap-2 mb-3">
+        <label for="volRangeLower" class="font-semibold"> Lower</label>
+        <InputNumber
+          v-model="formData.volRangeLower"
+          :suffix="getUnitLabel(formData.unitTypeVolRange)"
+          :maxFractionDigits="10"
+        />
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="flex flex-column gap-2 mb-3">
+        <label for="volRangeUpper" class="font-semibold"> Upper</label>
+        <InputNumber
+          v-model="formData.volRangeUpper"
+          :suffix="getUnitLabel(formData.unitTypeVolRange)"
+          :maxFractionDigits="10"
+        />
+      </div>
+    </div>
+
     <div class="col-2">
       <div class="flex flex-column gap-2 mb-3 flex-1">
-        <label for="unitType" class="font-semibold"> Unit </label>
+        <label for="unitTypeVolRange" class="font-semibold"> Unit </label>
         <Dropdown
-          id="unitType"
-          v-model="formData.unitType"
-          :options="voltageUnitOpts"
+          id="unitTypeVolRange"
+          v-model="formData.unitTypeVolRange"
+          :options="unitLabelOpts"
           optionLabel="label"
           optionValue="value"
           class="flex-auto w-full"
@@ -20,35 +45,43 @@
         />
       </div>
     </div>
-    <div class="col-12">
-      <span class="p-text-secondary block"> Voltage Range</span>
-    </div>
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="volRangeLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.volRangeLower" :suffix="unitLabel" :maxFractionDigits="10" />
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="volRangeUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.volRangeUpper" :suffix="unitLabel" :maxFractionDigits="10" />
-      </div>
-    </div>
 
     <div class="col-12">
       <span class="p-text-secondary block">Normal Voltage Limit</span>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="normalVolLimitLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.normalVolLimitLower" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber
+          v-model="formData.normalVolLimitLower"
+          :suffix="getUnitLabel(formData.normalVolLimitLower)"
+          :maxFractionDigits="10"
+        />
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="normalVolLimitUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.normalVolLimitUpper" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber
+          v-model="formData.normalVolLimitUpper"
+          :suffix="getUnitLabel(formData.normalVolLimitLower)"
+          :maxFractionDigits="10"
+        />
+      </div>
+    </div>
+
+    <div class="col-2">
+      <div class="flex flex-column gap-2 mb-3 flex-1">
+        <label for="unitTypeNormalVolLimit" class="font-semibold"> Unit </label>
+        <Dropdown
+          id="unitTypeNormalVolLimit"
+          v-model="formData.unitTypeNormalVolLimit"
+          :options="unitLabelOpts"
+          optionLabel="label"
+          optionValue="value"
+          class="flex-auto w-full"
+          autocomplete="off"
+        />
       </div>
     </div>
 
@@ -62,23 +95,41 @@
       </div>
     </div>
 
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="abnormalVolLimitLower" class="font-semibold"> Lower</label>
         <InputNumber
           v-model="formData.abnormalVolLimitLower"
           :disabled="!formData.abnormalActivation"
-          :suffix="unitLabel" :maxFractionDigits="10"
+          :suffix="getUnitLabel(formData.unitTypeAbnormalVolLimit)"
+          :maxFractionDigits="10"
         />
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
         <label for="abnormalVolLimitUpper" class="font-semibold"> Upper</label>
         <InputNumber
           v-model="formData.abnormalVolLimitUpper"
           :disabled="!formData.abnormalActivation"
-          :suffix="unitLabel" :maxFractionDigits="10"
+          :suffix="getUnitLabel(formData.unitTypeAbnormalVolLimit)"
+          :maxFractionDigits="10"
+        />
+      </div>
+    </div>
+
+    <div class="col-2">
+      <div class="flex flex-column gap-2 mb-3 flex-1">
+        <label for="unitTypeAbnormalVolLimit" class="font-semibold"> Unit </label>
+        <Dropdown
+          id="unitTypeAbnormalVolLimit"
+          v-model="formData.unitTypeAbnormalVolLimit"
+          :options="unitLabelOpts"
+          :disabled="!formData.abnormalActivation"
+          optionLabel="label"
+          optionValue="value"
+          class="flex-auto w-full"
+          autocomplete="off"
         />
       </div>
     </div>
@@ -87,18 +138,14 @@
 <script setup>
 import Checkbox from 'primevue/checkbox';
 
-import InputGroup from 'primevue/inputgroup';
-import InputGroupAddon from 'primevue/inputgroupaddon';
-import { computed } from 'vue';
-
 const formData = defineModel('formData');
-const voltageUnitOpts = ref([
+const unitLabelOpts = ref([
   { label: 'kV', value: 0 },
   { label: '%', value: 1 },
 ]);
-const unitLabel = computed(() => {
-  return ' ' + voltageUnitOpts.value.filter((item) => item.value === formData.value.unitType)[0].label;
-});
+const getUnitLabel = (unitLabel) => {
+  return ' ' + unitLabelOpts.value.filter((item) => item.value === unitLabel)[0].label;
+};
 </script>
 <style>
 .p-autocomplete-input,

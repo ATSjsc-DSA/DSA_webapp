@@ -5,7 +5,7 @@
         <div class="flex flex-column justify-content-start align-items-start">
           <div><i class="pi pi-folder-open pr-3"></i>{{ chartTitle }}</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
-          <div style="font-size: 0.7rem; padding-top: 0.5rem">
+          <div v-if="typeChart === 'appTimeSeries'" style="font-size: 0.7rem; padding-top: 0.5rem">
             {{ rangeTimeOfTimeSeriesChart }}
           </div>
         </div>
@@ -37,7 +37,6 @@
               </div>
             </OverlayPanel>
           </div>
-
           <div v-if="typeChart === 'appTimeSeries'">
             <Button
               type="button"
