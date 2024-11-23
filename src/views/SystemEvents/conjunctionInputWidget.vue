@@ -38,14 +38,20 @@ onMounted(() => {
 watch(
   () => props.filterNameSelected,
   () => {
-    console.log('get filterSuggestions');
     getFilterSuggestions();
   },
 );
 const query = ref('');
 const conjunction = ref(filterConjunction.value);
 watch(conjunction, () => {
-  filterConjunction.value = conjunction.value;
+  if (conjunction.value !== filterConjunction.value) {
+    filterConjunction.value = conjunction.value;
+  }
+});
+watch(filterConjunction, () => {
+  if (conjunction.value !== filterConjunction.value) {
+    conjunction.value = filterConjunction.value;
+  }
 });
 const suggestionArr = ref([]);
 const menuSuggestion = ref();

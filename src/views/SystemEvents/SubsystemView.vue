@@ -86,6 +86,17 @@
               >
                 <div class="w-full mb-5 px-3 mt-1 flex justify-content-between align-items-center">
                   <span class="text-xl font-semibold"> Power System</span>
+                  <div class="flex align-items-center justify-content-end gap-2">
+                    <MultiSelect
+                      v-model="stationSearchSelected"
+                      :options="psStationList"
+                      optionLabel="name"
+                      :maxSelectedLabels="3"
+                      class="w-full md:w-20rem"
+                      placeholder="Search Station"
+                    />
+                    <Button severity="primary" icon="pi pi-search" @click="changeStationFilter" />
+                  </div>
                 </div>
                 <div class="w-full pl-3" style="height: 46rem">
                   <DataTable
@@ -106,11 +117,13 @@
                       </template>
                     </Column>
                     <Column field="generalInfo.name" header="Name" style="text-wrap: nowrap"></Column>
+
                     <Column
                       field="generalInfo.operationName"
                       header="Operation Name"
                       style="text-wrap: nowrap"
                     ></Column>
+                    <Column field="stationName" header="Station" style="text-wrap: nowrap"></Column>
 
                     <template #empty> No Data </template>
                   </DataTable>
@@ -166,6 +179,8 @@ import TabPanel from 'primevue/tabpanel';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
+
+import MultiSelect from 'primevue/multiselect';
 
 import filterSubSystemView from './filterSubSystemView.vue';
 import Toast from 'primevue/toast';
@@ -225,6 +240,8 @@ const handleRowClick = async (item) => {
         type: filterConditions.station.type.map((item) => item._id),
       },
       powersystem: filterConditions.powerSystem.map((item) => item._id),
+      filtering: filterConditions.filtering,
+      stationSort: [],
     };
 
     await changeFilter(newFilter);
@@ -318,6 +335,7 @@ const filterData = ref([]);
 const changeFilter = async (newfilter) => {
   filterData.value = newfilter;
   await getParameterList();
+  await getStationList();
 };
 
 const pageRowNumber = ref(10);
@@ -338,7 +356,6 @@ const getParameterList = async () => {
     parameterTotal.value = res.data.total;
   } catch (error) {
     parameterData.value = [];
-    console.log('getParameterList error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
   isParameterLoading.value = false;
@@ -371,18 +388,22 @@ const deleteThis = async (id) => {
   }
 };
 
-const x = {
-  name: 'subSystem',
-  filterConditions: {
-    area: { value: [], type: [] },
-    zone: { value: [], type: [] },
-    owner: { value: [], type: [] },
-    kv: { value: [], type: [] },
-    station: { value: [], type: [] },
-    powersystem: [],
-    filtering: '',
-  },
-  active: true,
+// search station name
+const stationSearchSelected = ref([]);
+const psStationList = ref([]);
+const getStationList = async () => {
+  try {
+    const res = await PowerSystemParameterApi.getStationListFollowSubsystemFilter(filterData.value);
+    psStationList.value = res.data;
+  } catch (error) {
+    psStationList.value = [];
+    console.warn('getStationListFollowSubsystemFilter err', error);
+  }
+};
+
+const changeStationFilter = async () => {
+  filterData.value.stationSort = stationSearchSelected.value.map((item) => item._id);
+  await getParameterList();
 };
 </script>
 

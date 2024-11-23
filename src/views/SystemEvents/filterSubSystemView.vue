@@ -177,7 +177,6 @@
             />
           </div>
         </div>
-        <!-- <Textarea id="filterConjunction" v-model="filterConjunction" class="flex-auto" autocomplete="off" /> -->
         <conjunctionInputWidget
           v-model:filterConjunction="filterConjunction"
           v-model:canDuplicate="conjunctionCanDuplicate"
@@ -288,6 +287,9 @@ const clearFilterSelected = () => {
   filterConjunction.value = '';
 };
 
+watch(filterConjunction, (newval, oldval) => {
+  console.log('safas', 'newval', newval, 'oldval', oldval, '--');
+});
 // definiton List
 const definitionList = ref();
 const getDefinitionList = async () => {
@@ -324,6 +326,8 @@ const getdefinitionSubsystemList = async () => {
 watch(
   () => props.currentFilter,
   async () => {
+    clearFilterSelected();
+
     await nextTick(() => {
       areaSelected.value = props.currentFilter.area.value;
       areaDefinitionSelected.value = props.currentFilter.area.type;
@@ -342,8 +346,8 @@ watch(
 
       psSelected.value = props.currentFilter.powerSystem.value;
       psDefinitionType.value = definitionSubsystemList.value;
-
       filterConjunction.value = props.currentFilter.filtering || '';
+
     });
   },
   { deep: true },

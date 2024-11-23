@@ -86,6 +86,10 @@ export class PowerSystemParameterApi {
     );
   }
 
+  static async getStationListFollowSubsystemFilter(filter) {
+    return post(`/powersystem/${projectData.value._id}/subsystem/${slotData.value._id}/station`, filter);
+  }
+
   static async searchPs(definitionList = [], query, exceptionArr = []) {
     let url = `/powersystem/${projectData.value._id}/powersystemdata/${slotData.value._id}/search`;
 
