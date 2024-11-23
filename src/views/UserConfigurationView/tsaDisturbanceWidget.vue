@@ -18,7 +18,6 @@
       </Column>
 
       <Column field="startTimestamp" header="Start Time" sortable style="width: 18%"> </Column>
-      <Column field="endTimestamp" header="End Time" sortable style="width: 18%" />
       <Column field="disturbanceEvenType" header="Event Type">
         <template #body="{ data }">
           <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
@@ -91,17 +90,10 @@
           </div>
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-12">
         <div class="flex flex-column gap-2 mb-3">
           <label for="startTimestamp" class="font-semibold"> Start Timestamp </label>
           <InputNumber v-model="disturbanceData.startTimestamp" :maxFractionDigits="5" />
-        </div>
-      </div>
-
-      <div class="col-6">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="endTimestamp" class="font-semibold"> End Timestamp </label>
-          <InputNumber v-model="disturbanceData.endTimestamp" :maxFractionDigits="5" />
         </div>
       </div>
 
@@ -177,17 +169,24 @@
       <Button
         v-if="modeChange === 'Create'"
         type="button"
-        :disabled="!disturbanceData.name || !psSelected || !disturbanceData.disturbanceEvenType"
+        :disabled="disturbanceData.name === '' || !psSelected || disturbanceData.disturbanceEvenType === undefined"
         label="Save"
         @click="createDisturbance"
       ></Button>
-      <Button v-if="modeChange === 'Update'" type="button" label="Update" @click="updateDisturbance"></Button>
+
+      <Button
+        v-if="modeChange === 'Update'"
+        :disabled="disturbanceData.name === '' || !psSelected || disturbanceData.disturbanceEvenType === undefined"
+        type="button"
+        label="Update"
+        @click="updateDisturbance"
+      ></Button>
     </template>
   </Dialog>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import { DefinitionListApi } from '@/views/PowerSystem/api';
@@ -245,7 +244,6 @@ const handleCreate = () => {
     name: '',
     powerSystemId: '',
     startTimestamp: 0,
-    endTimestamp: 0,
     disturbanceEvenType: 0, // 0: Short Circuit, 1:Switch
 
     action: 0,
@@ -258,7 +256,6 @@ const handleCreate = () => {
   changeVisibleDialog.value = true;
 };
 const psSelected = ref();
-
 const createDisturbance = async () => {
   const data = JSON.parse(JSON.stringify(disturbanceData.value));
   data.powerSystemId = psSelected.value._id;
@@ -326,6 +323,13 @@ const deleteDisturbance = async (data) => {
 };
 const disturbanceType = ref(0);
 
+watch(disturbanceType, (newVal) => {
+  if (newVal === 0) {
+    disturbanceData.value.disturbanceEvenType = listDisturbanceEventTypeSC[0].value;
+  } else {
+    disturbanceData.value.disturbanceEvenType = listDisturbanceEventTypeSwitch[0].value;
+  }
+});
 const listDisturbanceType = [
   { name: 'Short Circuit', value: 0 },
   { name: 'Switch', value: 1 },
