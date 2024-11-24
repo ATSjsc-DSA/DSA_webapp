@@ -361,6 +361,7 @@ const handlerUpdate = (data) => {
     _id: data.powerSystemId._id,
     name: data.powerSystemId.name,
   };
+  disturbanceType.value = updateData.disturbanceEvenType <= 10 ? 0 : 1;
   disturbanceData.value = updateData;
   changeVisibleDialog.value = true;
 };
@@ -407,13 +408,13 @@ const deleteDisturbance = async (data) => {
 };
 const disturbanceType = ref(0);
 
-watch(disturbanceType, (newVal) => {
-  if (newVal === 0) {
-    disturbanceData.value.disturbanceEvenType = listDisturbanceEventTypeSC[0].value;
-  } else {
-    disturbanceData.value.disturbanceEvenType = listDisturbanceEventTypeSwitch[0].value;
-  }
-});
+// watch(disturbanceType, (newVal) => {
+//   if (newVal === 0) {
+//     disturbanceData.value.disturbanceEvenType = listDisturbanceEventTypeSC[0].value;
+//   } else {
+//     disturbanceData.value.disturbanceEvenType = listDisturbanceEventTypeSwitch[0].value;
+//   }
+// });
 const listDisturbanceType = [
   { name: 'Short Circuit', value: 0 },
   { name: 'Switch', value: 1 },
