@@ -12,9 +12,9 @@
       dataKey="_id"
       tableStyle="min-width: 50rem"
       :lazy="true"
-      @page="onPageChange"
       :sortOrder="1"
       rowHover
+      @page="onPageChange"
     >
       <template #header>
         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
@@ -28,6 +28,10 @@
           <Chip :label="data.contingencyType === 0 ? 'N-1' : 'N-2'" />
         </template>
       </Column>
+      <Column field="active" header="Active">
+        <template #body="{ data }">
+          <Tag :value="data.active" :severity="data.active ? 'success' : 'danger'" /> </template
+      ></Column>
       <Column field="listPowerSystemId" header="List Power System">
         <template #body="{ data }">
           <div>
@@ -37,20 +41,17 @@
           </div>
         </template>
       </Column>
-      <Column field="active" header="Active">
-        <template #body="{ data }">
-          <Tag :value="data.active" :severity="data.active ? 'success' : 'danger'" /> </template
-      ></Column>
+
       <Column :exportable="false" style="width: 8rem">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" rounded text class="mr-2" @click="confirmUpdateThis($event, slotProps.data)" />
           <Button
+            ref="popupButton"
             icon="pi pi-trash"
             rounded
             text
             severity="danger"
             @click="confirmDelete($event, slotProps.data)"
-            ref="popupButton"
           />
         </template>
       </Column>
@@ -58,76 +59,80 @@
     </DataTable>
     <!-- Dialog -->
 
-    <Dialog v-model:visible="visible" modal :header="headerDialog + ' Contingency'" :style="{ width: '35rem' }">
-      <div class="p-fluid">
-        <div class="field">
-          <label for="name" class="font-semibold">Name</label>
-          <InputText id="name" class="flex-auto" autocomplete="off" v-model="contingencyModelData.name" />
+    <Dialog v-model:visible="visible" modal :header="headerDialog + ' Contingency'" :style="{ width: '48rem' }">
+      <div class="grid">
+        <div class="col-12 flex justify-content-between">
+          <div class="flex flex-column gap-2 mb-3 flex-1">
+            <label for="name" class="font-semibold"> Name </label>
+            <InputText id="name" v-model="contingencyModelData.name" class="flex-auto w-full" autocomplete="off" />
+          </div>
+          <div class="flex flex-column gap-2 mb-3 align-items-center">
+            <label for="active" class="font-semibold mb-2"> Active</label>
+            <InputSwitch id="active" v-model="contingencyModelData.active" autocomplete="off" />
+          </div>
         </div>
-        <div class="field">
-          <label for="email" class="font-semibold">Contingency Type</label>
-          <Dropdown
-            v-model="contingencyModelData.contingencyType"
-            :options="listType"
-            optionLabel="name"
-            option-value="value"
-            placeholder="Select a City"
-            class="w-full"
-          />
-        </div>
-        <div class="grid">
-          <div class="field col-12 md:col-4">
-            <label for="name" class="font-semibold">Type Element</label>
+        <div class="col-12">
+          <div class="flex flex-column gap-2 mb-3 flex-1">
+            <label for="contingencyType" class="font-semibold">Contingency Type</label>
             <Dropdown
-              v-model="selectedDefinition1"
-              :options="listDefinition"
+              v-model="contingencyModelData.contingencyType"
+              :options="listType"
               optionLabel="name"
-              optionValue="_id"
+              option-value="value"
+              placeholder="Select a Type"
               class="w-full"
             />
           </div>
-          <div class="field col-12 md:col-8">
-            <label for="name" class="font-semibold">Element</label>
-            <AutoComplete
-              v-model="autoCompleteValue1"
-              completeOnFocus
-              optionLabel="name"
-              :suggestions="items"
-              @complete="searchPs1"
-            />
+        </div>
+        <div class="col-12">
+          <div class="grid align-items-center">
+            <div class="col-4">
+              <div class="flex flex-column align-items-start gap-1">
+                <label for="name" class="font-semibold"> Element Type 1</label>
+                <MultiSelect
+                  v-model="selectedDefinition1"
+                  display="chip"
+                  :options="listDefinition"
+                  optionLabel="name"
+                  class="w-full"
+                />
+              </div>
+            </div>
+            <div class="col-8">
+              <searchPsWidget
+                v-model="autoCompleteValue1"
+                label="Element 1"
+                :definitionId="selectedDefinition1.map((item) => item._id)"
+              />
+            </div>
           </div>
         </div>
-        <div v-if="contingencyModelData.contingencyType === 1" class="grid">
-          <div class="field col-12 md:col-8">
-            <label for="name" class="font-semibold">Power System 2</label>
-            <AutoComplete
+        <template v-if="contingencyModelData.contingencyType === 1">
+          <div class="col-4">
+            <div class="flex flex-column align-items-start gap-1">
+              <label for="name" class="font-semibold"> Element Type 2</label>
+              <MultiSelect
+                v-model="selectedDefinition2"
+                display="chip"
+                :options="listDefinition"
+                optionLabel="name"
+                class="w-full"
+              />
+            </div>
+          </div>
+          <div class="col-8">
+            <searchPsWidget
               v-model="autoCompleteValue2"
-              completeOnFocus
-              optionLabel="name"
-              :suggestions="items"
-              @complete="searchPs2"
+              label="Power System 2"
+              :definitionId="selectedDefinition2.map((item) => item._id)"
             />
           </div>
-          <div class="field col-12 md:col-4">
-            <label for="name" class="font-semibold">Definition</label>
-            <Dropdown
-              v-model="selectedDefinition2"
-              :options="listDefinition"
-              optionLabel="name"
-              optionValue="_id"
-              class="w-full"
-            />
-          </div>
-        </div>
-        <div class="flex align-items-center gap-3 mb-5">
-          <label for="active" class="font-semibold">Active</label>
-          <InputSwitch id="active" v-model="contingencyModelData.active" />
-        </div>
+        </template>
+      </div>
 
-        <div class="flex justify-content-end gap-2">
-          <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-          <Button type="button" label="Save" @click="headerDialog === 'Create' ? createThis() : editThis()"></Button>
-        </div>
+      <div class="flex justify-content-end gap-2 mt-5">
+        <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
+        <Button type="button" label="Save" @click="headerDialog === 'Create' ? createThis() : editThis()"></Button>
       </div>
     </Dialog>
   </div>
@@ -136,8 +141,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ApiContingency } from './api';
-import { PowerSystemParameterApi, DefinitionListApi } from '@/views/PowerSystem/api';
-
+import { DefinitionListApi } from '@/views/PowerSystem/api';
+import searchPsWidget from '../PowerSystem/searchPsWidget.vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
@@ -183,8 +188,8 @@ const contingencyModelData = ref({
 const headerDialog = ref('Edit');
 const autoCompleteValue1 = ref({});
 const autoCompleteValue2 = ref({});
-const selectedDefinition1 = ref();
-const selectedDefinition2 = ref();
+const selectedDefinition1 = ref([]);
+const selectedDefinition2 = ref([]);
 watchEffect(() => {
   contingencyModelData.value.listPowerSystemId = [
     ...(autoCompleteValue1.value._id ? [autoCompleteValue1.value._id] : []),
@@ -222,25 +227,6 @@ const getListContingency = async () => {
   }
 };
 
-const searchPs1 = async (event) => {
-  const query = event.query.trim();
-  await search(query, selectedDefinition1.value ? [selectedDefinition1.value] : []);
-};
-
-const searchPs2 = async (event) => {
-  const query = event.query.trim();
-  await search(query, selectedDefinition2.value ? [selectedDefinition2.value] : []);
-};
-
-const search = async (query, definition) => {
-  try {
-    const res = await PowerSystemParameterApi.searchPs(definition, query);
-    items.value = res.data;
-  } catch (error) {
-    console.log('searchPsdQueryFilter: error ', error);
-  }
-};
-
 const confirmDelete = async (event, data) => {
   confirm.require({
     target: event.currentTarget,
@@ -261,8 +247,8 @@ const handlerCreateThis = async () => {
   contingencyModelData.value = dataDefault;
   autoCompleteValue1.value = {};
   autoCompleteValue2.value = {};
-  selectedDefinition1.value = null;
-  selectedDefinition2.value = null;
+  selectedDefinition1.value = listDefinition.value;
+  selectedDefinition2.value = listDefinition.value;
   visible.value = true;
   headerDialog.value = 'Create';
 };
@@ -295,25 +281,34 @@ const confirmUpdateThis = async (event, data) => {
 const handlerEditThis = async (data) => {
   contingencyModelData.value = JSON.parse(JSON.stringify(data)); // Tạo bản sao của data
   headerDialog.value = 'Edit';
+  selectedDefinition1.value = listDefinition.value;
+  selectedDefinition2.value = listDefinition.value;
+
   if (contingencyModelData.value.listPowerSystemId.length === 1) {
-    const { definitionId, ...rest } = contingencyModelData.value.listPowerSystemId[0];
-    autoCompleteValue1.value = rest;
-    selectedDefinition1.value = definitionId;
+    const psData1 = contingencyModelData.value.listPowerSystemId[0];
+    autoCompleteValue1.value = {
+      _id: psData1._id,
+      name: psData1.name,
+    };
   } else if (contingencyModelData.value.listPowerSystemId.length === 2) {
-    const { definitionId, ...rest1 } = contingencyModelData.value.listPowerSystemId[0];
-    autoCompleteValue1.value = rest1;
-    selectedDefinition1.value = definitionId;
-    const { definitionId: definitionId2, ...rest2 } = contingencyModelData.value.listPowerSystemId[1];
-    autoCompleteValue2.value = rest2;
-    selectedDefinition2.value = definitionId2;
+    const psData1 = contingencyModelData.value.listPowerSystemId[0];
+    autoCompleteValue1.value = {
+      _id: psData1._id,
+      name: psData1.name,
+    };
+
+    const psData2 = contingencyModelData.value.listPowerSystemId[1];
+    autoCompleteValue2.value = {
+      _id: psData2._id,
+      name: psData2.name,
+    };
   }
   visible.value = true;
 };
 
 const editThis = async () => {
   try {
-    const { _id, ...dataToUpdate } = contingencyModelData.value;
-    await ApiContingency.updateContingencyData(_id, dataToUpdate);
+    await ApiContingency.updateContingencyData(contingencyModelData.value._id, contingencyModelData.value);
     getListContingency();
     visible.value = false;
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Update successfully', life: 3000 });

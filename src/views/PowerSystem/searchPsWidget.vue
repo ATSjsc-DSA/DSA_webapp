@@ -51,6 +51,10 @@ const searchQueryFilter = async (event) => {
   flex-wrap: auto;
 }
 
+.p-autocomplete-input {
+  width: 100%;
+}
+
 .p-autocomplete-input-token {
   flex-grow: 1;
 }
