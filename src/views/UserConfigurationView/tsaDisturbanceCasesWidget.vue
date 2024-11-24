@@ -160,8 +160,10 @@ const handleCaseCreate = () => {
 };
 const createCase = async () => {
   try {
-    await ApiDisturbances.createDisturbances(props.tsaId, caseData.value);
+    ApiDisturbances.createDisturbances(props.tsaId, caseData.value);
     await getDisturbancesCaseList();
+    caseExpandedRows.value = {};
+
     toast.add({ severity: 'success', summary: 'Created Successfully', life: 3000 });
     changeVisibleDialog.value = false;
   } catch (error) {
@@ -179,6 +181,7 @@ const updateCase = async () => {
   try {
     await ApiDisturbances.updateDisturbances(caseData.value._id, caseData.value);
     await getDisturbancesCaseList();
+    caseExpandedRows.value = {};
     toast.add({ severity: 'success', summary: 'Updated Successfully', life: 3000 });
     changeVisibleDialog.value = false;
   } catch (error) {
@@ -206,6 +209,7 @@ const deleteDisturbances = async (data) => {
   try {
     await ApiDisturbances.deleteDisturbances(data._id);
     await getDisturbancesCaseList();
+    caseExpandedRows.value[data._id] = false;
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
     changeVisibleDialog.value = false;
   } catch (error) {

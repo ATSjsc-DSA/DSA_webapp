@@ -41,24 +41,17 @@
       <ScrollPanel style="width: 100%; height: 100%">
         <DataView v-if="logList.length > 0" :value="logList">
           <template #list="slotProps">
-            <div v-for="(item, index) in slotProps.items" :key="index" class="py-3">
-              <div class="flex gap-3" :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
-                <Message :value="getLabelSeverityStyle(item.severity)" :closable="false">
-                  {{ getLabelLogsType(item.label) }}</Message
-                >
-                <!-- <Tag
-                  :value="getLabelLogsType(item.label)"
-                  :style="getLabelSeverityStyle(item.severity)"
-                  style="width: 20%; min-width: 5rem; text-align: left"
-                /> -->
-                <div class="flex-grow-1">
-                  <div class="text-semibold capitalize">
-                    {{ item.message }}
-                  </div>
-                  <div class="text-xs pt-1" style="color: var(--text-color-secondary)">
-                    {{ convertDateTimeToString(item.createdTimestamp) }}
-                  </div>
-                </div>
+            <div v-for="(item, index) in slotProps.items" :key="index" class="py-1">
+              <div
+                class="text-xs pt-1"
+                :style="getLabelSeverityStyle(item.severity)"
+                :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }"
+              >
+                <span class="text-semibold">
+                  {{ `[${convertDateTimeToString(item.createdTimestamp)}] ${getLabelLogsType(item.label)}:` }}
+                </span>
+
+                {{ item.message }}
               </div>
             </div>
           </template>
@@ -144,17 +137,17 @@ const SeverityLogsType = {
 const getLabelSeverityStyle = (severity) => {
   switch (severity) {
     case 0:
-      return 'backgroundColor:var(--blue-100);color:var(--text-color)';
+      return { color: 'var(--text-color)' };
     case 1:
-      return 'backgroundColor:var(--orange-100);color:var(--text-color)';
+      return { color: 'var(--orange-400)' };
     case 2:
-      return 'backgroundColor:var(--red-200);color:var(--text-color)';
+      return { color: 'var(--orange-600)' };
     case 3:
-      return 'backgroundColor:var(--red-400);color:white';
+      return { color: 'var(--red-400)' };
     case 4:
-      return 'backgroundColor:var(--red-600); color:white';
+      return { color: 'var(--red-600)' };
     default:
-      return 'backgroundColor:var(--gray-100);color:var(--text-color)';
+      return { color: 'var(--text-color)' };
   }
 };
 

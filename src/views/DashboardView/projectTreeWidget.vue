@@ -152,7 +152,9 @@ import ScrollPanel from 'primevue/scrollpanel';
 import ContextMenu from 'primevue/contextmenu';
 import { useToast } from 'primevue/usetoast';
 const toast = useToast();
+import { useLayout } from '@/layout/composables/layout';
 
+const { isDarkTheme } = useLayout();
 import { VsaApi, TsaApi, CommonApi } from './api';
 import { DSA_api } from '../DSASettingView/api';
 const props = defineProps({
@@ -649,29 +651,53 @@ const getTsaCurveTypeSeverity = (curveType) => {
   }
   switch (curveType) {
     case 0:
-      return 'backgroundColor:var(--teal-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--blue-500);color:var(--text-color)'
+        : 'backgroundColor:var(--blue-300);color:var(--text-color)';
     case 1:
-      return 'backgroundColor:var(--teal-200)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--blue-700);color:var(--text-color)'
+        : 'backgroundColor:var(--blue-500);color:var(--text-color)';
     case 2:
-      return 'backgroundColor:var(--teal-300)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--blue-900);color:white'
+        : 'backgroundColor:var(--blue-600);color:var(--text-color)';
     case 3:
-      return 'backgroundColor:var(--teal-400);color:var(--surface-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--teal-500);color:var(--text-color)'
+        : 'backgroundColor:var(--teal-300);color:var(--text-color)';
     case 4:
-      return 'backgroundColor:var(--teal-500);color:var(--surface-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--teal-700);color:var(--text-color)'
+        : 'backgroundColor:var(--teal-500);color:var(--text-color)';
     case 5:
-      return 'backgroundColor:var(--teal-600);color:var(--surface-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--teal-900));color:white'
+        : 'backgroundColor:var(--teal-600);color:var(--text-color)';
     case 6:
-      return 'backgroundColor:var(--cyan-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--yellow-500);color:var(--text-color)'
+        : 'backgroundColor:var(--yellow-300);color:var(--text-color)';
     case 7:
-      return 'backgroundColor:var(--cyan-200)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--yellow-700);color:var(--text-color)'
+        : 'backgroundColor:var(--yellow-500);color:var(--text-color)';
     case 8:
-      return 'backgroundColor:var(--cyan-300)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--yellow-900);color:var(--text-color)'
+        : 'backgroundColor:var(--yellow-600);color:var(--text-color)';
     case 9:
-      return 'backgroundColor:var(--cyan-400);color:var(--surface-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--primary-500);color:var(--text-color)'
+        : 'backgroundColor:var(--primary-400);color:var(--text-color)';
     case 10:
-      return 'backgroundColor:var(--cyan-500) ;color:var(--surface-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--primary-700) ;color:var(--text-color)'
+        : 'backgroundColor:var(--primary-500) ;color:var(--text-color)';
     default:
-      return 'backgroundColor:var(--graygray-600);color:var(--surface-100)';
+      return isDarkTheme.value
+        ? 'backgroundColor:var(--graygray-600);color:var(--text-color)'
+        : 'backgroundColor:var(--graygray-600);color:var(--text-color)';
   }
 };
 
