@@ -33,6 +33,9 @@ export class CommonApi {
   static async getProjectRadarChartData() {
     return get(`/hmi/${measInfoActive.value._id}/radar/project/${projectData.value._id}`);
   }
+  static async getLogs() {
+    return get(`/common/${projectData.value._id}/dsa/logs`);
+  }
 }
 
 export class VsaApi {

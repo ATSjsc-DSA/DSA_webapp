@@ -1,9 +1,10 @@
 <template>
   <div class="grid w-full h-full">
-    <div v-if="showTree" class="col-3">
-      <div class="sticky" style="top: 6rem">
-        <ScrollPanel style="width: 100%; height: 58rem">
+    <div v-if="showTree || showLog" class="col-3">
+      <div class="sticky flex flex-column gap-3" style="top: 6rem">
+        <ScrollPanel v-if="showTree" style="width: 100%" :style="{ height: showLog ? '28rem' : '58rem' }">
           <projectTreeWidget
+            v-if="showTree"
             v-bind:application-draggable="applicationDraggable"
             v-bind:vsa-curve-draggable="vsaCurveDraggable"
             v-bind:tsa-curve-draggable="tsaCurveDraggable"
@@ -11,8 +12,13 @@
             @onRemoveWidget="showTree = false"
           />
         </ScrollPanel>
+
+        <ScrollPanel v-if="showLog" style="width: 100%" :style="{ height: showTree ? '28rem' : '58rem' }">
+          <logListWidget @onRemoveWidget="showLog = false" @saveLogConfig="saveLogConfig" />
+        </ScrollPanel>
       </div>
     </div>
+
     <div class="col">
       <div class="w-full h-full flex gap-3">
         <div
@@ -142,6 +148,16 @@
               <i class="pi pi-list" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">TREE</div>
             </div>
+
+            <div
+              v-tooltip.left="'Logs'"
+              class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
+              placeholder="Left"
+              @click="showLog = !showLog"
+            >
+              <i class="pi pi-file" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">LOG</div>
+            </div>
             <Divider class="m-1" />
 
             <div
@@ -239,6 +255,7 @@ import ScrollPanel from 'primevue/scrollpanel';
 import { useToast } from 'primevue/usetoast';
 import mapView from '@/components/mapView.vue';
 import projectTreeWidget from './projectTreeWidget.vue';
+import logListWidget from './logListWidget.vue';
 import { useCommonStore } from '@/store';
 
 import chartComponent from './chartComponent.vue';
@@ -253,6 +270,8 @@ const confirm = useConfirm();
 const commonStore = useCommonStore();
 
 const showTree = ref(localStorage.getItem('showTree') === 'true' || false);
+const showLog = ref(localStorage.getItem('showLog') === 'true' || false);
+
 const gridStackComponentGrid = ref(null);
 const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
@@ -275,6 +294,13 @@ onMounted(async () => {
       oldGrid.forEach((widget) => {
         if (widget.type === 'map') {
           addMapComponent(widget);
+        }
+        if (widget.type === 'log') {
+          showLog.value = widget.show;
+          localStorage.setItem('logConfig', JSON.stringify(widget));
+        }
+        if (widget.type === 'tree') {
+          showTree.value = widget.show;
         }
         if (widget.type === 'chart') {
           if (widget.typeChart === 'projectRadar') {
@@ -380,11 +406,42 @@ const saveGrid = async () => {
       }
     });
   });
+
+  const logComponent = gridStackComponentArr.value.filter((item) => item.type === 'log');
+  if (logComponent.length > 0) {
+    logComponent.show = showLog.value;
+  } else {
+    gridStackComponentArr.value.push({
+      type: 'log',
+      show: showLog.value,
+      limitLog: 100,
+      intervalTime: 5 * 1000,
+    });
+  }
+  const treeComponent = gridStackComponentArr.value.filter((item) => item.type === 'tree');
+  if (treeComponent.length > 0) {
+    treeComponent.show = showTree.value;
+  } else {
+    gridStackComponentArr.value.push({
+      type: 'tree',
+      show: showTree.value,
+    });
+  }
+
   localStorage.setItem('gridStackComponentArr', JSON.stringify(gridStackComponentArr.value));
   localStorage.setItem('showTree', JSON.stringify(showTree.value));
+  localStorage.setItem('showLog', JSON.stringify(showLog.value));
+
   localStorage.setItem('stopReloadChartData', stopReloadChartData.value);
   toast.add({ severity: 'success', summary: 'Saved Successfully', life: 3000 });
 
+  await updateGridInAuth(JSON.stringify(gridStackComponentArr.value));
+};
+
+const saveLogConfig = async (newConfig) => {
+  newConfig.type = 'log';
+  newConfig.show = showLog.value;
+  gridStackComponentArr.value.push(newConfig);
   await updateGridInAuth(JSON.stringify(gridStackComponentArr.value));
 };
 

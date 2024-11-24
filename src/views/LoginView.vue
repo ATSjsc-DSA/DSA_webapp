@@ -20,7 +20,7 @@ const login = async () => {
     const res = await user_api.login(username.value, password.value);
     localStorage.setItem('token', res.data.access_token);
     localStorage.setItem('refreshToken', res.data.refresh_token);
-    localStorage.setItem('gridStackComponentArr', res.data.dataLayout);
+    localStorage.setItem('gridStackComponentArr', JSON.stringify(res.data.dataLayout));
 
     const user = await user_api.getUserActive();
     localStorage.setItem('user', user.data.username);

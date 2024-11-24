@@ -48,7 +48,7 @@
         <Row>
           <Column>
             <template #header>
-              <div class="flex align-items-center justify-content-center w-full">Fault</div>
+              <div class="flex align-items-center justify-content-center w-full">Fault Location</div>
             </template>
           </Column>
           <Column>
@@ -80,7 +80,7 @@
         </template>
       </Column>
 
-      <Column field="shcLocation" header="Fault">
+      <Column field="shcLocation" header="Fault Location">
         <template #body="{ data }">
           <div v-if="data.disturbanceEvenType <= 10">
             {{ data.shcLocation }}
@@ -211,7 +211,7 @@
       <template v-if="disturbanceType === 0">
         <div class="col-6">
           <div class="flex flex-column gap-2 mb-3">
-            <label for="shcLocation" class="font-semibold">Fault </label>
+            <label for="shcLocation" class="font-semibold">Fault Location</label>
             <InputNumber v-model="disturbanceData.shcLocation" suffix=" %" :maxFractionDigits="5" />
           </div>
         </div>
