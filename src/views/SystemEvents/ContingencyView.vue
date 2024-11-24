@@ -76,16 +76,6 @@
           />
         </div>
         <div class="grid">
-          <div class="field col-12 md:col-8">
-            <label for="name" class="font-semibold">Element</label>
-            <AutoComplete
-              v-model="autoCompleteValue1"
-              completeOnFocus
-              optionLabel="name"
-              :suggestions="items"
-              @complete="searchPs1"
-            />
-          </div>
           <div class="field col-12 md:col-4">
             <label for="name" class="font-semibold">Type Element</label>
             <Dropdown
@@ -94,6 +84,16 @@
               optionLabel="name"
               optionValue="_id"
               class="w-full"
+            />
+          </div>
+          <div class="field col-12 md:col-8">
+            <label for="name" class="font-semibold">Element</label>
+            <AutoComplete
+              v-model="autoCompleteValue1"
+              completeOnFocus
+              optionLabel="name"
+              :suggestions="items"
+              @complete="searchPs1"
             />
           </div>
         </div>
