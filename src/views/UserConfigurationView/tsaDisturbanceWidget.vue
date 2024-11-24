@@ -496,8 +496,8 @@ const getEventValue = (value) => {
   }
 };
 const listEventValue = [
-  { name: 'OPEN', value: 1 },
-  { name: 'CLOSE', value: 0 },
+  { name: 'CLOSE', value: 1 },
+  { name: 'OPEN', value: 0 },
 ];
 
 const listDefinition = ref();
