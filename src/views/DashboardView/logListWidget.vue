@@ -43,11 +43,14 @@
           <template #list="slotProps">
             <div v-for="(item, index) in slotProps.items" :key="index" class="py-3">
               <div class="flex gap-3" :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
-                <Tag
+                <Message :value="getLabelSeverityStyle(item.severity)" :closable="false">
+                  {{ getLabelLogsType(item.label) }}</Message
+                >
+                <!-- <Tag
                   :value="getLabelLogsType(item.label)"
                   :style="getLabelSeverityStyle(item.severity)"
                   style="width: 20%; min-width: 5rem; text-align: left"
-                />
+                /> -->
                 <div class="flex-grow-1">
                   <div class="text-semibold capitalize">
                     {{ item.message }}

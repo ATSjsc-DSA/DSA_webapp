@@ -486,9 +486,9 @@ const listDisturbanceEventTypeSwitch = [
 
 const getEventValue = (value) => {
   switch (value) {
-    case 1:
-      return 'OPEN';
     case 0:
+      return 'OPEN';
+    case 1:
       return 'CLOSE';
     default:
       return 'OPEN';

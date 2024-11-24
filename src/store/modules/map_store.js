@@ -81,7 +81,7 @@ export const useMapStore = defineStore('map_Store', () => {
           geometry: new Point(fromLonLat([sub.long, sub.lat])),
           name: sub.name,
           id: 'sub',
-          code: sub.code,
+          code: sub.type_name,
           subData: {
             name: sub.name,
             id: 'sub',
@@ -265,16 +265,16 @@ export const useMapStore = defineStore('map_Store', () => {
       console.log(projectData, 'projectData');
       console.log(slotData, 'slotData');
       const res = await DSA_api.getListSub(projectData.value._id, slotData.value._id);
-      // console.log(res.data, 'res');
+      console.log(res.data['500.0'], 'res');
 
       const newFeaturesArray = [
-        ...getFeaturesPoint(res.data.sub500kV ?? [], 500, true),
-        ...getFeaturesPoint(res.data.sub345kV ?? [], 345),
-        ...getFeaturesPoint(res.data.sub287kV ?? [], 287),
-        ...getFeaturesPoint(res.data.sub230kV ?? [], 230),
-        ...getFeaturesPoint(res.data.sub138kV ?? [], 138),
-        ...getFeaturesPoint(res.data.sub115kV ?? [], 115),
-        ...getFeaturesPoint(res.data.sub20kV ?? [], 20),
+        ...getFeaturesPoint(res.data['500.0'] ?? [], 500, true),
+        ...getFeaturesPoint(res.data['345'] ?? [], 345),
+        ...getFeaturesPoint(res.data['287'] ?? [], 287),
+        ...getFeaturesPoint(res.data['230'] ?? [], 230),
+        ...getFeaturesPoint(res.data['138'] ?? [], 138),
+        ...getFeaturesPoint(res.data['115'] ?? [], 115),
+        ...getFeaturesPoint(res.data['20'] ?? [], 20),
       ];
       // console.log(newFeaturesArray, 'newFeaturesArray');
 
