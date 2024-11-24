@@ -377,7 +377,7 @@
                         }"
                       >
                         <stationGraphic
-                          v-if="tabMenuPSActive === 6 && isStation"
+                          v-if="tabMenuPSList[tabMenuPSActive] === 'Graphics' && isStation"
                           :nodeSelected="nodeSelected"
                         ></stationGraphic>
                       </div>
