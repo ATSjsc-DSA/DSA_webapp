@@ -335,7 +335,7 @@ const getChartData = async () => {
       }
     }
     if (props.typeChart === 'projectRadar') {
-      res = await ApplicationApi.getRadarChartData(projectData.value._id);
+      res = await ApplicationApi.getRadarProjectChartData();
 
       // res = await CommonApi.getProjectRadarChartData();
       if (!chartRadarDataKey.value) {

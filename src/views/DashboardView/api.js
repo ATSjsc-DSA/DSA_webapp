@@ -11,7 +11,9 @@ export class ApplicationApi {
   static async getRadarChartData(appId = '') {
     return get(`/hmi/${measInfoActive.value._id}/radar/app/${appId}`);
   }
-
+  static async getRadarProjectChartData() {
+    return get(`/hmi/${measInfoActive.value._id}/radar/project/${projectData.value._id}`);
+  }
   static async getBarTimeSeriesChartData(appId = '', startTime = 0, endTime = 0) {
     return get(`/hmi/app/timeseries/${appId}`, {
       startTime: parseInt(startTime),
