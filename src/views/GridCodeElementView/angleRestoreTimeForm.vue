@@ -11,22 +11,16 @@
       </div>
     </div>
 
-    <div class="col-4">
+    <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="dampingRequirement" class="font-semibold">Damping Requirement</label>
         <InputNumber v-model="formData.dampingRequirement" suffix="%" :maxFractionDigits="10" class="flex-auto" />
       </div>
     </div>
-    <div class="col-4">
+    <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="restoreTime" class="font-semibold">Restore Time</label>
         <InputNumber v-model="formData.restoreTime" class="flex-auto" />
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="flex flex-column gap-2 mb-3">
-        <label for="unit" class="font-semibold">Unit</label>
-        <InputNumber v-model="formData.unit" class="flex-auto" />
       </div>
     </div>
 

@@ -217,7 +217,6 @@ const handleRowClick = async (item) => {
     selectedItem.value._id = item._id;
 
     const { filterConditions } = selectedItem.value;
-
     const newFilter = {
       area: {
         value: filterConditions.area.value.map((item) => item._id),
@@ -240,6 +239,7 @@ const handleRowClick = async (item) => {
         type: filterConditions.station.type.map((item) => item._id),
       },
       powersystem: filterConditions.powerSystem.map((item) => item._id),
+
       filtering: filterConditions.filtering,
       stationSort: [],
     };
@@ -334,6 +334,7 @@ const filterData = ref([]);
 
 const changeFilter = async (newfilter) => {
   filterData.value = newfilter;
+  stationSearchSelected.value = [];
   await getParameterList();
   await getStationList();
 };

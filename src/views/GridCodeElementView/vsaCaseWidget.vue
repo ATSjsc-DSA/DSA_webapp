@@ -233,7 +233,7 @@ const createVsaCase = async () => {
   try {
     const res = await ApiVsaCase.create(props.gridcodeId, newVsaCase.value);
     await getVsaCaseList();
-    vsaCaseSelected.value = res.data;
+    vsaCaseClick(res.data);
     createVsaCaseVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
   } catch (error) {

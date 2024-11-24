@@ -85,14 +85,15 @@
                   <Column header="Restore Time" :rowspan="2" />
                   <Column :colspan="2">
                     <template #header>
-                      <div class="block w-full text-center">Error</div>
+                      <div class="block w-full text-center">Stable Range</div>
                     </template>
                   </Column>
                   <Column :colspan="2">
                     <template #header>
-                      <div class="block w-full text-center">Stable Range</div>
+                      <div class="block w-full text-center">Error</div>
                     </template>
                   </Column>
+
                   <Column :rowspan="2" />
                 </Row>
                 <Row>
@@ -135,7 +136,20 @@
               </Column>
 
               <Column field="restoreTime" header="Restore Time" style="text-wrap: nowrap" />
-
+              <Column field="stableRangeLower" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.stableRangeLower }} {{ getUnitLabel(data.unitTypeStable) }}
+                  </div>
+                </template>
+              </Column>
+              <Column field="stableRangeUpper" style="text-wrap: nowrap">
+                <template #body="{ data }">
+                  <div class="block w-full text-center">
+                    {{ data.stableRangeUpper }} {{ getUnitLabel(data.unitTypeStable) }}
+                  </div>
+                </template>
+              </Column>
               <Column field="lowerError" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div class="block w-full text-center">
@@ -151,20 +165,6 @@
                 </template>
               </Column>
 
-              <Column field="stableRangeLower" style="text-wrap: nowrap">
-                <template #body="{ data }">
-                  <div class="block w-full text-center">
-                    {{ data.stableRangeLower }} {{ getUnitLabel(data.unitTypeStable) }}
-                  </div>
-                </template>
-              </Column>
-              <Column field="stableRangeUpper" style="text-wrap: nowrap">
-                <template #body="{ data }">
-                  <div class="block w-full text-center">
-                    {{ data.stableRangeUpper }} {{ getUnitLabel(data.unitTypeStable) }}
-                  </div>
-                </template>
-              </Column>
               <Column style="width: 4rem; padding-top: 0; padding-bottom: 0">
                 <template #body="{ data }">
                   <div class="flex w-full justify-content-between align-items-center">

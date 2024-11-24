@@ -9,7 +9,6 @@
         :definitionMonitor="definitionMonitor"
         @updateMonitor="updateMonitor"
       />
-      
     </TabPanel>
 
     <TabPanel header="Scada">
@@ -21,7 +20,11 @@
         showGridlines
         :loading="loadingScada"
       >
-        <Column field="name" header="Name" />
+        <Column field="ScadaKey" header="ScadaKey">
+          <template #body="{ data }">
+            {{ getScadaKey(data.monitorScadaId) }}
+          </template>
+        </Column>
         <Column field="monitorScadaName" header="Monitor Scada Name" />
         <Column field="active" header="Active">
           <template #body="{ data }">
@@ -170,7 +173,7 @@
     <monitorScadaFormWidget v-model="editScadaData" :isCreateForm="false" />
     <template #footer>
       <Button type="button" label="Cancel" severity="secondary" @click="updataScadaVisibleDialog = false"></Button>
-      <Button type="button" label="Update" :disabled="!editScadaData.name" @click="updateScada"></Button>
+      <Button type="button" label="Update" @click="updateScada"></Button>
     </template>
   </Dialog>
 
@@ -234,7 +237,7 @@ const loadingScada = ref(false);
 const loadingPmu = ref(false);
 
 onMounted(async () => {
-  await getMonitorData();
+  await getCommonData();
   getScadaList();
   getPmuList();
 });
@@ -247,7 +250,7 @@ watch(
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
       nextTick(async () => {
         monitorData.value = newValue;
-        await getMonitorData();
+        await getCommonData();
         getScadaList();
         getPmuList();
       });
@@ -255,25 +258,23 @@ watch(
   },
 );
 const psdSelected = ref();
-const listScadaMonitor = ref();
+const listScadaMonitor = ref([]);
+const scadaKeyData = ref([]);
 const definitionMonitor = ref();
-
-const getMonitorData = async () => {
+const getCommonData = async () => {
   try {
-    const result = await PowerSystemParameterApi.getPowersystemMonitor(monitorData.value.powersystemId);
+    const res = await PowerSystemParameterApi.getPowersystemMonitor(monitorData.value.powersystemId);
+
     psdSelected.value = {
-      _id: result.data._id,
-      name: result.data.name,
+      _id: res.data._id,
+      name: res.data.name,
     };
-    listScadaMonitor.value = result.data.data;
-    definitionMonitor.value = result.data.definitionId;
+    definitionMonitor.value = res.data.definitionId;
+    listScadaMonitor.value = res.data.data;
   } catch (error) {
-    psdSelected.value = {
-      _id: '',
-      name: ''
-    };
+    psdSelected.value = undefined;
     listScadaMonitor.value = [];
-    definitionMonitor.value = ''
+    definitionMonitor.value = '';
   }
 };
 
@@ -288,6 +289,8 @@ const updateMonitor = async (data) => {
       res.data.name,
       res.data.active,
     );
+    await getCommonData();
+    await getScadaList();
   } catch (error) {
     console.log('updateMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
@@ -358,7 +361,6 @@ const delScada = async () => {
 // ---- PMU
 const pmuList = ref([]);
 const createPmuVisibleDialog = ref(false);
-const pmuData = ref();
 const newPmuData = ref({
   active: true,
   current: {
@@ -453,6 +455,13 @@ const delPmu = async () => {
   } catch (error) {
     console.log('delPmu: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const getScadaKey = (scadaId) => {
+  const scadaData = listScadaMonitor.value.filter((item) => item._id === scadaId)[0];
+  if (scadaData) {
+    return scadaData.scadakey[Number(monitorData.value.monitorType)];
   }
 };
 </script>

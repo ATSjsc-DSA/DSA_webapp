@@ -74,8 +74,8 @@
     />
   </div>
   <div v-if="!isCreateForm" class="flex justify-content-end gap-3">
-        <Button type="button" label="Update" @click="confirmUpdateMonitor"></Button>
-      </div>
+    <Button type="button" label="Update" @click="confirmUpdateMonitor"></Button>
+  </div>
 </template>
 
 <script setup>
@@ -95,8 +95,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['update:psdSelected', 'updateMonitor']);
 
-
-const isCreateForm = computed(() => props.isCreateForm)
+const isCreateForm = computed(() => props.isCreateForm);
 const data = ref(props.data);
 
 const typeOpts = ref([
@@ -117,10 +116,7 @@ const priorityOpts = ref([
 
 watch(
   () => props.data,
-  
-  
   (newValue, oldValue) => {
-    console.log(newValue, "newValue");
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
       nextTick(() => {
         data.value = newValue;
@@ -161,7 +157,7 @@ const confirmUpdateMonitor = async (event) => {
     rejectLabel: 'Cancel',
     acceptLabel: 'Update',
     accept: async () => {
-      emit('updateMonitor', data.value)
+      emit('updateMonitor', data.value);
     },
   });
 };

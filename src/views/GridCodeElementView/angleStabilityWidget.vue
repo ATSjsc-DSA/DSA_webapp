@@ -82,7 +82,6 @@
                 <Row>
                   <Column header="Name" :rowspan="2" />
                   <Column header="Active" :rowspan="2" />
-                  <Column header="Unit" :rowspan="2" />
                   <Column header="Damping Requirement" :rowspan="2" />
                   <Column header="Restore Time" :rowspan="2" />
 
@@ -152,7 +151,6 @@
                   ></Tag>
                 </template>
               </Column>
-              <Column field="unit" header="Unit" style="text-wrap: nowrap" />
               <Column field="dampingRequirement" header="Damping Requirement" style="text-wrap: nowrap">
                 <template #body="{ data }">
                   <div>
@@ -518,8 +516,6 @@ const handleCreateRestoreTime = () => {
     stableLower: -1,
     stableUpper: 1,
     unitTypeStable: 3,
-
-    unit: 1,
   };
   createRestoreTimeVisibleDialog.value = true;
 };
@@ -561,6 +557,8 @@ const handleUpdateRestoreTime = (data) => {
 };
 const updateRestoreTime = async () => {
   try {
+    console.log(editRestoreTime.value);
+
     await ApiAngleStability.updateAngleRestoreTime(editRestoreTime.value._id, editRestoreTime.value);
     await getAngleRestoreTimeList();
     updateRestoreTimeVisibleDialog.value = false;
@@ -593,7 +591,7 @@ const deleteRestoreTime = async (id) => {
     await getAngleRestoreTimeList();
     toast.add({ severity: 'success', summary: 'Deleted Successfully', life: 3000 });
   } catch (error) {
-    console.log('deleteAngleStabilityData error', error);
+    console.log('deleteRestoreTime error', error);
   }
 };
 

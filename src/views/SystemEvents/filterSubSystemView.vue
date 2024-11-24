@@ -254,7 +254,7 @@ const getFilterSelected = () => {
       value: stationSelected.value.map((item) => item._id),
       type: stationSelected.value.length > 0 ? stationDefinitionSelected.value.map((item) => item._id) : [],
     },
-
+    powerSystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
     powersystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
     filtering: filterConjunction.value,
   };
@@ -344,10 +344,9 @@ watch(
       stationSelected.value = props.currentFilter.station.value;
       stationDefinitionSelected.value = props.currentFilter.station.type;
 
-      psSelected.value = props.currentFilter.powerSystem.value;
+      psSelected.value = props.currentFilter.powerSystem;
       psDefinitionType.value = definitionSubsystemList.value;
       filterConjunction.value = props.currentFilter.filtering || '';
-
     });
   },
   { deep: true },
