@@ -8,6 +8,62 @@
           <Button type="button" icon="pi pi-plus" size="small" text @click="handleCreate" />
         </div>
       </template>
+
+      <ColumnGroup type="header">
+        <Row>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Name</div>
+            </template>
+          </Column>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Power System</div>
+            </template>
+          </Column>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Start Time</div>
+            </template>
+          </Column>
+
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Event Type</div>
+            </template>
+          </Column>
+
+          <Column :colspan="3">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Short Circuit</div>
+            </template>
+          </Column>
+          <Column :rowspan="2">
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Switch</div>
+            </template>
+          </Column>
+          <Column :rowspan="2"> </Column>
+        </Row>
+        <Row>
+          <Column>
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Fault</div>
+            </template>
+          </Column>
+          <Column>
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Resistance</div>
+            </template>
+          </Column>
+          <Column>
+            <template #header>
+              <div class="flex align-items-center justify-content-center w-full">Reactance</div>
+            </template>
+          </Column>
+        </Row>
+      </ColumnGroup>
+
       <Column field="name" header="Name"></Column>
       <Column field="powerSystemId" header="Power System">
         <template #body="{ data }">
@@ -23,9 +79,33 @@
           <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
         </template>
       </Column>
-      <Column field="eventValue" header="Event Value">
+
+      <Column field="shcLocation" header="Fault">
         <template #body="{ data }">
-          <Chip :label="getEventValue(data.eventValue)" />
+          <div v-if="data.disturbanceEvenType <= 10">
+            {{ data.shcLocation }}
+          </div>
+        </template>
+      </Column>
+      <Column field="resistance" header="Resistance">
+        <template #body="{ data }">
+          <div v-if="data.disturbanceEvenType <= 10">
+            {{ data.resistance }}
+          </div>
+        </template>
+      </Column>
+      <Column field="reactance" header="Reactance">
+        <template #body="{ data }">
+          <div v-if="data.disturbanceEvenType <= 10">
+            {{ data.reactance }}
+          </div>
+        </template>
+      </Column>
+      <Column field="action" header="Action">
+        <template #body="{ data }">
+          <div class="flex align-items-center justify-content-center w-full">
+            <Chip v-if="data.disturbanceEvenType > 10" :label="getEventValue(data.action)" />
+          </div>
         </template>
       </Column>
       <Column style="width: 8rem">
@@ -131,10 +211,14 @@
       <template v-if="disturbanceType === 0">
         <div class="col-6">
           <div class="flex flex-column gap-2 mb-3">
-            <label for="shcLocation" class="font-semibold">SHC Location </label>
-            <InputNumber v-model="disturbanceData.shcLocation" suffix=" Ohm" :maxFractionDigits="5" />
+            <label for="shcLocation" class="font-semibold">Fault </label>
+            <InputNumber v-model="disturbanceData.shcLocation" suffix=" %" :maxFractionDigits="5" />
           </div>
         </div>
+        <div class="col-12">
+          <span class="p-text-secondary block"> Fault Impedance</span>
+        </div>
+
         <div class="col-6">
           <div class="flex flex-column gap-2 mb-3">
             <label for="resistance" class="font-semibold"> Resistance </label>
@@ -152,7 +236,7 @@
       <!-- Switch -->
       <div v-else class="col-6">
         <div class="flex flex-column gap-2 mb-3">
-          <label for="action" class="font-semibold">Event Value</label>
+          <label for="action" class="font-semibold">Action</label>
           <Dropdown
             v-model="disturbanceData.action"
             :options="listEventValue"
@@ -402,17 +486,17 @@ const listDisturbanceEventTypeSwitch = [
 
 const getEventValue = (value) => {
   switch (value) {
-    case 0:
-      return 'ON';
     case 1:
-      return 'OFF';
+      return 'OPEN';
+    case 0:
+      return 'CLOSE';
     default:
-      return 'ON';
+      return 'OPEN';
   }
 };
 const listEventValue = [
-  { name: 'ON', value: 0 },
-  { name: 'OFF', value: 1 },
+  { name: 'OPEN', value: 1 },
+  { name: 'CLOSE', value: 0 },
 ];
 
 const listDefinition = ref();
