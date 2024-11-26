@@ -38,17 +38,39 @@
       </div>
     </template>
     <template #content>
-      <ScrollPanel style="width: 100%; height: 100%">
-        <DataView v-if="logList.length > 0" :value="logList">
+      <template v-if="alarmLogList.length > 0">
+        <ScrollPanel style="width: 100%; height: 30%">
+          <DataView :value="alarmLogList">
+            <template #list="slotProps">
+              <div v-for="(item, index) in slotProps.items" :key="index" class="py-1">
+                <div
+                  class="text-xs pt-1"
+                  :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }"
+                >
+                  <span class="text-semibold">
+                    {{ `[${convertDateTimeToString(item.createdTimestamp)}] ` }}
+                  </span>
+                  <span :style="getLabelSeverityStyle(item.severity)">
+                    {{ getLabelLogsType(item.label) }}
+                  </span>
+                  {{ item.message }}
+                </div>
+              </div>
+            </template>
+          </DataView>
+        </ScrollPanel>
+        <Divider />
+      </template>
+      <ScrollPanel style="width: 100%" :style="{ height: alarmLogList.length > 0 ? '70%' : '100%' }">
+        <DataView v-if="otherLogList.length > 0" :value="otherLogList">
           <template #list="slotProps">
             <div v-for="(item, index) in slotProps.items" :key="index" class="py-1">
-              <div
-                class="text-xs pt-1"
-                :style="getLabelSeverityStyle(item.severity)"
-                :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }"
-              >
+              <div class="text-xs pt-1" :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
                 <span class="text-semibold">
-                  {{ `[${convertDateTimeToString(item.createdTimestamp)}] ${getLabelLogsType(item.label)}:` }}
+                  {{ `[${convertDateTimeToString(item.createdTimestamp)}] ` }}
+                </span>
+                <span :style="getLabelSeverityStyle(item.severity)">
+                  {{ getLabelLogsType(item.label) }}
                 </span>
 
                 {{ item.message }}
@@ -93,15 +115,29 @@ const onRemoveWidget = () => {
   emit('onRemoveWidget');
 };
 const lastUpdate = ref(new Date());
-const logList = ref([]);
+const otherLogList = ref([]);
+const alarmLogList = ref([]);
+
 const intervalTime = ref(props.intervalTime);
 const limitLog = ref(props.limitLog);
 const reloadGetLog = ref();
 const getLogList = async () => {
   try {
     const res = await CommonApi.getLogs();
-    const logsNotExist = res.data.filter((item) => logList.value.map((item) => item._id).indexOf(item._id) === -1);
-    logList.value = logsNotExist.concat(logList.value).slice(0, limitLog.value);
+    const alarmLogs = res.data.filter((item) => item.label === 0);
+    const otherLogs = res.data.filter((item) => item.label !== 0);
+
+    const alarmLogsNotExist = alarmLogs.filter(
+      (item) => alarmLogList.value.map((item) => item._id).indexOf(item._id) === -1,
+    );
+    if (alarmLogsNotExist.length > 0) {
+      alarmLogList.value = alarmLogsNotExist.concat(alarmLogList.value).slice(0, limitLog.value);
+      playAlarmSound();
+    }
+    const otherLogsNotExist = otherLogs.filter(
+      (item) => otherLogList.value.map((item) => item._id).indexOf(item._id) === -1,
+    );
+    otherLogList.value = otherLogsNotExist.concat(otherLogList.value).slice(0, limitLog.value);
     lastUpdate.value = new Date();
     reloadGetLog.value = setTimeout(async () => {
       await getLogList();
@@ -110,14 +146,19 @@ const getLogList = async () => {
     console.log('getLogs error', error);
   }
 };
+
+const playAlarmSound = () => {
+  const audio = new Audio('/img/SoundBible.mp3');
+  audio.play();
+};
+
 const LabelLogsType = {
-  Application: 0,
-  Security: 1,
-  System: 2,
-  Setup: 3,
-  'Forwarded Events': 4,
-  Audit: 5,
-  'Security Incident': 6,
+  Alarm: 0, // Log for alarm when values violate thresholds
+  'User Config': 1, // Log for changes in user configuration
+  'Grid Code': 2, // Log for changes in grid codes
+  'Core System': 3, // Logs for core computation system
+  Security: 4, // Consolidated logs for security and audit events
+  General: 5, // Generic logs for miscellaneous purposes
   Custom: 7,
   'PowerSystem Change': 8,
 };
@@ -165,7 +206,7 @@ const changeConfig = async () => {
   intervalTime.value = intervalTimeChange.value * 1000;
   limitLog.value = limitLogChange.value;
   closeMenuConfigLogs();
-  logList.value = [];
+  otherLogList.value = [];
   await getLogList();
   emit('saveLogConfig', {
     intervalTime: intervalTime.value,

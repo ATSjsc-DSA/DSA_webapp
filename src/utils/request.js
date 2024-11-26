@@ -78,10 +78,15 @@ instance.interceptors.response.use(
           return Promise.reject(refreshError);
         }
       } else {
-        localStorage.removeItem('token'); // clear token at localStorage
-        localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
-        router.push('/');
-        return Promise.reject(error);
+        console.error('----------------------------');
+        console.error('jwt expired');
+
+        console.error(response);
+        // localStorage.removeItem('token'); // clear token at localStorage
+        // localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
+        // router.push('/');
+        // return Promise.reject(error);
+        console.error('----------------------------');
       }
     } else {
       return Promise.reject(response);

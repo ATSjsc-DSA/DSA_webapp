@@ -37,7 +37,7 @@ export const useCommonStore = defineStore('common', () => {
   };
 
   const updateMeasInfoActive = (newInfo) => {
-    console.log(newInfo, 'console.log(newInfo);');
+    // console.log(newInfo, 'console.log(newInfo);');
 
     measInfoActive.value = newInfo;
     localStorage.setItem('measInfoActive', JSON.stringify(newInfo));

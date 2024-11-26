@@ -1,5 +1,17 @@
 <template>
   <Dialog v-model:visible="dialogVisible" modal header="Change Measurement Info" :style="{ width: '30rem' }">
+    <template #header>
+      <div class="flex align-items-center justify-content-between gap-2 w-full">
+        <div>Change Measurement Info</div>
+        <Button
+          type="button"
+          :icon="pinMeasInfo ? 'pi pi-eye-slash' : 'pi pi-eye'"
+          severity="secondary"
+          text
+          @click="pinMeasInfo = !pinMeasInfo"
+        />
+      </div>
+    </template>
     <span class="p-text-secondary block mb-5">Select Active Measure</span>
     <div class="flex gap-2 mb-5">
       <div class="flex-auto">
@@ -63,6 +75,7 @@ const prop = defineProps({
   },
 });
 
+const pinMeasInfo = defineModel();
 const dialogVisible = computed({
   get: () => prop.dialogVisible,
   set: (value) => {

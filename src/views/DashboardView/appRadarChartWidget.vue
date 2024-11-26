@@ -20,7 +20,6 @@ const getChartWidth = async () => {
     let w = 0;
     await nextTick(() => {
       w = appRadarChartWrap.value.getBoundingClientRect().width;
-      console.log('getChartWidth', w, appRadarChartWrap.value.getBoundingClientRect().width);
     });
     return w;
   }

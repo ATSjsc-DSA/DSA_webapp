@@ -29,13 +29,6 @@
           @dragover.prevent="dragOverGridStackComponent"
           @drop.prevent="onDropGridStackComponent"
         >
-          <div
-            v-if="gridStackComponentArr.length === 0"
-            class="flex h-full justify-content-center align-items-center"
-            :class="{ 'bg-white font-semibold': canDropGridStackComponent }"
-          >
-            Drag component at right to here !
-          </div>
           <div class="grid-stack" style="margin: -0.7rem">
             <div
               v-for="w in gridStackComponentArr"
@@ -49,6 +42,8 @@
               :gs-id="w.id"
             >
               <div class="grid-stack-item-content">
+                <MeasInfoDialogWidget v-if="w.type === 'measInfo' && w.show" @reloadData="reloadData" />
+
                 <div v-if="w.type === 'map'" class="h-full">
                   <mapView @onRemoveWidget="onRemoveGridStackComponent(w)" />
                 </div>
@@ -89,6 +84,7 @@
               text
               @click="changeMeasInfoActive()"
             />
+
             <div
               v-tooltip.left="'Reload Data'"
               class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
@@ -239,7 +235,11 @@
       </div>
     </div>
   </div>
-  <MeasInfoDialog v-model:dialogVisible="MeasInfoDialogVisible" @reloadData="reloadData"></MeasInfoDialog>
+  <MeasInfoDialog
+    v-model:dialogVisible="MeasInfoDialogVisible"
+    v-model="pinMeasInfo"
+    @reloadData="reloadData"
+  ></MeasInfoDialog>
   <ConfirmDialog />
   <Toast />
 </template>
@@ -256,6 +256,7 @@ import { useToast } from 'primevue/usetoast';
 import mapView from '@/components/mapView.vue';
 import projectTreeWidget from './projectTreeWidget.vue';
 import logListWidget from './logListWidget.vue';
+import MeasInfoDialogWidget from './MeasInfoWidget.vue';
 import { useCommonStore } from '@/store';
 
 import chartComponent from './chartComponent.vue';
@@ -277,7 +278,15 @@ const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
 
 const { measInfo_automatic } = storeToRefs(commonStore);
-
+const pinMeasInfo = ref(false);
+watch(pinMeasInfo, (isPin) => {
+  const measInfoComponent = gridStackComponentArr.value.filter((item) => item.type === 'measInfo');
+  if (measInfoComponent.length > 0) {
+    measInfoComponent[0].show = pinMeasInfo.value;
+  } else if (isPin) {
+    addMeasInfoComponent();
+  }
+});
 onMounted(async () => {
   gridStackComponentGrid.value = GridStack.init({
     float: false,
@@ -301,6 +310,10 @@ onMounted(async () => {
         }
         if (widget.type === 'tree') {
           showTree.value = widget.show;
+        }
+        if (widget.type === 'measInfo') {
+          addMeasInfoComponent(widget);
+          pinMeasInfo.value = widget.show;
         }
         if (widget.type === 'chart') {
           if (widget.typeChart === 'projectRadar') {
@@ -546,6 +559,27 @@ const addMapComponent = async (oldConfig = {}) => {
   await nextTick(() => {
     gridStackComponentGrid.value.makeWidget(mapId);
     gridStackComponentGrid.value.update(document.querySelector(mapId), {
+      resizable: { handles: 'e, se, s, sw, w, nw, n, ne' },
+    });
+  });
+};
+
+const addMeasInfoComponent = async (oldConfig = {}) => {
+  const measinfoId = 'measInfo' + v4();
+  const node = {
+    x: oldConfig.x || 0,
+    y: oldConfig.y | 0,
+    w: oldConfig.w || 6,
+    h: oldConfig.h || 6,
+    id: measinfoId,
+    type: 'measInfo',
+    show: oldConfig.show !== undefined ? oldConfig.show : true,
+  };
+  gridStackComponentArr.value.push(node);
+
+  await nextTick(() => {
+    gridStackComponentGrid.value.makeWidget(measinfoId);
+    gridStackComponentGrid.value.update(document.querySelector(measinfoId), {
       resizable: { handles: 'e, se, s, sw, w, nw, n, ne' },
     });
   });
