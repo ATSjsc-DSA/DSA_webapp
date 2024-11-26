@@ -49,45 +49,46 @@ instance.interceptors.response.use(
       });
     }
     if (response.status === 401) {
-      if (response.data.detail === 'jwt expired') {
-        const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      console.log(" localStorage.getItem('token');", localStorage.getItem('token'));
+      console.log(" localStorage.getItem('refreshToken');", localStorage.getItem('refreshToken'));
 
-        if (!refreshToken) {
-          // check refreshToken, func reload login
-          localStorage.removeItem('token'); // clear token at localStorage
-          localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
-          router.push('/login');
-          return Promise.reject(error);
-        }
-        try {
-          const res = await instance.post('/auth/token', {
-            refresh_token: refreshToken,
-          });
-          // set new token
-          localStorage.setItem('token', res.data.access_token);
-
-          // update on axios.defaults.headers.common
-          instance.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
-
-          const originalRequest = response.config;
-          originalRequest.headers['Authorization'] = `Bearer ${res.data.access_token}`;
-          return instance(originalRequest);
-        } catch (refreshError) {
-          localStorage.removeItem('refreshToken');
-          router.push('/');
-          return Promise.reject(refreshError);
-        }
-      } else {
-        console.error('----------------------------');
-        console.error('jwt expired');
-
-        console.error(response);
-        // localStorage.removeItem('token'); // clear token at localStorage
-        // localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
-        // router.push('/');
-        // return Promise.reject(error);
-        console.error('----------------------------');
+      if (!refreshToken) {
+        // check refreshToken, func reload login
+        localStorage.removeItem('token'); // clear token at localStorage
+        localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
+        router.push('/login');
+        return Promise.reject(error);
       }
+      try {
+        const res = await instance.post('/auth/token', {
+          refresh_token: refreshToken,
+        });
+        // set new token
+        localStorage.setItem('token', res.data.access_token);
+
+        // update on axios.defaults.headers.common
+        instance.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
+
+        const originalRequest = response.config;
+        originalRequest.headers['Authorization'] = `Bearer ${res.data.access_token}`;
+        return instance(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem('refreshToken');
+        router.push('/');
+        return Promise.reject(refreshError);
+      }
+      // } else {
+      //   console.error('----------------------------');
+      //   console.error('jwt expired');
+
+      //   console.error(response);
+      //   // localStorage.removeItem('token'); // clear token at localStorage
+      //   // localStorage.removeItem('refreshToken'); // clear refreshToken at localStorage
+      //   // router.push('/');
+      //   // return Promise.reject(error);
+      //   console.error('----------------------------');
+      // }
     } else {
       return Promise.reject(response);
     }

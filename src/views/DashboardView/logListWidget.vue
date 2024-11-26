@@ -40,48 +40,136 @@
     <template #content>
       <template v-if="alarmLogList.length > 0">
         <ScrollPanel style="width: 100%; height: 30%">
-          <DataView :value="alarmLogList">
-            <template #list="slotProps">
-              <div v-for="(item, index) in slotProps.items" :key="index" class="py-1">
-                <div
-                  class="text-xs pt-1"
-                  :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }"
-                >
-                  <span class="text-semibold">
-                    {{ `[${convertDateTimeToString(item.createdTimestamp)}] ` }}
-                  </span>
-                  <span :style="getLabelSeverityStyle(item.severity)">
-                    {{ getLabelLogsType(item.label) }}
-                  </span>
-                  {{ item.message }}
+          <DataTable v-if="alarmLogList.length > 0" class="logTable" :value="alarmLogList" size="small">
+            <Column field="createdTimestamp" header="Timestamp" style="padding-right: 0.5rem; padding-left: 0">
+              <template #body="{ data }">
+                <div class="text-semibold text-xs">
+                  {{ `${convertDateTimeToString(data.createdTimestamp)}` }}
                 </div>
-              </div>
-            </template>
-          </DataView>
+              </template>
+            </Column>
+            <Column field="userName" header="User" style="padding-right: 0.5rem; padding-left: 0">
+              <template #body="{ data }">
+                <div class="text-semibold text-xs">
+                  <div class="">{{ `[${data.userName}] ` }}</div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="label" header="Type" style="padding-right: 0.5rem; padding-left: 0">
+              <template #body="{ data }">
+                <div class="text-semibold text-xs" :style="getLabelSeverityStyle(data.severity)">
+                  {{ getLabelLogsType(data.label) }}
+                </div>
+              </template>
+            </Column>
+            <Column field="message" header="Message" style="width: 50%; padding-right: 0.5rem; padding-left: 0">
+              <template #body="{ data }">
+                <div class="text-xs">
+                  {{ data.message }}
+                </div>
+              </template>
+            </Column>
+            <Column field="detail" style="padding: 0">
+              <template #body="{ data }">
+                <div v-if="data.detail" class="">
+                  <Button
+                    text
+                    severity="secondary"
+                    icon="pi pi-ellipsis-h"
+                    class="text-xs"
+                    @click="openDetailTable(data)"
+                  />
+                </div>
+              </template>
+            </Column>
+            <template #empty> <div class="text-xs">No data</div> </template>
+          </DataTable>
         </ScrollPanel>
         <Divider />
       </template>
       <ScrollPanel style="width: 100%" :style="{ height: alarmLogList.length > 0 ? '70%' : '100%' }">
-        <DataView v-if="otherLogList.length > 0" :value="otherLogList">
-          <template #list="slotProps">
-            <div v-for="(item, index) in slotProps.items" :key="index" class="py-1">
-              <div class="text-xs pt-1" :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
-                <span class="text-semibold">
-                  {{ `[${convertDateTimeToString(item.createdTimestamp)}] ` }}
-                </span>
-                <span :style="getLabelSeverityStyle(item.severity)">
-                  {{ getLabelLogsType(item.label) }}
-                </span>
-
-                {{ item.message }}
+        <DataTable class="logTable" :value="otherLogList" size="small">
+          <Column field="createdTimestamp" header="Timestamp" style="padding-right: 0.5rem; padding-left: 0">
+            <template #body="{ data }">
+              <div class="font-semibold text-xs">
+                {{ `${convertDateTimeToString(data.createdTimestamp)}` }}
               </div>
-            </div>
-          </template>
-        </DataView>
-        <div v-else>No data</div>
+            </template>
+          </Column>
+          <Column field="userName" header="User" style="padding-right: 0.5rem; padding-left: 0">
+            <template #body="{ data }">
+              <div class="text-xs">
+                <div class="">{{ `[${data.userName}] ` }}</div>
+              </div>
+            </template>
+          </Column>
+
+          <Column field="label" header="Type" style="padding-right: 0.5rem; padding-left: 0">
+            <template #body="{ data }">
+              <div class="font-semibold text-xs" :style="getLabelSeverityStyle(data.severity)">
+                {{ getLabelLogsType(data.label) }}
+              </div>
+            </template>
+          </Column>
+          <Column field="message" header="Message" style="width: 50%; padding-right: 0.5rem; padding-left: 0">
+            <template #body="{ data }">
+              <div class="text-xs">
+                {{ data.message }}
+              </div>
+            </template>
+          </Column>
+          <Column field="detail" style="padding: 0">
+            <template #body="{ data }">
+              <div v-if="data.detail" class="">
+                <Button
+                  text
+                  severity="secondary"
+                  icon="pi pi-ellipsis-h"
+                  class="text-xs"
+                  @click="openDetailTable(data)"
+                />
+              </div>
+            </template>
+          </Column>
+          <template #empty> <div class="text-xs">No data</div> </template>
+        </DataTable>
       </ScrollPanel>
     </template>
   </Card>
+
+  <Dialog v-model:visible="detailTableVisible" modal header=" Measurement Logs Info" :style="{ width: '72rem' }">
+    <DataTable v-if="detailTable._id" show-gridlines :value="detailTable.table" tableStyle="min-width: 50rem">
+      <template #header>
+        <div class="flex flex-wrap align-items-center justify-content-between gap-2 py-3">
+          <span class="font-semibold">
+            <span class="text-semibold">
+              {{ `[${convertDateTimeToString(detailTable.createdTimestamp)}] ` }}
+            </span>
+            <span v-if="detailTable.userName"> {{ `[${detailTable.userName}] ` }} </span>
+            <span :style="getLabelSeverityStyle(detailTable.severity)">
+              {{ getLabelLogsType(detailTable.label) + ': ' }}
+            </span>
+            <span>
+              {{ detailTable.message }}
+            </span>
+          </span>
+        </div>
+      </template>
+      <Column field="Station" header="Station" />
+      <Column field="Generator" header="Generator" />
+      <Column field="Transf3W" header="Transf3W" />
+      <Column field="Transf2W" header="Transf2W" />
+      <Column field="Load" header="Load" />
+      <Column field="Line" header="Line" />
+      <Column field="Breaker" header="Breaker" />
+      <Column field="Shunt" header="Shunt" />
+      <Column field="Series Impedances" header="Series Impedances" />
+    </DataTable>
+    <div class="flex justify-content-end gap-2 mt-3">
+      <Button type="button" label="Close" severity="secondary" @click="detailTableVisible = false"></Button>
+    </div>
+  </Dialog>
 </template>
 
 <script setup>
@@ -138,6 +226,7 @@ const getLogList = async () => {
       (item) => otherLogList.value.map((item) => item._id).indexOf(item._id) === -1,
     );
     otherLogList.value = otherLogsNotExist.concat(otherLogList.value).slice(0, limitLog.value);
+
     lastUpdate.value = new Date();
     reloadGetLog.value = setTimeout(async () => {
       await getLogList();
@@ -160,7 +249,7 @@ const LabelLogsType = {
   Security: 4, // Consolidated logs for security and audit events
   General: 5, // Generic logs for miscellaneous purposes
   Custom: 7,
-  'PowerSystem Change': 8,
+  PowerSystem: 8,
 };
 
 const getLabelLogsType = (typeLabel) => {
@@ -213,4 +302,39 @@ const changeConfig = async () => {
     limitLog: limitLog.value,
   });
 };
+
+const detailTable = ref({});
+const detailTableHeader = [
+  'Station',
+  'Generator',
+  'Transf3W',
+  'Transf2W',
+  'Load',
+  'Line',
+  'Breaker',
+  'Shunt',
+  'Series Impedances',
+];
+const detailTableVisible = ref(false);
+const openDetailTable = (item) => {
+  const tableData = [];
+  for (const stationData of item.detail) {
+    const rowData = {};
+    for (let index = 0; index < detailTableHeader.length; index++) {
+      rowData[detailTableHeader[index]] = stationData[index];
+    }
+    tableData.push(rowData);
+  }
+
+  detailTable.value = { ...item, table: tableData };
+  detailTableVisible.value = true;
+};
 </script>
+<style>
+.logTable .p-column-title {
+  font-size: 0.8rem;
+}
+.logTable td {
+  font-size: 1rem;
+}
+</style>
