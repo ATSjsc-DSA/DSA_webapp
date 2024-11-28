@@ -195,7 +195,6 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const isAuthenticated = localStorage.getItem('token');
   if (to.name !== 'Login' && !isAuthenticated) {
-    ('abc');
     return {
       name: 'Login',
       query: { redirect: to.fullPath },

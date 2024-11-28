@@ -32,109 +32,82 @@
               <Button type="button" :disabled="!limitLogChange" label="Submit" @click="changeConfig"></Button>
             </div>
           </OverlayPanel>
-          <Button icon="pi pi-refresh" text severity="secondary" title="Reload Logs" @click="getLogList" />
+          <Button icon="pi pi-refresh" text severity="secondary" title="Reload Logs" @click="getLogList(false)" />
           <Button icon="pi pi-times" text severity="secondary" title="Close Logs" @click="onRemoveWidget" />
         </div>
       </div>
     </template>
     <template #content>
-      <template v-if="alarmLogList.length > 0">
-        <ScrollPanel style="width: 100%; height: 30%">
-          <DataTable v-if="alarmLogList.length > 0" class="logTable" :value="alarmLogList" size="small">
-            <Column field="createdTimestamp" header="Timestamp" style="padding-right: 0.5rem; padding-left: 0">
-              <template #body="{ data }">
-                <div class="text-semibold text-xs">
-                  {{ `${convertDateTimeToString(data.createdTimestamp)}` }}
-                </div>
-              </template>
-            </Column>
-            <Column field="userName" header="User" style="padding-right: 0.5rem; padding-left: 0">
-              <template #body="{ data }">
-                <div class="text-semibold text-xs">
-                  <div class="">{{ `[${data.userName}] ` }}</div>
-                </div>
-              </template>
-            </Column>
-
-            <Column field="label" header="Type" style="padding-right: 0.5rem; padding-left: 0">
-              <template #body="{ data }">
-                <div class="text-semibold text-xs" :style="getLabelSeverityStyle(data.severity)">
-                  {{ getLabelLogsType(data.label) }}
-                </div>
-              </template>
-            </Column>
-            <Column field="message" header="Message" style="width: 50%; padding-right: 0.5rem; padding-left: 0">
-              <template #body="{ data }">
-                <div class="text-xs">
-                  {{ data.message }}
-                </div>
-              </template>
-            </Column>
-            <Column field="detail" style="padding: 0">
-              <template #body="{ data }">
-                <div v-if="data.detail" class="">
-                  <Button
-                    text
-                    severity="secondary"
-                    icon="pi pi-ellipsis-h"
-                    class="text-xs"
-                    @click="openDetailTable(data)"
-                  />
-                </div>
-              </template>
-            </Column>
-            <template #empty> <div class="text-xs">No data</div> </template>
-          </DataTable>
-        </ScrollPanel>
-        <Divider />
+      <template v-if="alarmLog._id">
+        <Fieldset legend="Alarm" class="mb-3">
+          <template #legend>
+            <div class="flex align-items-center pl-2">
+              Alarm
+              <span v-if="isShowAlarmDot" id="dashbordAlarmBadge" v-badge.danger></span>
+            </div>
+          </template>
+          <span class="text-semibold">
+            {{ `[${convertDateTimeToString(alarmLog.createdTimestamp)}] ` }}
+          </span>
+          <span :style="getLabelSeverityStyle(alarmLog.severity)">
+            {{ getLabelLogsType(alarmLog.label) + ': ' }}
+          </span>
+          <span>
+            {{ alarmLog.message }}
+          </span>
+        </Fieldset>
       </template>
-      <ScrollPanel style="width: 100%" :style="{ height: alarmLogList.length > 0 ? '70%' : '100%' }">
-        <DataTable class="logTable" :value="otherLogList" size="small">
-          <Column field="createdTimestamp" header="Timestamp" style="padding-right: 0.5rem; padding-left: 0">
-            <template #body="{ data }">
-              <div class="font-semibold text-xs">
-                {{ `${convertDateTimeToString(data.createdTimestamp)}` }}
-              </div>
-            </template>
-          </Column>
-          <Column field="userName" header="User" style="padding-right: 0.5rem; padding-left: 0">
-            <template #body="{ data }">
-              <div class="text-xs">
-                <div class="">{{ `[${data.userName}] ` }}</div>
-              </div>
-            </template>
-          </Column>
+      <DataTable
+        class="logTable"
+        :value="otherLogList"
+        size="small"
+        scrollable
+        :scroll-height="alarmLog._id ? '44rem' : '51rem'"
+      >
+        <Column field="createdTimestamp" header="Timestamp" style="padding-right: 0.5rem; padding-left: 0">
+          <template #body="{ data }">
+            <div class="font-semibold text-xs">
+              {{ `${convertDateTimeToString(data.createdTimestamp)}` }}
+            </div>
+          </template>
+        </Column>
+        <Column field="userName" header="User" style="padding-right: 0.5rem; padding-left: 0">
+          <template #body="{ data }">
+            <div class="text-xs">
+              <div class="">{{ `[${data.userName}] ` }}</div>
+            </div>
+          </template>
+        </Column>
 
-          <Column field="label" header="Type" style="padding-right: 0.5rem; padding-left: 0">
-            <template #body="{ data }">
-              <div class="font-semibold text-xs" :style="getLabelSeverityStyle(data.severity)">
-                {{ getLabelLogsType(data.label) }}
-              </div>
-            </template>
-          </Column>
-          <Column field="message" header="Message" style="width: 50%; padding-right: 0.5rem; padding-left: 0">
-            <template #body="{ data }">
-              <div class="text-xs">
-                {{ data.message }}
-              </div>
-            </template>
-          </Column>
-          <Column field="detail" style="padding: 0">
-            <template #body="{ data }">
-              <div v-if="data.detail" class="">
-                <Button
-                  text
-                  severity="secondary"
-                  icon="pi pi-ellipsis-h"
-                  class="text-xs"
-                  @click="openDetailTable(data)"
-                />
-              </div>
-            </template>
-          </Column>
-          <template #empty> <div class="text-xs">No data</div> </template>
-        </DataTable>
-      </ScrollPanel>
+        <Column field="label" header="Type" style="padding-right: 0.5rem; padding-left: 0">
+          <template #body="{ data }">
+            <div class="font-semibold text-xs" :style="getLabelSeverityStyle(data.severity)">
+              {{ getLabelLogsType(data.label) }}
+            </div>
+          </template>
+        </Column>
+        <Column field="message" header="Message" style="width: 50%; padding-right: 0.5rem; padding-left: 0">
+          <template #body="{ data }">
+            <div class="text-xs">
+              {{ data.message }}
+            </div>
+          </template>
+        </Column>
+        <Column field="detail" style="padding: 0">
+          <template #body="{ data }">
+            <div v-if="data.detail" class="">
+              <Button
+                text
+                severity="secondary"
+                icon="pi pi-ellipsis-h"
+                class="text-xs"
+                @click="openDetailTable(data)"
+              />
+            </div>
+          </template>
+        </Column>
+        <template #empty> <div class="text-xs">No data</div> </template>
+      </DataTable>
     </template>
   </Card>
 
@@ -175,6 +148,10 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
 import { CommonApi } from './api';
+import Badge from 'primevue/badge';
+
+import Fieldset from 'primevue/fieldset';
+
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 onMounted(async () => {
@@ -204,23 +181,55 @@ const onRemoveWidget = () => {
 };
 const lastUpdate = ref(new Date());
 const otherLogList = ref([]);
-const alarmLogList = ref([]);
+const alarmLog = ref({});
 
 const intervalTime = ref(props.intervalTime);
 const limitLog = ref(props.limitLog);
 const reloadGetLog = ref();
-const getLogList = async () => {
+const isShowAlarmDot = ref(false);
+const getLogList = async (isAutoReload = true) => {
   try {
     const res = await CommonApi.getLogs();
+
+    // this is for test
+
+    if (res.data.length === 0) {
+      alarmLog.value = {
+        _id: 'xxx',
+        message: 'this is a test message',
+        createdTimestamp: new Date() / 1000,
+        severity: 1,
+        label: 2,
+      };
+
+      playAlarmSound();
+      isShowAlarmDot.value = true;
+      setTimeout(() => {
+        isShowAlarmDot.value = false;
+      }, 3000);
+
+      const fakeLog = [];
+      for (let index = 0; index < 100; index++) {
+        fakeLog.push({
+          _id: 'xxx',
+          message: 'this is a test message ' + index + 'abc xyzabc xyzabc xyzabc xyzabc xyzabc xyz',
+          createdTimestamp: new Date() / 1000,
+          severity: index % 4,
+          label: index % 8,
+        });
+      }
+      otherLogList.value = fakeLog;
+    }
+    // end test
+
     const alarmLogs = res.data.filter((item) => item.label === 0);
     const otherLogs = res.data.filter((item) => item.label !== 0);
 
-    const alarmLogsNotExist = alarmLogs.filter(
-      (item) => alarmLogList.value.map((item) => item._id).indexOf(item._id) === -1,
-    );
-    if (alarmLogsNotExist.length > 0) {
-      alarmLogList.value = alarmLogsNotExist.concat(alarmLogList.value).slice(0, limitLog.value);
+    if (alarmLogs.length > 0) {
+      alarmLog.value = alarmLogs[0];
       playAlarmSound();
+      isShowAlarmDot.value = true;
+      setTimeout(() => (isShowAlarmDot.value = false), 1000);
     }
     const otherLogsNotExist = otherLogs.filter(
       (item) => otherLogList.value.map((item) => item._id).indexOf(item._id) === -1,
@@ -228,9 +237,11 @@ const getLogList = async () => {
     otherLogList.value = otherLogsNotExist.concat(otherLogList.value).slice(0, limitLog.value);
 
     lastUpdate.value = new Date();
-    reloadGetLog.value = setTimeout(async () => {
-      await getLogList();
-    }, intervalTime.value);
+    if (isAutoReload) {
+      reloadGetLog.value = setTimeout(async () => {
+        await getLogList();
+      }, intervalTime.value);
+    }
   } catch (error) {
     console.log('getLogs error', error);
   }
@@ -296,7 +307,7 @@ const changeConfig = async () => {
   limitLog.value = limitLogChange.value;
   closeMenuConfigLogs();
   otherLogList.value = [];
-  await getLogList();
+  await getLogList(false);
   emit('saveLogConfig', {
     intervalTime: intervalTime.value,
     limitLog: limitLog.value,
@@ -336,5 +347,9 @@ const openDetailTable = (item) => {
 }
 .logTable td {
   font-size: 1rem;
+}
+
+#dashbordAlarmBadge .p-badge-dot {
+  padding: 0 0 0.5rem 0;
 }
 </style>
