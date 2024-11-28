@@ -8,6 +8,7 @@
             v-bind:application-draggable="applicationDraggable"
             v-bind:vsa-curve-draggable="vsaCurveDraggable"
             v-bind:tsa-curve-draggable="tsaCurveDraggable"
+            v-bind:ssr-curve-draggable="ssrCurveDraggable"
             @onStartDragNode="onStartDragNode"
             @onRemoveWidget="showTree = false"
           />
@@ -240,6 +241,17 @@
               <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
               <div style="font-size: 0.7rem">TSA</div>
             </div>
+
+            <div
+              v-tooltip.left="'SSR Line'"
+              class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+              draggable="true"
+              placeholder="Left"
+              @dragstart="handleDragStart('ssr')"
+            >
+              <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
+              <div style="font-size: 0.7rem">SSR</div>
+            </div>
           </div>
         </div>
       </div>
@@ -350,6 +362,10 @@ onMounted(async () => {
           if (widget.typeChart === 'tsa') {
             tsaCurveDraggable.value = true;
             addNewChartComponent('tsa', true, widget);
+          }
+          if (widget.typeChart === 'ssr') {
+            ssrCurveDraggable.value = true;
+            addNewChartComponent('ssr', true, widget);
           }
         }
       });
@@ -493,6 +509,7 @@ const componentSelected = ref();
 const applicationDraggable = ref(false);
 const vsaCurveDraggable = ref(false);
 const tsaCurveDraggable = ref(false);
+const ssrCurveDraggable = ref(false);
 
 // -- add
 const handleDragStart = (componentType) => {
@@ -527,7 +544,10 @@ const onDropGridStackComponent = () => {
     tsaCurveDraggable.value = true;
     addNewChartComponent(componentSelected.value, true);
   }
-
+  if (componentSelected.value === 'ssr') {
+    ssrCurveDraggable.value = true;
+    addNewChartComponent(componentSelected.value, true);
+  }
   if (componentSelected.value === 'map') {
     addMapComponent();
   }

@@ -89,7 +89,7 @@
         <appBarTimeSerieschartWidget v-if="typeChart === 'appTimeSeries'" :data="chartData" />
 
         <vsaCurveLinechartWidget v-if="typeChart === 'vsa'" :data="chartData" />
-        <tsaCurveLinechartWidget v-if="typeChart === 'tsa'" :data="chartData" />
+        <ssrCaseLinechartWidget v-if="typeChart === 'ssr'" :data="chartData" />
 
         <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
         <projectRadarChartWidget v-if="typeChart === 'projectRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
@@ -105,10 +105,10 @@ import Calendar from 'primevue/calendar';
 import appBarchartWidget from './appBarchartWidget.vue';
 import appBarTimeSerieschartWidget from './appBarTimeSerieschartWidget.vue';
 import vsaCurveLinechartWidget from './vsaCurveLinechartWidget.vue';
-import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
+import ssrCaseLinechartWidget from './ssrCaseLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import projectRadarChartWidget from './projectRadarChartWidget.vue';
-import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
+import { VsaApi, SsrApi, ApplicationApi, CommonApi } from './api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
@@ -137,8 +137,6 @@ const props = defineProps({
 
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
-const stopReloadChartData = defineModel('stopReloadChartData');
-const autoreloadChartData = ref(!stopReloadChartData.value);
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
@@ -164,11 +162,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearTimeout(interval.value);
-  autoreloadChartData.value = false;
 });
-watch(stopReloadChartData, (newStt) => {
-  autoreloadChartData.value = !newStt;
-  getChartData();
+watch(measInfo_automatic, async (isActive) => {
+  if (!isActive) {
+    clearTimeout(interval.value);
+  }
 });
 
 const onRemoveWidget = () => {
@@ -221,8 +219,8 @@ const typeChartCanDrop = computed(() => {
   if (props.typeChart === 'vsa') {
     return 'VsaCurve';
   }
-  if (props.typeChart === 'tsa') {
-    return 'TsaCurve';
+  if (props.typeChart === 'ssr') {
+    return 'SsrCase';
   }
   return '';
 });
@@ -245,8 +243,8 @@ const setInitTitle = () => {
   if (props.typeChart === 'vsa') {
     chartTitle.value = 'Vsa';
   }
-  if (props.typeChart === 'tsa') {
-    chartTitle.value = 'Tsa';
+  if (props.typeChart === 'ssr') {
+    chartTitle.value = 'SSR';
   }
 };
 //  Drop Application - bar
@@ -277,12 +275,9 @@ const onDropComponent = async () => {
           moduleInfoId: props.nodeDrag.moduleInfoId,
         });
       }
-      if (props.typeChart === 'tsa') {
+      if (props.typeChart === 'ssr') {
         nodeSelectedInChart.value.push({
-          curveInfoId: props.nodeDrag._id,
-          curveType: props.nodeDrag.curveType,
-          subCaseInfoId: props.nodeDrag.subCaseInfo,
-          caseInfoId: props.nodeDrag.caseInfoId,
+          caseInfoId: props.nodeDrag._id,
           moduleInfoId: props.nodeDrag.moduleInfoId,
         });
       }
@@ -348,8 +343,8 @@ const getChartData = async () => {
     if (props.typeChart === 'vsa') {
       res = await VsaApi.getChartData(nodeSelectedInChart.value);
     }
-    if (props.typeChart === 'tsa') {
-      res = await TsaApi.getChartData(nodeSelectedInChart.value);
+    if (props.typeChart === 'ssr') {
+      res = await SsrApi.getChartData(nodeSelectedInChart.value);
     }
     if (res.data) {
       chartData.value = res.data;
@@ -361,7 +356,7 @@ const getChartData = async () => {
       modificationTime.value = undefined;
     }
 
-    if (measInfo_automatic.value && autoreloadChartData.value) {
+    if (measInfo_automatic.value) {
       interval.value = setTimeout(async () => {
         await getChartData();
       }, intervalTime);

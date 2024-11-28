@@ -10,8 +10,6 @@ import { watch } from 'vue';
 import Chart from 'primevue/chart';
 import { colorArray } from './chartConfig';
 import chartComposable from '@/combosables/chartData';
-import { useLayout } from '@/layout/composables/layout';
-const { isDarkTheme } = useLayout();
 
 const { zoomOptions } = chartComposable();
 
@@ -25,7 +23,6 @@ const props = defineProps({
     default: () => {},
   },
 });
-const hiddenDatasets = defineModel('hiddenDatasets');
 
 onMounted(async () => {
   chartData.value = setChartData();
@@ -46,14 +43,7 @@ watch(
     chartOptions.value = await setChartOptions();
   },
 );
-watch(
-  isDarkTheme,
-  async () => {
-    chartData.value = setChartData();
-    chartOptions.value = await setChartOptions();
-  },
-  { immediate: false },
-);
+
 const chartData = ref();
 const chartOptions = ref();
 
@@ -125,7 +115,6 @@ const setChartData = () => {
         borderColor: documentStyle.getPropertyValue(colorArray[colorIndex]),
         tension: 0.4,
         pointRadius: 1,
-        hidden: hiddenDatasets.value.includes(colorIndex),
       });
       colorIndex++;
     }
@@ -157,19 +146,6 @@ const setChartOptions = async () => {
             size: isSmallChart ? 8 : 12,
           },
           padding: 12,
-        },
-        onClick: function (event, legendItem, legend) {
-          const index = legendItem.datasetIndex;
-          const ci = legend.chart;
-          if (ci.isDatasetVisible(index)) {
-            ci.hide(index);
-            legendItem.hidden = true;
-            hiddenDatasets.value.push(index);
-          } else {
-            ci.show(index);
-            legendItem.hidden = false;
-            hiddenDatasets.value.filter((item) => item !== index);
-          }
         },
       },
       zoom: {
@@ -323,7 +299,7 @@ const getOtherdAnnotation = async () => {
       const stabilityLineColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '900');
       colorIndex++;
       if (props.config.other.indexOf(curveName) !== -1) {
-        otherAnnotations[curveName + '_line_max_1'] = {
+        otherAnnotations[curveName + '_line_max_1' + caseIndex] = {
           type: 'line',
           yMin: caseData.other[curveName][0],
           yMax: caseData.other[curveName][0],
@@ -331,7 +307,7 @@ const getOtherdAnnotation = async () => {
           borderWidth: isSmallChart ? 1 : 2,
           borderDash: [5, 2], // Length and spacing of dashes
         };
-        otherAnnotations[curveName + '_line_max_2'] = {
+        otherAnnotations[curveName + '_line_max_2' + caseIndex] = {
           type: 'line',
           yMin: caseData.other[curveName][1],
           yMax: caseData.other[curveName][1],
@@ -339,7 +315,7 @@ const getOtherdAnnotation = async () => {
           borderWidth: isSmallChart ? 1 : 2,
           borderDash: [5, 2], // Length and spacing of dashes
         };
-        otherAnnotations[curveName + '_line_min'] = {
+        otherAnnotations[curveName + '_line_min' + caseIndex] = {
           type: 'line',
           yMin: caseData.other[curveName][2],
           yMax: caseData.other[curveName][2],
@@ -347,7 +323,7 @@ const getOtherdAnnotation = async () => {
           borderWidth: isSmallChart ? 1 : 2,
           borderDash: [5, 2], // Length and spacing of dashes
         };
-        otherAnnotations[curveName + '_time_stability'] = {
+        otherAnnotations[curveName + '_time_stability' + caseIndex] = {
           type: 'line',
           xMin: caseData.other[curveName][3],
           xMax: caseData.other[curveName][3],

@@ -98,3 +98,24 @@ export class TsaApi {
     return post(`hmi/${measInfoActive.value._id}/chart/tsa/curve`, { payload: curveNameList });
   }
 }
+
+export class SsrApi {
+  /*
+    ssr Tree
+    app
+    --> DSA module
+        --> SSA
+              --> Curse
+    vẽ chart của 1 list Curse
+   */
+  static async getSsrList(dsaId) {
+    return get(`/hmi/${measInfoActive.value._id}/child/ssr/module/${dsaId}`);
+  }
+
+  static async getCaseList(ssr_info_id) {
+    return get(`hmi/${measInfoActive.value._id}/child/ssr/case/${ssr_info_id}`);
+  }
+  static async getChartData(caseDataList = []) {
+    return post(`hmi/${measInfoActive.value._id}/chart/ssr/case`, { payload: caseDataList });
+  }
+}

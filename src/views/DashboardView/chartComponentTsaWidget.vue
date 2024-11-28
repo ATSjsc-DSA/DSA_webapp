@@ -63,7 +63,7 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        <tsaCurveLinechartWidget v-model:hiddenDatasets="hiddenDatasets" :data="chartData" :config="config" />
+        <tsaCurveLinechartWidget :data="chartData" :config="config" />
       </div>
     </template>
   </Card>
@@ -110,6 +110,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearTimeout(interval.value);
+});
+
+watch(measInfo_automatic, async (isActive) => {
+  if (!isActive) {
+    clearTimeout(interval.value);
+  }
 });
 
 const onRemoveWidget = () => {

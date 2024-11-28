@@ -74,6 +74,15 @@
             </div>
           </template>
 
+          <template #SSR="slotProps">
+            <div class="w-full flex align-items-center justify-content-start gap-3">
+              <Tag value="SSR" severity="secondary" rounded />
+              <div :class="{ textUnActive: !slotProps.node.active }">
+                {{ slotProps.node.label }}
+              </div>
+            </div>
+          </template>
+
           <template #VsaCase="slotProps">
             <div
               class="w-full flex align-items-center justify-content-start"
@@ -137,6 +146,18 @@
               <div>{{ slotProps.node.label }}</div>
             </div>
           </template>
+
+          <template #SsrCase="slotProps">
+            <div
+              :id="slotProps.node.key"
+              :draggable="ssrCurveDraggable"
+              class="w-full flex align-items-center justify-content-start"
+              :class="{ 'cursor-grap': ssrCurveDraggable }"
+              @dragstart="onStartDragNode($event, slotProps.node)"
+            >
+              <div>{{ slotProps.node.label }}</div>
+            </div>
+          </template>
         </Tree>
         <div v-else>No data</div>
       </ScrollPanel>
@@ -155,7 +176,7 @@ const toast = useToast();
 import { useLayout } from '@/layout/composables/layout';
 
 const { isDarkTheme } = useLayout();
-import { VsaApi, TsaApi, CommonApi } from './api';
+import { VsaApi, TsaApi, SsrApi, CommonApi } from './api';
 import { DSA_api } from '../DSASettingView/api';
 const props = defineProps({
   applicationDraggable: {
@@ -167,6 +188,10 @@ const props = defineProps({
     default: false,
   },
   tsaCurveDraggable: {
+    type: Boolean,
+    default: false,
+  },
+  ssrCurveDraggable: {
     type: Boolean,
     default: false,
   },
@@ -215,7 +240,10 @@ const onNodeExpand = async (node) => {
     if (node.type === 'DSA') {
       const vsaBranch = await getVsaBranchData(node);
       const tsaBranch = await getTsaBranchData(node);
-      const branch = vsaBranch.concat(tsaBranch);
+      const ssrBranch = await getSsrBranchData(node);
+
+      const branch = vsaBranch.concat(tsaBranch, ssrBranch);
+
       if (branch.length === 0) {
         node.leaf = true;
       } else {
@@ -237,6 +265,11 @@ const onNodeExpand = async (node) => {
     if (node.type === 'TsaSubCase') {
       node['children'] = await getTsaCurveBranchData(node);
     }
+
+    if (node.type === 'SSR') {
+      node['children'] = await getSsrCaseBranchData(node);
+    }
+
     node.loading = false;
   }
 };
@@ -545,14 +578,72 @@ const getTsaCurveList = async (subCase_id) => {
   }
 };
 
-// -- drag drop ---
-// const nodeDrag = ref({});
-// const onStartDragNode = (evt, node) => {
-//   evt.dataTransfer.dropEffect = 'move';
-//   evt.dataTransfer.effectAllowed = 'move';
-//   evt.dataTransfer.setData('itemDrag', node.label);
-//   nodeDrag.value = node;
-// };
+// --- Ssr
+
+const getSsrBranchData = async (dsaModuleNode) => {
+  const branch = [];
+  const dataList = await getSsrList(dsaModuleNode._id);
+  if (dataList.length === 0) {
+    dsaModuleNode.leaf = true;
+  } else {
+    for (let index = 0; index < dataList.length; index++) {
+      const leafData = dataList[index];
+      branch.push({
+        key: dsaModuleNode.key + '_' + 'ssr_' + index,
+        label: leafData.name,
+        _id: leafData._id,
+        type: 'SSR',
+        active: leafData.active,
+        leaf: false,
+      });
+    }
+  }
+  return branch;
+};
+
+const getSsrList = async (dsaId) => {
+  try {
+    const res = await SsrApi.getSsrList(dsaId);
+    return res.data;
+  } catch (error) {
+    console.log('getAppList: error ', error);
+    return [];
+  }
+};
+
+const getSsrCaseBranchData = async (ssrNode) => {
+  const branch = [];
+  const dataList = await getSsrCaseList(ssrNode._id);
+  if (dataList.length === 0) {
+    ssrNode.leaf = true;
+  } else {
+    for (let index = 0; index < dataList.length; index++) {
+      const leafData = dataList[index];
+      branch.push({
+        key: ssrNode.key + '_' + index,
+        label: leafData.name,
+        _id: leafData._id,
+        type: 'SsrCase',
+        active: leafData.active,
+        leaf: true,
+        moduleInfoId: ssrNode._id,
+      });
+    }
+  }
+  return branch;
+};
+
+const getSsrCaseList = async (case_id) => {
+  try {
+    const res = await SsrApi.getCaseList(case_id);
+    return res.data;
+  } catch (error) {
+    console.log('getAppList: error ', error);
+    return [];
+  }
+};
+
+// ----- for style
 
 // vsa caseType
 const getVsaCaseTypeValue = (caseType) => {
