@@ -1,0 +1,239 @@
+<template>
+  <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropNode }">
+    <template #title>
+      <div class="flex justify-content-between align-items-center">
+        <div class="flex flex-column justify-content-start align-items-start">
+          <div><i class="pi pi-folder-open pr-3"></i>TSA</div>
+          <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
+        </div>
+        <div class="flex justify-content-between align-items-center">
+          <div>
+            <Button
+              type="button"
+              icon="pi pi-ellipsis-v"
+              aria-haspopup="true"
+              aria-controls="menuTsaConfigOverlay"
+              text
+              @click="toggleMenuTsaConfig"
+            />
+            <OverlayPanel id="menuTsaConfigOverlay" ref="menuTsaConfig" style="width: 42rem">
+              <div class="font-semibold text-lg mb-2">TSA: Configuration</div>
+              <Divider />
+
+              <div class="flex flex-column align-items-start gap-1 p-3">
+                <label for="Standard" class="font-semibold text-base mb-1"> Standard Point </label>
+                <MultiSelect
+                  v-model="standardSelected"
+                  :options="standardCurveName"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                  display="chip"
+                  class="w-full"
+                />
+              </div>
+
+              <div class="flex flex-column align-items-start gap-1 p-3">
+                <label for="Standard" class="font-semibold text-base mb-1"> Range Line </label>
+                <MultiSelect
+                  v-model="otherSelected"
+                  :options="otherCurveName"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                  display="chip"
+                  class="w-full"
+                />
+              </div>
+              <div class="flex justify-content-end my-3">
+                <Button label="Submit" @click="changeConfig" />
+              </div>
+            </OverlayPanel>
+          </div>
+          <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
+          <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="getChartData" />
+          <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
+        </div>
+      </div>
+    </template>
+    <template #content>
+      <div
+        :id="`${chartId}ChartWrap`"
+        class="w-full h-full"
+        @dragleave.prevent="canDropNode = false"
+        @dragenter.prevent
+        @dragover.prevent="onDragoverComponent"
+        @drop.prevent="onDropComponent"
+      >
+        <tsaCurveLinechartWidget v-model:hiddenDatasets="hiddenDatasets" :data="chartData" :config="config" />
+      </div>
+    </template>
+  </Card>
+</template>
+
+<script setup>
+import { computed, onUnmounted, onMounted, watch } from 'vue';
+import MultiSelect from 'primevue/multiselect';
+
+import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
+import { TsaApi } from './api';
+import chartComposable from '@/combosables/chartData';
+const { convertDateTimeToString } = chartComposable();
+import { useCommonStore } from '@/store';
+const commonStore = useCommonStore();
+const { measInfo_automatic } = storeToRefs(commonStore);
+
+const props = defineProps({
+  nodeDrag: {
+    type: Object,
+    required: true,
+  },
+
+  chartId: {
+    type: String,
+    default: 'chartId',
+  },
+});
+
+const emit = defineEmits(['onRemoveWidget']);
+
+const nodeSelected = defineModel('nodeSelected');
+const interval = ref(null);
+const intervalTime = 5 * 1000;
+onMounted(() => {
+  if (nodeSelected.value) {
+    nodeSelectedInChart.value = nodeSelected.value.data;
+    config.value = nodeSelected.value.config;
+    standardSelected.value = config.value.standard;
+    otherSelected.value = config.value.other;
+    getChartData();
+  }
+});
+
+onUnmounted(() => {
+  clearTimeout(interval.value);
+});
+
+const onRemoveWidget = () => {
+  resetChart();
+  emit('onRemoveWidget');
+};
+
+const typeChartCanDrop = ref('TsaCurve');
+const hiddenDatasets = ref([]);
+const nodeSelectedInChart = ref([]);
+const nodeKeySelected = ref([]);
+const canDropNode = ref(false);
+
+const onDragoverComponent = () => {
+  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
+    canDropNode.value = true;
+  } else {
+    canDropNode.value = false;
+  }
+};
+const onDropComponent = async () => {
+  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
+    nodeKeySelected.value.push(props.nodeDrag.key);
+    nodeSelectedInChart.value.push({
+      curveInfoId: props.nodeDrag._id,
+      curveType: props.nodeDrag.curveType,
+      subCaseInfoId: props.nodeDrag.subCaseInfo,
+      caseInfoId: props.nodeDrag.caseInfoId,
+      moduleInfoId: props.nodeDrag.moduleInfoId,
+    });
+
+    nodeSelected.value = {
+      data: nodeSelectedInChart.value,
+      config: config.value,
+    };
+    await getChartData();
+    canDropNode.value = false;
+  }
+};
+
+const chartData = ref([]);
+const modificationTime = ref();
+
+const getChartData = async () => {
+  try {
+    const res = await TsaApi.getChartData(nodeSelectedInChart.value);
+    if (res.data) {
+      chartData.value = res.data;
+      modificationTime.value = res.data.modificationTime
+        ? convertDateTimeToString(res.data.modificationTime)
+        : undefined;
+      getStandardCurveName(res.data);
+      getOtherCurveName(res.data);
+    } else {
+      chartData.value = [];
+      modificationTime.value = undefined;
+    }
+
+    if (measInfo_automatic.value) {
+      interval.value = setTimeout(async () => {
+        await getChartData();
+      }, intervalTime);
+    }
+  } catch (error) {
+    console.log('get chart data: error ', props.typeChart, error);
+    chartData.value = [];
+    modificationTime.value = undefined;
+  }
+};
+
+const menuTsaConfig = ref();
+const toggleMenuTsaConfig = (event) => {
+  menuTsaConfig.value.toggle(event);
+};
+
+const standardSelected = ref([]);
+const standardCurveName = ref([]);
+const getStandardCurveName = (data) => {
+  const names = [];
+  for (let caseIndex = 0; caseIndex < data.length; caseIndex++) {
+    const caseData = data[caseIndex];
+    names.push({ label: caseData.caseName, items: Object.keys(caseData.standard) });
+  }
+  standardCurveName.value = names;
+};
+const otherSelected = ref([]);
+const otherCurveName = ref([]);
+const getOtherCurveName = (data) => {
+  const names = [];
+  for (let caseIndex = 0; caseIndex < data.length; caseIndex++) {
+    const caseData = data[caseIndex];
+    names.push({ label: caseData.caseName, items: Object.keys(caseData.other) });
+  }
+  otherCurveName.value = names;
+};
+
+const resetChart = async () => {
+  clearTimeout(interval.value);
+  chartData.value = [];
+  nodeSelected.value = [];
+  nodeSelectedInChart.value = [];
+  config.value = { standard: [], other: [] };
+  standardCurveName.value = [];
+  standardSelected.value = [];
+  otherCurveName.value = [];
+  otherSelected.value = [];
+  hiddenDatasets.value = [];
+};
+const config = ref({ standard: [], other: [] });
+const changeConfig = () => {
+  config.value = {
+    standard: standardSelected.value,
+    other: otherSelected.value,
+  };
+  nodeSelected.value.config = config.value;
+  menuTsaConfig.value.hide();
+};
+</script>
+
+<style>
+.p-card-body {
+  height: 100% !important;
+}
+.p-card-content {
+  height: 90% !important;
+}
+</style>

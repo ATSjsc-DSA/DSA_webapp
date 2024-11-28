@@ -47,16 +47,26 @@
                 <div v-if="w.type === 'map'" class="h-full">
                   <mapView @onRemoveWidget="onRemoveGridStackComponent(w)" />
                 </div>
-                <chartComponent
-                  v-if="w.type === 'chart'"
-                  v-model:nodeSelected="w.nodeSelected"
-                  v-model:stopReloadChartData="stopReloadChartData"
-                  :nodeDrag="nodeDrag"
-                  :chartId="w.id"
-                  :typeChart="w.typeChart"
-                  :muiltiSelect="w.muiltiSelect"
-                  @onRemoveWidget="onRemoveGridStackComponent(w)"
-                />
+
+                <template v-if="w.type === 'chart'">
+                  <chartComponentTsaWidget
+                    v-if="w.typeChart === 'tsa'"
+                    v-model:nodeSelected="w.nodeSelected"
+                    :nodeDrag="nodeDrag"
+                    :chartId="w.id"
+                    @onRemoveWidget="onRemoveGridStackComponent(w)"
+                  />
+                  <chartComponent
+                    v-else
+                    v-model:nodeSelected="w.nodeSelected"
+                    v-model:stopReloadChartData="stopReloadChartData"
+                    :nodeDrag="nodeDrag"
+                    :chartId="w.id"
+                    :typeChart="w.typeChart"
+                    :muiltiSelect="w.muiltiSelect"
+                    @onRemoveWidget="onRemoveGridStackComponent(w)"
+                  />
+                </template>
               </div>
             </div>
           </div>
@@ -257,9 +267,11 @@ import mapView from '@/components/mapView.vue';
 import projectTreeWidget from './projectTreeWidget.vue';
 import logListWidget from './logListWidget.vue';
 import MeasInfoDialogWidget from './MeasInfoWidget.vue';
+import chartComponent from './chartComponent.vue';
+import chartComponentTsaWidget from './chartComponentTsaWidget.vue';
+
 import { useCommonStore } from '@/store';
 
-import chartComponent from './chartComponent.vue';
 import { GridStack } from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
 import MeasInfoDialog from './MeasInfoDialog.vue';

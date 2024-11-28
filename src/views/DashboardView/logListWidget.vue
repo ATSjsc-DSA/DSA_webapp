@@ -148,7 +148,6 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
 import { CommonApi } from './api';
-import Badge from 'primevue/badge';
 
 import Fieldset from 'primevue/fieldset';
 
@@ -190,37 +189,6 @@ const isShowAlarmDot = ref(false);
 const getLogList = async (isAutoReload = true) => {
   try {
     const res = await CommonApi.getLogs();
-
-    // this is for test
-
-    if (res.data.length === 0) {
-      alarmLog.value = {
-        _id: 'xxx',
-        message: 'this is a test message',
-        createdTimestamp: new Date() / 1000,
-        severity: 1,
-        label: 2,
-      };
-
-      playAlarmSound();
-      isShowAlarmDot.value = true;
-      setTimeout(() => {
-        isShowAlarmDot.value = false;
-      }, 3000);
-
-      const fakeLog = [];
-      for (let index = 0; index < 100; index++) {
-        fakeLog.push({
-          _id: 'xxx',
-          message: 'this is a test message ' + index + 'abc xyzabc xyzabc xyzabc xyzabc xyzabc xyz',
-          createdTimestamp: new Date() / 1000,
-          severity: index % 4,
-          label: index % 8,
-        });
-      }
-      otherLogList.value = fakeLog;
-    }
-    // end test
 
     const alarmLogs = res.data.filter((item) => item.label === 0);
     const otherLogs = res.data.filter((item) => item.label !== 0);

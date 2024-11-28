@@ -43,10 +43,10 @@ export const useCommonStore = defineStore('common', () => {
     localStorage.setItem('measInfoActive', JSON.stringify(newInfo));
   };
 
-  const updateMeasInfoAutomatic = (newId) => {
-    if (measInfo_automatic.value != newId) {
-      measInfo_automatic.value = newId;
-      localStorage.setItem('measInfo_automatic', newId);
+  const updateMeasInfoAutomatic = (newStt) => {
+    if (measInfo_automatic.value != newStt) {
+      measInfo_automatic.value = newStt;
+      localStorage.setItem('measInfo_automatic', newStt);
     }
   };
 

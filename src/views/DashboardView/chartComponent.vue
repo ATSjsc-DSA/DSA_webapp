@@ -88,7 +88,9 @@
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <appBarTimeSerieschartWidget v-if="typeChart === 'appTimeSeries'" :data="chartData" />
 
-        <curveLinechartWidget v-if="typeChart === 'vsa' || typeChart === 'tsa'" :data="chartData" />
+        <vsaCurveLinechartWidget v-if="typeChart === 'vsa'" :data="chartData" />
+        <tsaCurveLinechartWidget v-if="typeChart === 'tsa'" :data="chartData" />
+
         <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
         <projectRadarChartWidget v-if="typeChart === 'projectRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
       </div>
@@ -102,7 +104,8 @@ import Calendar from 'primevue/calendar';
 
 import appBarchartWidget from './appBarchartWidget.vue';
 import appBarTimeSerieschartWidget from './appBarTimeSerieschartWidget.vue';
-import curveLinechartWidget from './curveLinechartWidget.vue';
+import vsaCurveLinechartWidget from './vsaCurveLinechartWidget.vue';
+import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import projectRadarChartWidget from './projectRadarChartWidget.vue';
 import { VsaApi, TsaApi, ApplicationApi, CommonApi } from './api';
@@ -110,7 +113,7 @@ import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectData } = storeToRefs(commonStore);
+const { measInfo_automatic } = storeToRefs(commonStore);
 
 const props = defineProps({
   nodeDrag: {
@@ -358,7 +361,7 @@ const getChartData = async () => {
       modificationTime.value = undefined;
     }
 
-    if (autoreloadChartData.value) {
+    if (measInfo_automatic.value && autoreloadChartData.value) {
       interval.value = setTimeout(async () => {
         await getChartData();
       }, intervalTime);
