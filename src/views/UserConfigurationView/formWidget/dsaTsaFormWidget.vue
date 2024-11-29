@@ -247,15 +247,23 @@ watch(data, async (newVal, oldVal) => {
 const setDefaultData = async () => {
   if (data.value.sourceId) {
     sourceSelected.value = await getSubSystemData(data.value.sourceId);
+  } else {
+    sourceSelected.value = {};
   }
   if (data.value.sinkId) {
     sinkSelected.value = await getSubSystemData(data.value.sinkId);
+  } else {
+    sinkSelected.value = {};
   }
   if (data.value.fixSubSystemId) {
     fixSubPsSelected.value = await getSubSystemData(data.value.fixSubSystemId);
+  } else {
+    fixSubPsSelected.value = {};
   }
   if (data.value.monitor.monitorSubSystemId) {
     monitorSubSystemSelected.value = await getSubSystemData(data.value.monitor.monitorSubSystemId);
+  } else {
+    monitorSubSystemSelected.value = {};
   }
 };
 
@@ -300,6 +308,7 @@ const getSubSystemData = async (id) => {
     };
   } catch (error) {
     console.log('getSubSystemData: error ', error);
+    return {};
   }
 };
 </script>
