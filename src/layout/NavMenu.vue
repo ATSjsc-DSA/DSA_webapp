@@ -54,6 +54,7 @@ const items = computed(() => {
         },
         { label: 'DSA Online Setting', icon: 'pi pi-fw pi-cog', to: '/DSA/Setting' },
         { label: 'Task list', icon: 'pi pi-fw pi-calendar-plus', to: '/DSA/Task' },
+        { label: 'Log list', icon: 'pi pi-fw pi-book', to: '/log' },
       ],
     },
   ];

@@ -23,9 +23,11 @@ onMounted(() => {
 });
 watch(
   () => props.data,
-  () => {
-    chartData.value = setChartData();
-    chartOptions.value = setChartOptions();
+  async (newVal, oldVal) => {
+    if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+      chartData.value = setChartData();
+      chartOptions.value = setChartOptions();
+    }
   },
 );
 

@@ -38,6 +38,12 @@ export class CommonApi {
   static async getLogs() {
     return get(`/common/${projectData.value._id}/dsa/logs`);
   }
+  static async getLogsInTime(startTime, endTime) {
+    return get(`/common/${projectData.value._id}/his/logs`, {
+      startTime: parseInt(startTime),
+      endTime: parseInt(endTime),
+    });
+  }
 }
 
 export class VsaApi {

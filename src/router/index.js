@@ -14,6 +14,11 @@ const router = createRouter({
           component: () => import('@/views/DashboardView/DashboardView.vue'),
         },
         {
+          path: '/log',
+          name: 'Log',
+          component: () => import('@/views/LogView.vue'),
+        },
+        {
           path: '/DSA/SSR',
           name: 'SSR',
           component: () => import('@/views/SSR_View.vue'),

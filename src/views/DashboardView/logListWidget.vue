@@ -4,6 +4,7 @@
       <div class="flex justify-content-between align-items-center">
         <div>
           <div><i class="pi pi-credit-card pr-3"></i>Logs</div>
+
           <div class="text-xs pt-1" style="color: var(--text-color-secondary)">
             {{ convertDateTimeToString(lastUpdate / 1000) }}
           </div>
@@ -57,13 +58,7 @@
           </span>
         </Fieldset>
       </template>
-      <DataTable
-        class="logTable"
-        :value="otherLogList"
-        size="small"
-        scrollable
-        :scroll-height="alarmLog._id ? '44rem' : '51rem'"
-      >
+      <DataTable class="logTable" :value="otherLogList" size="small" scrollable :scroll-height="logtableHeight">
         <Column field="createdTimestamp" header="Timestamp" style="padding-right: 0.5rem; padding-left: 0">
           <template #body="{ data }">
             <div class="font-semibold text-xs">
@@ -146,7 +141,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { CommonApi } from './api';
 
 import Fieldset from 'primevue/fieldset';
@@ -172,7 +167,17 @@ const props = defineProps({
   intervalTime: { type: Number, default: 5 * 1000 },
   limitLog: { type: Number, default: 100 },
 });
+
 const emit = defineEmits(['onRemoveWidget', 'saveLogConfig']);
+const showTree = defineModel();
+
+const logtableHeight = computed(() => {
+  if (showTree.value) {
+    return alarmLog.value._id ? '16rem' : '22rem';
+  } else {
+    return alarmLog.value._id ? '44rem' : '51rem';
+  }
+});
 
 const onRemoveWidget = () => {
   clearTimeout(reloadGetLog.value);
@@ -186,12 +191,12 @@ const intervalTime = ref(props.intervalTime);
 const limitLog = ref(props.limitLog);
 const reloadGetLog = ref();
 const isShowAlarmDot = ref(false);
+
 const getLogList = async (isAutoReload = true) => {
   try {
     const res = await CommonApi.getLogs();
 
     const alarmLogs = res.data.filter((item) => item.label === 0);
-    const otherLogs = res.data.filter((item) => item.label !== 0);
 
     if (alarmLogs.length > 0) {
       alarmLog.value = alarmLogs[0];
@@ -199,7 +204,7 @@ const getLogList = async (isAutoReload = true) => {
       isShowAlarmDot.value = true;
       setTimeout(() => (isShowAlarmDot.value = false), 1000);
     }
-    const otherLogsNotExist = otherLogs.filter(
+    const otherLogsNotExist = res.data.filter(
       (item) => otherLogList.value.map((item) => item._id).indexOf(item._id) === -1,
     );
     otherLogList.value = otherLogsNotExist.concat(otherLogList.value).slice(0, limitLog.value);
@@ -246,7 +251,7 @@ const SeverityLogsType = {
 const getLabelSeverityStyle = (severity) => {
   switch (severity) {
     case 0:
-      return { color: 'var(--text-color)' };
+      return { color: 'var(--blue-400)' };
     case 1:
       return { color: 'var(--orange-400)' };
     case 2:
