@@ -143,8 +143,8 @@ export class ApiDsa {
   static async delDependency(dependencyId) {
     return _delete(`/userconfig/moduledependency/${dependencyId}`);
   }
-  static async importDependency(dependencyId) {
-    return put(`/userconfig/${profileData.value._id}/${dependencyId}/import/moduledependency`);
+  static async importDependency(dependencyId, data) {
+    return put(`/userconfig/${profileData.value._id}/${dependencyId}/import/moduledependency`, data);
   }
   static async exportDependency(dependencyId) {
     return put(`/userconfig/${profileData.value._id}/${dependencyId}/export/moduledependency`);

@@ -389,7 +389,8 @@ const isImporting = ref(false);
 const importDependency = async (formData, callback) => {
   isImporting.value = true;
   try {
-    // await ApiDsa.importDependency(formData);
+    await ApiDsa.importDependency(props.dependencyId, formData);
+    await getDependencyList();
     setTimeout(() => {
       toast.add({ severity: 'success', summary: 'Dependency', detail: 'Import Successfully', life: 3000 });
       importVisibleDialog.value = false;
@@ -403,10 +404,18 @@ const importDependency = async (formData, callback) => {
   }
 };
 const isExporting = ref(false);
-const handleExport = () => {
+const handleExport = async () => {
   isExporting.value = true;
   try {
-    // await ApiDsa.exportDependency();
+    const response = await ApiDsa.exportDependency(props.dependencyId);
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'export.csv'; // Tên file tải về
+    document.body.appendChild(link);
+    link.click();
+    link.click();
     setTimeout(() => {
       toast.add({ severity: 'success', summary: 'Dependency', detail: 'Export Successfully', life: 3000 });
       isExporting.value = false;
