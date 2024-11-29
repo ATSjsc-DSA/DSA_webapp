@@ -155,6 +155,11 @@
               :class="{ 'cursor-grap': ssrCurveDraggable }"
               @dragstart="onStartDragNode($event, slotProps.node)"
             >
+              <Tag
+                class="mr-1 w-4rem"
+                :value="getSsrTypeLabel(slotProps.node.caseType)"
+                :severity="getSeveritySsrType(slotProps.node.caseType)"
+              />
               <div>{{ slotProps.node.label }}</div>
             </div>
           </template>
@@ -627,6 +632,7 @@ const getSsrCaseBranchData = async (ssrNode) => {
         active: leafData.active,
         leaf: true,
         moduleInfoId: ssrNode._id,
+        caseType: leafData.caseType,
       });
     }
   }
@@ -864,6 +870,32 @@ const updateTsaCaseActiveStatus = async (tsaCaseId, newStatus) => {
   } catch (error) {
     console.log('updateTsaCaseActiveStatus error', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const getSsrTypeLabel = (typeValue) => {
+  switch (Number(typeValue)) {
+    case 0:
+      return 'N-1';
+    case 1:
+      return 'N-2';
+    case 2:
+      return 'Base';
+    default:
+      return 'N-1';
+  }
+};
+
+const getSeveritySsrType = (typeValue) => {
+  switch (Number(typeValue)) {
+    case 0:
+      return 'primary';
+    case 1:
+      return 'info';
+    case 2:
+      return 'secondary';
+    default:
+      return 'primary';
   }
 };
 </script>
