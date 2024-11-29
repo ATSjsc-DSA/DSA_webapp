@@ -24,7 +24,7 @@
                 <label for="Standard" class="font-semibold text-base mb-1"> Standard Point </label>
                 <MultiSelect
                   v-model="standardSelected"
-                  :options="standardCurveName"
+                  :options="curveNameOpts"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
                   display="chip"
@@ -36,7 +36,7 @@
                 <label for="Standard" class="font-semibold text-base mb-1"> Range Line </label>
                 <MultiSelect
                   v-model="otherSelected"
-                  :options="otherCurveName"
+                  :options="curveNameOpts"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
                   display="chip"
@@ -167,8 +167,7 @@ const getChartData = async () => {
       modificationTime.value = res.data.modificationTime
         ? convertDateTimeToString(res.data.modificationTime)
         : undefined;
-      getStandardCurveName(res.data);
-      getOtherCurveName(res.data);
+      getCurveNameOpts(res.data);
     } else {
       chartData.value = [];
       modificationTime.value = undefined;
@@ -192,24 +191,22 @@ const toggleMenuTsaConfig = (event) => {
 };
 
 const standardSelected = ref([]);
-const standardCurveName = ref([]);
-const getStandardCurveName = (data) => {
-  const names = [];
-  for (let caseIndex = 0; caseIndex < data.length; caseIndex++) {
-    const caseData = data[caseIndex];
-    names.push({ label: caseData.caseName, items: Object.keys(caseData.standard) });
-  }
-  standardCurveName.value = names;
-};
 const otherSelected = ref([]);
-const otherCurveName = ref([]);
-const getOtherCurveName = (data) => {
-  const names = [];
-  for (let caseIndex = 0; caseIndex < data.length; caseIndex++) {
-    const caseData = data[caseIndex];
-    names.push({ label: caseData.caseName, items: Object.keys(caseData.other) });
+
+const curveNameOpts = ref([]);
+const getCurveNameOpts = (data) => {
+  const moduleNameObj = {};
+  for (let curveIndex = 0; curveIndex < data.length; curveIndex++) {
+    moduleNameObj[data[curveIndex].moduleName] = { items: [] };
   }
-  otherCurveName.value = names;
+  for (let curveIndex = 0; curveIndex < data.length; curveIndex++) {
+    moduleNameObj[data[curveIndex].moduleName].items.push(data[curveIndex].curveName);
+  }
+
+  curveNameOpts.value = Object.keys(moduleNameObj).map((moduleName) => ({
+    label: moduleName,
+    items: moduleNameObj[moduleName].items,
+  }));
 };
 
 const resetChart = async () => {
@@ -218,9 +215,8 @@ const resetChart = async () => {
   nodeSelected.value = [];
   nodeSelectedInChart.value = [];
   config.value = { standard: [], other: [] };
-  standardCurveName.value = [];
+  curveNameOpts.value = [];
   standardSelected.value = [];
-  otherCurveName.value = [];
   otherSelected.value = [];
   hiddenDatasets.value = [];
 };
