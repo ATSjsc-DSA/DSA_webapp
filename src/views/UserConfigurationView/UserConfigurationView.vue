@@ -1090,6 +1090,71 @@ const dsaContextMenu = computed(() => [
         active: true,
         type: 'VSA',
       };
+
+      newVsaData.value = {
+        name: 'string',
+        active: true,
+        maxChange: 0,
+        stepChange: 0,
+        sourceId: null,
+        sinkId: null,
+
+        monitor: {
+          monitorSubSystemId: null,
+          signalP: true,
+          signalQ: true,
+          signalV: true,
+          active: true,
+        },
+        contingencyId: null,
+        remedialActionId: null,
+        digsilentSettingId: null,
+        fixSubSystemId: null,
+      };
+      newTsaData.value = {
+        name: 'string',
+        sourceId: null,
+        sinkId: null,
+        maxChange: 0,
+        stepChange: 0,
+        monitor: {
+          monitorSubSystemId: null,
+          busConfig: {
+            voltage: 0,
+            freq: 0,
+            angle: 0,
+            active: true,
+          },
+          branchConfig: {
+            activePower: 0,
+            reActivePower: 0,
+            active: true,
+          },
+          genConfig: {
+            rotorAngle: 0,
+            electP: 0,
+            electQ: 0,
+            mechP: 0,
+            efd: 0,
+            active: true,
+          },
+          active: true,
+        },
+        // disturbanceId: null,
+        remedialActionId: null,
+        digsilentSettingId: null,
+        fixSubSystemId: null,
+        active: true,
+      };
+
+      newSsrData.value = {
+        active: true,
+        contingenciesId: null,
+        name: '',
+        fixSubSystemId: null,
+        generatorReactance: 0,
+      };
+
       createTaskDsaDialog.value = true;
     },
   },
@@ -1415,6 +1480,7 @@ const getSsrData = async (ssrId) => {
 };
 const createSsr = async () => {
   try {
+    console.log(newSsrData.value);
     const res = await ApiDsa.createSsr(dsaModuleRightClick.value._id, newSsrData.value);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     expandedKeys.value[dsaModuleRightClick.value.key] = true;

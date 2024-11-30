@@ -52,14 +52,26 @@ const data = defineModel();
 onMounted(async () => {
   if (data.value.contingenciesId) {
     await getContingenciesData();
+  } else {
+    contingenciesSelected.value = undefined;
+  }
+  if (data.value.fixSubSystemId) {
     await getSubsystemData();
+  } else {
+    subsytemSelected.value = undefined;
   }
 });
 watch(data, async (newVal, oldVal) => {
   if (newVal._id !== oldVal.__id) {
     if (newVal.contingenciesId) {
       await getContingenciesData();
+    } else {
+      contingenciesSelected.value = {};
+    }
+    if (newVal.fixSubSystemId) {
       await getSubsystemData();
+    } else {
+      subsytemSelected.value = {};
     }
   }
 });
@@ -83,6 +95,7 @@ const getContingenciesData = async () => {
       _id: res.data._id,
     };
   } catch (error) {
+    contingenciesSelected.value = {};
     console.log('getContingenciesData: error ', error);
   }
 };
@@ -96,6 +109,7 @@ const getSubsystemData = async () => {
       _id: data.value.fixSubSystemId,
     };
   } catch (error) {
+    subsytemSelected.value = {};
     console.log('getSubsystemData: error ', error);
   }
 };
