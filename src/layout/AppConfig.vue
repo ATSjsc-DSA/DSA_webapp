@@ -11,18 +11,10 @@ defineProps({
 });
 
 const $primevue = usePrimeVue();
-const inputStyle = computed(() => $primevue.config.inputStyle || 'outlined');
 
 const scales = ref([12, 13, 14, 15, 16]);
 const visible = ref(false);
-const inputStyles = ref([
-  { label: 'Outlined', value: 'outlined' },
-  { label: 'Filled', value: 'filled' },
-]);
-const menuModes = ref([
-  { label: 'Static', value: 'static' },
-  { label: 'Overlay', value: 'overlay' },
-]);
+
 // const compactMaterial = ref(false);
 // const primaryFocusRing = ref(true);
 
@@ -50,13 +42,7 @@ const incrementScale = () => {
 const applyScale = () => {
   document.documentElement.style.fontSize = layoutConfig.scale.value + 'px';
 };
-const onInputStyleChange = (value) => {
-  $primevue.config.inputStyle = value;
-};
-const onMenuModeChange = (value) => {
-  layoutConfig.menuMode.value = value;
-  localStorage.setItem('menuMode', value);
-};
+
 const onDarkModeChange = (value) => {
   const newThemeName = value
     ? layoutConfig.theme.value.replace('light', 'dark')
@@ -66,56 +52,7 @@ const onDarkModeChange = (value) => {
   localStorage.setItem('theme', newThemeName);
   // layoutConfig.darkTheme.value = value;
 };
-// const changeTheme = (theme, color) => {
-//   let newTheme, dark;
 
-//   newTheme = theme + '-' + (layoutConfig.darkTheme.value ? 'dark' : 'light');
-
-//   if (color) {
-//     newTheme += '-' + color;
-//   }
-
-//   if (newTheme.startsWith('md-') && compactMaterial.value) {
-//     newTheme = newTheme.replace('md-', 'mdc-');
-//   }
-
-//   dark = layoutConfig.darkTheme.value;
-
-//   onChangeTheme(newTheme, dark);
-// };
-// const isThemeActive = (themeFamily, color) => {
-//   let themeName;
-//   let themePrefix = themeFamily === 'md' && compactMaterial.value ? 'mdc' : themeFamily;
-
-//   themeName = themePrefix + (layoutConfig.darkTheme.value ? '-dark' : '-light');
-
-//   if (color) {
-//     themeName += '-' + color;
-//   }
-
-//   return layoutConfig.theme.value === themeName;
-// };
-// const onCompactMaterialChange = (value) => {
-//   compactMaterial.value = value;
-
-//   if (layoutConfig.theme.value.startsWith('md')) {
-//     let tokens = layoutConfig.theme.value.split('-');
-
-//     changeTheme(tokens[0].substring(0, 2), tokens[2]);
-//   }
-// };
-// const onFocusRingColorChange = (value) => {
-//   primaryFocusRing.value = value;
-//   let root = document.documentElement;
-
-//   if (value) {
-//     if (layoutConfig.darkTheme.value) root.style.setProperty('--p-focus-ring-color', 'var(--primary-500)');
-//     else root.style.setProperty('--p-focus-ring-color', 'var(--primary-500)');
-//   } else {
-//     if (layoutConfig.darkTheme.value) root.style.setProperty('--p-focus-ring-color', 'var(--surface-500)');
-//     else root.style.setProperty('--p-focus-ring-color', 'var(--surface-900)');
-//   }
-// };
 onMounted(() => {
   // Lấy giá trị theme từ localStorage
   const theme = localStorage.getItem('theme');

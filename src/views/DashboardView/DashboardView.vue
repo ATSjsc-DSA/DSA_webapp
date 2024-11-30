@@ -1,5 +1,5 @@
 <template>
-  <div class="grid w-full h-full">
+  <div class="grid w-full h-full m-0">
     <div v-if="showTree || showLog" class="col-3">
       <div class="sticky flex flex-column gap-3" style="top: 6rem">
         <ScrollPanel v-if="showTree" style="width: 100%" :style="{ height: showLog ? '28rem' : '58rem' }">
@@ -731,5 +731,9 @@ const reloadData = () => {
 
 #application-right-side-custom .p-accordion-header-link {
   padding: 1rem 0 !important ;
+}
+
+#application-right-side-custom .p-accordion-header {
+  border-radius: 0 !important ;
 }
 </style>

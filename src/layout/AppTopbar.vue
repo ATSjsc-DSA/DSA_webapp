@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import { usePrimeVue } from 'primevue/config';
 
 import NavMenu from './NavMenu.vue';
 
@@ -9,7 +10,7 @@ import DSA_api from '@/api/dsa_api';
 import chartComposable from '@/combosables/chartData';
 import { intervalTime } from '@/Constants/';
 import { useCommonStore } from '@/store';
-const { layoutConfig, onMenuToggle } = useLayout();
+const { layoutConfig, isDarkTheme } = useLayout();
 const { convertDateTimeToString } = chartComposable();
 const commonStore = useCommonStore();
 
@@ -17,22 +18,35 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 
+const PrimeVue = usePrimeVue();
 const logs = ref();
 const countLogs = ref('0');
 let logView = [];
 const interval = ref(null);
 const op = ref();
-const audioSrc = '@/public/img/Elevator Ding-SoundBible.com-685385892.mp3';
 const { measInfo_automatic } = storeToRefs(commonStore);
 onMounted(async () => {
   await commonStore.getMeasInfoActive();
-  // await commonStore
-  // await commonStore.getListMeasInfo();
   if (measInfo_automatic.value) {
     commonStore.startAutoUpdate();
   }
-  // getLogs();
   bindOutsideClickListener();
+
+  const theme = localStorage.getItem('theme');
+  if (theme !== null) {
+    const DarkMode = !!theme.includes('dark');
+
+    const linkElement = document.getElementById('theme-css');
+
+    // Thay đổi giá trị href bằng cách sử dụng replace
+    if (linkElement) {
+      linkElement.href = linkElement
+        .getAttribute('href')
+        .replace(/\/themes\/.*\/theme\.css/, `/themes/${theme}/theme.css`);
+    }
+    layoutConfig.theme.value = theme;
+    layoutConfig.theme.darkTheme = DarkMode;
+  }
 });
 
 onBeforeUnmount(() => {
@@ -40,11 +54,17 @@ onBeforeUnmount(() => {
   clearInterval(interval.value);
 });
 
-const getLogs = async () => {
-  try {
-    const res = await DSA_api.getLogs();
-    logs.value = res.data.items;
-  } catch (error) {}
+const toggleDarkMode = () => {
+  const newDarkMode = !layoutConfig.darkTheme.value;
+  const newThemeName = newDarkMode ? 'aura-dark-green' : 'aura-light-green';
+  console.log('newThemeName', newThemeName);
+  PrimeVue.changeTheme(layoutConfig.theme.value, newThemeName, 'theme-css', () => {
+    layoutConfig.theme.value = newThemeName;
+    setTimeout(() => {
+      layoutConfig.darkTheme.value = newDarkMode;
+    }, 100);
+    localStorage.setItem('theme', newThemeName);
+  });
 };
 
 watch(logs, async (newValue, oldValue) => {
@@ -79,6 +99,12 @@ const onTopBarUserView = () => {
 const onProjectView = () => {
   localStorage.removeItem('projectData');
   localStorage.removeItem('slotData');
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('gridStackComponentArr');
+
+  localStorage.setItem('user', user.data.username);
+  localStorage.setItem('role', user.data.role);
   router.push('/Project');
 };
 
@@ -131,8 +157,16 @@ const isOutsideClicked = (event) => {
     </button>
 
     <nav-menu />
+    <div class="layout-topbar-menu align-items-center" :class="topbarMenuClasses">
+      <Button
+        type="button"
+        rounded
+        outlined
+        :icon="isDarkTheme ? 'pi pi-moon' : 'pi pi-sun'"
+        class="mx-3"
+        @click="toggleDarkMode"
+      />
 
-    <div class="layout-topbar-menu" :class="topbarMenuClasses">
       <div v-tooltip.bottom="'Notification'" class="p-link layout-topbar-notifi" type="text" @click="toggle">
         <i v-if="countLogs === '0'" class="pi pi-bell"></i>
         <i v-else v-badge.danger="countLogs" class="pi pi-bell" />
