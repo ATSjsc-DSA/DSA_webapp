@@ -3,7 +3,7 @@
     <template #title>
       <div class="flex justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
-          <div><i class="pi pi-folder-open pr-3"></i>TSA</div>
+          <div>TSA</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
         </div>
         <div class="flex justify-content-between align-items-center">
@@ -79,7 +79,7 @@ import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { measInfo_automatic } = storeToRefs(commonStore);
+const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
 
 const props = defineProps({
   nodeDrag: {
@@ -115,6 +115,11 @@ onUnmounted(() => {
 watch(measInfo_automatic, async (isActive) => {
   if (!isActive) {
     clearTimeout(interval.value);
+  }
+});
+watch(measInfoActive, async (newVal, oldVal) => {
+  if (newVal._id) {
+    await getChartData();
   }
 });
 

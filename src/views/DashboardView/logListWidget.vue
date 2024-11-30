@@ -28,7 +28,7 @@
               <label for="limitLog" class="font-semibold">Number Of Logs </label>
               <InputNumber v-model="limitLogChange" suffix=" logs" />
             </div>
-            <div class="flex justify-content-end align-items-center">
+            <div class="flex justify-content-end align-items-center gap-3">
               <Button type="button" label="Cancel" severity="secondary" @click="closeMenuConfigLogs"></Button>
               <Button type="button" :disabled="!limitLogChange" label="Submit" @click="changeConfig"></Button>
             </div>

@@ -74,9 +74,9 @@
         </div>
         <Accordion
           id="application-right-side-custom"
-          multiple="true"
+          :multiple="true"
           :activeIndex="menuRightActiveIndex"
-          style="position: sticky; top: 6rem"
+          style="position: sticky; top: 6rem; margin-left: 1rem"
         >
           <AccordionTab>
             <template #header>
@@ -290,6 +290,7 @@
 <script setup>
 import { onMounted, ref, render, watch } from 'vue';
 import { v4 } from 'uuid';
+import Loading from '@/components/Loading.vue';
 
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
@@ -313,7 +314,7 @@ const toast = useToast();
 
 const confirm = useConfirm();
 const commonStore = useCommonStore();
-const menuRightActiveIndex = ref([0, 1]);
+const menuRightActiveIndex = ref([0, 1, 2]);
 const showTree = ref(localStorage.getItem('showTree') === 'true' || false);
 const showLog = ref(localStorage.getItem('showLog') === 'true' || false);
 
@@ -321,7 +322,7 @@ const gridStackComponentGrid = ref(null);
 const gridLock = ref(true);
 const gridStackComponentArr = ref([]);
 
-const { measInfo_automatic } = storeToRefs(commonStore);
+const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
 const pinMeasInfo = ref(false);
 watch(pinMeasInfo, (isPin) => {
   const measInfoComponent = gridStackComponentArr.value.filter((item) => item.type === 'measInfo');
@@ -666,13 +667,11 @@ const changeMeasInfoMode = (event) => {
   });
 };
 const reloadData = () => {
-  const oldStt = stopReloadChartData.value;
-  stopReloadChartData.value = false;
-  if (oldStt != false) {
-    setTimeout(() => {
-      stopReloadChartData.value = oldStt;
-    }, 5000);
-  }
+  const oldId = measInfoActive.value;
+  measInfoActive.value = {};
+  setTimeout(() => {
+    measInfoActive.value = oldId;
+  }, 1000);
 };
 </script>
 <style>

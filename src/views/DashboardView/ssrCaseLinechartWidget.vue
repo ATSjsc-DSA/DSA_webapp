@@ -184,7 +184,7 @@ const getAnnotation = async () => {
   return { annotations: annotation };
 };
 
-const xDm = 0.5;
+const xDm = 25;
 const getDmAnnotation = async () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const chartWidth = await getChartWidth();
