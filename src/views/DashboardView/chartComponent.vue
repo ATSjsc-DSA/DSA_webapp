@@ -219,16 +219,16 @@ const setInitRangeTimeOfSeriesChart = () => {
 
 const typeChartCanDrop = computed(() => {
   if (props.typeChart.includes('app')) {
-    return 'Application';
+    return ['Application'];
   }
 
   if (props.typeChart === 'vsa') {
-    return 'VsaCurve';
+    return ['VsaCurve'];
   }
   if (props.typeChart === 'ssr') {
-    return 'SsrCase';
+    return ['SsrCase', 'SSR'];
   }
-  return '';
+  return [''];
 });
 
 const chartTitle = ref('');
@@ -263,14 +263,14 @@ const onDragoverComponent = () => {
   if (props.typeChart === 'projectRadar') {
     return false;
   }
-  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
+  if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
     canDropNode.value = true;
   } else {
     canDropNode.value = false;
   }
 };
 const onDropComponent = async () => {
-  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
+  if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
     if (props.muiltiSelect) {
       nodeKeySelected.value.push(props.nodeDrag.key);
       if (props.typeChart === 'vsa') {
@@ -282,10 +282,21 @@ const onDropComponent = async () => {
         });
       }
       if (props.typeChart === 'ssr') {
-        nodeSelectedInChart.value.push({
-          caseInfoId: props.nodeDrag._id,
-          moduleInfoId: props.nodeDrag.moduleInfoId,
-        });
+        if (props.nodeDrag.type === 'SsrCase') {
+          nodeSelectedInChart.value.push({
+            caseInfoId: props.nodeDrag._id,
+            moduleInfoId: props.nodeDrag.moduleInfoId,
+          });
+        }
+        if (props.nodeDrag.type === 'SSR') {
+          const ssrCaseData = JSON.parse(props.nodeDrag.data);
+          ssrCaseData.forEach((ssrCaseId) => {
+            nodeSelectedInChart.value.push({
+              caseInfoId: ssrCaseId,
+              moduleInfoId: props.nodeDrag._id,
+            });
+          });
+        }
       }
     } else {
       resetChart();

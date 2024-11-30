@@ -1,6 +1,6 @@
 <template>
   <div class="grid w-full h-full m-0">
-    <div v-if="showTree || showLog" class="col-3">
+    <div v-if="showTree || showLog" class="col-3 xl:col-4">
       <div class="sticky flex flex-column gap-3" style="top: 6rem">
         <ScrollPanel v-if="showTree" style="width: 100%" :style="{ height: showLog ? '28rem' : '58rem' }">
           <projectTreeWidget
@@ -24,6 +24,7 @@
       <div class="w-full h-full flex">
         <div
           class="w-full h-full"
+          style="margin-right: 4rem"
           :class="{ 'border-2 border-gray-300': gridStackComponentArr.length === 0 }"
           @dragleave.prevent="canDropGridStackComponent = false"
           @dragenter.prevent
@@ -72,211 +73,196 @@
             </div>
           </div>
         </div>
-        <Accordion
-          id="application-right-side-custom"
-          :multiple="true"
-          :activeIndex="menuRightActiveIndex"
-          style="position: sticky; top: 6rem; margin-left: 1rem"
-        >
-          <AccordionTab>
-            <template #header>
-              <div class="font-semibold text-center w-full" style="font-size: 0.8rem">DATA</div>
-            </template>
-            <div class="flex flex-column gap-2 justify-content-center align-items-center">
-              <div
-                v-tooltip.left="measInfo_automatic ? 'Stop Automatic Mode' : 'Start Automatic Mode'"
-                class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
-                :class="!measInfo_automatic ? 'bg-primary' : 'bg-red-400'"
-                placeholder="Left"
-                @click="changeMeasInfoMode"
-              >
-                <i v-if="!measInfo_automatic" class="pi pi-play cursor-pointer" style="font-size: 1rem" />
-                <i v-else class="pi pi-pause" style="font-size: 1rem" />
-
-                <div style="font-size: 0.7rem">{{ measInfo_automatic ? 'STOP' : 'START' }}</div>
-              </div>
-              <Button
-                v-show="!measInfo_automatic"
-                v-tooltip.left="'His HMI Data'"
-                icon="pi  pi-ellipsis-h"
-                aria-label="Filter"
-                text
-                @click="changeMeasInfoActive()"
-              />
-
-              <div
-                v-tooltip.left="'Reload Data'"
-                class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
-                placeholder="Left"
-                @click="reloadData"
-              >
-                <i class="pi pi-replay" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">RELOAD</div>
-              </div>
-            </div>
-          </AccordionTab>
-
-          <AccordionTab>
-            <template #header>
-              <div class="font-semibold text-center w-full" style="font-size: 0.8rem">GRID</div>
-            </template>
-            <div class="flex flex-column gap-2 justify-content-center align-items-center">
-              <div
-                v-tooltip.left="'Compact Grid'"
-                class="flex flex-column align-items-center gap-1 px-1 py-2 bg-primary button-choose-components button-select cursor-pointer"
-                placeholder="Left"
-                @click="sortGrid"
-              >
-                <i class="pi pi-sync" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">SORT</div>
-              </div>
-              <div
-                v-tooltip.left="'Lock'"
-                class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
-                :class="gridLock ? 'bg-gray-500' : 'bg-orange-500'"
-                placeholder="Left"
-                @click="gridLock = !gridLock"
-              >
-                <i :class="gridLock ? 'pi pi-lock' : 'pi pi-lock-open'" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">{{ gridLock ? 'LOCK' : 'OPEN' }}</div>
-              </div>
-              <div
-                v-tooltip.left="'Compact Grid'"
-                class="flex flex-column align-items-center gap-1 px-1 py-2 bg-red-400 button-choose-components button-select cursor-pointer"
-                placeholder="Left"
-                @click="confirmRemoveAllComponent"
-              >
-                <i class="pi pi-trash" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">DELETE</div>
-              </div>
-              <div
-                v-tooltip.left="'Save Grid'"
-                class="flex flex-column align-items-center gap-1 px-1 py-2 bg-cyan-600 button-choose-components button-select cursor-pointer"
-                placeholder="Left"
-                @click="saveGrid"
-              >
-                <i class="pi pi-save" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">SAVE</div>
-              </div>
-            </div>
-          </AccordionTab>
-
-          <AccordionTab>
-            <template #header>
-              <div class="font-semibold text-center w-full" style="font-size: 0.8rem">COMPONENT</div>
-            </template>
-            <div class="flex flex-column gap-2 justify-content-center align-items-center">
-              <div
-                v-tooltip.left="'Project Tree'"
-                class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
-                placeholder="Left"
-                @click="showTree = !showTree"
-              >
-                <i class="pi pi-list" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">TREE</div>
-              </div>
-
-              <div
-                v-tooltip.left="'Logs'"
-                class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
-                placeholder="Left"
-                @click="showLog = !showLog"
-              >
-                <i class="pi pi-file" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">LOG</div>
-              </div>
-              <Divider class="m-1" />
-
-              <div
-                v-tooltip.left="'Map'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('map')"
-              >
-                <i class="pi pi-map" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">MAP</div>
-              </div>
-
-              <Divider class="m-1" />
-              <div class="font-semibold" style="font-size: 0.8rem">CHART</div>
-              <div
-                v-tooltip.left="'Project Radar'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('projectRadar')"
-              >
-                <i class="pi pi-chart-pie" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">PROJECT</div>
-              </div>
-
-              <div
-                v-tooltip.left="'Appplication Radar'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('appRadar')"
-              >
-                <i class="pi pi-chart-pie" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">APP</div>
-              </div>
-              <div
-                v-tooltip.left="'Appplication Bar'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('appBar')"
-              >
-                <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">BAR</div>
-              </div>
-              <div
-                v-tooltip.left="'Appplication Bar Time Series'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('appTimeSeries')"
-              >
-                <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">TIME</div>
-              </div>
-              <div
-                v-tooltip.left="'VSA Line'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('vsa')"
-              >
-                <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">VSA</div>
-              </div>
-              <div
-                v-tooltip.left="'TSA Line'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('tsa')"
-              >
-                <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">TSA</div>
-              </div>
-
-              <div
-                v-tooltip.left="'SSR Line'"
-                class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
-                draggable="true"
-                placeholder="Left"
-                @dragstart="handleDragStart('ssr')"
-              >
-                <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
-                <div style="font-size: 0.7rem">SSR</div>
-              </div>
-            </div>
-          </AccordionTab>
-        </Accordion>
       </div>
     </div>
+  </div>
+  <div id="application-right-side-custom" class="fixed" style="top: 6rem; right: 0; margin-left: 1rem">
+    <div class="font-semibold text-center w-full pb-3" style="font-size: 0.8rem">DATA</div>
+    <div class="flex flex-column gap-2 justify-content-center align-items-center">
+      <div
+        v-tooltip.left="measInfo_automatic ? 'Stop Automatic Mode' : 'Start Automatic Mode'"
+        class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
+        :class="!measInfo_automatic ? 'bg-primary' : 'bg-red-400'"
+        placeholder="Left"
+        @click="changeMeasInfoMode"
+      >
+        <i v-if="!measInfo_automatic" class="pi pi-play cursor-pointer" style="font-size: 1rem" />
+        <i v-else class="pi pi-pause" style="font-size: 1rem" />
+
+        <div style="font-size: 0.7rem">{{ measInfo_automatic ? 'STOP' : 'START' }}</div>
+      </div>
+      <Button
+        v-show="!measInfo_automatic"
+        v-tooltip.left="'His HMI Data'"
+        icon="pi  pi-ellipsis-h"
+        aria-label="Filter"
+        text
+        @click="changeMeasInfoActive()"
+      />
+
+      <div
+        v-tooltip.left="'Reload Data'"
+        class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
+        placeholder="Left"
+        @click="reloadData"
+      >
+        <i class="pi pi-replay" style="font-size: 1rem" />
+        <div style="font-size: 0.7rem">RELOAD</div>
+      </div>
+    </div>
+
+    <div class="font-semibold text-center w-full py-3" style="font-size: 0.8rem">GRID</div>
+    <div class="flex flex-column gap-2 justify-content-center align-items-center">
+      <div
+        v-tooltip.left="'Compact Grid'"
+        class="flex flex-column align-items-center gap-1 px-1 py-2 bg-primary button-choose-components button-select cursor-pointer"
+        placeholder="Left"
+        @click="sortGrid"
+      >
+        <i class="pi pi-sync" style="font-size: 1rem" />
+        <div style="font-size: 0.7rem">SORT</div>
+      </div>
+      <div
+        v-tooltip.left="'Lock'"
+        class="flex flex-column align-items-center gap-1 px-1 py-2 button-choose-components button-select cursor-pointer"
+        :class="gridLock ? 'bg-gray-500' : 'bg-orange-500'"
+        placeholder="Left"
+        @click="gridLock = !gridLock"
+      >
+        <i :class="gridLock ? 'pi pi-lock' : 'pi pi-lock-open'" style="font-size: 1rem" />
+        <div style="font-size: 0.7rem">{{ gridLock ? 'LOCK' : 'OPEN' }}</div>
+      </div>
+      <div
+        v-tooltip.left="'Compact Grid'"
+        class="flex flex-column align-items-center gap-1 px-1 py-2 bg-red-400 button-choose-components button-select cursor-pointer"
+        placeholder="Left"
+        @click="confirmRemoveAllComponent"
+      >
+        <i class="pi pi-trash" style="font-size: 1rem" />
+        <div style="font-size: 0.7rem">DELETE</div>
+      </div>
+      <div
+        v-tooltip.left="'Save Grid'"
+        class="flex flex-column align-items-center gap-1 px-1 py-2 bg-cyan-600 button-choose-components button-select cursor-pointer"
+        placeholder="Left"
+        @click="saveGrid"
+      >
+        <i class="pi pi-save" style="font-size: 1rem" />
+        <div style="font-size: 0.7rem">SAVE</div>
+      </div>
+    </div>
+
+    <div class="font-semibold text-center w-full py-3" style="font-size: 0.8rem">COMPONENT</div>
+    <ScrollPanel style="height: 26rem">
+      <div class="flex flex-column gap-2 justify-content-center align-items-center">
+        <div
+          v-tooltip.left="'Project Tree'"
+          class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
+          placeholder="Left"
+          @click="showTree = !showTree"
+        >
+          <i class="pi pi-list" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">TREE</div>
+        </div>
+
+        <div
+          v-tooltip.left="'Logs'"
+          class="flex flex-column align-items-center gap-1 p-1 button-choose-components"
+          placeholder="Left"
+          @click="showLog = !showLog"
+        >
+          <i class="pi pi-file" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">LOG</div>
+        </div>
+        <Divider class="m-1" />
+
+        <div
+          v-tooltip.left="'Map'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('map')"
+        >
+          <i class="pi pi-map" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">MAP</div>
+        </div>
+
+        <Divider class="m-1" />
+        <div class="font-semibold" style="font-size: 0.8rem">CHART</div>
+        <div
+          v-tooltip.left="'Project Radar'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('projectRadar')"
+        >
+          <i class="pi pi-chart-pie" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">PROJECT</div>
+        </div>
+
+        <div
+          v-tooltip.left="'Appplication Radar'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('appRadar')"
+        >
+          <i class="pi pi-chart-pie" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">APP</div>
+        </div>
+        <div
+          v-tooltip.left="'Appplication Bar'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('appBar')"
+        >
+          <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">BAR</div>
+        </div>
+        <div
+          v-tooltip.left="'Appplication Bar Time Series'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('appTimeSeries')"
+        >
+          <i class="pi pi-fw pi-chart-bar" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">TIME</div>
+        </div>
+        <div
+          v-tooltip.left="'VSA Line'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('vsa')"
+        >
+          <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">VSA</div>
+        </div>
+        <div
+          v-tooltip.left="'TSA Line'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('tsa')"
+        >
+          <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">TSA</div>
+        </div>
+
+        <div
+          v-tooltip.left="'SSR Line'"
+          class="flex flex-column align-items-center gap-1 p-1 cursor-grap button-choose-components"
+          draggable="true"
+          placeholder="Left"
+          @dragstart="handleDragStart('ssr')"
+        >
+          <i class="pi pi-fw pi-chart-line" style="font-size: 1rem" />
+          <div style="font-size: 0.7rem">SSR</div>
+        </div>
+      </div>
+    </ScrollPanel>
   </div>
   <MeasInfoDialog
     v-model:dialogVisible="MeasInfoDialogVisible"
@@ -719,21 +705,5 @@ const reloadData = () => {
 .button-select {
   border: 0;
   border-radius: 0.5rem;
-}
-
-#application-right-side-custom .p-icon {
-  display: none !important;
-}
-
-#application-right-side-custom .p-accordion-tab:not(:last-child) {
-  border-bottom: 1px solid var(--gray-500) !important;
-}
-
-#application-right-side-custom .p-accordion-header-link {
-  padding: 1rem 0 !important ;
-}
-
-#application-right-side-custom .p-accordion-header {
-  border-radius: 0 !important ;
 }
 </style>

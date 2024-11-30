@@ -74,15 +74,6 @@
             </div>
           </template>
 
-          <template #SSR="slotProps">
-            <div class="w-full flex align-items-center justify-content-start gap-3">
-              <Tag value="SSR" severity="secondary" rounded />
-              <div :class="{ textUnActive: !slotProps.node.active }">
-                {{ slotProps.node.label }}
-              </div>
-            </div>
-          </template>
-
           <template #VsaCase="slotProps">
             <div
               class="w-full flex align-items-center justify-content-start"
@@ -99,19 +90,6 @@
             </div>
             <ContextMenu ref="vsaCaseContextMenuRef" :model="vsaCaseContextMenu" />
           </template>
-
-          <template #TsaCase="slotProps">
-            <div
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ textUnActive: !slotProps.node.active }"
-              aria-haspopup="true"
-              @contextmenu="onTsaCaseRightClick($event, slotProps.node)"
-            >
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-            <ContextMenu ref="tsaCaseContextMenuRef" :model="tsaCaseContextMenu" />
-          </template>
-
           <template #VsaCurve="slotProps">
             <div
               :id="slotProps.node.key"
@@ -129,6 +107,30 @@
               <div>{{ slotProps.node.label }}</div>
             </div>
           </template>
+          <template #TsaCase="slotProps">
+            <div
+              class="w-full flex align-items-center justify-content-start"
+              :class="{ textUnActive: !slotProps.node.active }"
+              aria-haspopup="true"
+              @contextmenu="onTsaCaseRightClick($event, slotProps.node)"
+            >
+              <div>{{ slotProps.node.label }}</div>
+            </div>
+            <ContextMenu ref="tsaCaseContextMenuRef" :model="tsaCaseContextMenu" />
+          </template>
+
+          <template #TsaCurveType="slotProps">
+            <div
+              :id="slotProps.node.key"
+              :draggable="tsaCurveDraggable"
+              class="w-full flex align-items-center justify-content-start"
+              :class="{ 'cursor-grap': tsaCurveDraggable }"
+              @dragstart="onStartDragTsaCurveTypeNode($event, slotProps.node)"
+            >
+              <div>{{ slotProps.node.label }}</div>
+            </div>
+          </template>
+
           <template #TsaCurve="slotProps">
             <div
               :id="slotProps.node.key"
@@ -137,16 +139,23 @@
               :class="{ 'cursor-grap': tsaCurveDraggable }"
               @dragstart="onStartDragNode($event, slotProps.node)"
             >
-              <Tag
-                class="mr-3"
-                :value="getTsaCurveTypeValue(slotProps.node.curveType)"
-                :style="getTsaCurveTypeSeverity(slotProps.node.curveType)"
-              />
-
               <div>{{ slotProps.node.label }}</div>
             </div>
           </template>
 
+          <template #SSR="slotProps">
+            <div
+              :id="slotProps.node.key"
+              class="w-full flex align-items-center justify-content-start gap-3"
+              :draggable="ssrCurveDraggable"
+              @dragstart="onStartDragSsrCaseNode($event, slotProps.node)"
+            >
+              <Tag value="SSR" severity="secondary" rounded />
+              <div :class="{ textUnActive: !slotProps.node.active }">
+                {{ slotProps.node.label }}
+              </div>
+            </div>
+          </template>
           <template #SsrCase="slotProps">
             <div
               :id="slotProps.node.key"
@@ -203,6 +212,14 @@ const props = defineProps({
 });
 const emit = defineEmits(['onStartDragNode', 'onRemoveWidget']);
 const onStartDragNode = (evt, node) => {
+  emit('onStartDragNode', evt, node);
+};
+const onStartDragTsaCurveTypeNode = async (evt, node) => {
+  await onNodeExpand(node);
+  emit('onStartDragNode', evt, node);
+};
+const onStartDragSsrCaseNode = async (evt, node) => {
+  await onNodeExpand(node);
   emit('onStartDragNode', evt, node);
 };
 onMounted(async () => {
@@ -499,6 +516,7 @@ const getTsaCaseBranchData = async (tsaNode) => {
         active: leafData.active,
         icon: 'pi pi-list',
         leaf: false,
+        highlight: leafData.highlight,
         moduleInfoId: tsaNode._id,
       });
     }
@@ -532,6 +550,7 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         icon: 'pi pi-file',
         leaf: false,
         caseInfoId: caseNode._id,
+        highlight: leafData.highlight,
         moduleInfoId: caseNode.moduleInfoId,
       });
     }
@@ -551,24 +570,39 @@ const getTsaSubCaseList = async (tsa_info_id, case_info_id) => {
 
 const getTsaCurveBranchData = async (subCaseNode) => {
   const branch = [];
-  const dataList = await getTsaCurveList(subCaseNode._id);
-  if (dataList.length === 0) {
+  const curveList = await getTsaCurveList(subCaseNode._id);
+  if (curveList.length === 0) {
     subCaseNode.leaf = true;
   } else {
-    for (let index = 0; index < dataList.length; index++) {
-      const leafData = dataList[index];
+    let curveTypeList = curveList.map((item) => item.curveType);
+    curveTypeList = [...new Set(curveTypeList)];
+    curveTypeList.forEach((curveType) => {
       branch.push({
-        key: subCaseNode.key + '_' + index,
-        label: leafData.name,
-        _id: leafData._id,
-        type: 'TsaCurve',
-        curveType: leafData.curveType,
-        leaf: true,
+        key: subCaseNode.key + '_' + curveType,
+        label: getTsaCurveTypeValue(curveType),
+        styleStr: getTsaCurveTypeSeverity(curveType),
+        data: JSON.stringify(curveList.filter((item) => item.curveType === curveType).map((leafData) => leafData._id)),
+        type: 'TsaCurveType',
+        leaf: false,
+        curveType: curveType,
         subCaseInfo: subCaseNode._id,
         caseInfoId: subCaseNode.caseInfoId,
         moduleInfoId: subCaseNode.moduleInfoId,
+        children: curveList
+          .filter((item) => item.curveType === curveType)
+          .map((leafData, index) => ({
+            key: subCaseNode.key + curveType + '_' + index,
+            label: leafData.name,
+            _id: leafData._id,
+            type: 'TsaCurve',
+            curveType: leafData.curveType,
+            leaf: true,
+            subCaseInfo: subCaseNode._id,
+            caseInfoId: subCaseNode.caseInfoId,
+            moduleInfoId: subCaseNode.moduleInfoId,
+          })),
       });
-    }
+    });
   }
   return branch;
 };
@@ -600,6 +634,7 @@ const getSsrBranchData = async (dsaModuleNode) => {
         type: 'SSR',
         active: leafData.active,
         leaf: false,
+        data: '[]',
       });
     }
   }
@@ -622,6 +657,8 @@ const getSsrCaseBranchData = async (ssrNode) => {
   if (dataList.length === 0) {
     ssrNode.leaf = true;
   } else {
+    ssrNode.data = JSON.stringify(dataList.map((item) => item._id));
+    console.log(ssrNode.data);
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
       branch.push({
@@ -646,6 +683,81 @@ const getSsrCaseList = async (case_id) => {
   } catch (error) {
     console.log('getAppList: error ', error);
     return [];
+  }
+};
+
+// -- right click to active/unactive
+const vsaCaseContextMenuRef = ref();
+const vsaCaseContextMenu = ref([]);
+const onVsaCaseRightClick = async (event, node) => {
+  if (node.active) {
+    vsaCaseContextMenu.value = [
+      {
+        label: 'Unactive',
+        icon: 'pi pi-times',
+        command: async () => {
+          await updateVsaCaseActiveStatus(node._id, false);
+        },
+      },
+    ];
+  } else {
+    vsaCaseContextMenu.value = [
+      {
+        label: 'Active',
+        icon: 'pi pi-check',
+        command: async () => {
+          await updateVsaCaseActiveStatus(node._id, true);
+        },
+      },
+    ];
+  }
+  vsaCaseContextMenuRef.value.show(event);
+};
+
+const updateVsaCaseActiveStatus = async (vsaCaseId, newStatus) => {
+  try {
+    await VsaApi.updateVsaCase(vsaCaseId, { active: newStatus });
+    toast.add({ severity: 'success', summary: 'Updated Active Status successfully', life: 3000 });
+  } catch (error) {
+    console.log('updateVsaCaseActiveStatus error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const tsaCaseContextMenuRef = ref();
+const tsaCaseContextMenu = ref([]);
+const onTsaCaseRightClick = async (event, node) => {
+  if (node.active) {
+    tsaCaseContextMenu.value = [
+      {
+        label: 'Unactive',
+        icon: 'pi pi-times',
+        command: async () => {
+          await updateTsaCaseActiveStatus(node._id, false);
+        },
+      },
+    ];
+  } else {
+    tsaCaseContextMenu.value = [
+      {
+        label: 'Active',
+        icon: 'pi pi-check',
+        command: async () => {
+          await updateTsaCaseActiveStatus(node._id, true);
+        },
+      },
+    ];
+  }
+  tsaCaseContextMenuRef.value.show(event);
+};
+
+const updateTsaCaseActiveStatus = async (tsaCaseId, newStatus) => {
+  try {
+    await TsaApi.updateTsaCase(tsaCaseId, { active: newStatus });
+    toast.add({ severity: 'success', summary: 'Updated Active Status successfully', life: 3000 });
+  } catch (error) {
+    console.log('updateTsaCaseActiveStatus error', error);
+    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 
@@ -795,81 +907,6 @@ const getTsaCurveTypeSeverity = (curveType) => {
       return isDarkTheme.value
         ? 'backgroundColor:var(--graygray-600);color:var(--text-color)'
         : 'backgroundColor:var(--graygray-600);color:var(--text-color)';
-  }
-};
-
-// -- right click to active/unactive
-const vsaCaseContextMenuRef = ref();
-const vsaCaseContextMenu = ref([]);
-const onVsaCaseRightClick = async (event, node) => {
-  if (node.active) {
-    vsaCaseContextMenu.value = [
-      {
-        label: 'Unactive',
-        icon: 'pi pi-times',
-        command: async () => {
-          await updateVsaCaseActiveStatus(node._id, false);
-        },
-      },
-    ];
-  } else {
-    vsaCaseContextMenu.value = [
-      {
-        label: 'Active',
-        icon: 'pi pi-check',
-        command: async () => {
-          await updateVsaCaseActiveStatus(node._id, true);
-        },
-      },
-    ];
-  }
-  vsaCaseContextMenuRef.value.show(event);
-};
-
-const updateVsaCaseActiveStatus = async (vsaCaseId, newStatus) => {
-  try {
-    await VsaApi.updateVsaCase(vsaCaseId, { active: newStatus });
-    toast.add({ severity: 'success', summary: 'Updated Active Status successfully', life: 3000 });
-  } catch (error) {
-    console.log('updateVsaCaseActiveStatus error', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
-  }
-};
-
-const tsaCaseContextMenuRef = ref();
-const tsaCaseContextMenu = ref([]);
-const onTsaCaseRightClick = async (event, node) => {
-  if (node.active) {
-    tsaCaseContextMenu.value = [
-      {
-        label: 'Unactive',
-        icon: 'pi pi-times',
-        command: async () => {
-          await updateTsaCaseActiveStatus(node._id, false);
-        },
-      },
-    ];
-  } else {
-    tsaCaseContextMenu.value = [
-      {
-        label: 'Active',
-        icon: 'pi pi-check',
-        command: async () => {
-          await updateTsaCaseActiveStatus(node._id, true);
-        },
-      },
-    ];
-  }
-  tsaCaseContextMenuRef.value.show(event);
-};
-
-const updateTsaCaseActiveStatus = async (tsaCaseId, newStatus) => {
-  try {
-    await TsaApi.updateTsaCase(tsaCaseId, { active: newStatus });
-    toast.add({ severity: 'success', summary: 'Updated Active Status successfully', life: 3000 });
-  } catch (error) {
-    console.log('updateTsaCaseActiveStatus error', error);
-    toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
 };
 

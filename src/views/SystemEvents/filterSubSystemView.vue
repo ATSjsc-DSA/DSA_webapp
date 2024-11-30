@@ -256,7 +256,8 @@ const getFilterSelected = () => {
     },
     powerSystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
     powersystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
-    filtering: filterConjunction.value,
+
+    filtering: filterNameSelected.value.length >= 2 ? filterConjunction.value : '',
   };
 };
 const changFilter = () => {

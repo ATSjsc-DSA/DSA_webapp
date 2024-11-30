@@ -99,9 +99,9 @@ const nodeSelected = defineModel('nodeSelected');
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
-  if (nodeSelected.value) {
+  if (nodeSelected.value.length>0) {
     nodeSelectedInChart.value = nodeSelected.value.data;
-    config.value = nodeSelected.value.config;
+    config.value = nodeSelected.value.config || { standard: [], other: [] };
     standardSelected.value = config.value.standard;
     otherSelected.value = config.value.other;
     getChartData();
@@ -128,29 +128,44 @@ const onRemoveWidget = () => {
   emit('onRemoveWidget');
 };
 
-const typeChartCanDrop = ref('TsaCurve');
+const typeChartCanDrop = ref(['TsaCurve', 'TsaCurveType']);
 const hiddenDatasets = ref([]);
 const nodeSelectedInChart = ref([]);
 const nodeKeySelected = ref([]);
 const canDropNode = ref(false);
 
 const onDragoverComponent = () => {
-  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
+  if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
     canDropNode.value = true;
   } else {
     canDropNode.value = false;
   }
 };
 const onDropComponent = async () => {
-  if (props.nodeDrag.type === typeChartCanDrop.value && nodeSelectedInChart.value !== props.nodeDrag._id) {
-    nodeKeySelected.value.push(props.nodeDrag.key);
-    nodeSelectedInChart.value.push({
-      curveInfoId: props.nodeDrag._id,
-      curveType: props.nodeDrag.curveType,
-      subCaseInfoId: props.nodeDrag.subCaseInfo,
-      caseInfoId: props.nodeDrag.caseInfoId,
-      moduleInfoId: props.nodeDrag.moduleInfoId,
-    });
+  if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
+    if (props.nodeDrag.type === 'TsaCurve') {
+      nodeKeySelected.value.push(props.nodeDrag.key);
+      nodeSelectedInChart.value.push({
+        curveInfoId: props.nodeDrag._id,
+        curveType: props.nodeDrag.curveType,
+        subCaseInfoId: props.nodeDrag.subCaseInfo,
+        caseInfoId: props.nodeDrag.caseInfoId,
+        moduleInfoId: props.nodeDrag.moduleInfoId,
+      });
+    }
+    if (props.nodeDrag.type === 'TsaCurveType') {
+      const tsaCurveData = JSON.parse(props.nodeDrag.data);
+      nodeKeySelected.value.push(props.nodeDrag.key);
+      tsaCurveData.forEach((curveId) => {
+        nodeSelectedInChart.value.push({
+          curveInfoId: curveId,
+          curveType: props.nodeDrag.curveType,
+          subCaseInfoId: props.nodeDrag.subCaseInfo,
+          caseInfoId: props.nodeDrag.caseInfoId,
+          moduleInfoId: props.nodeDrag.moduleInfoId,
+        });
+      });
+    }
 
     nodeSelected.value = {
       data: nodeSelectedInChart.value,
