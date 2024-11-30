@@ -7,47 +7,14 @@
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
         </div>
         <div class="flex justify-content-between align-items-center">
-          <div>
-            <Button
-              type="button"
-              icon="pi pi-ellipsis-v"
-              aria-haspopup="true"
-              aria-controls="menuTsaConfigOverlay"
-              text
-              @click="toggleMenuTsaConfig"
-            />
-            <OverlayPanel id="menuTsaConfigOverlay" ref="menuTsaConfig" style="width: 42rem">
-              <div class="font-semibold text-lg mb-2">TSA: Configuration</div>
-              <Divider />
-
-              <div class="flex flex-column align-items-start gap-1 p-3">
-                <label for="Standard" class="font-semibold text-base mb-1"> Standard Point </label>
-                <MultiSelect
-                  v-model="standardSelected"
-                  :options="curveNameOpts"
-                  optionGroupLabel="label"
-                  optionGroupChildren="items"
-                  display="chip"
-                  class="w-full"
-                />
-              </div>
-
-              <div class="flex flex-column align-items-start gap-1 p-3">
-                <label for="Standard" class="font-semibold text-base mb-1"> Range Line </label>
-                <MultiSelect
-                  v-model="otherSelected"
-                  :options="curveNameOpts"
-                  optionGroupLabel="label"
-                  optionGroupChildren="items"
-                  display="chip"
-                  class="w-full"
-                />
-              </div>
-              <div class="flex justify-content-end my-3">
-                <Button label="Submit" @click="changeConfig" />
-              </div>
-            </OverlayPanel>
-          </div>
+          <ToggleButton
+            v-model="showAnnotations"
+            :disabled="chartData.length !== 1"
+            onLabel="Standard"
+            offLabel="Curve Only"
+            onIcon="pi pi-chart-bar"
+            offIcon="pi pi-chart-line"
+          />
           <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
           <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="getChartData" />
           <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
@@ -63,7 +30,7 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        <tsaCurveLinechartWidget :data="chartData" :config="config" />
+        <tsaCurveLinechartWidget :data="chartData" :showAnnotations="showAnnotations" />
       </div>
     </template>
   </Card>
@@ -71,8 +38,7 @@
 
 <script setup>
 import { computed, onUnmounted, onMounted, watch } from 'vue';
-import MultiSelect from 'primevue/multiselect';
-
+import ToggleButton from 'primevue/togglebutton';
 import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
 import { TsaApi } from './api';
 import chartComposable from '@/combosables/chartData';
@@ -99,11 +65,9 @@ const nodeSelected = defineModel('nodeSelected');
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
-  if (nodeSelected.value.length>0) {
+  if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
-    config.value = nodeSelected.value.config || { standard: [], other: [] };
-    standardSelected.value = config.value.standard;
-    otherSelected.value = config.value.other;
+    showAnnotations.value = nodeSelected.value.showAnnotations;
     getChartData();
   }
 });
@@ -169,7 +133,7 @@ const onDropComponent = async () => {
 
     nodeSelected.value = {
       data: nodeSelectedInChart.value,
-      config: config.value,
+      showAnnotations: showAnnotations.value,
     };
     await getChartData();
     canDropNode.value = false;
@@ -205,11 +169,6 @@ const getChartData = async () => {
   }
 };
 
-const menuTsaConfig = ref();
-const toggleMenuTsaConfig = (event) => {
-  menuTsaConfig.value.toggle(event);
-};
-
 const standardSelected = ref([]);
 const otherSelected = ref([]);
 
@@ -234,20 +193,16 @@ const resetChart = async () => {
   chartData.value = [];
   nodeSelected.value = [];
   nodeSelectedInChart.value = [];
-  config.value = { standard: [], other: [] };
+  showAnnotations.value = true;
   curveNameOpts.value = [];
   standardSelected.value = [];
   otherSelected.value = [];
   hiddenDatasets.value = [];
 };
-const config = ref({ standard: [], other: [] });
+const showAnnotations = ref(false);
 const changeConfig = () => {
-  config.value = {
-    standard: standardSelected.value,
-    other: otherSelected.value,
-  };
+  showAnnotations.value = !showAnnotations.value;
   nodeSelected.value.config = config.value;
-  menuTsaConfig.value.hide();
 };
 </script>
 

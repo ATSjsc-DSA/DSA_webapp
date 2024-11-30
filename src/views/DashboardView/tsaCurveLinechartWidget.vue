@@ -18,9 +18,9 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  config: {
-    type: Object,
-    default: () => {},
+  showAnnotations: {
+    type: Boolean,
+    default: true,
   },
 });
 
@@ -39,9 +39,8 @@ watch(
 );
 
 watch(
-  () => props.config,
+  () => props.showAnnotations,
   async () => {
-    chartData.value = setChartData();
     chartOptions.value = await setChartOptions();
   },
 );
@@ -210,15 +209,17 @@ const getAnnotation = async () => {
       },
     };
   }
+  if (props.showAnnotations && props.data.length === 1) {
+    const standarAnnotations = getStandardAnnotation();
+    if (standarAnnotations) {
+      annotation = { ...annotation, ...standarAnnotations };
+    }
+    const otherAnnotations = await getOtherdAnnotation();
+    if (otherAnnotations) {
+      annotation = { ...annotation, ...otherAnnotations };
+    }
+  }
 
-  const standarAnnotations = getStandardAnnotation();
-  if (standarAnnotations) {
-    annotation = { ...annotation, ...standarAnnotations };
-  }
-  const otherAnnotations = await getOtherdAnnotation();
-  if (otherAnnotations) {
-    annotation = { ...annotation, ...otherAnnotations };
-  }
   return { annotations: annotation };
 };
 const getStandardAnnotation = () => {
@@ -232,26 +233,24 @@ const getStandardAnnotation = () => {
     const maxPointColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '500');
     const minPointColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '900');
     colorIndex++;
-    if (props.config.standard.indexOf(curveData.curveName) !== -1) {
-      for (let pointMaxIndex = 0; pointMaxIndex < curveData.standard.definitionMax.length; pointMaxIndex++) {
-        standarAnnotations[curveData.curveName + '_point_max_' + pointMaxIndex] = {
-          type: 'point',
-          radius: 4,
+    for (let pointMaxIndex = 0; pointMaxIndex < curveData.standard.definitionMax.length; pointMaxIndex++) {
+      standarAnnotations[curveData.curveName + '_point_max_' + pointMaxIndex] = {
+        type: 'point',
+        radius: 4,
 
-          xValue: curveData.standard.definitionMax[pointMaxIndex],
-          yValue: curveData.standard.valueMax[pointMaxIndex],
-          backgroundColor: maxPointColor,
-        };
-      }
-      for (let pointMinIndex = 0; pointMinIndex < curveData.standard.definitionMin.length; pointMinIndex++) {
-        standarAnnotations[curveData.curveName + '_point_min_' + pointMinIndex] = {
-          type: 'point',
-          radius: 4,
-          xValue: curveData.standard.definitionMin[pointMinIndex],
-          yValue: curveData.standard.valueMin[pointMinIndex],
-          backgroundColor: minPointColor,
-        };
-      }
+        xValue: curveData.standard.definitionMax[pointMaxIndex],
+        yValue: curveData.standard.valueMax[pointMaxIndex],
+        backgroundColor: maxPointColor,
+      };
+    }
+    for (let pointMinIndex = 0; pointMinIndex < curveData.standard.definitionMin.length; pointMinIndex++) {
+      standarAnnotations[curveData.curveName + '_point_min_' + pointMinIndex] = {
+        type: 'point',
+        radius: 4,
+        xValue: curveData.standard.definitionMin[pointMinIndex],
+        yValue: curveData.standard.valueMin[pointMinIndex],
+        backgroundColor: minPointColor,
+      };
     }
   }
   return standarAnnotations;
@@ -271,45 +270,43 @@ const getOtherdAnnotation = async () => {
 
   for (let curveIndex = 0; curveIndex < props.data.length; curveIndex++) {
     const curveData = props.data[curveIndex];
-    const maxLine1Color = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '500');
-    const maxLine2Color = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '700');
-    const minLineColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '900');
-    const stabilityLineColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '900');
+    const maxLine1Color = documentStyle.getPropertyValue('--green-500');
+    const maxLine2Color = documentStyle.getPropertyValue('--green-500');
+    const minLineColor = documentStyle.getPropertyValue('--green-500');
+    const stabilityLineColor = documentStyle.getPropertyValue('--orange-500');
     colorIndex++;
-    if (props.config.other.indexOf(curveData.curveName) !== -1) {
-      otherAnnotations[curveData.curveName + '_line_max_1' + curveIndex] = {
-        type: 'line',
-        yMin: curveData.other[0],
-        yMax: curveData.other[0],
-        borderColor: maxLine1Color,
-        borderWidth: isSmallChart ? 1 : 2,
-        borderDash: [5, 2], // Length and spacing of dashes
-      };
-      otherAnnotations[curveData.curveName + '_line_max_2' + curveIndex] = {
-        type: 'line',
-        yMin: curveData.other[1],
-        yMax: curveData.other[1],
-        borderColor: maxLine2Color,
-        borderWidth: isSmallChart ? 1 : 2,
-        borderDash: [5, 2], // Length and spacing of dashes
-      };
-      otherAnnotations[curveData.curveName + '_line_min' + curveIndex] = {
-        type: 'line',
-        yMin: curveData.other[2],
-        yMax: curveData.other[2],
-        borderColor: minLineColor,
-        borderWidth: isSmallChart ? 1 : 2,
-        borderDash: [5, 2], // Length and spacing of dashes
-      };
-      otherAnnotations[curveData.curveName + '_time_stability' + curveIndex] = {
-        type: 'line',
-        xMin: curveData.other[3],
-        xMax: curveData.other[3],
-        borderColor: stabilityLineColor,
-        borderWidth: isSmallChart ? 1 : 2,
-        borderDash: [20, 3], // Length and spacing of dashes
-      };
-    }
+    otherAnnotations[curveData.curveName + '_line_max_1' + curveIndex] = {
+      type: 'line',
+      yMin: curveData.other[0],
+      yMax: curveData.other[0],
+      borderColor: maxLine1Color,
+      borderWidth: isSmallChart ? 1 : 2,
+      borderDash: [5, 2], // Length and spacing of dashes
+    };
+    otherAnnotations[curveData.curveName + '_line_max_2' + curveIndex] = {
+      type: 'line',
+      yMin: curveData.other[1],
+      yMax: curveData.other[1],
+      borderColor: maxLine2Color,
+      borderWidth: isSmallChart ? 1 : 2,
+      borderDash: [5, 2], // Length and spacing of dashes
+    };
+    otherAnnotations[curveData.curveName + '_line_min' + curveIndex] = {
+      type: 'line',
+      yMin: curveData.other[2],
+      yMax: curveData.other[2],
+      borderColor: minLineColor,
+      borderWidth: isSmallChart ? 1 : 2,
+      borderDash: [5, 2], // Length and spacing of dashes
+    };
+    otherAnnotations[curveData.curveName + '_time_stability' + curveIndex] = {
+      type: 'line',
+      xMin: curveData.other[3],
+      xMax: curveData.other[3],
+      borderColor: stabilityLineColor,
+      borderWidth: isSmallChart ? 1 : 2,
+      borderDash: [20, 3], // Length and spacing of dashes
+    };
   }
   return otherAnnotations;
 };
