@@ -73,7 +73,7 @@ const setChartData = () => {
         data: data,
         fill: false,
         borderColor: documentStyle.getPropertyValue(colorArray[colorIndex]),
-        tension: 0.4,
+        tension: 0,
         pointRadius: 1,
       });
       colorIndex++;
@@ -93,6 +93,7 @@ const setChartOptions = async () => {
     stacked: true,
     maintainAspectRatio: false,
     aspectRatio: 0.6,
+    type: 'line',
     plugins: {
       zoom: zoomOptions(),
       legend: {

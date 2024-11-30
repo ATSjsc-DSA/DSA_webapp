@@ -65,7 +65,7 @@ const setChartData = (dataSub) => {
     fill: true,
     borderColor: documentStyle.getPropertyValue('--red-300'),
     yAxisID: 'y',
-    tension: 0.4,
+    tension: 0,
     data: [{ x: dataSub.f, y: 0.3 }],
     pointRadius: 2,
     borderWidth: 6,
@@ -77,7 +77,7 @@ const setChartData = (dataSub) => {
     fill: false,
     borderColor: documentStyle.getPropertyValue('--yellow-300'),
     yAxisID: 'y',
-    tension: 0.4,
+    tension: 0,
     data: [
       { x: dataSub.f, y: dataSub.dmin },
       { x: dataSub.f, y: dataSub.dmax },

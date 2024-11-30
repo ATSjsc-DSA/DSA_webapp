@@ -77,11 +77,11 @@ list of curveData
               definitionMin: []
               valueMin: []
         },
-        other: 
+        other:
          [max-line, max-ràng-line, min-rangeline, time of stability] <--- 3 annotations y và 1 annotations x
    }
-  
-  
+
+
   */
 
 const setChartData = () => {
@@ -104,7 +104,7 @@ const setChartData = () => {
       data: data,
       fill: false,
       borderColor: documentStyle.getPropertyValue(colorArray[colorIndex]),
-      tension: 0.4,
+      tension: 0,
       pointRadius: 1,
     });
     colorIndex++;

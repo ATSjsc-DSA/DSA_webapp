@@ -71,7 +71,7 @@ const setChartData = () => {
         data: data,
         fill: false,
         borderColor: documentStyle.getPropertyValue(colorArray[colorIndex]),
-        tension: 0.4,
+        tension: 0,
         pointRadius: 1,
       });
       colorIndex++;
