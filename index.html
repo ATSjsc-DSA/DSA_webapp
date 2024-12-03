@@ -7,9 +7,14 @@
     <link id="theme-css" rel="stylesheet" type="text/css" href="/themes/aura-dark-green/theme.css" />
 
     <title>DSA App</title>
+    <script>
+      document.addEventListener('touchstart', ()=>{console.log("touchstart")}, { passive: true });
+    </script>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+
+   
   </body>
 </html>

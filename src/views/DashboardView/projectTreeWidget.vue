@@ -19,161 +19,163 @@
     </template>
     <template #content>
       <ScrollPanel style="width: 100%; height: 100%">
-        <Tree
-          v-if="treeData.length > 0"
-          v-model:expandedKeys="treeExpandedKeys"
-          :selectionKeys="treeSelected"
-          :value="treeData"
-          loadingMode="icon"
-          selectionMode="single"
-          class="w-full"
-          :loading="treeloading"
-          @node-expand="onNodeExpand"
-          @node-select="onNodeSelect"
-        >
-          <template #default="slotProps">
-            <div :class="{ textUnActive: !slotProps.node.active }">
-              {{ slotProps.node.label }}
-            </div>
-          </template>
-
-          <template #Application="slotProps">
-            <div
-              :id="slotProps.node.key"
-              :draggable="applicationDraggable"
-              class="w-full flex align-items-center justify-content-between"
-              :class="{ 'cursor-grap': applicationDraggable }"
-              @dragstart="onStartDragNode($event, slotProps.node)"
-            >
-              <div class="font-bold text-lg" :class="{ textUnActive: !slotProps.node.active }">
-                {{ slotProps.node.label }}
-              </div>
-            </div>
-          </template>
-          <template #DSA="slotProps">
-            <div class="font-semibold" :class="{ textUnActive: !slotProps.node.active }">
-              {{ slotProps.node.label }}
-            </div>
-          </template>
-
-          <template #VSA="slotProps">
-            <div class="w-full flex align-items-center justify-content-start gap-3">
-              <Tag value="VSA" severity="contrast" rounded />
+        <template v-if="treeloading"> <div>Loading ...</div> </template>
+        <template v-else>
+          <Tree
+            v-if="treeData.length > 0"
+            v-model:expandedKeys="treeExpandedKeys"
+            :selectionKeys="treeSelected"
+            :value="treeData"
+            loadingMode="icon"
+            selectionMode="single"
+            class="w-full"
+            @node-expand="onNodeExpand"
+            @node-select="onNodeSelect"
+          >
+            <template #default="slotProps">
               <div :class="{ textUnActive: !slotProps.node.active }">
                 {{ slotProps.node.label }}
               </div>
-            </div>
-          </template>
+            </template>
 
-          <template #TSA="slotProps">
-            <div class="w-full flex align-items-center justify-content-start gap-3">
-              <Tag value="TSA" severity="secondary" rounded />
-              <div :class="{ textUnActive: !slotProps.node.active }">
+            <template #Application="slotProps">
+              <div
+                :id="slotProps.node.key"
+                :draggable="applicationDraggable"
+                class="w-full flex align-items-center justify-content-between"
+                :class="{ 'cursor-grap': applicationDraggable }"
+                @dragstart="onStartDragNode($event, slotProps.node)"
+              >
+                <div class="font-bold text-lg" :class="{ textUnActive: !slotProps.node.active }">
+                  {{ slotProps.node.label }}
+                </div>
+              </div>
+            </template>
+            <template #DSA="slotProps">
+              <div class="font-semibold" :class="{ textUnActive: !slotProps.node.active }">
                 {{ slotProps.node.label }}
               </div>
-            </div>
-          </template>
+            </template>
 
-          <template #VsaCase="slotProps">
-            <div
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ textUnActive: !slotProps.node.active }"
-              aria-haspopup="true"
-              @contextmenu="onVsaCaseRightClick($event, slotProps.node)"
-            >
-              <Tag
-                class="mr-1 w-2rem"
-                :value="getVsaCaseTypeValue(slotProps.node.caseType)"
-                :severity="getVsaCaseTypeSeverity(slotProps.node.caseType)"
-              />
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-            <ContextMenu ref="vsaCaseContextMenuRef" :model="vsaCaseContextMenu" />
-          </template>
-          <template #VsaCurve="slotProps">
-            <div
-              :id="slotProps.node.key"
-              :draggable="vsaCurveDraggable"
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ 'cursor-grap': vsaCurveDraggable }"
-              @dragstart="onStartDragNode($event, slotProps.node)"
-            >
-              <Tag
-                class="mr-3"
-                :value="getVsaCurveTypeValue(slotProps.node.curveType)"
-                :severity="getVsaCurveTypeSeverity(slotProps.node.curveType)"
-              />
-
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-          </template>
-          <template #TsaCase="slotProps">
-            <div
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ textUnActive: !slotProps.node.active }"
-              aria-haspopup="true"
-              @contextmenu="onTsaCaseRightClick($event, slotProps.node)"
-            >
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-            <ContextMenu ref="tsaCaseContextMenuRef" :model="tsaCaseContextMenu" />
-          </template>
-
-          <template #TsaCurveType="slotProps">
-            <div
-              :id="slotProps.node.key"
-              :draggable="tsaCurveDraggable"
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ 'cursor-grap': tsaCurveDraggable }"
-              @dragstart="onStartDragTsaCurveTypeNode($event, slotProps.node)"
-            >
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-          </template>
-
-          <template #TsaCurve="slotProps">
-            <div
-              :id="slotProps.node.key"
-              :draggable="tsaCurveDraggable"
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ 'cursor-grap': tsaCurveDraggable }"
-              @dragstart="onStartDragNode($event, slotProps.node)"
-            >
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-          </template>
-
-          <template #SSR="slotProps">
-            <div
-              :id="slotProps.node.key"
-              class="w-full flex align-items-center justify-content-start gap-3"
-              :draggable="ssrCurveDraggable"
-              @dragstart="onStartDragSsrCaseNode($event, slotProps.node)"
-            >
-              <Tag value="SSR" severity="secondary" rounded />
-              <div :class="{ textUnActive: !slotProps.node.active }">
-                {{ slotProps.node.label }}
+            <template #VSA="slotProps">
+              <div class="w-full flex align-items-center justify-content-start gap-3">
+                <Tag value="VSA" severity="contrast" rounded />
+                <div :class="{ textUnActive: !slotProps.node.active }">
+                  {{ slotProps.node.label }}
+                </div>
               </div>
-            </div>
-          </template>
-          <template #SsrCase="slotProps">
-            <div
-              :id="slotProps.node.key"
-              :draggable="ssrCurveDraggable"
-              class="w-full flex align-items-center justify-content-start"
-              :class="{ 'cursor-grap': ssrCurveDraggable }"
-              @dragstart="onStartDragNode($event, slotProps.node)"
-            >
-              <Tag
-                class="mr-1 w-4rem"
-                :value="getSsrTypeLabel(slotProps.node.caseType)"
-                :severity="getSeveritySsrType(slotProps.node.caseType)"
-              />
-              <div>{{ slotProps.node.label }}</div>
-            </div>
-          </template>
-        </Tree>
-        <div v-else>No data</div>
+            </template>
+
+            <template #TSA="slotProps">
+              <div class="w-full flex align-items-center justify-content-start gap-3">
+                <Tag value="TSA" severity="secondary" rounded />
+                <div :class="{ textUnActive: !slotProps.node.active }">
+                  {{ slotProps.node.label }}
+                </div>
+              </div>
+            </template>
+
+            <template #VsaCase="slotProps">
+              <div
+                class="w-full flex align-items-center justify-content-start"
+                :class="{ textUnActive: !slotProps.node.active }"
+                aria-haspopup="true"
+                @contextmenu="onVsaCaseRightClick($event, slotProps.node)"
+              >
+                <Tag
+                  class="mr-1 w-2rem"
+                  :value="getVsaCaseTypeValue(slotProps.node.caseType)"
+                  :severity="getVsaCaseTypeSeverity(slotProps.node.caseType)"
+                />
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+              <ContextMenu ref="vsaCaseContextMenuRef" :model="vsaCaseContextMenu" />
+            </template>
+            <template #VsaCurve="slotProps">
+              <div
+                :id="slotProps.node.key"
+                :draggable="vsaCurveDraggable"
+                class="w-full flex align-items-center justify-content-start"
+                :class="{ 'cursor-grap': vsaCurveDraggable }"
+                @dragstart="onStartDragNode($event, slotProps.node)"
+              >
+                <Tag
+                  class="mr-3"
+                  :value="getVsaCurveTypeValue(slotProps.node.curveType)"
+                  :severity="getVsaCurveTypeSeverity(slotProps.node.curveType)"
+                />
+
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+            </template>
+            <template #TsaCase="slotProps">
+              <div
+                class="w-full flex align-items-center justify-content-start"
+                :class="{ textUnActive: !slotProps.node.active }"
+                aria-haspopup="true"
+                @contextmenu="onTsaCaseRightClick($event, slotProps.node)"
+              >
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+              <ContextMenu ref="tsaCaseContextMenuRef" :model="tsaCaseContextMenu" />
+            </template>
+
+            <template #TsaCurveType="slotProps">
+              <div
+                :id="slotProps.node.key"
+                :draggable="tsaCurveDraggable"
+                class="w-full flex align-items-center justify-content-start"
+                :class="{ 'cursor-grap': tsaCurveDraggable }"
+                @dragstart="onStartDragTsaCurveTypeNode($event, slotProps.node)"
+              >
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+            </template>
+
+            <template #TsaCurve="slotProps">
+              <div
+                :id="slotProps.node.key"
+                :draggable="tsaCurveDraggable"
+                class="w-full flex align-items-center justify-content-start"
+                :class="{ 'cursor-grap': tsaCurveDraggable }"
+                @dragstart="onStartDragNode($event, slotProps.node)"
+              >
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+            </template>
+
+            <template #SSR="slotProps">
+              <div
+                :id="slotProps.node.key"
+                class="w-full flex align-items-center justify-content-start gap-3"
+                :draggable="ssrCurveDraggable"
+                @dragstart="onStartDragSsrCaseNode($event, slotProps.node)"
+              >
+                <Tag value="SSR" severity="secondary" rounded />
+                <div :class="{ textUnActive: !slotProps.node.active }">
+                  {{ slotProps.node.label }}
+                </div>
+              </div>
+            </template>
+            <template #SsrCase="slotProps">
+              <div
+                :id="slotProps.node.key"
+                :draggable="ssrCurveDraggable"
+                class="w-full flex align-items-center justify-content-start"
+                :class="{ 'cursor-grap': ssrCurveDraggable }"
+                @dragstart="onStartDragNode($event, slotProps.node)"
+              >
+                <Tag
+                  class="mr-1 w-4rem"
+                  :value="getSsrTypeLabel(slotProps.node.caseType)"
+                  :severity="getSeveritySsrType(slotProps.node.caseType)"
+                />
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+            </template>
+          </Tree>
+          <div v-else>No data</div>
+        </template>
       </ScrollPanel>
     </template>
   </Card>
@@ -233,13 +235,12 @@ onMounted(async () => {
 });
 
 watch(measInfoActive, async (newId, oldId) => {
-  if (newId !== oldId) {
+  if (newId._id && newId !== oldId) {
     await reloadTree();
   }
 });
 
 const userConfigProfileId = ref('');
-
 const reloadTree = async () => {
   treeData.value = [];
   await getDsaService();
@@ -321,7 +322,7 @@ const getAppBranchData = async () => {
 
   for (let appIndex = 0; appIndex < appList.length; appIndex++) {
     const app = appList[appIndex];
-    branch.push({
+    const newNode = {
       key: 'app_' + appIndex,
       label: app.name,
       _id: app._id,
@@ -329,9 +330,11 @@ const getAppBranchData = async () => {
       type: 'Application',
       icon: 'pi pi-folder-open',
       leaf: false,
-    });
+      loading: false,
+    };
+    branch.push(newNode);
     if (treeExpandedKeys.value['app_' + appIndex]) {
-      onNodeExpand('app_' + appIndex);
+      await onNodeExpand(newNode);
     }
   }
   return branch;
@@ -356,7 +359,7 @@ const getDsaModuleBranchData = async (appNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: appNode.key + '_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -365,9 +368,11 @@ const getDsaModuleBranchData = async (appNode) => {
         icon: 'pi pi-th-large',
         leaf: false,
         active: leafData.active,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[appNode.key + '_' + index]) {
-        onNodeExpand(appNode.key + '_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -394,16 +399,19 @@ const getVsaBranchData = async (dsaModuleNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: dsaModuleNode.key + '_' + 'vsa_' + index,
         label: leafData.name,
         _id: leafData._id,
         type: 'VSA',
         leaf: false,
         active: leafData.active,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
+
       if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'vsa_' + index]) {
-        onNodeExpand(dsaModuleNode.key + '_' + 'vsa_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -428,7 +436,7 @@ const getVsaCaseBranchData = async (vsaNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: vsaNode.key + '_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -437,9 +445,12 @@ const getVsaCaseBranchData = async (vsaNode) => {
         caseType: leafData.caseType,
         leaf: false,
         moduleInfoId: vsaNode._id,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
+
       if (treeExpandedKeys.value[vsaNode.key + '_' + index]) {
-        onNodeExpand(vsaNode.key + '_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -464,7 +475,7 @@ const getVsaCurveBranchData = async (caseNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: caseNode.key + '_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -474,9 +485,11 @@ const getVsaCurveBranchData = async (caseNode) => {
         leaf: true,
         caseInfoId: caseNode._id,
         moduleInfoId: caseNode.moduleInfoId,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[caseNode.key + '_' + index]) {
-        onNodeExpand(caseNode.key + '_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -503,16 +516,18 @@ const getTsaBranchData = async (dsaModuleNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: dsaModuleNode.key + '_' + 'tsa_' + index,
         label: leafData.name,
         _id: leafData._id,
         type: 'TSA',
         active: leafData.active,
         leaf: false,
-      });
+        loading: false,
+      };
+      branch.push();
       if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'tsa_' + index]) {
-        onNodeExpand(dsaModuleNode.key + '_' + 'tsa_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -537,7 +552,7 @@ const getTsaCaseBranchData = async (tsaNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: tsaNode.key + '_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -547,9 +562,11 @@ const getTsaCaseBranchData = async (tsaNode) => {
         leaf: false,
         highlight: leafData.highlight,
         moduleInfoId: tsaNode._id,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[tsaNode.key + '_' + index]) {
-        onNodeExpand(tsaNode.key + '_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -573,7 +590,7 @@ const getTsaSubCaseBranchData = async (caseNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: caseNode.key + '_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -584,9 +601,11 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         caseInfoId: caseNode._id,
         highlight: leafData.highlight,
         moduleInfoId: caseNode.moduleInfoId,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[caseNode.key + '_' + index]) {
-        onNodeExpand(caseNode.key + '_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -611,8 +630,8 @@ const getTsaCurveBranchData = async (subCaseNode) => {
   } else {
     let curveTypeList = curveList.map((item) => item.curveType);
     curveTypeList = [...new Set(curveTypeList)];
-    curveTypeList.forEach((curveType) => {
-      branch.push({
+    curveTypeList.forEach(async (curveType) => {
+      const newNode = {
         key: subCaseNode.key + '_' + curveType,
         label: getTsaCurveTypeValue(curveType),
         styleStr: getTsaCurveTypeSeverity(curveType),
@@ -623,6 +642,7 @@ const getTsaCurveBranchData = async (subCaseNode) => {
         subCaseInfo: subCaseNode._id,
         caseInfoId: subCaseNode.caseInfoId,
         moduleInfoId: subCaseNode.moduleInfoId,
+        loading: false,
         children: curveList
           .filter((item) => item.curveType === curveType)
           .map((leafData, index) => ({
@@ -635,10 +655,12 @@ const getTsaCurveBranchData = async (subCaseNode) => {
             subCaseInfo: subCaseNode._id,
             caseInfoId: subCaseNode.caseInfoId,
             moduleInfoId: subCaseNode.moduleInfoId,
+            loading: false,
           })),
-      });
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[subCaseNode.key + '_' + curveType]) {
-        onNodeExpand(subCaseNode.key + '_' + curveType);
+        await onNodeExpand(newNode);
       }
     });
   }
@@ -665,7 +687,7 @@ const getSsrBranchData = async (dsaModuleNode) => {
   } else {
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: dsaModuleNode.key + '_' + 'ssr_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -673,9 +695,11 @@ const getSsrBranchData = async (dsaModuleNode) => {
         active: leafData.active,
         leaf: false,
         data: '[]',
-      });
+        loading: false,
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'ssr_' + index]) {
-        onNodeExpand(dsaModuleNode.key + '_' + 'ssr_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
@@ -701,7 +725,7 @@ const getSsrCaseBranchData = async (ssrNode) => {
     ssrNode.data = JSON.stringify(dataList.map((item) => item._id));
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
-      branch.push({
+      const newNode = {
         key: ssrNode.key + '_' + index,
         label: leafData.name,
         _id: leafData._id,
@@ -710,9 +734,11 @@ const getSsrCaseBranchData = async (ssrNode) => {
         leaf: true,
         moduleInfoId: ssrNode._id,
         caseType: leafData.caseType,
-      });
+        loading: false,
+      };
+      branch.push(newNode);
       if (treeExpandedKeys.value[ssrNode.key + '_' + index]) {
-        onNodeExpand(ssrNode.key + '_' + index);
+        await onNodeExpand(newNode);
       }
     }
   }
