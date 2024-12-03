@@ -164,7 +164,7 @@ const getChartData = async () => {
       }, intervalTime);
     }
   } catch (error) {
-    console.log('get chart data: error ',  error);
+    console.log('get chart data: error ', error);
     chartData.value = [];
     modificationTime.value = undefined;
   }

@@ -98,7 +98,7 @@
                 @contextmenu="onVsaCaseRightClick($event, slotProps.node)"
               >
                 <Tag
-                  class="mr-1 w-2rem"
+                  class="mr-2 w-2rem"
                   :value="getVsaCaseTypeValue(slotProps.node.caseType)"
                   :severity="getVsaCaseTypeSeverity(slotProps.node.caseType)"
                 />
@@ -108,35 +108,54 @@
             </template>
 
             <template #VsaCurveType="slotProps">
-              <div
-                :id="slotProps.node.key"
-                :draggable="vsaCurveDraggable"
-                class="w-full flex align-items-center justify-content-start"
-                :class="{ 'cursor-grap': vsaCurveDraggable }"
-                @dragstart="onStartDragGroupNode($event, slotProps.node)"
-              >
-                <Tag
-                  class="mr-3"
-                  :value="getVsaCurveTypeValue(slotProps.node.curveType)"
-                  :severity="getVsaCurveTypeSeverity(slotProps.node.curveType)"
-                />
+              <div class="subTree">
+                <div
+                  :id="slotProps.node.key"
+                  :draggable="vsaCurveDraggable"
+                  class="w-full flex align-items-center justify-content-start"
+                  :class="{ 'cursor-grap': vsaCurveDraggable }"
+                  @dragstart="onStartDragGroupNode($event, slotProps.node)"
+                  @click="slotProps.node.showSubChildren = !slotProps.node.showSubChildren"
+                >
+                  <Button
+                    :icon="slotProps.node.showSubChildren ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                    style="margin-left: -2rem"
+                    text
+                    severity="secondary"
+                  />
+                  <Tag
+                    class="mr-3 px-3"
+                    :value="getVsaCurveTypeValue(slotProps.node.curveType)"
+                    :severity="getVsaCurveTypeSeverity(slotProps.node.curveType)"
+                  />
+                </div>
+                <ScrollPanel
+                  v-if="slotProps.node.showSubChildren && slotProps.node.subChildren"
+                  class="mt-1"
+                  style="width: 100%; height: 20rem; margin-left: -0.5rem"
+                >
+                  <Tree :value="slotProps.node.subChildren" class="subTree">
+                    <template #VsaCurve="slotProps">
+                      <div
+                        :id="slotProps.node.key"
+                        :draggable="vsaCurveDraggable"
+                        class="w-full flex align-items-center justify-content-start"
+                        :class="{ 'cursor-grap': vsaCurveDraggable }"
+                        @dragstart="onStartDragNode($event, slotProps.node)"
+                      >
+                        <div>{{ slotProps.node.label }}</div>
+                      </div>
+                    </template>
+                  </Tree>
+                </ScrollPanel>
               </div>
             </template>
-            <template #VsaCurve="slotProps">
-              <div
-                :id="slotProps.node.key"
-                :draggable="vsaCurveDraggable"
-                class="w-full flex align-items-center justify-content-start"
-                :class="{ 'cursor-grap': vsaCurveDraggable }"
-                @dragstart="onStartDragNode($event, slotProps.node)"
-              >
-                <div>{{ slotProps.node.label }}</div>
-              </div>
-            </template>
+            <!--  -->
             <template #TsaCase="slotProps">
               <div
                 class="w-full flex align-items-center justify-content-start"
                 :class="{ textUnActive: !slotProps.node.active }"
+                :style="{ color: slotProps.node.highlight ? 'var( --blue-500)' : '' }"
                 aria-haspopup="true"
                 @contextmenu="onTsaCaseRightClick($event, slotProps.node)"
               >
@@ -146,26 +165,45 @@
             </template>
 
             <template #TsaCurveType="slotProps">
-              <div
-                :id="slotProps.node.key"
-                :draggable="tsaCurveDraggable"
-                class="w-full flex align-items-center justify-content-start"
-                :class="{ 'cursor-grap': tsaCurveDraggable }"
-                @dragstart="onStartDragGroupNode($event, slotProps.node)"
-              >
-                <div>{{ slotProps.node.label }}</div>
-              </div>
-            </template>
-
-            <template #TsaCurve="slotProps">
-              <div
-                :id="slotProps.node.key"
-                :draggable="tsaCurveDraggable"
-                class="w-full flex align-items-center justify-content-start"
-                :class="{ 'cursor-grap': tsaCurveDraggable }"
-                @dragstart="onStartDragNode($event, slotProps.node)"
-              >
-                <div>{{ slotProps.node.label }}</div>
+              <div class="subTree">
+                <div
+                  :id="slotProps.node.key"
+                  :draggable="tsaCurveDraggable"
+                  class="w-full flex align-items-center justify-content-start"
+                  :class="{ 'cursor-grap': tsaCurveDraggable }"
+                  @dragstart="onStartDragGroupNode($event, slotProps.node)"
+                >
+                  <Button
+                    :icon="slotProps.node.showSubChildren ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                    style="margin-left: -2rem"
+                    text
+                    severity="secondary"
+                  />
+                  <Tag
+                    class="mr-3 px-3"
+                    :value="getTsaCurveTypeValue(slotProps.node.curveType)"
+                    :severity="getTsaCurveTypeSeverity(slotProps.node.curveType)"
+                  />
+                </div>
+                <ScrollPanel
+                  v-if="slotProps.node.showSubChildren && slotProps.node.subChildren"
+                  class="mt-1"
+                  style="width: 100%; height: 20rem; margin-left: -0.5rem"
+                >
+                  <Tree :value="slotProps.node.subChildren" class="subTree">
+                    <template #TsaCurve="slotProps">
+                      <div
+                        :id="slotProps.node.key"
+                        :draggable="tsaCurveDraggable"
+                        class="w-full flex align-items-center justify-content-start"
+                        :class="{ 'cursor-grap': tsaCurveDraggable }"
+                        @dragstart="onStartDragNode($event, slotProps.node)"
+                      >
+                        <div>{{ slotProps.node.label }}</div>
+                      </div>
+                    </template>
+                  </Tree>
+                </ScrollPanel>
               </div>
             </template>
 
@@ -496,26 +534,27 @@ const getVsaCurveBranchData = async (caseNode) => {
   } else {
     let curveTypeList = curveList.map((item) => item.curveType);
     curveTypeList = [...new Set(curveTypeList)];
-    curveTypeList.forEach(async (curveType) => {
+    curveTypeList.forEach((curveType) => {
       const curvesInType = curveList.filter((item) => item.curveType === curveType);
       const newNode = {
         key: caseNode.key + '_' + curveType,
         label: getVsaCurveTypeValue(curveType),
         data: JSON.stringify(curvesInType.map((leafData) => leafData._id)),
         type: 'VsaCurveType',
-        leaf: false,
+        leaf: true,
         curveType: curveType,
         caseInfoId: caseNode._id,
         moduleInfoId: caseNode.moduleInfoId,
         loading: false,
-        children: curvesInType.map((leafData, index) => ({
+        showSubChildren: false,
+        subChildren: curvesInType.map((leafData, index) => ({
           key: caseNode.key + '_' + index,
           label: leafData.name,
           _id: leafData._id,
           type: 'VsaCurve',
           curveType: leafData.curveType,
           active: leafData.active,
-          leaf: true,
+          leaf: false,
           caseInfoId: caseNode._id,
           moduleInfoId: caseNode.moduleInfoId,
           loading: false,
@@ -523,7 +562,7 @@ const getVsaCurveBranchData = async (caseNode) => {
       };
       branch.push(newNode);
       if (treeExpandedKeys.value[caseNode.key + '_' + curveType]) {
-        await onNodeExpand(newNode);
+        onNodeExpand(newNode);
       }
     });
   }
@@ -594,7 +633,7 @@ const getTsaCaseBranchData = async (tsaNode) => {
         active: leafData.active,
         icon: 'pi pi-list',
         leaf: false,
-        highlight: leafData.highlight,
+        highlight: leafData.attention,
         moduleInfoId: tsaNode._id,
         loading: false,
       };
@@ -633,7 +672,7 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         icon: 'pi pi-file',
         leaf: false,
         caseInfoId: caseNode._id,
-        highlight: leafData.highlight,
+        highlight: leafData.attention,
         moduleInfoId: caseNode.moduleInfoId,
         loading: false,
       };
@@ -665,35 +704,35 @@ const getTsaCurveBranchData = async (subCaseNode) => {
     let curveTypeList = curveList.map((item) => item.curveType);
     curveTypeList = [...new Set(curveTypeList)];
     curveTypeList.forEach(async (curveType) => {
+      const curvesInType = curveList.filter((item) => item.curveType === curveType);
       const newNode = {
         key: subCaseNode.key + '_' + curveType,
         label: getTsaCurveTypeValue(curveType),
-        data: JSON.stringify(curveList.filter((item) => item.curveType === curveType).map((leafData) => leafData._id)),
+        data: JSON.stringify(curvesInType.map((leafData) => leafData._id)),
         type: 'TsaCurveType',
-        leaf: false,
+        leaf: true,
+        showSubChildren: false,
         curveType: curveType,
         subCaseInfo: subCaseNode._id,
         caseInfoId: subCaseNode.caseInfoId,
         moduleInfoId: subCaseNode.moduleInfoId,
         loading: false,
-        children: curveList
-          .filter((item) => item.curveType === curveType)
-          .map((leafData, index) => ({
-            key: subCaseNode.key + curveType + '_' + index,
-            label: leafData.name,
-            _id: leafData._id,
-            type: 'TsaCurve',
-            curveType: leafData.curveType,
-            leaf: true,
-            subCaseInfo: subCaseNode._id,
-            caseInfoId: subCaseNode.caseInfoId,
-            moduleInfoId: subCaseNode.moduleInfoId,
-            loading: false,
-          })),
+        subChildren: curvesInType.map((leafData, index) => ({
+          key: subCaseNode.key + curveType + '_' + index,
+          label: leafData.name,
+          _id: leafData._id,
+          type: 'TsaCurve',
+          curveType: leafData.curveType,
+          leaf: true,
+          subCaseInfo: subCaseNode._id,
+          caseInfoId: subCaseNode.caseInfoId,
+          moduleInfoId: subCaseNode.moduleInfoId,
+          loading: false,
+        })),
       };
       branch.push(newNode);
       if (treeExpandedKeys.value[subCaseNode.key + '_' + curveType]) {
-        await onNodeExpand(newNode);
+        onNodeExpand(newNode);
       }
     });
   }
@@ -1038,3 +1077,16 @@ const getSeveritySsrType = (typeValue) => {
   }
 };
 </script>
+
+<style>
+.subTree .p-tree-toggler {
+  display: none;
+}
+
+.subTree .p-treenode-content {
+  padding-bottom: 1rem;
+}
+.p-treenode-content.p-treenode-selectable {
+  align-items: start;
+}
+</style>

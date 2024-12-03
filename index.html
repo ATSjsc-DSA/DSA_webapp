@@ -8,13 +8,17 @@
 
     <title>DSA App</title>
     <script>
-      document.addEventListener('touchstart', ()=>{console.log("touchstart")}, { passive: true });
+      document.addEventListener(
+        'touchstart',
+        () => {
+          console.log('touchstart');
+        },
+        { passive: true },
+      );
     </script>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
-
-   
   </body>
 </html>
