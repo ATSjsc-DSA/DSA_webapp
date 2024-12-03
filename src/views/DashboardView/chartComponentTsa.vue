@@ -6,7 +6,7 @@
           <div>TSA</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
         </div>
-        <div class="flex justify-content-between align-items-center">
+        <div class="hidden md:flex gap-2 justify-content-between align-items-center">
           <ToggleButton
             v-model="showAnnotations"
             :disabled="chartData.length !== 1"
@@ -14,6 +14,16 @@
             offLabel="Curve Only"
             onIcon="pi pi-chart-bar"
             offIcon="pi pi-chart-line"
+            @change="changeConfig"
+          />
+
+          <ToggleButton
+            v-model="showLegend"
+            :disabled="chartData.length === 0"
+            onLabel=""
+            offLabel=""
+            onIcon="pi pi-eye"
+            offIcon="pi pi-eye-slash"
             @change="changeConfig"
           />
           <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
@@ -199,15 +209,21 @@ const resetChart = async () => {
   nodeSelected.value = [];
   nodeSelectedInChart.value = [];
   showAnnotations.value = true;
+  showLegend.value = true;
   curveNameOpts.value = [];
   standardSelected.value = [];
   otherSelected.value = [];
   hiddenDatasets.value = [];
 };
 const showAnnotations = ref(false);
+const showLegend = ref(true);
+
 const changeConfig = () => {
-  showAnnotations.value = !showAnnotations.value;
+  // showAnnotations.value = !showAnnotations.value;
+  // showLegend.value = !showLegend.value;
+
   nodeSelected.value.showAnnotations = showAnnotations.value;
+  nodeSelected.value.showLegend = showLegend.value;
 };
 </script>
 

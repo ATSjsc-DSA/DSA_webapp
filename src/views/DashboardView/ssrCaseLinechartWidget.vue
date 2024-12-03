@@ -77,6 +77,9 @@ const setChartData = () => {
         pointRadius: 1,
       });
       colorIndex++;
+      if (colorIndex >= colorArray.length) {
+        colorIndex = 0;
+      }
     }
   }
   return { datasets: datasets, labels: labels };
@@ -197,6 +200,9 @@ const getDmAnnotation = async () => {
     const caseData = props.data[caseIndex];
     const dmLineColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '500');
     colorIndex++;
+      if (colorIndex >= colorArray.length) {
+        colorIndex = 0;
+      }
     dmAnnotations['line_dm_' + caseIndex] = {
       type: 'line',
       yMin: caseData.minDm,

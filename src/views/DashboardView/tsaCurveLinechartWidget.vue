@@ -107,6 +107,9 @@ const setChartData = () => {
       pointRadius: 1,
     });
     colorIndex++;
+      if (colorIndex >= colorArray.length) {
+        colorIndex = 0;
+      }
   }
 
   return { datasets: datasets, labels: labels };
@@ -233,6 +236,9 @@ const getStandardAnnotation = () => {
     const maxPointColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '500');
     const minPointColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '900');
     colorIndex++;
+      if (colorIndex >= colorArray.length) {
+        colorIndex = 0;
+      }
     for (let pointMaxIndex = 0; pointMaxIndex < curveData.standard.definitionMax.length; pointMaxIndex++) {
       standarAnnotations[curveData.curveName + '_point_max_' + pointMaxIndex] = {
         type: 'point',
@@ -275,6 +281,9 @@ const getOtherdAnnotation = async () => {
     const minLineColor = documentStyle.getPropertyValue('--green-500');
     const stabilityLineColor = documentStyle.getPropertyValue('--orange-500');
     colorIndex++;
+      if (colorIndex >= colorArray.length) {
+        colorIndex = 0;
+      }
     otherAnnotations[curveData.curveName + '_line_max_1' + curveIndex] = {
       type: 'line',
       yMin: curveData.other[0],

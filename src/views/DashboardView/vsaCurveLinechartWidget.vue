@@ -16,6 +16,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  showLegend: {
+    type: Boolean,
+    default: true,
+  },
 });
 onMounted(() => {
   chartData.value = setChartData();
@@ -28,6 +32,12 @@ watch(
       chartData.value = setChartData();
       chartOptions.value = setChartOptions();
     }
+  },
+);
+watch(
+  () => props.showLegend,
+  () => {
+    chartOptions.value = setChartOptions();
   },
 );
 
@@ -75,6 +85,9 @@ const setChartData = () => {
         pointRadius: 1,
       });
       colorIndex++;
+      if (colorIndex >= colorArray.length) {
+        colorIndex = 0;
+      }
     }
   }
   return { datasets: datasets, labels: labels };
@@ -94,6 +107,7 @@ const setChartOptions = () => {
     plugins: {
       zoom: zoomOptions(),
       legend: {
+        display: props.showLegend,
         labels: {
           usePointStyle: true,
           color: textColor,

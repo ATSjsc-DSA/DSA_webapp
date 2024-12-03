@@ -70,6 +70,16 @@
               </div>
             </OverlayPanel>
           </div>
+          <ToggleButton
+            v-if="typeChart === 'vsa'"
+            v-model="showVsaLegend"
+            :disabled="chartData.length === 0"
+            onLabel=""
+            offLabel=""
+            onIcon="pi pi-eye"
+            offIcon="pi pi-eye-slash"
+            @change="changeConfig"
+          />
           <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
           <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="reloaData" />
           <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
@@ -88,7 +98,7 @@
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
         <appTimeSerieschartWidget v-if="typeChart === 'appTimeSeries'" :data="chartData" />
 
-        <vsaCurveLinechartWidget v-if="typeChart === 'vsa'" :data="chartData" />
+        <vsaCurveLinechartWidget v-if="typeChart === 'vsa'" :showLegend="showVsaLegend" :data="chartData" />
         <ssrCaseLinechartWidget v-if="typeChart === 'ssr'" :data="chartData" />
 
         <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
@@ -146,6 +156,7 @@ onMounted(() => {
       chartTitle.value = nodeSelected.value.title;
     } else {
       setInitTitle();
+      showVsaLegend.value = nodeSelected.value.showLegend;
     }
     if (props.typeChart === 'appTimeSeries') {
       setInitRangeTimeOfSeriesChart();
@@ -322,6 +333,7 @@ const onDropComponent = async () => {
     nodeSelected.value = {
       title: props.nodeDrag.label,
       data: nodeSelectedInChart.value,
+      showLegend: showVsaLegend.value,
       dataKey: [],
       startTimeSeries: 0,
       endTimeSeries: 0,
@@ -409,6 +421,13 @@ const resetChart = async () => {
   setInitTitle();
   nodeSelected.value = props.muiltiSelect ? {} : undefined;
   nodeSelectedInChart.value = props.muiltiSelect ? [] : undefined;
+  showVsaLegend.value = true;
+};
+
+const showVsaLegend = ref(true);
+
+const changeConfig = () => {
+  nodeSelected.value.showLegend = showVsaLegend.value;
 };
 </script>
 
