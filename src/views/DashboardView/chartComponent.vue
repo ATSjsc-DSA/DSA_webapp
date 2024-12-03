@@ -223,7 +223,7 @@ const typeChartCanDrop = computed(() => {
   }
 
   if (props.typeChart === 'vsa') {
-    return ['VsaCurve'];
+    return ['VsaCurve', 'VsaCurveType'];
   }
   if (props.typeChart === 'ssr') {
     return ['SsrCase', 'SSR'];
@@ -274,12 +274,26 @@ const onDropComponent = async () => {
     if (props.muiltiSelect) {
       nodeKeySelected.value.push(props.nodeDrag.key);
       if (props.typeChart === 'vsa') {
-        nodeSelectedInChart.value.push({
-          curveInfoId: props.nodeDrag._id,
-          curveType: props.nodeDrag.curveType,
-          caseInfoId: props.nodeDrag.caseInfoId,
-          moduleInfoId: props.nodeDrag.moduleInfoId,
-        });
+        if (props.nodeDrag.type === 'VsaCurve') {
+          nodeSelectedInChart.value.push({
+            curveInfoId: props.nodeDrag._id,
+            curveType: props.nodeDrag.curveType,
+            caseInfoId: props.nodeDrag.caseInfoId,
+            moduleInfoId: props.nodeDrag.moduleInfoId,
+          });
+        }
+        if (props.nodeDrag.type === 'VsaCurveType') {
+          const vsaCurveData = JSON.parse(props.nodeDrag.data);
+          nodeKeySelected.value.push(props.nodeDrag.key);
+          vsaCurveData.forEach((curveId) => {
+            nodeSelectedInChart.value.push({
+              curveInfoId: curveId,
+              curveType: props.nodeDrag.curveType,
+              caseInfoId: props.nodeDrag.caseInfoId,
+              moduleInfoId: props.nodeDrag.moduleInfoId,
+            });
+          });
+        }
       }
       if (props.typeChart === 'ssr') {
         if (props.nodeDrag.type === 'SsrCase') {
