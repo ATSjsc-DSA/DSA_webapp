@@ -14,9 +14,10 @@
             offLabel="Curve Only"
             onIcon="pi pi-chart-bar"
             offIcon="pi pi-chart-line"
+            @change="changeConfig"
           />
           <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
-          <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="getChartData" />
+          <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="reloaData" />
           <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
         </div>
       </div>
@@ -187,6 +188,10 @@ const getCurveNameOpts = (data) => {
     items: moduleNameObj[moduleName].items,
   }));
 };
+const reloaData = async () => {
+  chartData.value = [];
+  await getChartData();
+};
 
 const resetChart = async () => {
   clearTimeout(interval.value);
@@ -202,7 +207,7 @@ const resetChart = async () => {
 const showAnnotations = ref(false);
 const changeConfig = () => {
   showAnnotations.value = !showAnnotations.value;
-  nodeSelected.value.config = config.value;
+  nodeSelected.value.showAnnotations = showAnnotations.value;
 };
 </script>
 

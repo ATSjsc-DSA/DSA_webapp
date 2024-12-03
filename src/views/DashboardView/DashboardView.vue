@@ -1,8 +1,8 @@
 <template>
   <div class="grid w-full h-full m-0">
-    <div v-if="showTree || showLog" class="col-3 xl:col-4">
+    <div v-if="showTree || showLog" class="col-3 2xl:col-4">
       <div class="sticky flex flex-column gap-3" style="top: 6rem">
-        <ScrollPanel v-if="showTree" style="width: 100%" :style="{ height: showLog ? '28rem' : '58rem' }">
+        <ScrollPanel v-if="showTree" style="width: 100%" :style="{ height: showLog ? '30rem' : '61rem' }">
           <projectTreeWidget
             v-if="showTree"
             v-bind:application-draggable="applicationDraggable"
@@ -14,7 +14,7 @@
           />
         </ScrollPanel>
 
-        <ScrollPanel v-if="showLog" style="width: 100%" :style="{ height: showTree ? '30rem' : '58rem' }">
+        <ScrollPanel v-if="showLog" style="width: 100%" :style="{ height: showTree ? '30rem' : '61rem' }">
           <logListWidget v-model="showTree" @onRemoveWidget="showLog = false" @saveLogConfig="saveLogConfig" />
         </ScrollPanel>
       </div>
@@ -51,8 +51,15 @@
                 </div>
 
                 <template v-if="w.type === 'chart'">
-                  <chartComponentTsaWidget
+                  <chartComponentTsa
                     v-if="w.typeChart === 'tsa'"
+                    v-model:nodeSelected="w.nodeSelected"
+                    :nodeDrag="nodeDrag"
+                    :chartId="w.id"
+                    @onRemoveWidget="onRemoveGridStackComponent(w)"
+                  />
+                  <chartComponentAppTimeseries
+                    v-else-if="w.typeChart === 'appTimeSeries'"
                     v-model:nodeSelected="w.nodeSelected"
                     :nodeDrag="nodeDrag"
                     :chartId="w.id"
@@ -153,7 +160,7 @@
     </div>
 
     <div class="font-semibold text-center w-full py-3" style="font-size: 0.8rem">COMPONENT</div>
-    <ScrollPanel style="height: 26rem">
+    <ScrollPanel :style="{ height: measInfo_automatic ? '37rem' : '31rem' }">
       <div class="flex flex-column gap-2 justify-content-center align-items-center">
         <div
           v-tooltip.left="'Project Tree'"
@@ -287,7 +294,8 @@ import projectTreeWidget from './projectTreeWidget.vue';
 import logListWidget from './logListWidget.vue';
 import MeasInfoDialogWidget from './MeasInfoWidget.vue';
 import chartComponent from './chartComponent.vue';
-import chartComponentTsaWidget from './chartComponentTsaWidget.vue';
+import chartComponentTsa from './chartComponentTsa.vue';
+import chartComponentAppTimeseries from './chartComponentAppTimeseries.vue';
 
 import { useCommonStore } from '@/store';
 

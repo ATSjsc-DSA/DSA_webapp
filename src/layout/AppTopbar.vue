@@ -8,7 +8,6 @@ import NavMenu from './NavMenu.vue';
 
 import DSA_api from '@/api/dsa_api';
 import chartComposable from '@/combosables/chartData';
-import { intervalTime } from '@/Constants/';
 import { useCommonStore } from '@/store';
 const { layoutConfig, isDarkTheme } = useLayout();
 const { convertDateTimeToString } = chartComposable();
@@ -163,31 +162,10 @@ const isOutsideClicked = (event) => {
         rounded
         outlined
         :icon="isDarkTheme ? 'pi pi-moon' : 'pi pi-sun'"
-        class="mx-3"
+        class="mx-2"
         @click="toggleDarkMode"
       />
 
-      <div v-tooltip.bottom="'Notification'" class="p-link layout-topbar-notifi" type="text" @click="toggle">
-        <i v-if="countLogs === '0'" class="pi pi-bell"></i>
-        <i v-else v-badge.danger="countLogs" class="pi pi-bell" />
-        <OverlayPanel ref="op" appendTo="body">
-          <DataTable
-            v-model:selection="selectedProduct"
-            :value="logs"
-            selectionMode="single"
-            :rows="5"
-            highlightOnSelect
-            scrollable
-            scrollHeight="400px"
-          >
-            <Column field="timestamp" header="Timestamp" sortable style="min-width: 8rem">
-              <template #body="slotProps"> {{ convertDateTimeToString(slotProps.data.timestamp) }} </template>
-            </Column>
-
-            <Column field="event" header="Event" style="min-width: 18rem"> </Column>
-          </DataTable>
-        </OverlayPanel>
-      </div>
       <button v-tooltip.bottom="'User'" class="p-link layout-topbar-button" type="text" @click="onTopBarUserView()">
         <i class="pi pi-user"></i>
         <span>User</span>

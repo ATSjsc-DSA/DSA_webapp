@@ -180,7 +180,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, render } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useCommonStore } from '@/store';
 
 import Tree from 'primevue/tree';
 import ScrollPanel from 'primevue/scrollpanel';
@@ -190,8 +191,12 @@ const toast = useToast();
 import { useLayout } from '@/layout/composables/layout';
 
 const { isDarkTheme } = useLayout();
+
 import { VsaApi, TsaApi, SsrApi, CommonApi } from './api';
 import { DSA_api } from '../DSASettingView/api';
+
+const commonStore = useCommonStore();
+const { measInfoActive } = storeToRefs(commonStore);
 const props = defineProps({
   applicationDraggable: {
     type: Boolean,
@@ -225,6 +230,12 @@ const onStartDragSsrCaseNode = async (evt, node) => {
 onMounted(async () => {
   await getDsaService();
   await getTreeData();
+});
+
+watch(measInfoActive, async (newId, oldId) => {
+  if (newId !== oldId) {
+    await reloadTree();
+  }
 });
 
 const userConfigProfileId = ref('');
@@ -319,6 +330,9 @@ const getAppBranchData = async () => {
       icon: 'pi pi-folder-open',
       leaf: false,
     });
+    if (treeExpandedKeys.value['app_' + appIndex]) {
+      onNodeExpand('app_' + appIndex);
+    }
   }
   return branch;
 };
@@ -352,6 +366,9 @@ const getDsaModuleBranchData = async (appNode) => {
         leaf: false,
         active: leafData.active,
       });
+      if (treeExpandedKeys.value[appNode.key + '_' + index]) {
+        onNodeExpand(appNode.key + '_' + index);
+      }
     }
   }
   return branch;
@@ -385,6 +402,9 @@ const getVsaBranchData = async (dsaModuleNode) => {
         leaf: false,
         active: leafData.active,
       });
+      if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'vsa_' + index]) {
+        onNodeExpand(dsaModuleNode.key + '_' + 'vsa_' + index);
+      }
     }
   }
   return branch;
@@ -418,6 +438,9 @@ const getVsaCaseBranchData = async (vsaNode) => {
         leaf: false,
         moduleInfoId: vsaNode._id,
       });
+      if (treeExpandedKeys.value[vsaNode.key + '_' + index]) {
+        onNodeExpand(vsaNode.key + '_' + index);
+      }
     }
   }
   return branch;
@@ -452,6 +475,9 @@ const getVsaCurveBranchData = async (caseNode) => {
         caseInfoId: caseNode._id,
         moduleInfoId: caseNode.moduleInfoId,
       });
+      if (treeExpandedKeys.value[caseNode.key + '_' + index]) {
+        onNodeExpand(caseNode.key + '_' + index);
+      }
     }
   }
   return branch;
@@ -485,6 +511,9 @@ const getTsaBranchData = async (dsaModuleNode) => {
         active: leafData.active,
         leaf: false,
       });
+      if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'tsa_' + index]) {
+        onNodeExpand(dsaModuleNode.key + '_' + 'tsa_' + index);
+      }
     }
   }
   return branch;
@@ -519,6 +548,9 @@ const getTsaCaseBranchData = async (tsaNode) => {
         highlight: leafData.highlight,
         moduleInfoId: tsaNode._id,
       });
+      if (treeExpandedKeys.value[tsaNode.key + '_' + index]) {
+        onNodeExpand(tsaNode.key + '_' + index);
+      }
     }
   }
   return branch;
@@ -553,6 +585,9 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         highlight: leafData.highlight,
         moduleInfoId: caseNode.moduleInfoId,
       });
+      if (treeExpandedKeys.value[caseNode.key + '_' + index]) {
+        onNodeExpand(caseNode.key + '_' + index);
+      }
     }
   }
   return branch;
@@ -602,6 +637,9 @@ const getTsaCurveBranchData = async (subCaseNode) => {
             moduleInfoId: subCaseNode.moduleInfoId,
           })),
       });
+      if (treeExpandedKeys.value[subCaseNode.key + '_' + curveType]) {
+        onNodeExpand(subCaseNode.key + '_' + curveType);
+      }
     });
   }
   return branch;
@@ -636,6 +674,9 @@ const getSsrBranchData = async (dsaModuleNode) => {
         leaf: false,
         data: '[]',
       });
+      if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'ssr_' + index]) {
+        onNodeExpand(dsaModuleNode.key + '_' + 'ssr_' + index);
+      }
     }
   }
   return branch;
@@ -658,7 +699,6 @@ const getSsrCaseBranchData = async (ssrNode) => {
     ssrNode.leaf = true;
   } else {
     ssrNode.data = JSON.stringify(dataList.map((item) => item._id));
-    console.log(ssrNode.data);
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
       branch.push({
@@ -671,6 +711,9 @@ const getSsrCaseBranchData = async (ssrNode) => {
         moduleInfoId: ssrNode._id,
         caseType: leafData.caseType,
       });
+      if (treeExpandedKeys.value[ssrNode.key + '_' + index]) {
+        onNodeExpand(ssrNode.key + '_' + index);
+      }
     }
   }
   return branch;
@@ -851,7 +894,7 @@ const getTsaCurveTypeValue = (curveType) => {
     case 10:
       return 'Efd';
     default:
-      return curveType;
+      return 'Unknown';
   }
 };
 const getTsaCurveTypeSeverity = (curveType) => {

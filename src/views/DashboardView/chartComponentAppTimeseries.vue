@@ -5,39 +5,13 @@
         <div class="flex flex-column justify-content-start align-items-start">
           <div>{{ chartTitle }}</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
-          <div v-if="typeChart === 'appTimeSeries'" style="font-size: 0.7rem; padding-top: 0.5rem">
+          <div style="font-size: 0.7rem; padding-top: 0.5rem">
             {{ rangeTimeOfTimeSeriesChart }}
           </div>
         </div>
         <div class="flex justify-content-between align-items-center">
           <!-- choose label for radar chart  -->
-          <div v-if="chartData.Key">
-            <Button
-              type="button"
-              icon="pi pi-ellipsis-v"
-              aria-haspopup="true"
-              aria-controls="overlay_panel_radarchart"
-              text
-              @click="toggleMenuSelectKeyRadarChart"
-            />
-            <OverlayPanel id="overlay_panel_radarchart" ref="menuSelectDataKey">
-              <div class="font-semibold text-lg mb-2">{{ chartTitle }}: Select Keys</div>
-              <Divider />
-              <div class="flex flex-column gap-3 p-2">
-                <div v-for="item in chartData.Key" :key="item" class="flex align-items-center">
-                  <Checkbox
-                    v-model="chartRadarDataKey"
-                    :inputId="item"
-                    :name="item"
-                    :value="item"
-                    :disabled="chartData.Key.length < 8"
-                  />
-                  <label :for="item" class="ml-2"> {{ item }} </label>
-                </div>
-              </div>
-            </OverlayPanel>
-          </div>
-          <div v-if="typeChart === 'appTimeSeries'">
+          <div>
             <Button
               type="button"
               icon="pi pi-ellipsis-v"
@@ -78,21 +52,14 @@
     </template>
     <template #content>
       <div
-        :id="`${typeChart}ChartWrap`"
+        :id="`${chartId}ChartWrap`"
         class="w-full h-full"
         @dragleave.prevent="canDropNode = false"
         @dragenter.prevent
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" />
-        <appTimeSerieschartWidget v-if="typeChart === 'appTimeSeries'" :data="chartData" />
-
-        <vsaCurveLinechartWidget v-if="typeChart === 'vsa'" :data="chartData" />
-        <ssrCaseLinechartWidget v-if="typeChart === 'ssr'" :data="chartData" />
-
-        <appRadarChartWidget v-if="typeChart === 'appRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
-        <projectRadarChartWidget v-if="typeChart === 'projectRadar'" :data="chartData" :dataKey="chartRadarDataKey" />
+        <appTimeSerieschartWidget :data="chartData" />
       </div>
     </template>
   </Card>
@@ -102,13 +69,8 @@
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 import Calendar from 'primevue/calendar';
 
-import appBarchartWidget from './appBarchartWidget.vue';
 import appTimeSerieschartWidget from './appTimeSerieschartWidget.vue';
-import vsaCurveLinechartWidget from './vsaCurveLinechartWidget.vue';
-import ssrCaseLinechartWidget from './ssrCaseLinechartWidget.vue';
-import appRadarChartWidget from './appRadarChartWidget.vue';
-import projectRadarChartWidget from './projectRadarChartWidget.vue';
-import { VsaApi, SsrApi, ApplicationApi, CommonApi } from './api';
+import { ApplicationApi } from './api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
@@ -125,10 +87,7 @@ const props = defineProps({
     type: String,
     default: 'chartId',
   },
-  typeChart: {
-    type: String,
-    required: true,
-  },
+
   muiltiSelect: {
     type: Boolean,
     default: false,
@@ -140,22 +99,12 @@ const nodeSelected = defineModel('nodeSelected');
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
+  chartTitle.value = 'Time Series';
+
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
-    if (!props.muiltiSelect) {
-      chartTitle.value = nodeSelected.value.title;
-    } else {
-      setInitTitle();
-    }
-    if (props.typeChart === 'appTimeSeries') {
-      setInitRangeTimeOfSeriesChart();
-    }
-    getChartData();
-    chartRadarDataKey.value = nodeSelected.value.dataKey;
-  } else {
-    setInitTitle();
-  }
-  if (props.typeChart === 'projectRadar') {
+    chartTitle.value = nodeSelected.value.title;
+    setInitRangeTimeOfSeriesChart();
     getChartData();
   }
 });
@@ -217,42 +166,10 @@ const setInitRangeTimeOfSeriesChart = () => {
   }
 };
 
-const typeChartCanDrop = computed(() => {
-  if (props.typeChart.includes('app')) {
-    return ['Application'];
-  }
+const typeChartCanDrop = ref(['Application']);
 
-  if (props.typeChart === 'vsa') {
-    return ['VsaCurve'];
-  }
-  if (props.typeChart === 'ssr') {
-    return ['SsrCase', 'SSR'];
-  }
-  return [''];
-});
+const chartTitle = ref('Time Series');
 
-const chartTitle = ref('');
-
-const setInitTitle = () => {
-  if (props.typeChart === 'appRadar') {
-    chartTitle.value = 'Radar';
-  }
-  if (props.typeChart === 'appBar') {
-    chartTitle.value = 'Application';
-  }
-  if (props.typeChart === 'appTimeSeries') {
-    chartTitle.value = 'Time Series';
-  }
-  if (props.typeChart === 'projectRadar') {
-    chartTitle.value = 'Project';
-  }
-  if (props.typeChart === 'vsa') {
-    chartTitle.value = 'Vsa';
-  }
-  if (props.typeChart === 'ssr') {
-    chartTitle.value = 'SSR';
-  }
-};
 //  Drop Application - bar
 
 const nodeSelectedInChart = ref(props.muiltiSelect ? [] : undefined);
@@ -260,9 +177,6 @@ const nodeKeySelected = ref(props.muiltiSelect ? [] : undefined);
 const canDropNode = ref(false);
 
 const onDragoverComponent = () => {
-  if (props.typeChart === 'projectRadar') {
-    return false;
-  }
   if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
     canDropNode.value = true;
   } else {
@@ -271,55 +185,21 @@ const onDragoverComponent = () => {
 };
 const onDropComponent = async () => {
   if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
-    if (props.muiltiSelect) {
-      nodeKeySelected.value.push(props.nodeDrag.key);
-      if (props.typeChart === 'vsa') {
-        nodeSelectedInChart.value.push({
-          curveInfoId: props.nodeDrag._id,
-          curveType: props.nodeDrag.curveType,
-          caseInfoId: props.nodeDrag.caseInfoId,
-          moduleInfoId: props.nodeDrag.moduleInfoId,
-        });
-      }
-      if (props.typeChart === 'ssr') {
-        if (props.nodeDrag.type === 'SsrCase') {
-          nodeSelectedInChart.value.push({
-            caseInfoId: props.nodeDrag._id,
-            moduleInfoId: props.nodeDrag.moduleInfoId,
-          });
-        }
-        if (props.nodeDrag.type === 'SSR') {
-          const ssrCaseData = JSON.parse(props.nodeDrag.data);
-          ssrCaseData.forEach((ssrCaseId) => {
-            nodeSelectedInChart.value.push({
-              caseInfoId: ssrCaseId,
-              moduleInfoId: props.nodeDrag._id,
-            });
-          });
-        }
-      }
-    } else {
-      resetChart();
-      chartTitle.value = props.nodeDrag.label;
-      nodeSelectedInChart.value = props.nodeDrag._id;
-      nodeKeySelected.value = props.nodeDrag.key;
-    }
-
-    nodeSelected.value = {
-      title: props.nodeDrag.label,
-      data: nodeSelectedInChart.value,
-      dataKey: [],
-      startTimeSeries: 0,
-      endTimeSeries: 0,
-    };
-
-    await getChartData();
-    canDropNode.value = false;
-
-    // interval.value = setInterval(async () => {
-    //   await getChartData();
-    // }, intervalTime);
+    resetChart();
+    chartTitle.value = props.nodeDrag.label;
+    nodeSelectedInChart.value = props.nodeDrag._id;
+    nodeKeySelected.value = props.nodeDrag.key;
   }
+
+  nodeSelected.value = {
+    title: props.nodeDrag.label,
+    data: nodeSelectedInChart.value,
+    startTimeSeries: 0,
+    endTimeSeries: 0,
+  };
+
+  await getChartData();
+  canDropNode.value = false;
 };
 
 const chartRadarDataKey = ref();
@@ -327,49 +207,25 @@ watch(chartRadarDataKey, (keyArr) => {
   nodeSelected.value.dataKey = keyArr;
 });
 
-const chartData = ref([]);
+const chartData = ref({});
 const modificationTime = ref();
 
 const getChartData = async () => {
   try {
     let res = {};
-    if (props.typeChart === 'appBar') {
-      res = await ApplicationApi.getBarChartData(nodeSelectedInChart.value);
-    }
-    if (props.typeChart === 'appTimeSeries') {
-      res = await ApplicationApi.getBarTimeSeriesChartData(
-        nodeSelectedInChart.value,
-        new Date(startTimeSeries.value).getTime() / 1000,
-        new Date(endTimeSeries.value).getTime() / 1000,
-      );
-    }
-    if (props.typeChart === 'appRadar') {
-      res = await ApplicationApi.getRadarChartData(nodeSelectedInChart.value);
-      if (!chartRadarDataKey.value) {
-        chartRadarDataKey.value = res.data.Key.slice(0, 8);
-      }
-    }
-    if (props.typeChart === 'projectRadar') {
-      res = await ApplicationApi.getRadarProjectChartData();
+    res = await ApplicationApi.getBarTimeSeriesChartData(
+      nodeSelectedInChart.value,
+      new Date(startTimeSeries.value).getTime() / 1000,
+      new Date(endTimeSeries.value).getTime() / 1000,
+    );
 
-      // res = await CommonApi.getProjectRadarChartData();
-      if (!chartRadarDataKey.value) {
-        chartRadarDataKey.value = res.data.Key.slice(0, 8);
-      }
-    }
-    if (props.typeChart === 'vsa') {
-      res = await VsaApi.getChartData(nodeSelectedInChart.value);
-    }
-    if (props.typeChart === 'ssr') {
-      res = await SsrApi.getChartData(nodeSelectedInChart.value);
-    }
     if (res.data) {
       chartData.value = res.data;
       modificationTime.value = res.data.modificationTime
         ? convertDateTimeToString(res.data.modificationTime)
         : undefined;
     } else {
-      chartData.value = [];
+      chartData.value = {};
       modificationTime.value = undefined;
     }
 
@@ -380,7 +236,7 @@ const getChartData = async () => {
     }
   } catch (error) {
     // console.log('get chart data: error ', props.typeChart, error);
-    chartData.value = [];
+    chartData.value = {};
     modificationTime.value = undefined;
   }
 };
@@ -391,8 +247,12 @@ const reloaData = async () => {
 
 const resetChart = async () => {
   clearTimeout(interval.value);
-  chartData.value = [];
-  setInitTitle();
+  chartData.value = {};
+  chartTitle.value = 'Time Series';
+
+  startTimeSeries.value = new Date();
+  endTimeSeries.value = new Date();
+  rangeTimeOfTimeSeriesChart.value = 'Choose a Range Time';
   nodeSelected.value = props.muiltiSelect ? {} : undefined;
   nodeSelectedInChart.value = props.muiltiSelect ? [] : undefined;
 };

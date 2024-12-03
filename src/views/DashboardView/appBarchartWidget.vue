@@ -7,7 +7,7 @@
 <script setup>
 import Chart from 'primevue/chart';
 import { watch } from 'vue';
-
+import { draw, generate } from 'patternomaly';
 import chartComposable from '@/combosables/chartData';
 const { zoomOptions, nodataAnnotationOption } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
@@ -88,6 +88,7 @@ const setChartData = async () => {
     currentData.push(moduleData.current);
     currentColor.push(getCurrentColor(moduleData.current, moduleData.online));
   }
+
   const datasets = [
     // online
     {
@@ -95,7 +96,7 @@ const setChartData = async () => {
       type: 'bar',
       label: 'Rate Critical 1',
       data: onlineRate1Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-600'),
+      backgroundColor: 'rgba(40,167,69,0.6)',
       stack: 'Stack Online',
     },
     {
@@ -103,7 +104,7 @@ const setChartData = async () => {
       datalabels: 'Online',
       label: 'Rate Critical 2',
       data: onlineRate2Data,
-      backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
+      backgroundColor: 'rgba(255,165,0,0.6)',
       stack: 'Stack Online',
     },
 
@@ -113,7 +114,7 @@ const setChartData = async () => {
       datalabels: 'Offline',
       label: 'Rate Critical 1',
       data: offlineRate1Data,
-      backgroundColor: documentStyle.getPropertyValue('--primary-400'),
+      backgroundColor: 'rgba(40,167,69,0.3)',
       stack: 'Stack Offline',
     },
     {
@@ -121,7 +122,7 @@ const setChartData = async () => {
       datalabels: 'Offline',
       label: 'Rate Critical 2',
       data: offlineRate2Data,
-      backgroundColor: documentStyle.getPropertyValue('--yellow-400'),
+      backgroundColor: 'rgba(255,165,0,0.3)',
       stack: 'Stack Offline',
     },
 
@@ -131,7 +132,8 @@ const setChartData = async () => {
       datalabels: 'Current',
       label: 'Current',
       data: currentData,
-      backgroundColor: currentColor,
+      // backgroundColor: currentColor,
+      backgroundColor: [draw('dash', currentColor, currentColor, isSmallChart ? 20 : 30)],
       stack: 'Stack Current',
     },
   ];
@@ -139,14 +141,12 @@ const setChartData = async () => {
 };
 
 const getCurrentColor = (current, rateArr) => {
-  const documentStyle = getComputedStyle(document.documentElement);
-
   if (current <= rateArr['rateCritical1']) {
-    return documentStyle.getPropertyValue('--primary-600');
+    return 'rgba(40,167,69,0.6)';
   } else if (current <= rateArr['rateCritical2']) {
-    return documentStyle.getPropertyValue('--yellow-600');
+    return 'rgba(255,165,0,0.5)';
   } else {
-    return documentStyle.getPropertyValue('--red-600');
+    return 'rgba(255,0,0,1)';
   }
 };
 
