@@ -58,6 +58,14 @@ watch(measInfo_automatic, async (isActive) => {
   }
 });
 
+watch(measInfoActive, async (newVal, oldVal) => {
+  if (newVal._id && newVal._id !== oldVal._id) {
+    if (measInfoList.value.map((item) => item._id).indexOf(newVal._id) !== -1) {
+      currentIndex.value = measInfoList.value.map((item) => item._id).indexOf(newVal._id);
+    }
+  }
+});
+
 const getListMeasInfo = async () => {
   try {
     const res = await DSA_api.getListMeasInfo(projectData.value._id, {
@@ -73,16 +81,20 @@ const getListMeasInfo = async () => {
     console.log('getListMeasInfo error', error);
   }
 };
-
+const updateMeasInfoDelay = ref();
 const getPrevIndex = async () => {
   currentIndex.value -= 1;
   await updateMeasInfo();
 };
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 const getNextIndex = async () => {
   currentIndex.value += 1;
   await updateMeasInfo();
 };
 const updateMeasInfo = async () => {
+  await delay(300);
   commonStore.updateMeasInfoActive(measInfoList.value[currentIndex.value]);
   emit('reloadData');
 };

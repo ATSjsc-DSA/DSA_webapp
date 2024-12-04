@@ -44,9 +44,16 @@
               </div>
             </OverlayPanel>
           </div>
-          <Button icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
+          <Button v-if="!gridLock" icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
           <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="reloaData" />
-          <Button icon="pi pi-times" text severity="secondary" title="Remove chart" @click="onRemoveWidget" />
+          <Button
+            v-if="!gridLock"
+            icon="pi pi-times"
+            text
+            severity="secondary"
+            title="Remove chart"
+            @click="onRemoveWidget"
+          />
         </div>
       </div>
     </template>
@@ -93,9 +100,10 @@ const props = defineProps({
     default: false,
   },
 });
-
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
+const gridLoc = defineModel('gridLock');
+
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {

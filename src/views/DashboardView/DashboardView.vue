@@ -54,6 +54,7 @@
                   <chartComponentTsa
                     v-if="w.typeChart === 'tsa'"
                     v-model:nodeSelected="w.nodeSelected"
+                    v-model:gridLock="gridLock"
                     :nodeDrag="nodeDrag"
                     :chartId="w.id"
                     @onRemoveWidget="onRemoveGridStackComponent(w)"
@@ -61,6 +62,7 @@
                   <chartComponentAppTimeseries
                     v-else-if="w.typeChart === 'appTimeSeries'"
                     v-model:nodeSelected="w.nodeSelected"
+                    v-model:gridLock="gridLock"
                     :nodeDrag="nodeDrag"
                     :chartId="w.id"
                     @onRemoveWidget="onRemoveGridStackComponent(w)"
@@ -68,7 +70,7 @@
                   <chartComponent
                     v-else
                     v-model:nodeSelected="w.nodeSelected"
-                    v-model:stopReloadChartData="stopReloadChartData"
+                    v-model:gridLock="gridLock"
                     :nodeDrag="nodeDrag"
                     :chartId="w.id"
                     :typeChart="w.typeChart"

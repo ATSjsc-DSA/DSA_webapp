@@ -172,6 +172,7 @@
                   class="w-full flex align-items-center justify-content-start"
                   :class="{ 'cursor-grap': tsaCurveDraggable }"
                   @dragstart="onStartDragGroupNode($event, slotProps.node)"
+                  @click="slotProps.node.showSubChildren = !slotProps.node.showSubChildren"
                 >
                   <Button
                     :icon="slotProps.node.showSubChildren ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
@@ -334,9 +335,7 @@ const onNodeExpand = async (node) => {
       const vsaBranch = await getVsaBranchData(node);
       const tsaBranch = await getTsaBranchData(node);
       const ssrBranch = await getSsrBranchData(node);
-
       const branch = vsaBranch.concat(tsaBranch, ssrBranch);
-
       if (branch.length === 0) {
         node.leaf = true;
       } else {
@@ -350,6 +349,7 @@ const onNodeExpand = async (node) => {
       node['children'] = await getVsaCurveBranchData(node);
     }
     if (node.type === 'TSA') {
+      console.log('tsa');
       node['children'] = await getTsaCaseBranchData(node);
     }
     if (node.type === 'TsaCase') {
@@ -598,7 +598,7 @@ const getTsaBranchData = async (dsaModuleNode) => {
         leaf: false,
         loading: false,
       };
-      branch.push();
+      branch.push(newNode);
       if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'tsa_' + index]) {
         await onNodeExpand(newNode);
       }
@@ -705,6 +705,7 @@ const getTsaCurveBranchData = async (subCaseNode) => {
     curveTypeList = [...new Set(curveTypeList)];
     curveTypeList.forEach(async (curveType) => {
       const curvesInType = curveList.filter((item) => item.curveType === curveType);
+      console.log(curveType, curvesInType);
       const newNode = {
         key: subCaseNode.key + '_' + curveType,
         label: getTsaCurveTypeValue(curveType),
