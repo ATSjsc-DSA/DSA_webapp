@@ -132,7 +132,8 @@
                 <ScrollPanel
                   v-if="slotProps.node.showSubChildren && slotProps.node.subChildren"
                   class="mt-1"
-                  style="width: 100%; height: 20rem; margin-left: -0.5rem"
+                  :style="{ height: showLog ? '10rem' : '20rem' }"
+                  style="width: 100%; margin-left: -0.5rem"
                 >
                   <Tree :value="slotProps.node.subChildren" class="subTree">
                     <template #VsaCurve="slotProps">
@@ -164,6 +165,15 @@
               <ContextMenu ref="tsaCaseContextMenuRef" :model="tsaCaseContextMenu" />
             </template>
 
+            <template #TsaSubCase="slotProps">
+              <div
+                class="w-full flex align-items-center justify-content-start"
+                :style="{ color: slotProps.node.highlight ? 'var( --blue-500)' : '' }"
+              >
+                <div>{{ slotProps.node.label }}</div>
+              </div>
+            </template>
+
             <template #TsaCurveType="slotProps">
               <div class="subTree">
                 <div
@@ -189,7 +199,8 @@
                 <ScrollPanel
                   v-if="slotProps.node.showSubChildren && slotProps.node.subChildren"
                   class="mt-1"
-                  style="width: 100%; height: 20rem; margin-left: -0.5rem"
+                  :style="{ height: showLog ? '10rem' : '20rem' }"
+                  style="width: 100%; margin-left: -0.5rem"
                 >
                   <Tree :value="slotProps.node.subChildren" class="subTree">
                     <template #TsaCurve="slotProps">
@@ -277,6 +288,10 @@ const props = defineProps({
     default: false,
   },
   ssrCurveDraggable: {
+    type: Boolean,
+    default: false,
+  },
+  showLog: {
     type: Boolean,
     default: false,
   },

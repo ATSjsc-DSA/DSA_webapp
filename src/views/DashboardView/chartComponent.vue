@@ -3,7 +3,9 @@
     <template #title>
       <div class="flex justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
-          <div>{{ chartTitle }}</div>
+          <div class="">
+            {{ chartTitle }}
+          </div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
         </div>
         <div class="flex gap-2 justify-content-between align-items-center">

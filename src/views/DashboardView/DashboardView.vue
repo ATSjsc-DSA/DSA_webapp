@@ -9,6 +9,7 @@
             v-bind:vsa-curve-draggable="vsaCurveDraggable"
             v-bind:tsa-curve-draggable="tsaCurveDraggable"
             v-bind:ssr-curve-draggable="ssrCurveDraggable"
+            v-bind:showLog="showLog"
             @onStartDragNode="onStartDragNode"
             @onRemoveWidget="showTree = false"
           />
@@ -288,7 +289,6 @@
 <script setup>
 import { onMounted, ref, render, watch } from 'vue';
 import { v4 } from 'uuid';
-import Loading from '@/components/Loading.vue';
 
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';

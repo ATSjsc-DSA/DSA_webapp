@@ -1,5 +1,14 @@
 <template>
   <div class="card layout-content">
+    <router-link to="/gridcode">
+      <Button
+        label="Grid Code"
+        text
+        icon="pi pi-list"
+        style="position: fixed; right: 3.5rem; top: 7.5rem; z-index: 399"
+      />
+    </router-link>
+
     <TabView>
       <TabPanel header="Voltage">
         <voltageWidget :gridcode-id="gridCodeId" />
