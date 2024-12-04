@@ -16,7 +16,7 @@
         <InputNumber
           v-model="formData.volRangeLower"
           :suffix="getUnitLabel(formData.unitTypeVolRange)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -26,7 +26,7 @@
         <InputNumber
           v-model="formData.volRangeUpper"
           :suffix="getUnitLabel(formData.unitTypeVolRange)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -55,7 +55,7 @@
         <InputNumber
           v-model="formData.normalVolLimitLower"
           :suffix="getUnitLabel(formData.unitTypeNormalVolLimit)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -65,7 +65,7 @@
         <InputNumber
           v-model="formData.normalVolLimitUpper"
           :suffix="getUnitLabel(formData.unitTypeNormalVolLimit)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -102,7 +102,7 @@
           v-model="formData.abnormalVolLimitLower"
           :disabled="!formData.abnormalActivation"
           :suffix="getUnitLabel(formData.unitTypeAbnormalVolLimit)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -113,7 +113,7 @@
           v-model="formData.abnormalVolLimitUpper"
           :disabled="!formData.abnormalActivation"
           :suffix="getUnitLabel(formData.unitTypeAbnormalVolLimit)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>

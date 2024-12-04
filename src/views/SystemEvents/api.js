@@ -23,6 +23,12 @@ export class ApiContingency {
   static async deleteContingency(id) {
     return _delete(`/seedconfig/contingency/${id}`);
   }
+  static async importContigency(contingenciesActiveId) {
+    return put(`/seedconfig/${contingenciesActiveId}/import/contingency`);
+  }
+  static async exportContigency(contingenciesActiveId) {
+    return get(`/seedconfig/${contingenciesActiveId}/export/contingency`);
+  }
 }
 
 export class ApiContingencies {

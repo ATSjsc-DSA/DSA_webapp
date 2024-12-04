@@ -13,7 +13,7 @@
     <div class="col-10">
       <div class="flex flex-column gap-2 mb-3">
         <label for="norminalFreq" class="font-semibold"> Norminal Frequency</label>
-        <InputNumber v-model="formData.norminalFreq" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber v-model="formData.norminalFreq" :suffix="unitLabel" :maxFractionDigits="10" :minFractionDigits="1" />
       </div>
     </div>
     <div class="col-2">
@@ -37,13 +37,13 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="normalVolLimitLower" class="font-semibold"> Lower</label>
-        <InputNumber v-model="formData.normalVolLimitLower" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber v-model="formData.normalVolLimitLower" :suffix="unitLabel" :maxFractionDigits="10" :minFractionDigits="1" />
       </div>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="normalVolLimitUpper" class="font-semibold"> Upper</label>
-        <InputNumber v-model="formData.normalVolLimitUpper" :suffix="unitLabel" :maxFractionDigits="10" />
+        <InputNumber v-model="formData.normalVolLimitUpper" :suffix="unitLabel" :maxFractionDigits="10" :minFractionDigits="1" />
       </div>
     </div>
   </div>

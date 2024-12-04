@@ -19,7 +19,28 @@
       <template #header>
         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
           <span class="text-xl text-900 font-bold">List Contingency</span>
-          <Button icon="pi pi-plus" rounded text raised @click="handlerCreateThis()" />
+          <div class="flex flex-wrap align-items-center justify-content-end gap-2">
+            <Button
+              :disabled="!contingenciesActiveId"
+              type="button"
+              label="Import"
+              severity="secondary"
+              icon="pi pi-upload"
+              text
+              @click="importVisibleDialog = true"
+            />
+            <Button
+              :disabled="!contingenciesActiveId"
+              type="button"
+              label="Export"
+              severity="secondary"
+              icon="pi pi-download"
+              text
+              @click="handleExport"
+            />
+            <Divider layout="vertical" />
+            <Button :disabled="!contingenciesActiveId" icon="pi pi-plus" rounded text @click="handlerCreateThis()" />
+          </div>
         </div>
       </template>
       <Column field="name" header="Name"></Column>
@@ -32,7 +53,7 @@
         <template #body="{ data }">
           <Tag :value="data.active" :severity="data.active ? 'success' : 'danger'" /> </template
       ></Column>
-      <Column field="listPowerSystemId" header="List Power System">
+      <Column field="listPowerSystemId" header="Elements">
         <template #body="{ data }">
           <div>
             <span v-for="(item, index) in data.listPowerSystemId" :key="index">
@@ -136,6 +157,10 @@
       </div>
     </Dialog>
   </div>
+
+  <Dialog v-model:visible="importVisibleDialog" :style="{ width: '50rem' }" header="UploadFile" :modal="true">
+    <uploadContigencyDialog @uploadFile="importContigency" />
+  </Dialog>
 </template>
 
 <script setup>
@@ -147,7 +172,7 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
-
+import uploadContigencyDialog from './uploadContigencyDialog.vue';
 const props = defineProps({
   contingenciesActive: Object,
 });
@@ -323,6 +348,46 @@ const deleteThis = async (data) => {
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Delete successfully', life: 3000 });
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
+  }
+};
+
+const importVisibleDialog = ref(false);
+const isImporting = ref(false);
+const importContigency = async (formData, callback) => {
+  isImporting.value = true;
+  try {
+    await ApiContingency.importContigency(contingenciesActiveId.value, formData);
+    await getListContingency();
+    setTimeout(() => {
+      toast.add({ severity: 'success', summary: 'Contigency', detail: 'Import Successfully', life: 3000 });
+      importVisibleDialog.value = false;
+      isImporting.value = false;
+      callback();
+    }, 1000);
+  } catch (error) {
+    isImporting.value = false;
+    toast.add({ severity: 'danger', summary: 'Contigency', detail: error, life: 3000 });
+  }
+};
+const handleExport = async () => {
+  try {
+    const response = await ApiContingency.exportContigency(contingenciesActiveId.value);
+    const blob = new Blob([response.data], { type: 'text/csv' });
+
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    // Tạo một thẻ <a> để thực hiện việc tải file
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'Contigency_' + props.contingenciesActive.name + '.csv'; // Tên file tải về
+    document.body.appendChild(link);
+    link.click();
+
+    // Sau khi tải file xong thì xoá thẻ <a>
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl); // Hủy đối tượng URL tạm thời
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Contigency', detail: error.data.detail, life: 3000 });
   }
 };
 </script>

@@ -18,13 +18,13 @@
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="instantaneousMin" class="font-semibold"> Min</label>
-          <InputNumber v-model="formData.instantaneousMin" :suffix="unitLabel" :maxFractionDigits="10" />
+          <InputNumber v-model="formData.instantaneousMin" :suffix="unitLabel" :maxFractionDigits="10" :minFractionDigits="1" />
         </div>
       </div>
       <div class="col-6">
         <div class="flex flex-column gap-2 mb-3">
           <label for="instantaneousMax" class="font-semibold"> Max</label>
-          <InputNumber v-model="formData.instantaneousMax" :suffix="unitLabel" :maxFractionDigits="10" />
+          <InputNumber v-model="formData.instantaneousMax" :suffix="unitLabel" :maxFractionDigits="10" :minFractionDigits="1" />
         </div>
       </div>
     </div>

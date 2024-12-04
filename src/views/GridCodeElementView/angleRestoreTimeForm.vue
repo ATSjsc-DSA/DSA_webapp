@@ -14,7 +14,7 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="dampingRequirement" class="font-semibold">Damping Requirement</label>
-        <InputNumber v-model="formData.dampingRequirement" suffix="%" :maxFractionDigits="10" class="flex-auto" />
+        <InputNumber v-model="formData.dampingRequirement" suffix="%" :maxFractionDigits="10" :minFractionDigits="1" class="flex-auto" />
       </div>
     </div>
     <div class="col-6">
@@ -35,7 +35,7 @@
           id="instantaneousMin"
           v-model="formData.InstantaneousMin"
           :suffix="getUnitLabel(formData.unitTypeInstantaneous)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -45,7 +45,7 @@
         <InputNumber
           v-model="formData.InstantaneousMax"
           :suffix="getUnitLabel(formData.unitTypeInstantaneous)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -75,7 +75,7 @@
         <InputNumber
           v-model="formData.freqOscillationLower"
           :suffix="getUnitLabel(formData.unitTypeSFrequencyOscillation)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -85,7 +85,7 @@
         <InputNumber
           v-model="formData.freqOscillationUpper"
           :suffix="getUnitLabel(formData.unitTypeSFrequencyOscillation)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -115,7 +115,7 @@
         <InputNumber
           v-model="formData.stableLower"
           :suffix="getUnitLabel(formData.unitTypeStable)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
@@ -125,7 +125,7 @@
         <InputNumber
           v-model="formData.stableUpper"
           :suffix="getUnitLabel(formData.unitTypeStable)"
-          :maxFractionDigits="10"
+          :maxFractionDigits="10" :minFractionDigits="1"
         />
       </div>
     </div>
