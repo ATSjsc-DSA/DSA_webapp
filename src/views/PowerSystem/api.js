@@ -142,6 +142,10 @@ export class PowerSystemParameterApi {
   static async getPowersystemData(psde_id) {
     return get(`/powersystem/${projectData.value._id}/powersystemdata/${slotData.value._id}/data/${psde_id}`);
   }
+
+  static async getPowersystemListVoltageLevel() {
+    return get(`/powersystem/${projectData.value._id}/${slotData.value._id}/powersystemdata/voltageLevel`);
+  }
 }
 
 export class PowerSystemEmsApi {

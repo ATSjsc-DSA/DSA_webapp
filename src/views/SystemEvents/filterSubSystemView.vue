@@ -91,7 +91,12 @@
 
       <div class="grid">
         <div class="col-8">
-          <searchPsWidget v-model="kVSelected" label="kV" :definitionId="[kVDefinitionId]" :multipleSelection="true" />
+          <searchPsWidget
+            v-model="kVSelected"
+            label="Station Voltage"
+            :definitionId="[kVDefinitionId]"
+            :multipleSelection="true"
+          />
         </div>
         <div class="col-4">
           <div class="flex flex-column align-items-start gap-1">
@@ -162,6 +167,20 @@
         </div>
       </div>
 
+      <div class="grid">
+        <div class="col-12 flex flex-column align-items-start gap-1">
+          <label for="type" class="font-semibold"> Element Voltage</label>
+          <MultiSelect
+            v-model="elementKVSelected"
+            display="chip"
+            :options="elementVoltageList"
+            optionLabel="name"
+            placeholder="Select Element Voltage"
+            class="w-full psFilterAutoComplete"
+          />
+        </div>
+      </div>
+
       <Divider />
 
       <div class="flex flex-column gap-2 mb-3">
@@ -192,12 +211,13 @@
 import MultiSelect from 'primevue/multiselect';
 import ScrollPanel from 'primevue/scrollpanel';
 import conjunctionInputWidget from './conjunctionInputWidget.vue';
-import { DefinitionListApi } from '@/views/PowerSystem/api';
+import { DefinitionListApi, PowerSystemParameterApi } from '@/views/PowerSystem/api';
 import { nextTick, onMounted, watch } from 'vue';
 import searchPsWidget from '../PowerSystem/searchPsWidget.vue';
 onMounted(async () => {
   await getDefinitionList();
   await getdefinitionSubsystemList();
+  await getPowersystemListVoltageLevel();
 });
 
 const props = defineProps({
@@ -228,6 +248,8 @@ const stationDefinitionId = ref([]);
 const psDefinitionType = ref([]);
 const psSelected = ref([]);
 
+const elementKVSelected = ref([]);
+
 const filterConjunction = ref('');
 
 const getFilterSelected = () => {
@@ -254,9 +276,9 @@ const getFilterSelected = () => {
       value: stationSelected.value.map((item) => item._id),
       type: stationSelected.value.length > 0 ? stationDefinitionSelected.value.map((item) => item._id) : [],
     },
-    powerSystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
+    // powerSystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
     powersystem: psSelected.value ? psSelected.value.map((item) => item._id) : [],
-
+    kVElement: elementKVSelected.value ? elementKVSelected.value.map((item) => item.name) : [],
     filtering: filterNameSelected.value.length >= 2 ? filterConjunction.value : '',
   };
 };
@@ -284,6 +306,8 @@ const clearFilterSelected = () => {
 
   psSelected.value = [];
   psDefinitionType.value = [];
+
+  elementKVSelected.value = [];
 
   filterConjunction.value = '';
 };
@@ -324,6 +348,20 @@ const getdefinitionSubsystemList = async () => {
   }
 };
 
+const elementVoltageList = ref([]);
+const getPowersystemListVoltageLevel = async () => {
+  try {
+    const res = await PowerSystemParameterApi.getPowersystemListVoltageLevel();
+    elementVoltageList.value = res.data.map((item) => {
+      // Kiểm tra nếu name có dấu chấm (số thập phân), thì chuyển thành float, nếu không thì chuyển thành int
+      item.name = item.name.includes('.') ? parseFloat(item.name) : parseInt(item.name);
+      return item;
+    });
+  } catch (error) {
+    console.log('getdefinitionSubsystemList: error ', error);
+    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+  }
+};
 watch(
   () => props.currentFilter,
   async () => {
@@ -347,6 +385,9 @@ watch(
 
       psSelected.value = props.currentFilter.powerSystem;
       psDefinitionType.value = definitionSubsystemList.value;
+
+      elementKVSelected.value = props.currentFilter.kVElement;
+
       filterConjunction.value = props.currentFilter.filtering || '';
     });
   },
@@ -372,6 +413,10 @@ const filterNameSelected = computed(() => {
   }
   if (psSelected.value && psSelected.value.length > 0) {
     suggestion.push('powerSystem');
+  }
+
+  if (elementKVSelected.value && elementKVSelected.value.length > 0) {
+    suggestion.push('kVElement');
   }
 
   return suggestion;
