@@ -504,18 +504,18 @@ const handleCreateRestoreTime = () => {
     active: true,
     InstantaneousMax: 1,
     InstantaneousMin: -1,
-    unitTypeInstantaneous: 3,
+    unitTypeInstantaneous: 1,
 
     dampingRequirement: 0.5,
 
     freqOscillationLower: 0.5,
     freqOscillationUpper: 1.5,
-    unitTypeSFrequencyOscillation: 3,
+    unitTypeSFrequencyOscillation: 1,
 
     restoreTime: 5,
     stableLower: -1,
     stableUpper: 1,
-    unitTypeStable: 3,
+    unitTypeStable: 1,
   };
   createRestoreTimeVisibleDialog.value = true;
 };

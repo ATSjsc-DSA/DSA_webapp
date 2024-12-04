@@ -14,7 +14,13 @@
     <div class="col-6">
       <div class="flex flex-column gap-2 mb-3">
         <label for="dampingRequirement" class="font-semibold">Damping Requirement</label>
-        <InputNumber v-model="formData.dampingRequirement" suffix="%" :maxFractionDigits="10" :minFractionDigits="1" class="flex-auto" />
+        <InputNumber
+          v-model="formData.dampingRequirement"
+          suffix="%"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
+          class="flex-auto"
+        />
       </div>
     </div>
     <div class="col-6">
@@ -35,7 +41,8 @@
           id="instantaneousMin"
           v-model="formData.InstantaneousMin"
           :suffix="getUnitLabel(formData.unitTypeInstantaneous)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -45,7 +52,8 @@
         <InputNumber
           v-model="formData.InstantaneousMax"
           :suffix="getUnitLabel(formData.unitTypeInstantaneous)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -71,11 +79,12 @@
 
     <div class="col-5">
       <div class="flex flex-column gap-2 mb-3">
-        <label for="freqOscillationLower" class="font-semibold"> Frequency Oscillation</label>
+        <label for="freqOscillationLower" class="font-semibold">Lower</label>
         <InputNumber
           v-model="formData.freqOscillationLower"
           :suffix="getUnitLabel(formData.unitTypeSFrequencyOscillation)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -85,7 +94,8 @@
         <InputNumber
           v-model="formData.freqOscillationUpper"
           :suffix="getUnitLabel(formData.unitTypeSFrequencyOscillation)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -115,7 +125,8 @@
         <InputNumber
           v-model="formData.stableLower"
           :suffix="getUnitLabel(formData.unitTypeStable)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -125,7 +136,8 @@
         <InputNumber
           v-model="formData.stableUpper"
           :suffix="getUnitLabel(formData.unitTypeStable)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -150,7 +162,7 @@
 const formData = defineModel('formData');
 const unitLabelOpts = ref([
   { label: '%', value: 1 },
-  { label: '\u00B0', value: 3 },
+  { label: 'Hz', value: 2 },
 ]);
 const getUnitLabel = (unitLabel) => {
   return ' ' + unitLabelOpts.value.filter((item) => item.value === unitLabel)[0].label;
