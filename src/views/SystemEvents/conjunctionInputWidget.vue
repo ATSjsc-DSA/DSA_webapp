@@ -37,7 +37,19 @@ onMounted(() => {
 
 watch(
   () => props.filterNameSelected,
+  (newVal, oldVal) => {
+    console.log(newVal);
+    if (newVal.length < oldVal.length) {
+      conjunction.value = '';
+    }
+    getFilterSuggestions();
+  },
+);
+
+watch(
+  () => props.canDuplicate,
   () => {
+    conjunction.value = '';
     getFilterSuggestions();
   },
 );
@@ -53,6 +65,7 @@ watch(filterConjunction, () => {
     conjunction.value = filterConjunction.value;
   }
 });
+
 const suggestionArr = ref([]);
 const menuSuggestion = ref();
 const openMenuSuggestion = (event) => {

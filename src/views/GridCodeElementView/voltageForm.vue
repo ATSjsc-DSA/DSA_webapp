@@ -54,7 +54,7 @@
         <label for="normalVolLimitLower" class="font-semibold"> Lower</label>
         <InputNumber
           v-model="formData.normalVolLimitLower"
-          :suffix="getUnitLabel(formData.normalVolLimitLower)"
+          :suffix="getUnitLabel(formData.unitTypeNormalVolLimit)"
           :maxFractionDigits="10"
         />
       </div>
@@ -64,7 +64,7 @@
         <label for="normalVolLimitUpper" class="font-semibold"> Upper</label>
         <InputNumber
           v-model="formData.normalVolLimitUpper"
-          :suffix="getUnitLabel(formData.normalVolLimitLower)"
+          :suffix="getUnitLabel(formData.unitTypeNormalVolLimit)"
           :maxFractionDigits="10"
         />
       </div>
@@ -145,6 +145,19 @@ const unitLabelOpts = ref([
 ]);
 const getUnitLabel = (unitLabel) => {
   return ' ' + unitLabelOpts.value.filter((item) => item.value === unitLabel)[0].label;
+};
+
+onMounted(async () => {
+  await nextTick(() => {
+    const inputElements = document.querySelectorAll('.p-inputnumber-input');
+    inputElements.forEach((input) => {
+      input.addEventListener('change', handleChange);
+    });
+  });
+});
+
+const handleChange = (event) => {
+  console.log(`Value changed to: ${event.target.value}`, event);
 };
 </script>
 <style>

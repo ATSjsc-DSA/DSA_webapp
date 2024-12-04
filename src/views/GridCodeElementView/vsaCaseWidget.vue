@@ -224,14 +224,17 @@ const handlerCreateVsaCase = () => {
     name: '',
     contingencyType: contingencyTypeOpts.value[0].value,
     active: true,
-    limitationReserve: 0,
+    limitationReserve: null,
   };
   createVsaCaseVisibleDialog.value = true;
 };
 
 const createVsaCase = async () => {
   try {
-    const res = await ApiVsaCase.create(props.gridcodeId, newVsaCase.value);
+    const newValue = JSON.parse(JSON.stringify(newVsaCase.value));
+    Object.keys(newValue).forEach((key) => (newValue[key] = newValue[key] === null ? 0 : newValue[key]));
+
+    const res = await ApiVsaCase.create(props.gridcodeId, newValue);
     await getVsaCaseList();
     vsaCaseClick(res.data);
     createVsaCaseVisibleDialog.value = false;

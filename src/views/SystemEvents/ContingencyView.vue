@@ -86,7 +86,7 @@
         </div>
         <div class="col-12">
           <div class="grid align-items-center">
-            <div class="col-4">
+            <div class="col-5">
               <div class="flex flex-column align-items-start gap-1">
                 <label for="name" class="font-semibold"> Element Type 1</label>
                 <MultiSelect
@@ -98,7 +98,7 @@
                 />
               </div>
             </div>
-            <div class="col-8">
+            <div class="col-7">
               <searchPsWidget
                 v-model="autoCompleteValue1"
                 label="Element 1"
@@ -108,7 +108,7 @@
           </div>
         </div>
         <template v-if="contingencyModelData.contingencyType === 1">
-          <div class="col-4">
+          <div class="col-5">
             <div class="flex flex-column align-items-start gap-1">
               <label for="name" class="font-semibold"> Element Type 2</label>
               <MultiSelect
@@ -120,10 +120,10 @@
               />
             </div>
           </div>
-          <div class="col-8">
+          <div class="col-7">
             <searchPsWidget
               v-model="autoCompleteValue2"
-              label="Power System 2"
+              label="Element 2"
               :definitionId="selectedDefinition2.map((item) => item._id)"
             />
           </div>

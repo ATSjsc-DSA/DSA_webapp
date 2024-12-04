@@ -1,5 +1,9 @@
 <template>
-  <div v-if="!measInfo_automatic" class="card h-full flex justify-content-between align-items-center">
+  <div
+    v-if="!measInfo_automatic"
+    class="card h-full flex justify-content-between align-items-center"
+    style="border-radius: 6px"
+  >
     <Button
       class="measInfoBtn"
       :disabled="!canGetPrev"
@@ -21,7 +25,7 @@
       @click="getNextIndex"
     />
   </div>
-  <div v-else class="card h-full flex justify-content-between align-items-center">
+  <div v-else class="card h-full flex justify-content-between align-items-center" style="border-radius: 6px">
     <div class="flex-grow-1 text-center">
       {{ formatMeasInfo(measInfoActive.createdTimestamp) }}
     </div>

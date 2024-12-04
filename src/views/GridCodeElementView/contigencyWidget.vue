@@ -339,15 +339,18 @@ const handlerCreateContingency = () => {
     name: '',
     active: true,
     contingencyType: 0,
-    criticalLower: 0,
-    criticalUpper: 0,
+    criticalLower: null,
+    criticalUpper: null,
     unitType: 1,
   };
   createContingencyVisibleDialog.value = true;
 };
 const createContingency = async () => {
   try {
-    const res = await ApiContingency.createContingency(props.standardId, newContingency.value);
+    const newValue = JSON.parse(JSON.stringify(newContingency.value));
+    Object.keys(newValue).forEach((key) => (newValue[key] = newValue[key] === null ? 0 : newValue[key]));
+
+    const res = await ApiContingency.createContingency(props.standardId, newValue);
     // await getContingencyList();
     contingencyList.value.push(res.data);
     contingencyIndexSelected.value = contingencyList.value.length - 1;

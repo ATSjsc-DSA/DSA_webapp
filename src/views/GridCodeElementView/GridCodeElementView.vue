@@ -5,7 +5,7 @@
         label="Grid Code"
         text
         icon="pi pi-list"
-        style="position: fixed; right: 3.5rem; top: 7.5rem; z-index: 399"
+        style="position: fixed; right: 3.5rem; top: 8rem; z-index: 399"
       />
     </router-link>
 
@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted } from 'vue';
+import { watch, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import confirmUpdateDialog from '@/components/confirmUpdateDialog.vue';
 
@@ -49,7 +49,6 @@ import vsaCaseWidget from './vsaCaseWidget.vue';
 
 const route = useRoute();
 
-onMounted(async () => {});
 watch(
   () => route.params.id,
   async (newId, oldId) => {

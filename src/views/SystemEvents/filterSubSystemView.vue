@@ -9,8 +9,8 @@
       <Button severity="primary" text icon="pi pi-filter" style="width: 32px" @click="changFilter" />
     </div>
   </div>
-  <ScrollPanel style="width: 100%; height: 46rem">
-    <div class="flex flex-column gap-3 pl-1">
+  <ScrollPanel style="width: 100%; height: 48rem">
+    <div class="flex flex-column gap-2 pl-1">
       <div class="grid">
         <div class="col-8">
           <searchPsWidget
@@ -158,7 +158,7 @@
           <div class="flex flex-column align-items-start gap-1">
             <searchPsWidget
               v-model="psSelected"
-              label="Power System"
+              label="Element"
               :definitionId="psDefinitionType.map((item) => item._id)"
               :multipleSelection="true"
               :showViaDotAtTenChild="true"
@@ -201,7 +201,16 @@
           v-model:canDuplicate="conjunctionCanDuplicate"
           :filter-name-selected="filterNameSelected"
         />
-        <small>Example: "Area and Zone or (kV and Station) not PowerSystem"</small>
+        <small v-if="!filterConjunction" class="mx-1"
+          >Example: "Area and Zone or (kV and Station) not PowerSystem"</small
+        >
+        <small v-else class="mx-3">
+          {{ '(' }}
+          <span v-for="conjunc in filterConjunction.split(' ')" :key="conjunc" :style="getConjuncColor(conjunc)">
+            {{ conjunc + ' ' }}
+          </span>
+          {{ ')' }}
+        </small>
       </div>
     </div>
   </ScrollPanel>
@@ -422,6 +431,27 @@ const filterNameSelected = computed(() => {
   return suggestion;
 });
 const conjunctionCanDuplicate = ref(false);
+
+const getConjuncColor = (conjunc) => {
+  switch (conjunc.toLowerCase().replace(')', '').replace('(', '')) {
+    case 'area':
+      return { color: 'var( --blue-500)' };
+    case 'zone':
+      return { color: 'var( --yellow-500)' };
+    case 'owner':
+      return { color: 'var( --green-500)' };
+    case 'kv':
+      return { color: 'var( --indigo-500)' };
+    case 'station':
+      return { color: 'var( --pink-500)' };
+    case 'powersystem':
+      return { color: 'var( --primary-500)' };
+    case 'kvelement':
+      return { color: 'var( --orange-500)' };
+    default:
+      return { color: 'var( --text-color)' };
+  }
+};
 </script>
 <style>
 .p-autocomplete-input,

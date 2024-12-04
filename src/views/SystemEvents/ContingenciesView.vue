@@ -66,7 +66,7 @@
               <Button label="Update" :disabled="!selectedItem._id" @click="confirmUpdate($event)" />
             </div>
           </TabPanel>
-          <TabPanel header="List Contingency">
+          <TabPanel header="Manage Contingencies">
             <ContingencyView :contingenciesActive="selectedItem"></ContingencyView>
           </TabPanel> </TabView
       ></SplitterPanel>

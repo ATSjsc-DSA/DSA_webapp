@@ -139,22 +139,25 @@ const handlerCreateFrequency = () => {
     active: true,
     name: '',
     unitType: 2,
-    normalVolLimitLower: 0,
-    normalVolLimitUpper: 0,
-    norminalFreq: 0,
+    normalVolLimitLower: null,
+    normalVolLimitUpper: null,
+    norminalFreq: null,
   };
   createFrequencyVisibleDialog.value = true;
 };
 const createFrequency = async () => {
   try {
-    const res = await ApiFrequency.createFrequency(props.gridcodeId, newFrequency.value);
+    const newValue = JSON.parse(JSON.stringify(newFrequency.value));
+    Object.keys(newValue).forEach((key) => (newValue[key] = newValue[key] === null ? 0 : newValue[key]));
+
+    const res = await ApiFrequency.createFrequency(props.gridcodeId, newValue);
     frequencyList.value.push(res.data);
     frequencyData.value = res.data;
     frequencyIndexSelected.value = frequencyList.value.length - 1;
     createFrequencyVisibleDialog.value = false;
     toast.add({ severity: 'success', summary: 'Create Successfully', life: 3000 });
   } catch (error) {
-    console.log('createAngleStability error', error);
+    console.log('createFrequency error', error);
     toast.add({ severity: 'error', summary: 'Create Message', detail: error.data.detail, life: 3000 });
   }
 };

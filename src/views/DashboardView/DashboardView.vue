@@ -1,7 +1,7 @@
 <template>
   <div class="grid w-full h-full m-0">
     <div v-if="showTree || showLog" class="col-3 2xl:col-4">
-      <div class="sticky flex flex-column gap-3" style="top: 6rem">
+      <div class="sticky flex flex-column gap-3" style="top: 5.5rem">
         <ScrollPanel v-if="showTree" style="width: 100%" :style="{ height: showLog ? '30rem' : '61rem' }">
           <projectTreeWidget
             v-if="showTree"
@@ -89,7 +89,7 @@
       </div>
     </div>
   </div>
-  <div id="application-right-side-custom" class="fixed" style="top: 6rem; right: 0; margin-left: 1rem">
+  <div id="application-right-side-custom" class="fixed" style="top: 6.5rem; right: 0; margin-left: 1rem">
     <div class="font-semibold text-center w-full pb-3" style="font-size: 0.8rem">DATA</div>
     <div class="flex flex-column gap-2 justify-content-center align-items-center">
       <div
@@ -166,7 +166,7 @@
     </div>
 
     <div class="font-semibold text-center w-full py-3" style="font-size: 0.8rem">COMPONENT</div>
-    <ScrollPanel :style="{ height: measInfo_automatic ? '37rem' : '31rem' }">
+    <ScrollPanel :style="{ height: measInfo_automatic ? '33rem' : '30rem' }">
       <div class="flex flex-column gap-2 justify-content-center align-items-center">
         <div
           v-tooltip.left="'Project Tree'"

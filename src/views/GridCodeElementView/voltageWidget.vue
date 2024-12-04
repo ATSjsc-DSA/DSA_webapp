@@ -100,6 +100,7 @@ const props = defineProps({
 onMounted(async () => {
   await getVoltageList();
 });
+
 const voltageList = ref([]);
 const getVoltageList = async () => {
   try {
@@ -138,23 +139,26 @@ const handlerCreateVoltage = () => {
     active: true,
     name: '',
     abnormalActivation: true,
-    abnormalVolLimitLower: 0,
-    abnormalVolLimitUpper: 0,
+    abnormalVolLimitLower: null,
+    abnormalVolLimitUpper: null,
     unitTypeAbnormalVolLimit: 0,
 
-    normalVolLimitLower: 0,
-    normalVolLimitUpper: 0,
+    normalVolLimitLower: null,
+    normalVolLimitUpper: null,
     unitTypeNormalVolLimit: 0,
 
-    volRangeLower: 0,
-    volRangeUpper: 0,
+    volRangeLower: null,
+    volRangeUpper: null,
     unitTypeVolRange: 0,
   };
   createVoltageVisibleDialog.value = true;
 };
 const createVoltage = async () => {
   try {
-    const res = await ApiVoltage.createVoltage(props.gridcodeId, newVoltage.value);
+    const newValue = JSON.parse(JSON.stringify(newVoltage.value));
+    Object.keys(newValue).forEach((key) => (newValue[key] = newValue[key] === null ? 0 : newValue[key]));
+
+    const res = await ApiVoltage.createVoltage(props.gridcodeId, newValue);
     // await getVoltageList();
     voltageList.value.push(res.data);
     voltageIndexSelected.value = voltageList.value.length - 1;
