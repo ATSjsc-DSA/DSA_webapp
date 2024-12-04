@@ -1,5 +1,5 @@
 <template>
-  <div ref="appTimeSeriesChartWrap" class="flex flex-column h-full">
+  <div class="flex flex-column h-full">
     <Chart type="line" :data="chartData" :options="chartOptions" class="flex-grow-1" />
   </div>
 </template>
@@ -13,6 +13,7 @@ import 'chartjs-adapter-dayjs-3';
 import chartComposable from '@/combosables/chartData';
 const { zoomOptions, nodataAnnotationOption, convertDateTimeToString } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
+import { smallChartSize } from './chartConfig';
 const { isDarkTheme } = useLayout();
 const props = defineProps({
   data: {
@@ -26,35 +27,40 @@ const props = defineProps({
     type: String,
     default: 'Application',
   },
+  width: {
+    type: Number,
+    default: 1,
+  },
 });
 onMounted(async () => {
   chartData.value = await setChartData();
-  chartOptions.value = await setChartOptions();
+  chartOptions.value = setChartOptions();
 });
 watch(
   () => props.data,
   async (newVal, oldVal) => {
-    const newChartWidth = await getChartWidth();
-    if (
-      (JSON.stringify(newVal) !== JSON.stringify(oldVal) || chartWidth !== newChartWidth) &&
-      newVal.list_data !== undefined
-    ) {
+    if (JSON.stringify(newVal) !== JSON.stringify(oldVal) && newVal.list_data !== undefined) {
       chartData.value = await setChartData();
-      chartOptions.value = await setChartOptions();
+      chartOptions.value = setChartOptions();
     }
   },
 );
 watch(
+  () => props.width,
+  async () => {
+    chartOptions.value = setChartOptions();
+  },
+);
+
+watch(
   isDarkTheme,
   async () => {
-    chartOptions.value = await setChartOptions();
+    chartOptions.value = setChartOptions();
   },
   { immediate: false },
 );
 const chartData = ref();
 const chartOptions = ref();
-const chartWidth = ref(0);
-const appTimeSeriesChartWrap = ref();
 const setChartData = async () => {
   const documentStyle = getComputedStyle(document.documentElement);
   if (props.data.list_time) {
@@ -74,12 +80,12 @@ const setChartData = async () => {
   }
 };
 
-const setChartOptions = async () => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-  const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
+
   const isNoData = !props.data.list_time || props.data.list_time.length === 0;
   return {
     animation: false,
@@ -99,9 +105,9 @@ const setChartOptions = async () => {
       x: {
         type: 'timeseries',
         time: {
-          unit: isSmallChart ? 'day' : 'hour',
+          unit: isSmallChart && props.data.list_time.length > 5 ? 'day' : 'hour',
           displayFormats: {
-            day: 'MM/DD HH:mm',
+            day: 'MM/DD ',
             hour: 'MM/DD HH:mm',
           },
         },
@@ -127,17 +133,6 @@ const setChartOptions = async () => {
       },
     },
   };
-};
-
-const getChartWidth = async () => {
-  if (appTimeSeriesChartWrap.value) {
-    let w = 0;
-    await nextTick(() => {
-      w = appTimeSeriesChartWrap.value.getBoundingClientRect().width;
-    });
-    return w;
-  }
-  return 0;
 };
 </script>
 <style>

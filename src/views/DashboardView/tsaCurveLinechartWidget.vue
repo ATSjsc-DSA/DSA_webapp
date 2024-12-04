@@ -1,5 +1,5 @@
 <template>
-  <div ref="tsaChartWrap" class="h-full">
+  <div class="h-full">
     <Chart type="line" :data="chartData" :options="chartOptions" class="h-full" />
   </div>
 </template>
@@ -8,7 +8,7 @@
 import { watch } from 'vue';
 
 import Chart from 'primevue/chart';
-import { colorArray } from './chartConfig';
+import { colorArray, smallChartSize } from './chartConfig';
 import chartComposable from '@/combosables/chartData';
 
 const { zoomOptions } = chartComposable();
@@ -21,6 +21,14 @@ const props = defineProps({
   showAnnotations: {
     type: Boolean,
     default: true,
+  },
+  showLegend: {
+    type: Boolean,
+    default: true,
+  },
+  width: {
+    type: Number,
+    default: 1,
   },
 });
 
@@ -45,43 +53,21 @@ watch(
   },
 );
 
+watch(
+  () => props.showLegend,
+  async () => {
+    chartOptions.value = await setChartOptions();
+  },
+);
+watch(
+  () => props.width,
+  async () => {
+    chartOptions.value = await setChartOptions();
+  },
+);
+
 const chartData = ref();
 const chartOptions = ref();
-
-const tsaChartWrap = ref();
-const getChartWidth = async () => {
-  if (tsaChartWrap.value) {
-    let w = 0;
-    await nextTick(() => {
-      w = tsaChartWrap.value.getBoundingClientRect().width;
-    });
-    return w;
-  }
-  return 0;
-};
-/*
-list of curveData
-  [
-   {
-        caseName: 'name of case',
-        documents:{
-          definition: [list of y]
-        value: [list of x],
-
-            ...
-        },
-        standard:{ <--point max và min
-              definitionMax: []
-              valueMax: []
-              definitionMin: []
-              valueMin: []
-        },
-        other:
-         [max-line, max-ràng-line, min-rangeline, time of stability] <--- 3 annotations y và 1 annotations x
-   }
-
-
-  */
 
 const setChartData = () => {
   const documentStyle = getComputedStyle(document.documentElement);
@@ -107,9 +93,9 @@ const setChartData = () => {
       pointRadius: 1,
     });
     colorIndex++;
-      if (colorIndex >= colorArray.length) {
-        colorIndex = 0;
-      }
+    if (colorIndex >= colorArray.length) {
+      colorIndex = 0;
+    }
   }
 
   return { datasets: datasets, labels: labels };
@@ -121,9 +107,9 @@ const setChartOptions = async () => {
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
   const annotation = await getAnnotation();
-  const chartWidth = await getChartWidth();
 
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
+
   return {
     animation: false,
     stacked: true,
@@ -132,6 +118,7 @@ const setChartOptions = async () => {
     plugins: {
       zoom: zoomOptions(),
       legend: {
+        display: props.showLegend,
         labels: {
           usePointStyle: true,
           color: textColor,
@@ -236,9 +223,9 @@ const getStandardAnnotation = () => {
     const maxPointColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '500');
     const minPointColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '900');
     colorIndex++;
-      if (colorIndex >= colorArray.length) {
-        colorIndex = 0;
-      }
+    if (colorIndex >= colorArray.length) {
+      colorIndex = 0;
+    }
     for (let pointMaxIndex = 0; pointMaxIndex < curveData.standard.definitionMax.length; pointMaxIndex++) {
       standarAnnotations[curveData.curveName + '_point_max_' + pointMaxIndex] = {
         type: 'point',
@@ -271,8 +258,7 @@ const getOtherdAnnotation = async () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const otherAnnotations = {};
   let colorIndex = 0;
-  const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
 
   for (let curveIndex = 0; curveIndex < props.data.length; curveIndex++) {
     const curveData = props.data[curveIndex];
@@ -281,9 +267,9 @@ const getOtherdAnnotation = async () => {
     const minLineColor = documentStyle.getPropertyValue('--green-500');
     const stabilityLineColor = documentStyle.getPropertyValue('--orange-500');
     colorIndex++;
-      if (colorIndex >= colorArray.length) {
-        colorIndex = 0;
-      }
+    if (colorIndex >= colorArray.length) {
+      colorIndex = 0;
+    }
     otherAnnotations[curveData.curveName + '_line_max_1' + curveIndex] = {
       type: 'line',
       yMin: curveData.other[0],

@@ -1,7 +1,7 @@
 <template>
   <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropNode }">
     <template #title>
-      <div class="flex justify-content-between align-items-center">
+      <div class="flex flex-wrap justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
           <div>TSA</div>
           <div style="font-size: 0.7rem; padding-top: 0.5rem">{{ modificationTime }}</div>
@@ -10,18 +10,17 @@
           <ToggleButton
             v-model="showAnnotations"
             :disabled="chartData.length !== 1"
-            onLabel="Standard"
-            offLabel="Curve Only"
+            :onLabel="width > smallChartSize ? 'Standard' : ''"
+            :offLabel="width > smallChartSize ? 'Curve Only' : ''"
             onIcon="pi pi-chart-bar"
             offIcon="pi pi-chart-line"
             @change="changeConfig"
           />
-
           <ToggleButton
             v-model="showLegend"
             :disabled="chartData.length === 0"
-            onLabel=""
-            offLabel=""
+            :onLabel="width > smallChartSize ? 'Show Label' : ''"
+            :offLabel="width > smallChartSize ? 'Hide Label' : ''"
             onIcon="pi pi-eye"
             offIcon="pi pi-eye-slash"
             @change="changeConfig"
@@ -48,7 +47,12 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        <tsaCurveLinechartWidget :data="chartData" :showAnnotations="showAnnotations" />
+        <tsaCurveLinechartWidget
+          :data="chartData"
+          :showAnnotations="showAnnotations"
+          :showLegend="showLegend"
+          :width="width"
+        />
       </div>
     </template>
   </Card>
@@ -59,18 +63,18 @@ import { computed, onUnmounted, onMounted, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
 import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
 import { TsaApi } from './api';
+import { smallChartSize } from './chartConfig';
+
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
-
 const props = defineProps({
   nodeDrag: {
     type: Object,
     required: true,
   },
-
   chartId: {
     type: String,
     default: 'chartId',
@@ -81,6 +85,7 @@ const emit = defineEmits(['onRemoveWidget']);
 
 const nodeSelected = defineModel('nodeSelected');
 const gridLock = defineModel('gridLock');
+const width = defineModel('width');
 
 const interval = ref(null);
 const intervalTime = 5 * 1000;
@@ -88,6 +93,7 @@ onMounted(() => {
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
     showAnnotations.value = nodeSelected.value.showAnnotations;
+    showLegend.value = nodeSelected.value.showLegend;
     getChartData();
   }
 });

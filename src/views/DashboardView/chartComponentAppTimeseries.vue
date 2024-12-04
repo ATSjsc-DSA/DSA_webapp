@@ -66,7 +66,7 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        <appTimeSerieschartWidget :data="chartData" />
+        <appTimeSerieschartWidget :data="chartData" :width="width" />
       </div>
     </template>
   </Card>
@@ -102,7 +102,8 @@ const props = defineProps({
 });
 const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
-const gridLoc = defineModel('gridLock');
+const gridLock = defineModel('gridLock');
+const width = defineModel('width');
 
 const interval = ref(null);
 const intervalTime = 5 * 1000;

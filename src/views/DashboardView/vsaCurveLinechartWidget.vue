@@ -20,6 +20,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  width: {
+    type: Number,
+    default: 1,
+  },
 });
 onMounted(() => {
   chartData.value = setChartData();
@@ -32,6 +36,13 @@ watch(
       chartData.value = setChartData();
       chartOptions.value = setChartOptions();
     }
+  },
+);
+
+watch(
+  () => props.width,
+  () => {
+    chartOptions.value = setChartOptions();
   },
 );
 watch(

@@ -11,36 +11,47 @@ import { draw, generate } from 'patternomaly';
 import chartComposable from '@/combosables/chartData';
 const { zoomOptions, nodataAnnotationOption } = chartComposable();
 import { useLayout } from '@/layout/composables/layout';
+import { smallChartSize } from './chartConfig';
 const { isDarkTheme } = useLayout();
 const props = defineProps({
   data: {
     type: Array,
     default: () => [],
   },
+  width: {
+    type: Number,
+    default: 1,
+  },
 });
 onMounted(async () => {
   chartData.value = await setChartData();
-  chartOptions.value = await setChartOptions();
+  chartOptions.value = setChartOptions();
 });
 watch(
   () => props.data,
   async (newVal, oldVal) => {
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       chartData.value = await setChartData();
-      chartOptions.value = await setChartOptions();
+      chartOptions.value = setChartOptions();
     }
+  },
+);
+
+watch(
+  () => props.width,
+  () => {
+    chartOptions.value = setChartOptions();
   },
 );
 watch(
   isDarkTheme,
-  async () => {
-    chartOptions.value = await setChartOptions();
+  () => {
+    chartOptions.value = setChartOptions();
   },
   { immediate: false },
 );
 const chartData = ref();
 const chartOptions = ref();
-const appBarChartWrap = ref();
 const setChartData = async () => {
   /*
   data = list of moduleData
@@ -61,7 +72,6 @@ const setChartData = async () => {
     }
 
   */
-  const documentStyle = getComputedStyle(document.documentElement);
 
   const labels = [];
   // const datasets = [];
@@ -74,8 +84,7 @@ const setChartData = async () => {
   const currentData = [];
   const currentColor = [];
 
-  const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
     // vsa / tsa data F
     const moduleData = props.data[moduleIndex];
@@ -150,12 +159,11 @@ const getCurrentColor = (current, rateArr) => {
   }
 };
 
-const setChartOptions = async () => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-  const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
   return {
     animation: false,
     barThickness: 20,
@@ -219,17 +227,6 @@ const setChartOptions = async () => {
       },
     },
   };
-};
-
-const getChartWidth = async () => {
-  if (appBarChartWrap.value) {
-    let w = 0;
-    await nextTick(() => {
-      w = appBarChartWrap.value.getBoundingClientRect().width;
-    });
-    return w;
-  }
-  return 0;
 };
 </script>
 <style>

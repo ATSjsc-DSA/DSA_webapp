@@ -33,49 +33,52 @@
         >
           <div class="grid-stack" style="margin: -0.7rem">
             <div
-              v-for="w in gridStackComponentArr"
-              :id="w.id"
-              :key="w.id"
+              v-for="widget in gridStackComponentArr"
+              :id="widget.id"
+              :key="widget.id"
               class="grid-stack-item"
-              :gs-x="w.x"
-              :gs-y="w.y"
-              :gs-w="w.w"
-              :gs-h="w.h"
-              :gs-id="w.id"
+              :gs-x="widget.x"
+              :gs-y="widget.y"
+              :gs-w="widget.w"
+              :gs-h="widget.h"
+              :gs-id="widget.id"
             >
               <div class="grid-stack-item-content">
-                <MeasInfoDialogWidget v-if="w.type === 'measInfo' && w.show" @reloadData="reloadData" />
+                <MeasInfoDialogWidget v-if="widget.type === 'measInfo' && widget.show" @reloadData="reloadData" />
 
-                <div v-if="w.type === 'map'" class="h-full">
-                  <mapView @onRemoveWidget="onRemoveGridStackComponent(w)" />
+                <div v-if="widget.type === 'map'" class="h-full">
+                  <mapView @onRemoveWidget="onRemoveGridStackComponent(widget)" />
                 </div>
 
-                <template v-if="w.type === 'chart'">
+                <template v-if="widget.type === 'chart'">
                   <chartComponentTsa
-                    v-if="w.typeChart === 'tsa'"
-                    v-model:nodeSelected="w.nodeSelected"
+                    v-if="widget.typeChart === 'tsa'"
+                    v-model:nodeSelected="widget.nodeSelected"
                     v-model:gridLock="gridLock"
+                    v-model:width="widget.w"
                     :nodeDrag="nodeDrag"
-                    :chartId="w.id"
-                    @onRemoveWidget="onRemoveGridStackComponent(w)"
+                    :chartId="widget.id"
+                    @onRemoveWidget="onRemoveGridStackComponent(widget)"
                   />
                   <chartComponentAppTimeseries
-                    v-else-if="w.typeChart === 'appTimeSeries'"
-                    v-model:nodeSelected="w.nodeSelected"
+                    v-else-if="widget.typeChart === 'appTimeSeries'"
+                    v-model:nodeSelected="widget.nodeSelected"
                     v-model:gridLock="gridLock"
+                    v-model:width="widget.w"
                     :nodeDrag="nodeDrag"
-                    :chartId="w.id"
-                    @onRemoveWidget="onRemoveGridStackComponent(w)"
+                    :chartId="widget.id"
+                    @onRemoveWidget="onRemoveGridStackComponent(widget)"
                   />
                   <chartComponent
                     v-else
-                    v-model:nodeSelected="w.nodeSelected"
+                    v-model:nodeSelected="widget.nodeSelected"
                     v-model:gridLock="gridLock"
+                    v-model:width="widget.w"
                     :nodeDrag="nodeDrag"
-                    :chartId="w.id"
-                    :typeChart="w.typeChart"
-                    :muiltiSelect="w.muiltiSelect"
-                    @onRemoveWidget="onRemoveGridStackComponent(w)"
+                    :chartId="widget.id"
+                    :typeChart="widget.typeChart"
+                    :muiltiSelect="widget.muiltiSelect"
+                    @onRemoveWidget="onRemoveGridStackComponent(widget)"
                   />
                 </template>
               </div>

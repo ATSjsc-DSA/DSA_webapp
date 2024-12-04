@@ -21,5 +21,6 @@ export const colorArray = [
   '--orange-600',
   '--red-600',
   '--purple-600',
-
 ];
+
+export const smallChartSize = 5;

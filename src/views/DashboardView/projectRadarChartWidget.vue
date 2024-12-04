@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue';
 import Chart from 'primevue/chart';
 import { useLayout } from '@/layout/composables/layout';
+import { smallChartSize } from './chartConfig';
 
 const { isDarkTheme } = useLayout();
 const props = defineProps({
@@ -13,37 +14,36 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  width: {
+    type: Number,
+    default: 1,
+  },
 });
-const projectRadarChartWrap = ref();
-const getChartWidth = async () => {
-  if (projectRadarChartWrap.value) {
-    let w = 0;
-    await nextTick(() => {
-      w = projectRadarChartWrap.value.getBoundingClientRect().width;
-    });
-    return w;
-  }
-  return 0;
-};
-onMounted(async () => {
-  chartData.value = await setChartData();
+
+onMounted(() => {
+  chartData.value = setChartData();
   chartOptions.value = setChartOptions();
 });
 
 watch(
   () => props.data,
-  async (newVal, oldVal) => {
+  (newVal, oldVal) => {
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      chartData.value = await setChartData();
+      chartData.value = setChartData();
       chartOptions.value = setChartOptions();
     }
   },
 );
-
+watch(
+  () => props.width,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+);
 watch(
   () => props.dataKey,
-  async () => {
-    chartData.value = await setChartData();
+  () => {
+    chartData.value = setChartData();
     chartOptions.value = setChartOptions();
   },
 );
@@ -97,7 +97,7 @@ const transformApiResponse = (data) => {
   return result;
 };
 
-const setChartData = async () => {
+const setChartData = () => {
   const radarData = transformApiResponse(props.data);
   const chartValue = [];
   const numAxis = radarData.Key.length;
@@ -151,33 +151,28 @@ const setChartData = async () => {
 
   chartValue.push(currentValue, reserve1Value, reserve2Value, boundValue);
   return {
-    labels: await breakLabels(radarData.Key),
+    labels: breakLabels(radarData.Key),
     datasets: chartValue,
   };
 };
-const breakLabels = async (labelArr) => {
+const breakLabels = (labelArr) => {
   const labels = [];
-  const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
   labelArr.forEach((item) => {
     const splitAtHyphen = item.split('-');
     let label = [];
-    if (splitAtHyphen.length > 1) {
-      if (isSmallChart) {
-        splitAtHyphen.forEach((itemBreak) => {
-          if (itemBreak.split('_').length > 3) {
-            const splitAtUnderscore = itemBreak.split('_');
-            label.push(splitAtUnderscore.slice(0, 2).join('_') + '_');
-            label.push(splitAtUnderscore.slice(2).join('_'));
-          } else {
-            label.push(itemBreak);
-          }
-        });
-      } else {
-        label = label.concat(splitAtHyphen);
-      }
+    if (isSmallChart) {
+      splitAtHyphen.forEach((itemBreak) => {
+        if (itemBreak.split('_').length > 3) {
+          const splitAtUnderscore = itemBreak.split('_');
+          label.push(splitAtUnderscore.slice(0, 2).join('_') + '_');
+          label.push(splitAtUnderscore.slice(2).join('_'));
+        } else {
+          label.push(itemBreak);
+        }
+      });
     } else {
-      label.push(item);
+      label = label.concat(splitAtHyphen);
     }
     labels.push(label);
   });
@@ -187,7 +182,6 @@ const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColor2nd = documentStyle.getPropertyValue('--text-color-secondary');
-  const primaryColor = documentStyle.getPropertyValue('--primary-color');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
   return {
     animation: false,
@@ -356,7 +350,7 @@ const removeValueExceed20 = (reserveData) => {
 </script>
 
 <template>
-  <div ref="projectRadarChartWrap" class="h-full">
+  <div class="h-full">
     <Chart type="radar" :data="chartData" :options="chartOptions" class="w-full h-full" />
   </div>
 </template>

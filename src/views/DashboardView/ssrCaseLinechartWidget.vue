@@ -1,5 +1,5 @@
 <template>
-  <div ref="ssrChartWrap" class="h-full">
+  <div class="h-full">
     <Chart type="line" :data="chartData" :options="chartOptions" class="h-full" />
   </div>
 </template>
@@ -8,7 +8,7 @@
 import { watch } from 'vue';
 
 import Chart from 'primevue/chart';
-import { colorArray } from './chartConfig';
+import { colorArray, smallChartSize } from './chartConfig';
 import chartComposable from '@/combosables/chartData';
 
 const { zoomOptions } = chartComposable();
@@ -18,21 +18,30 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  width: {
+    type: Number,
+    default: 1,
+  },
 });
-onMounted(async () => {
+onMounted(() => {
   chartData.value = setChartData();
-  chartOptions.value = await setChartOptions();
+  chartOptions.value = setChartOptions();
 });
 watch(
   () => props.data,
   async (newVal, oldVal) => {
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       chartData.value = setChartData();
-      chartOptions.value = await setChartOptions();
+      chartOptions.value = setChartOptions();
     }
   },
 );
-
+watch(
+  () => props.width,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+);
 const chartData = ref();
 const chartOptions = ref();
 
@@ -85,12 +94,12 @@ const setChartData = () => {
   return { datasets: datasets, labels: labels };
 };
 
-const setChartOptions = async () => {
+const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-  const annotation = await getAnnotation();
+  const annotation = getAnnotation();
   return {
     animation: false,
     stacked: true,
@@ -163,7 +172,7 @@ const setChartOptions = async () => {
   };
 };
 
-const getAnnotation = async () => {
+const getAnnotation = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   let annotation = {};
   if (props.data.length === 0) {
@@ -180,7 +189,7 @@ const getAnnotation = async () => {
       },
     };
   }
-  const dmAnnotations = await getDmAnnotation();
+  const dmAnnotations = getDmAnnotation();
   if (dmAnnotations) {
     annotation = { ...annotation, ...dmAnnotations };
   }
@@ -189,10 +198,9 @@ const getAnnotation = async () => {
 };
 
 const xDm = 25;
-const getDmAnnotation = async () => {
+const getDmAnnotation = () => {
   const documentStyle = getComputedStyle(document.documentElement);
-  const chartWidth = await getChartWidth();
-  const isSmallChart = chartWidth < 500;
+  const isSmallChart = props.width < smallChartSize;
   let colorIndex = 0;
 
   const dmAnnotations = {};
@@ -200,9 +208,9 @@ const getDmAnnotation = async () => {
     const caseData = props.data[caseIndex];
     const dmLineColor = documentStyle.getPropertyValue(colorArray[colorIndex].slice(0, -3) + '500');
     colorIndex++;
-      if (colorIndex >= colorArray.length) {
-        colorIndex = 0;
-      }
+    if (colorIndex >= colorArray.length) {
+      colorIndex = 0;
+    }
     dmAnnotations['line_dm_' + caseIndex] = {
       type: 'line',
       yMin: caseData.minDm,
@@ -214,17 +222,5 @@ const getDmAnnotation = async () => {
     };
   }
   return dmAnnotations;
-};
-
-const ssrChartWrap = ref();
-const getChartWidth = async () => {
-  if (ssrChartWrap.value) {
-    let w = 0;
-    await nextTick(() => {
-      w = ssrChartWrap.value.getBoundingClientRect().width;
-    });
-    return w;
-  }
-  return 0;
 };
 </script>
