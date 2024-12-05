@@ -60,13 +60,16 @@
         </div>
       </template>
     </FileUpload>
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
 <script setup>
 import { usePrimeVue } from 'primevue/config';
-
+import { useConfirm } from 'primevue/useconfirm';
+import ConfirmDialog from 'primevue/confirmdialog';
 const emit = defineEmits(['uploadFile']);
+const confirm = useConfirm();
 
 const $primevue = usePrimeVue();
 const totalSize = ref(0);
@@ -93,9 +96,23 @@ const formatSize = (bytes) => {
   return `${formattedSize} ${sizes[i]}`;
 };
 const uploadEvent = async (callback, files) => {
-  const formData = new FormData();
-  formData.append('file', files[0]);
-  totalSizePercent.value = totalSize.value / 10;
-  emit('uploadFile', formData, callback);
+  confirm.require({
+    message: 'All data will be replaced. Do you want to continue?',
+    header: 'Confirmation',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Continue',
+    accept: () => {
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      totalSizePercent.value = totalSize.value / 10;
+      emit('uploadFile', formData, callback);
+    },
+    reject: () => {
+      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    },
+  });
 };
 </script>
