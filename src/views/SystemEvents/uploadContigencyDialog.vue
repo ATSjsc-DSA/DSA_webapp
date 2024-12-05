@@ -109,11 +109,12 @@ const uploadEvent = async (callback, files) => {
       const formData = new FormData();
       formData.append('file', files[0]);
       totalSizePercent.value = totalSize.value / 10;
-      console.log('formData', formData, files[0]);
       emit('uploadFile', formData, callback);
     },
     reject: () => {
-      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      console.log('abc');
+
+      // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
     },
   });
 };

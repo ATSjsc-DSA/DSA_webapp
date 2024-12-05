@@ -60,14 +60,13 @@
         </div>
       </template>
     </FileUpload>
-    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
 <script setup>
 import { usePrimeVue } from 'primevue/config';
 import { useConfirm } from 'primevue/useconfirm';
-import ConfirmDialog from 'primevue/confirmdialog';
+
 const emit = defineEmits(['uploadFile']);
 const confirm = useConfirm();
 
@@ -111,7 +110,7 @@ const uploadEvent = async (callback, files) => {
       emit('uploadFile', formData, callback);
     },
     reject: () => {
-      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      console.log('abc');
     },
   });
 };
