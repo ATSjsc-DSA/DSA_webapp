@@ -87,6 +87,10 @@ const setChartOptions = () => {
   const isSmallChart = props.width < smallChartSize;
 
   const isNoData = !props.data.list_time || props.data.list_time.length === 0;
+  let unit = 'day';
+  if (!isNoData) {
+    unit = isSmallChart && props.data.list_time.length > 5 ? 'day' : 'hour';
+  }
   return {
     animation: false,
     barThickness: 20,
@@ -105,7 +109,7 @@ const setChartOptions = () => {
       x: {
         type: 'timeseries',
         time: {
-          unit: isSmallChart && props.data.list_time.length > 5 ? 'day' : 'hour',
+          unit: unit,
           displayFormats: {
             day: 'MM/DD ',
             hour: 'MM/DD HH:mm',

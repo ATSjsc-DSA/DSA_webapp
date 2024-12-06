@@ -69,8 +69,8 @@ watch(
 );
 watch(
   isDarkTheme,
-  () => {
-    chartOptions.value = setChartOptions();
+  async () => {
+    chartOptions.value = await setChartOptions();
   },
   { immediate: false },
 );

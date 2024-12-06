@@ -371,6 +371,31 @@ const showVsaLegend = ref(true);
 const changeConfig = () => {
   nodeSelected.value.showLegend = showVsaLegend.value;
 };
+
+const getSsrTypeLabel = (typeValue) => {
+  switch (Number(typeValue)) {
+    case 0:
+      return 'N-1';
+    case 1:
+      return 'N-2';
+    case 2:
+      return 'Base';
+    default:
+      return 'N-1';
+  }
+};
+const getVsaCaseTypeValue = (caseType) => {
+  switch (caseType) {
+    case 0:
+      return 'N:1';
+    case 1:
+      return 'N:2';
+    case 2:
+      return 'Base';
+    default:
+      return caseType;
+  }
+};
 </script>
 
 <style>

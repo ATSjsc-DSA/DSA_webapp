@@ -364,7 +364,6 @@ const onNodeExpand = async (node) => {
       node['children'] = await getVsaCurveBranchData(node);
     }
     if (node.type === 'TSA') {
-      console.log('tsa');
       node['children'] = await getTsaCaseBranchData(node);
     }
     if (node.type === 'TsaCase') {
@@ -651,6 +650,7 @@ const getTsaCaseBranchData = async (tsaNode) => {
         highlight: leafData.attention,
         moduleInfoId: tsaNode._id,
         loading: false,
+        tsaName: tsaNode.label,
       };
       branch.push(newNode);
       if (treeExpandedKeys.value[tsaNode.key + '_' + index]) {
@@ -687,6 +687,9 @@ const getTsaSubCaseBranchData = async (caseNode) => {
         icon: 'pi pi-file',
         leaf: false,
         caseInfoId: caseNode._id,
+        caseName: caseNode.label,
+        tsaName: caseNode.tsaName,
+
         highlight: leafData.attention,
         moduleInfoId: caseNode.moduleInfoId,
         loading: false,
@@ -720,11 +723,10 @@ const getTsaCurveBranchData = async (subCaseNode) => {
     curveTypeList = [...new Set(curveTypeList)];
     curveTypeList.forEach(async (curveType) => {
       const curvesInType = curveList.filter((item) => item.curveType === curveType);
-      console.log(curveType, curvesInType);
       const newNode = {
         key: subCaseNode.key + '_' + curveType,
         label: getTsaCurveTypeValue(curveType),
-        data: JSON.stringify(curvesInType.map((leafData) => leafData._id)),
+        data: JSON.stringify(curvesInType.map((leafData) => ({ _id: leafData._id, label: leafData.name }))),
         type: 'TsaCurveType',
         leaf: true,
         showSubChildren: false,
@@ -732,6 +734,11 @@ const getTsaCurveBranchData = async (subCaseNode) => {
         subCaseInfo: subCaseNode._id,
         caseInfoId: subCaseNode.caseInfoId,
         moduleInfoId: subCaseNode.moduleInfoId,
+
+        tsaName: subCaseNode.tsaName,
+        caseName: subCaseNode.caseName,
+        subCaseName: subCaseNode.label,
+
         loading: false,
         subChildren: curvesInType.map((leafData, index) => ({
           key: subCaseNode.key + curveType + '_' + index,
@@ -743,6 +750,10 @@ const getTsaCurveBranchData = async (subCaseNode) => {
           subCaseInfo: subCaseNode._id,
           caseInfoId: subCaseNode.caseInfoId,
           moduleInfoId: subCaseNode.moduleInfoId,
+
+          tsaName: subCaseNode.tsaName,
+          caseName: subCaseNode.caseName,
+          subCaseName: subCaseNode.label,
           loading: false,
         })),
       };
