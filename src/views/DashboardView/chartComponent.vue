@@ -111,7 +111,7 @@ const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
-
+import { smallChartSize } from './chartConfig';
 const props = defineProps({
   nodeDrag: {
     type: Object,

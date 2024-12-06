@@ -72,19 +72,19 @@ const setChartData = async () => {
     }
 
   */
+  const isSmallChart = props.width < smallChartSize;
 
   const labels = [];
-  // const datasets = [];
 
   const onlineRate1Data = [];
   const onlineRate2Data = [];
 
   const offlineRate1Data = [];
   const offlineRate2Data = [];
+
   const currentData = [];
   const currentColor = [];
-
-  const isSmallChart = props.width < smallChartSize;
+  const currentPatternomalyColor = 'rgb(229, 231, 235)';
   for (let moduleIndex = 0; moduleIndex < props.data.length; moduleIndex++) {
     // vsa / tsa data F
     const moduleData = props.data[moduleIndex];
@@ -92,28 +92,45 @@ const setChartData = async () => {
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.online['rateCritical1']);
 
-    offlineRate1Data.push(moduleData.offline['rateCritical1']);
-    offlineRate2Data.push(moduleData.offline['rateCritical2'] - moduleData.offline['rateCritical1']);
+    offlineRate1Data.push(moduleData.online['rateCritical1']);
+    offlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.offline['rateCritical1']);
     currentData.push(moduleData.current);
-    currentColor.push(getCurrentColor(moduleData.current, moduleData.online));
+    const currentBgColor = getCurrentColor(moduleData.current, moduleData.online);
+    currentColor.push(draw('dash', currentBgColor, currentPatternomalyColor, isSmallChart ? 40 : 25, 300));
   }
 
   const datasets = [
+    // current
+    {
+      type: 'bar',
+      datalabels: 'Current',
+      label: 'Current',
+      barThickness: isSmallChart ? 20 : 30,
+      data: currentData,
+      backgroundColor: currentColor,
+      borderColor: currentPatternomalyColor,
+      borderWidth: 0.1,
+      stack: 'Stack Current',
+    },
     // online
     {
       datalabels: 'Online',
+      barThickness: isSmallChart ? 20 : 30,
       type: 'bar',
       label: 'Rate Critical 1',
       data: onlineRate1Data,
-      backgroundColor: 'rgba(40,167,69,0.6)',
+      backgroundColor: 'rgba(40,167,69,1)',
+
       stack: 'Stack Online',
     },
     {
       type: 'bar',
       datalabels: 'Online',
+      barThickness: isSmallChart ? 20 : 30,
       label: 'Rate Critical 2',
       data: onlineRate2Data,
-      backgroundColor: 'rgba(255,165,0,0.6)',
+      backgroundColor: 'rgba(255,165,0,1)',
+
       stack: 'Stack Online',
     },
 
@@ -121,29 +138,22 @@ const setChartData = async () => {
     {
       type: 'bar',
       datalabels: 'Offline',
+      barThickness: isSmallChart ? 20 : 30,
       label: 'Rate Critical 1',
       data: offlineRate1Data,
-      backgroundColor: 'rgba(40,167,69,0.3)',
+      backgroundColor: isDarkTheme.value ? 'rgba(0,128,0,1)' : 'rgba(0,128,30,1)',
+
       stack: 'Stack Offline',
     },
     {
       type: 'bar',
       datalabels: 'Offline',
+      barThickness: isSmallChart ? 20 : 30,
       label: 'Rate Critical 2',
       data: offlineRate2Data,
-      backgroundColor: 'rgba(255,165,0,0.3)',
-      stack: 'Stack Offline',
-    },
+      backgroundColor: isDarkTheme.value ? 'rgba(255, 141, 0, 1)' : 'rgba(255, 141, 0, 1)',
 
-    // current
-    {
-      type: 'bar',
-      datalabels: 'Current',
-      label: 'Current',
-      data: currentData,
-      // backgroundColor: currentColor,
-      backgroundColor: [draw('dash', currentColor, currentColor, isSmallChart ? 20 : 30)],
-      stack: 'Stack Current',
+      stack: 'Stack Offline',
     },
   ];
   return { datasets: datasets, labels: labels };
@@ -151,9 +161,9 @@ const setChartData = async () => {
 
 const getCurrentColor = (current, rateArr) => {
   if (current <= rateArr['rateCritical1']) {
-    return 'rgba(40,167,69,0.6)';
+    return 'rgba(0,128,0,1)';
   } else if (current <= rateArr['rateCritical2']) {
-    return 'rgba(255,165,0,0.5)';
+    return 'rgba(255,255,0,1)';
   } else {
     return 'rgba(255,0,0,1)';
   }

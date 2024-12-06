@@ -10,8 +10,10 @@ import { watch } from 'vue';
 import Chart from 'primevue/chart';
 import { colorArray, smallChartSize } from './chartConfig';
 import chartComposable from '@/combosables/chartData';
+import { useLayout } from '@/layout/composables/layout';
 
 const { zoomOptions } = chartComposable();
+const { isDarkTheme } = useLayout();
 
 const props = defineProps({
   data: {
@@ -41,6 +43,13 @@ watch(
   () => {
     chartOptions.value = setChartOptions();
   },
+);
+watch(
+  isDarkTheme,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+  { immediate: false },
 );
 const chartData = ref();
 const chartOptions = ref();
