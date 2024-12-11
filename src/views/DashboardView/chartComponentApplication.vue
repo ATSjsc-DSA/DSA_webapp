@@ -61,8 +61,6 @@
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" :width="width" />
 
-        <ssrCaseLinechartWidget v-if="typeChart === 'ssr'" :data="chartData" :width="width" />
-
         <appRadarChartWidget
           v-if="typeChart === 'appRadar'"
           :data="chartData"
@@ -84,16 +82,14 @@
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 
 import appBarchartWidget from './appBarchartWidget.vue';
-import ssrCaseLinechartWidget from './ssrCaseLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import projectRadarChartWidget from './projectRadarChartWidget.vue';
-import { SsrApi, ApplicationApi } from './api';
+import { ApplicationApi } from './api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
 const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
-import { smallChartSize } from './chartConfig';
 const props = defineProps({
   nodeDrag: {
     type: Object,
@@ -108,10 +104,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  muiltiSelect: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 const emit = defineEmits(['onRemoveWidget']);
@@ -125,10 +117,6 @@ onMounted(() => {
   setInitTitle();
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
-    if (!props.muiltiSelect) {
-      chartTitle.value = nodeSelected.value.title;
-    }
-
     getChartData();
     chartRadarDataKey.value = nodeSelected.value.dataKey;
   } else {
@@ -165,16 +153,7 @@ const toggleMenuSelectKeyRadarChart = (event) => {
   menuSelectDataKey.value.toggle(event);
 };
 
-const typeChartCanDrop = computed(() => {
-  if (props.typeChart.includes('app')) {
-    return ['Application'];
-  }
-
-  if (props.typeChart === 'ssr') {
-    return ['SsrCase', 'SSR'];
-  }
-  return [''];
-});
+const typeChartCanDrop = ref(['Application']);
 
 const chartTitle = ref('');
 
@@ -189,15 +168,11 @@ const setInitTitle = () => {
   if (props.typeChart === 'projectRadar') {
     chartTitle.value = 'Project';
   }
-
-  if (props.typeChart === 'ssr') {
-    chartTitle.value = 'SSR';
-  }
 };
 //  Drop Application - bar
 
-const nodeSelectedInChart = ref(props.muiltiSelect ? [] : undefined);
-const nodeKeySelected = ref(props.muiltiSelect ? [] : undefined);
+const nodeSelectedInChart = ref(undefined);
+const nodeKeySelected = ref(undefined);
 const canDropNode = ref(false);
 
 const onDragoverComponent = () => {
@@ -212,32 +187,10 @@ const onDragoverComponent = () => {
 };
 const onDropComponent = async () => {
   if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
-    if (props.muiltiSelect) {
-      nodeKeySelected.value.push(props.nodeDrag.key);
-
-      if (props.typeChart === 'ssr') {
-        if (props.nodeDrag.type === 'SsrCase') {
-          nodeSelectedInChart.value.push({
-            caseInfoId: props.nodeDrag._id,
-            moduleInfoId: props.nodeDrag.moduleInfoId,
-          });
-        }
-        if (props.nodeDrag.type === 'SSR') {
-          const ssrCaseData = JSON.parse(props.nodeDrag.data);
-          ssrCaseData.forEach((ssrCaseId) => {
-            nodeSelectedInChart.value.push({
-              caseInfoId: ssrCaseId,
-              moduleInfoId: props.nodeDrag._id,
-            });
-          });
-        }
-      }
-    } else {
-      resetChart();
-      chartTitle.value = props.nodeDrag.label;
-      nodeSelectedInChart.value = props.nodeDrag._id;
-      nodeKeySelected.value = props.nodeDrag.key;
-    }
+    resetChart();
+    chartTitle.value = props.nodeDrag.label;
+    nodeSelectedInChart.value = props.nodeDrag._id;
+    nodeKeySelected.value = props.nodeDrag.key;
 
     nodeSelected.value = {
       title: props.nodeDrag.label,
@@ -273,14 +226,11 @@ const getChartData = async () => {
     if (props.typeChart === 'projectRadar') {
       res = await ApplicationApi.getRadarProjectChartData();
 
-      // res = await CommonApi.getProjectRadarChartData();
       if (!chartRadarDataKey.value) {
         chartRadarDataKey.value = res.data.Key.slice(0, 8);
       }
     }
-    if (props.typeChart === 'ssr') {
-      res = await SsrApi.getChartData(nodeSelectedInChart.value);
-    }
+
     if (res.data) {
       chartData.value = res.data;
       modificationTime.value = res.data.modificationTime
@@ -311,8 +261,8 @@ const resetChart = async () => {
   clearTimeout(interval.value);
   chartData.value = [];
   setInitTitle();
-  nodeSelected.value = props.muiltiSelect ? {} : undefined;
-  nodeSelectedInChart.value = props.muiltiSelect ? [] : undefined;
+  nodeSelected.value = undefined;
+  nodeSelectedInChart.value = undefined;
 };
 </script>
 

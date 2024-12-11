@@ -1,9 +1,24 @@
 <template>
   <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropNode }">
     <template #title>
-      <div class="flex flex-wrap justify-content-between align-items-center">
+      <div class="flex justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
-          <div>VSA</div>
+          <div
+            v-tooltip.bottom="{
+              value: title != 'VSA' ? title : '',
+              pt: {
+                text: {
+                  style: {
+                    width: '40rem',
+                  },
+                },
+              },
+            }"
+            class="truncate-title"
+            :style="{ maxWidth: (width / 2) * 10 + 'rem' }"
+          >
+            {{ title }}
+          </div>
         </div>
         <div class="hidden md:flex gap-2 justify-content-between align-items-center">
           <div>
@@ -132,12 +147,11 @@ const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
 const gridLock = defineModel('gridLock');
 const width = defineModel('width');
-
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
   if (nodeSelected.value) {
-    console.log('nodeSelected.value', nodeSelected.value);
+    console.log(nodeSelected.value);
     nodeSelectedInChart.value = nodeSelected.value.data;
     showLegend.value = nodeSelected.value.showLegend;
     curveTree.value = nodeSelected.value.curveTree;
@@ -157,6 +171,23 @@ watch(measInfo_automatic, async (isActive) => {
 watch(measInfoActive, async (newVal, oldVal) => {
   if (newVal._id) {
     await getChartData();
+  }
+});
+
+const title = computed(() => {
+  if (curveTree.value.length > 0) {
+    const caseTitle = [];
+    for (const vsaNode of curveTree.value) {
+      if (vsaNode.children.length > 0) {
+        for (let caseIndex = 0; caseIndex < vsaNode.children.length; caseIndex++) {
+          const caseData = vsaNode.children[caseIndex];
+          caseTitle.push(`${caseData.label}: ${caseData.children.map((typeCurve) => typeCurve.label).join(', ')}`);
+        }
+      }
+    }
+    return caseTitle.join('; ');
+  } else {
+    return 'VSA';
   }
 });
 
@@ -405,5 +436,11 @@ const getVsaCurveTypeValue = (curveType) => {
 }
 .p-card-content {
   height: 90% !important;
+}
+
+.truncate-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

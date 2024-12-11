@@ -1,9 +1,24 @@
 <template>
   <Card class="flex-grow-1 w-full h-full grid-stack-item-content" :class="{ 'border-2': canDropNode }">
     <template #title>
-      <div class="flex flex-wrap justify-content-between align-items-center">
+      <div class="flex justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
-          <div>TSA</div>
+          <div
+            v-tooltip.bottom="{
+              value: title != 'TSA' ? title : '',
+              pt: {
+                text: {
+                  style: {
+                    width: '40rem',
+                  },
+                },
+              },
+            }"
+            class="truncate-title"
+            :style="{ maxWidth: (width / 3) * 10 + 5 + 'rem' }"
+          >
+            {{ title }}
+          </div>
         </div>
         <div class="hidden md:flex gap-2 justify-content-between align-items-center">
           <div>
@@ -147,7 +162,6 @@ const emit = defineEmits(['onRemoveWidget']);
 const nodeSelected = defineModel('nodeSelected');
 const gridLock = defineModel('gridLock');
 const width = defineModel('width');
-
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
@@ -174,7 +188,21 @@ watch(measInfoActive, async (newVal, oldVal) => {
     await getChartData();
   }
 });
-
+const title = computed(() => {
+  if (curveTree.value.length > 0) {
+    const caseTitle = [];
+    for (const tsaNode of curveTree.value) {
+      if (tsaNode.children.length > 0) {
+        for (let caseIndex = 0; caseIndex < tsaNode.children.length; caseIndex++) {
+          const caseData = tsaNode.children[caseIndex];
+          caseTitle.push(`${caseData.label}: ${caseData.children.map((subcase) => subcase.label).join(', ')}`);
+        }
+      }
+    }
+    return caseTitle.join('; ');
+  }
+  return 'TSA';
+});
 const onRemoveWidget = () => {
   resetChart();
   emit('onRemoveWidget');
@@ -464,7 +492,7 @@ const getTsaCurveTypeValue = (curveType) => {
     case 8:
       return 'Elect Q';
     case 9:
-      return 'MechQ';
+      return 'Mech P';
     case 10:
       return 'Efd';
     default:

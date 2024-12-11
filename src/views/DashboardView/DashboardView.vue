@@ -88,7 +88,7 @@
                     :chartId="widget.id"
                     @onRemoveWidget="onRemoveGridStackComponent(widget)"
                   />
-                  <chartComponent
+                  <chartComponentApplication
                     v-else
                     v-model:nodeSelected="widget.nodeSelected"
                     v-model:gridLock="gridLock"
@@ -96,7 +96,6 @@
                     :nodeDrag="nodeDrag"
                     :chartId="widget.id"
                     :typeChart="widget.typeChart"
-                    :muiltiSelect="widget.muiltiSelect"
                     @onRemoveWidget="onRemoveGridStackComponent(widget)"
                   />
                 </template>
@@ -316,12 +315,11 @@ import mapView from '@/components/mapView.vue';
 import projectTreeWidget from './projectTreeWidget.vue';
 import logListWidget from './logListWidget.vue';
 import MeasInfoDialogWidget from './MeasInfoWidget.vue';
-import chartComponent from './chartComponent.vue';
 import chartComponentTsa from './chartComponentTsa.vue';
 import chartComponentVsa from './chartComponentVsa.vue';
 import chartComponentSsr from './chartComponentSsr.vue';
 import chartComponentAppTimeseries from './chartComponentAppTimeseries.vue';
-
+import chartComponentApplication from './chartComponentApplication.vue';
 import { useCommonStore } from '@/store';
 
 import { GridStack } from 'gridstack';
@@ -380,31 +378,31 @@ onMounted(async () => {
         }
         if (widget.type === 'chart') {
           if (widget.typeChart === 'projectRadar') {
-            addNewChartComponent('projectRadar', true, widget);
+            addNewChartComponent('projectRadar', widget);
           }
           if (widget.typeChart === 'appRadar') {
             applicationDraggable.value = true;
-            addNewChartComponent('appRadar', false, widget);
+            addNewChartComponent('appRadar', widget);
           }
           if (widget.typeChart === 'appBar') {
             applicationDraggable.value = true;
-            addNewChartComponent('appBar', false, widget);
+            addNewChartComponent('appBar', widget);
           }
           if (widget.typeChart === 'appTimeSeries') {
             applicationDraggable.value = true;
-            addNewChartComponent('appTimeSeries', false, widget);
+            addNewChartComponent('appTimeSeries', widget);
           }
           if (widget.typeChart === 'vsa') {
             vsaCurveDraggable.value = true;
-            addNewChartComponent('vsa', true, widget);
+            addNewChartComponent('vsa', widget);
           }
           if (widget.typeChart === 'tsa') {
             tsaCurveDraggable.value = true;
-            addNewChartComponent('tsa', true, widget);
+            addNewChartComponent('tsa', widget);
           }
           if (widget.typeChart === 'ssr') {
             ssrCurveDraggable.value = true;
-            addNewChartComponent('ssr', true, widget);
+            addNewChartComponent('ssr', widget);
           }
         }
       });
@@ -562,30 +560,30 @@ const onDropGridStackComponent = () => {
 
   if (componentSelected.value === 'appBar') {
     applicationDraggable.value = true;
-    addNewChartComponent(componentSelected.value, false);
+    addNewChartComponent(componentSelected.value);
   }
   if (componentSelected.value === 'appTimeSeries') {
     applicationDraggable.value = true;
-    addNewChartComponent(componentSelected.value, false);
+    addNewChartComponent(componentSelected.value);
   }
   if (componentSelected.value === 'appRadar') {
     applicationDraggable.value = true;
-    addNewChartComponent(componentSelected.value, false);
+    addNewChartComponent(componentSelected.value);
   }
   if (componentSelected.value === 'projectRadar') {
-    addNewChartComponent(componentSelected.value, true, { nodeSelected: { data: 'project' } });
+    addNewChartComponent(componentSelected.value, { nodeSelected: { data: 'project' } });
   }
   if (componentSelected.value === 'vsa') {
     vsaCurveDraggable.value = true;
-    addNewChartComponent(componentSelected.value, true);
+    addNewChartComponent(componentSelected.value);
   }
   if (componentSelected.value === 'tsa') {
     tsaCurveDraggable.value = true;
-    addNewChartComponent(componentSelected.value, true);
+    addNewChartComponent(componentSelected.value);
   }
   if (componentSelected.value === 'ssr') {
     ssrCurveDraggable.value = true;
-    addNewChartComponent(componentSelected.value, true);
+    addNewChartComponent(componentSelected.value);
   }
   if (componentSelected.value === 'map') {
     addMapComponent();
@@ -593,7 +591,7 @@ const onDropGridStackComponent = () => {
   componentSelected.value = undefined;
 };
 
-const addNewChartComponent = async (typeChart, muiltiSelect, oldConfig = {}) => {
+const addNewChartComponent = async (typeChart, oldConfig = {}) => {
   const node = {
     x: oldConfig.x || null,
     y: oldConfig.y | null,
@@ -601,7 +599,6 @@ const addNewChartComponent = async (typeChart, muiltiSelect, oldConfig = {}) => 
     h: oldConfig.h || 30,
     id: typeChart + '_' + gridStackComponentArr.value.length,
     typeChart: typeChart,
-    muiltiSelect: muiltiSelect,
     nodeSelected: oldConfig.nodeSelected,
     type: 'chart',
   };

@@ -3,7 +3,22 @@
     <template #title>
       <div class="flex flex-wrap justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
-          <div>SSR</div>
+          <div
+            v-tooltip.bottom="{
+              value: title != 'SSR' ? title : '',
+              pt: {
+                text: {
+                  style: {
+                    width: '40rem',
+                  },
+                },
+              },
+            }"
+            class="truncate-title"
+            :style="{ maxWidth: (width / 3) * 10 + 5 + 'rem' }"
+          >
+            {{ title }}
+          </div>
         </div>
         <div class="hidden md:flex gap-2 justify-content-between align-items-center">
           <div>
@@ -137,7 +152,6 @@ const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(async () => {
   if (nodeSelected.value) {
-    console.log('nodeSelected.value', nodeSelected.value);
     nodeSelectedInChart.value = nodeSelected.value.data;
     showLegend.value = nodeSelected.value.showLegend;
     curveTree.value = nodeSelected.value.curveTree;
@@ -164,6 +178,13 @@ const onRemoveWidget = () => {
   resetChart();
   emit('onRemoveWidget');
 };
+const title = computed(() => {
+  if (curveTree.value.length > 0) {
+    return curveTree.value.map((ssrNode) => ssrNode.label).join('; ');
+  } else {
+    return 'SSR';
+  }
+});
 
 const typeChartCanDrop = ref(['SsrCase', 'SSR']);
 const nodeSelectedInChart = ref([]);
