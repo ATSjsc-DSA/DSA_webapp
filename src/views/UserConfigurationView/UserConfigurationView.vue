@@ -61,14 +61,14 @@
                 </template>
 
                 <template #Project="slotProps">
-                  <div class="font-bold text-xl" aria-haspopup="true" @contextmenu="onProjectRightClick">
+                  <div class="font-bold text-xl mb-1" aria-haspopup="true" @contextmenu="onProjectRightClick">
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="projectContextMenuRef" :model="projectContextMenu" />
                 </template>
                 <template #Application="slotProps">
                   <div
-                    class="font-bold text-lg"
+                    class="font-bold text-lg mb-1"
                     aria-haspopup="true"
                     @contextmenu="onApplicationRightClick($event, slotProps.node)"
                   >
@@ -80,7 +80,7 @@
                 <!-- --- Monitor --- -->
                 <template #MonitorGroup="slotProps">
                   <div
-                    class="font-semibold"
+                    class="font-semibold mb-1"
                     aria-haspopup="true"
                     @contextmenu="onMonitorGroupRightClick($event, slotProps.node)"
                   >
@@ -89,7 +89,7 @@
                   <ContextMenu ref="monitorGroupContextMenuRef" :model="monitorGroupContextMenu" />
                 </template>
                 <template #Monitor="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onMonitorRightClick($event, slotProps.node)">
+                  <div aria-haspopup="true" class="mb-1" @contextmenu="onMonitorRightClick($event, slotProps.node)">
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="monitorContextMenuRef" :model="monitorContextMenu" />
@@ -98,7 +98,7 @@
                 <!-- --- DSA --- -->
                 <template #DSAGroup="slotProps">
                   <div
-                    class="font-semibold"
+                    class="font-semibold mb-1"
                     aria-haspopup="true"
                     @contextmenu="onDsaGroupRightClick($event, slotProps.node)"
                   >
@@ -107,39 +107,39 @@
                   <ContextMenu ref="dsaGroupContextMenuRef" :model="dsaGroupContextMenu" />
                 </template>
                 <template #DSA="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onDsaRightClick($event, slotProps.node)">
+                  <div aria-haspopup="true" class="mb-1" @contextmenu="onDsaRightClick($event, slotProps.node)">
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="dsaContextMenuRef" :model="dsaContextMenu" />
                 </template>
 
                 <template #VSA="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onVsaRightClick($event, slotProps.node)">
-                    <Tag value="VSA" severity="success" rounded />
+                  <div aria-haspopup="true" class="mb-1" @contextmenu="onVsaRightClick($event, slotProps.node)">
+                    <Tag value="VSA" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="vsaContextMenuRef" :model="vsaContextMenu" />
                 </template>
 
                 <template #TSA="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onTsaRightClick($event, slotProps.node)">
-                    <Tag value="TSA" severity="secondary" rounded />
+                  <div aria-haspopup="true" class="mb-1" @contextmenu="onTsaRightClick($event, slotProps.node)">
+                    <Tag value="TSA" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="tsaContextMenuRef" :model="tsaContextMenu" />
                 </template>
 
                 <template #SSR="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onSsrRightClick($event, slotProps.node)">
-                    <Tag value="SSR" severity="info" rounded />
+                  <div aria-haspopup="true" class="mb-1" @contextmenu="onSsrRightClick($event, slotProps.node)">
+                    <Tag value="SSR" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="ssrContextMenuRef" :model="ssrContextMenu" />
                 </template>
 
                 <template #OSL="slotProps">
-                  <div aria-haspopup="true" @contextmenu="onOslRightClick($event, slotProps.node)">
-                    <Tag value="OSL" severity="warning" rounded />
+                  <div aria-haspopup="true" class="mb-1" @contextmenu="onOslRightClick($event, slotProps.node)">
+                    <Tag value="OSL" :severity="slotProps.node.active ? 'success' : 'secondary'" rounded />
                     {{ slotProps.node.label }}
                   </div>
                   <ContextMenu ref="oslContextMenuRef" :model="oslContextMenu" />
@@ -828,6 +828,7 @@ const createApplication = async () => {
       active: newAppData.value.active,
       startTimestamp: parseInt(newAppData.value.startTimestamp.getTime() / 1000),
     };
+    setTimeout(() => (isLoadingUserConfig.value = true), 500);
     const res = await ApiApplication.createApp(dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
@@ -837,12 +838,15 @@ const createApplication = async () => {
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingUserConfig.value = false;
 };
 const confirmUpdateApplication = async (event) => {
   await confirmUpdate(event, updateApplication, 'Update Application');
 };
 const updateApplication = async () => {
   try {
+    setTimeout(() => (isLoadingUserConfig.value = true), 500);
+
     const res = await ApiApplication.updateAppData(appData.value._id, {
       name: appData.value.name,
       active: appData.value.active,
@@ -858,6 +862,7 @@ const updateApplication = async () => {
     console.log('updateApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
+  isLoadingUserConfig.value = false;
 };
 
 const appNodeRightClick = ref();

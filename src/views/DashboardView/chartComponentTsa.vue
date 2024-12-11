@@ -10,7 +10,7 @@
         <div class="hidden md:flex gap-2 justify-content-between align-items-center">
           <div>
             <Button
-              v-if="nodeSelectedInChart.length > 0 && !gridLock"
+              v-if="nodeSelectedInChart.length > 1 && !gridLock"
               type="button"
               severity="secondary"
               icon="pi pi-sitemap"
@@ -20,8 +20,8 @@
           </div>
 
           <ToggleButton
+            v-if="chartData.length !== 1"
             v-model="showAnnotations"
-            :disabled="chartData.length !== 1"
             :onLabel="width > smallChartSize ? 'Standard' : ''"
             :offLabel="width > smallChartSize ? 'Curve Only' : ''"
             onIcon="pi pi-chart-bar"
