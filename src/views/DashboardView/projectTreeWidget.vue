@@ -519,6 +519,7 @@ const getVsaCaseBranchData = async (vsaNode) => {
         leaf: false,
         moduleInfoId: vsaNode._id,
         loading: false,
+        vsaName: vsaNode.label,
       };
       branch.push(newNode);
 
@@ -553,12 +554,14 @@ const getVsaCurveBranchData = async (caseNode) => {
       const newNode = {
         key: caseNode.key + '_' + curveType,
         label: getVsaCurveTypeValue(curveType),
-        data: JSON.stringify(curvesInType.map((leafData) => leafData._id)),
+        data: JSON.stringify(curvesInType.map((leafData) => ({ _id: leafData._id, label: leafData.name }))),
         type: 'VsaCurveType',
         leaf: true,
         curveType: curveType,
         caseInfoId: caseNode._id,
         moduleInfoId: caseNode.moduleInfoId,
+        caseName: caseNode.label,
+        vsaName: caseNode.vsaName,
         loading: false,
         showSubChildren: false,
         subChildren: curvesInType.map((leafData, index) => ({
@@ -572,6 +575,8 @@ const getVsaCurveBranchData = async (caseNode) => {
           caseInfoId: caseNode._id,
           moduleInfoId: caseNode.moduleInfoId,
           loading: false,
+          caseName: caseNode.label,
+          vsaName: caseNode.vsaName,
         })),
       };
       branch.push(newNode);
@@ -795,6 +800,7 @@ const getSsrBranchData = async (dsaModuleNode) => {
         leaf: false,
         data: '[]',
         loading: false,
+        ssrName: leafData.name,
       };
       branch.push(newNode);
       if (treeExpandedKeys.value[dsaModuleNode.key + '_' + 'ssr_' + index]) {
@@ -821,7 +827,7 @@ const getSsrCaseBranchData = async (ssrNode) => {
   if (dataList.length === 0) {
     ssrNode.leaf = true;
   } else {
-    ssrNode.data = JSON.stringify(dataList.map((item) => item._id));
+    ssrNode.data = JSON.stringify(dataList.map((item) => ({ _id: item._id, label: item.name })));
     for (let index = 0; index < dataList.length; index++) {
       const leafData = dataList[index];
       const newNode = {
@@ -834,6 +840,7 @@ const getSsrCaseBranchData = async (ssrNode) => {
         moduleInfoId: ssrNode._id,
         caseType: leafData.caseType,
         loading: false,
+        ssrName: ssrNode.label,
       };
       branch.push(newNode);
       if (treeExpandedKeys.value[ssrNode.key + '_' + index]) {

@@ -92,8 +92,8 @@ const setChartData = async () => {
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.online['rateCritical1']);
 
-    offlineRate1Data.push(moduleData.online['rateCritical1']);
-    offlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.offline['rateCritical1']);
+    offlineRate1Data.push(moduleData.offline['rateCritical1']);
+    offlineRate2Data.push(moduleData.offline['rateCritical2'] - moduleData.offline['rateCritical1']);
     currentData.push(moduleData.current);
     const currentBgColor = getCurrentColor(moduleData.current, moduleData.online);
     currentColor.push(draw('dash', currentBgColor, currentPatternomalyColor, isSmallChart ? 40 : 25, 300));
@@ -161,9 +161,9 @@ const setChartData = async () => {
 
 const getCurrentColor = (current, rateArr) => {
   if (current <= rateArr['rateCritical1']) {
-    return 'rgba(0,128,0,1)';
+    return 'rgba(40,167,69,1)';
   } else if (current <= rateArr['rateCritical2']) {
-    return 'rgba(255,255,0,1)';
+    return 'rgba(255,165,0,1)';
   } else {
     return 'rgba(255,0,0,1)';
   }

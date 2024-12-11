@@ -61,6 +61,24 @@
                     :chartId="widget.id"
                     @onRemoveWidget="onRemoveGridStackComponent(widget)"
                   />
+                  <chartComponentVsa
+                    v-else-if="widget.typeChart === 'vsa'"
+                    v-model:nodeSelected="widget.nodeSelected"
+                    v-model:gridLock="gridLock"
+                    v-model:width="widget.w"
+                    :nodeDrag="nodeDrag"
+                    :chartId="widget.id"
+                    @onRemoveWidget="onRemoveGridStackComponent(widget)"
+                  />
+                  <chartComponentSsr
+                    v-else-if="widget.typeChart === 'ssr'"
+                    v-model:nodeSelected="widget.nodeSelected"
+                    v-model:gridLock="gridLock"
+                    v-model:width="widget.w"
+                    :nodeDrag="nodeDrag"
+                    :chartId="widget.id"
+                    @onRemoveWidget="onRemoveGridStackComponent(widget)"
+                  />
                   <chartComponentAppTimeseries
                     v-else-if="widget.typeChart === 'appTimeSeries'"
                     v-model:nodeSelected="widget.nodeSelected"
@@ -300,6 +318,8 @@ import logListWidget from './logListWidget.vue';
 import MeasInfoDialogWidget from './MeasInfoWidget.vue';
 import chartComponent from './chartComponent.vue';
 import chartComponentTsa from './chartComponentTsa.vue';
+import chartComponentVsa from './chartComponentVsa.vue';
+import chartComponentSsr from './chartComponentSsr.vue';
 import chartComponentAppTimeseries from './chartComponentAppTimeseries.vue';
 
 import { useCommonStore } from '@/store';

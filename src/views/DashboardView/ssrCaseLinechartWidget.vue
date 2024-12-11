@@ -24,6 +24,10 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  showLegend: {
+    type: Boolean,
+    default: true,
+  },
 });
 onMounted(() => {
   chartData.value = setChartData();
@@ -40,6 +44,12 @@ watch(
 );
 watch(
   () => props.width,
+  () => {
+    chartOptions.value = setChartOptions();
+  },
+);
+watch(
+  () => props.showLegend,
   () => {
     chartOptions.value = setChartOptions();
   },
@@ -118,6 +128,7 @@ const setChartOptions = () => {
     plugins: {
       zoom: zoomOptions(),
       legend: {
+        display: props.showLegend,
         labels: {
           usePointStyle: true,
           color: textColor,
@@ -153,14 +164,14 @@ const setChartOptions = () => {
       x: {
         type: 'linear',
         display: true,
+        title: {
+          display: true,
+          text: 'freq (Hz)',
+        },
         ticks: {
           color: textColorSecondary,
-          x: {
-            ticks: {
-              autoSkip: true,
-              maxTicksLimit: 5,
-            },
-          },
+          autoSkip: true,
+          maxTicksLimit: 5,
         },
         grid: {
           color: surfaceBorder,
@@ -170,6 +181,10 @@ const setChartOptions = () => {
         type: 'linear',
         display: true,
         position: 'left',
+        title: {
+          display: true,
+          text: 'D_elec (pu)',
+        },
         ticks: {
           color: textColorSecondary,
         },

@@ -3,7 +3,7 @@
     <template #title>
       <div class="flex flex-wrap justify-content-between align-items-center">
         <div class="flex flex-column justify-content-start align-items-start">
-          <div>TSA</div>
+          <div>SSR</div>
         </div>
         <div class="hidden md:flex gap-2 justify-content-between align-items-center">
           <div>
@@ -17,15 +17,6 @@
             />
           </div>
 
-          <ToggleButton
-            v-if="chartData.length === 1"
-            v-model="showAnnotations"
-            :onLabel="width > smallChartSize ? 'Standard' : ''"
-            :offLabel="width > smallChartSize ? 'Curve Only' : ''"
-            onIcon="pi pi-chart-bar"
-            offIcon="pi pi-chart-line"
-            @change="changeConfig"
-          />
           <ToggleButton
             v-model="showLegend"
             :disabled="chartData.length === 0"
@@ -57,12 +48,7 @@
         @dragover.prevent="onDragoverComponent"
         @drop.prevent="onDropComponent"
       >
-        <tsaCurveLinechartWidget
-          :data="chartData"
-          :showAnnotations="showAnnotations"
-          :showLegend="showLegend"
-          :width="width"
-        />
+        <ssrCaseLinechartWidget :data="chartData" :showLegend="showLegend" :width="width" />
       </div>
     </template>
   </Card>
@@ -119,15 +105,14 @@
 <script setup>
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
-import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
-import { TsaApi } from './api';
+import { SsrApi } from './api';
 import { smallChartSize } from './chartConfig';
+import ssrCaseLinechartWidget from './ssrCaseLinechartWidget.vue';
 
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 import Dialog from 'primevue/dialog';
-import ScrollPanel from 'primevue/scrollpanel';
 import Tree from 'primevue/tree';
 const commonStore = useCommonStore();
 const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
@@ -150,13 +135,13 @@ const width = defineModel('width');
 
 const interval = ref(null);
 const intervalTime = 5 * 1000;
-onMounted(() => {
+onMounted(async () => {
   if (nodeSelected.value) {
+    console.log('nodeSelected.value', nodeSelected.value);
     nodeSelectedInChart.value = nodeSelected.value.data;
-    showAnnotations.value = nodeSelected.value.showAnnotations;
     showLegend.value = nodeSelected.value.showLegend;
     curveTree.value = nodeSelected.value.curveTree;
-    getChartData();
+    await getChartData();
   }
 });
 
@@ -180,8 +165,7 @@ const onRemoveWidget = () => {
   emit('onRemoveWidget');
 };
 
-const typeChartCanDrop = ref(['TsaCurve', 'TsaCurveType']);
-const hiddenDatasets = ref([]);
+const typeChartCanDrop = ref(['SsrCase', 'SSR']);
 const nodeSelectedInChart = ref([]);
 const canDropNode = ref(false);
 
@@ -195,40 +179,30 @@ const onDragoverComponent = () => {
 
 const onDropComponent = async () => {
   if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
-    if (props.nodeDrag.type === 'TsaCurve') {
+    if (props.nodeDrag.type === 'SsrCase') {
       nodeSelectedInChart.value.push({
-        curveInfoId: props.nodeDrag._id,
-        curveType: props.nodeDrag.curveType,
-        subCaseInfoId: props.nodeDrag.subCaseInfo,
-        caseInfoId: props.nodeDrag.caseInfoId,
+        caseInfoId: props.nodeDrag._id,
         moduleInfoId: props.nodeDrag.moduleInfoId,
       });
-      addTsaCurveData(props.nodeDrag);
+      addSsrCurveData(props.nodeDrag);
     }
-    if (props.nodeDrag.type === 'TsaCurveType') {
-      const tsaCurveData = JSON.parse(props.nodeDrag.data);
-      tsaCurveData.forEach((curve) => {
+    if (props.nodeDrag.type === 'SSR') {
+      const curveData = JSON.parse(props.nodeDrag.data);
+      curveData.forEach((curve) => {
         nodeSelectedInChart.value.push({
-          curveInfoId: curve._id,
-          curveType: props.nodeDrag.curveType,
-          subCaseInfoId: props.nodeDrag.subCaseInfo,
-          caseInfoId: props.nodeDrag.caseInfoId,
-          moduleInfoId: props.nodeDrag.moduleInfoId,
+          caseInfoId: curve._id,
+          moduleInfoId: props.nodeDrag._id,
         });
-        addTsaCurveData({
+        addSsrCurveData({
           _id: curve._id,
           label: curve.label,
-          curveType: props.nodeDrag.curveType,
-          tsaName: props.nodeDrag.tsaName,
-          caseName: props.nodeDrag.caseName,
-          subCaseName: props.nodeDrag.subCaseName,
+          ssrName: props.nodeDrag.ssrName,
         });
       });
     }
 
     nodeSelected.value = {
       data: nodeSelectedInChart.value,
-      showAnnotations: showAnnotations.value,
       curveTree: curveTree.value,
     };
     await getChartData();
@@ -240,14 +214,8 @@ const chartData = ref([]);
 
 const getChartData = async () => {
   try {
-    const res = await TsaApi.getChartData(nodeSelectedInChart.value);
-    if (res.data) {
-      chartData.value = res.data;
-
-      getCurveNameOpts(res.data);
-    } else {
-      chartData.value = [];
-    }
+    const res = await SsrApi.getChartData(nodeSelectedInChart.value);
+    chartData.value = res.data || [];
 
     if (measInfo_automatic.value && deleteKey.value.length === 0) {
       interval.value = setTimeout(async () => {
@@ -260,24 +228,6 @@ const getChartData = async () => {
   }
 };
 
-const standardSelected = ref([]);
-const otherSelected = ref([]);
-
-const curveNameOpts = ref([]);
-const getCurveNameOpts = (data) => {
-  const moduleNameObj = {};
-  for (let curveIndex = 0; curveIndex < data.length; curveIndex++) {
-    moduleNameObj[data[curveIndex].moduleName] = { items: [] };
-  }
-  for (let curveIndex = 0; curveIndex < data.length; curveIndex++) {
-    moduleNameObj[data[curveIndex].moduleName].items.push(data[curveIndex].curveName);
-  }
-
-  curveNameOpts.value = Object.keys(moduleNameObj).map((moduleName) => ({
-    label: moduleName,
-    items: moduleNameObj[moduleName].items,
-  }));
-};
 const reloaData = async () => {
   chartData.value = [];
   await getChartData();
@@ -286,58 +236,29 @@ const reloaData = async () => {
 const resetChart = async () => {
   clearTimeout(interval.value);
   chartData.value = [];
-  nodeSelected.value = [];
+  nodeSelected.value = {};
   nodeSelectedInChart.value = [];
-  showAnnotations.value = true;
   showLegend.value = true;
-  curveNameOpts.value = [];
-  standardSelected.value = [];
-  otherSelected.value = [];
-  hiddenDatasets.value = [];
   curveTree.value = [];
   showMenuSelectCurve.value = false;
 };
-const showAnnotations = ref(false);
 const showLegend = ref(true);
 
 const changeConfig = () => {
-  nodeSelected.value.showAnnotations = showAnnotations.value;
   nodeSelected.value.showLegend = showLegend.value;
 };
 const curveTree = ref([]);
-const addTsaCurveData = (newNode) => {
-  const curveType = getTsaCurveTypeValue(newNode.curveType);
-
-  let tsaNode = curveTree.value.find((tsaNode) => tsaNode.key === newNode.tsaName);
-  if (!tsaNode) {
-    tsaNode = { key: newNode.tsaName, label: newNode.tsaName, children: [] };
-    curveTree.value.push(tsaNode);
+const addSsrCurveData = (newNode) => {
+  let ssrNode = curveTree.value.find((node) => node.key === newNode.ssrName);
+  if (!ssrNode) {
+    ssrNode = { key: newNode.ssrName, label: newNode.ssrName, children: [] };
+    curveTree.value.push(ssrNode);
   }
-  let caseNode = tsaNode.children.find((caseNode) => caseNode.key === newNode.caseName);
-  if (!caseNode) {
-    caseNode = { key: newNode.caseName, label: newNode.caseName, children: [] };
-    tsaNode.children.push(caseNode);
-  }
-
-  let subCaseNode = caseNode.children.find((subCaseNode) => subCaseNode.key === newNode.subCaseName);
-  if (!subCaseNode) {
-    subCaseNode = { key: newNode.subCaseName, label: newNode.subCaseName, children: [] };
-    caseNode.children.push(subCaseNode);
-  }
-
-  let typeNode = subCaseNode.children.find((typeNode) => typeNode.key === curveType);
-  if (!typeNode) {
-    typeNode = { key: curveType, label: curveType, children: [] };
-    subCaseNode.children.push(typeNode);
-  }
-  typeNode.children.push({
+  ssrNode.children.push({
     key: newNode._id,
     label: newNode.label,
     type: 'curve',
-    curveType: newNode.curveType,
-    tsaName: newNode.tsaName,
-    caseName: newNode.caseName,
-    subCaseName: newNode.subCaseName,
+    ssrName: newNode.ssrName,
     isDeleted: false,
   });
 };
@@ -348,47 +269,33 @@ const openTreeSelectedCurve = () => {
   // expandAll();
 };
 const toogleDeleteStatus = (node) => {
-  const tsaNode = curveTree.value.find((tsaNode) => tsaNode.key === node.tsaName);
-  if (!tsaNode) return;
-  const caseNode = tsaNode.children.find((caseNode) => caseNode.key === node.caseName);
-  if (!caseNode) return;
-  const subCaseNode = caseNode.children.find((subCaseNode) => subCaseNode.key === node.subCaseName);
-  if (!subCaseNode) return;
-  const curveType = getTsaCurveTypeValue(node.curveType);
-  const typeNode = subCaseNode.children.find((typeNode) => typeNode.key === curveType);
-  if (!typeNode) return;
-  const index = typeNode.children.findIndex((child) => child.key === node.key);
+  const ssrNode = curveTree.value.find((ssrNode) => ssrNode.key === node.ssrName);
+  if (!ssrNode) return;
+  const index = ssrNode.children.findIndex((child) => child.key === node.key);
   if (index !== -1) {
     if (node.isDeleted) {
       deleteKey.value.filter((item) => item.key !== node.key);
-      typeNode.children[index].isDeleted = false;
+      ssrNode.children[index].isDeleted = false;
     } else {
       deleteKey.value.push(node);
-      typeNode.children[index].isDeleted = true;
+      ssrNode.children[index].isDeleted = true;
     }
   }
 };
 
 const removeCurveNodeInTree = (node) => {
-  const tsaNode = curveTree.value.find((tsaNode) => tsaNode.key === node.tsaName);
-  if (!tsaNode) return;
-  const caseNode = tsaNode.children.find((caseNode) => caseNode.key === node.caseName);
-  if (!caseNode) return;
-  const subCaseNode = caseNode.children.find((subCaseNode) => subCaseNode.key === node.subCaseName);
-  if (!subCaseNode) return;
-  const curveType = getTsaCurveTypeValue(node.curveType);
-  const typeNode = subCaseNode.children.find((typeNode) => typeNode.key === curveType);
-  if (!typeNode) return;
-  const index = typeNode.children.findIndex((child) => child.key === node.key);
+  const ssrNode = curveTree.value.find((ssrNode) => ssrNode.key === node.ssrName);
+  if (!ssrNode) return;
+  const index = ssrNode.children.findIndex((child) => child.key === node.key);
   if (index !== -1) {
-    typeNode.children.splice(index, 1);
+    ssrNode.children.splice(index, 1);
   }
 };
 const deleteKey = ref([]);
 
 const submitRemoveCurve = async () => {
   deleteKey.value.forEach((node) => {
-    const indexNodeInChart = nodeSelectedInChart.value.findIndex((nodeInChart) => nodeInChart.curveInfoId === node.key);
+    const indexNodeInChart = nodeSelectedInChart.value.findIndex((nodeInChart) => nodeInChart.caseInfoId === node.key);
     if (indexNodeInChart !== -1) {
       nodeSelectedInChart.value.splice(indexNodeInChart, 1);
     }
@@ -399,8 +306,8 @@ const submitRemoveCurve = async () => {
   await getChartData();
   nodeSelected.value = {
     data: nodeSelectedInChart.value,
-    showAnnotations: showAnnotations.value,
     curveTree: curveTree.value,
+    showLegend: showLegend.value,
   };
   showMenuSelectCurve.value = false;
 };
@@ -440,35 +347,6 @@ const onNodeSelect = (node) => {
     delete expandedKeys.value[node.key];
   } else {
     expandedKeys.value[node.key] = true;
-  }
-};
-const getTsaCurveTypeValue = (curveType) => {
-  if (curveType === undefined) {
-    return '';
-  }
-  switch (curveType) {
-    case 0:
-      return 'ActivePower';
-    case 1:
-      return 'ReactivePower';
-    case 2:
-      return 'Voltage';
-    case 3:
-      return 'Frequency';
-    case 5:
-      return 'Angle';
-    case 6:
-      return 'RotorAngle';
-    case 7:
-      return 'Elect P';
-    case 8:
-      return 'Elect Q';
-    case 9:
-      return 'MechQ';
-    case 10:
-      return 'Efd';
-    default:
-      return 'Unknown';
   }
 };
 </script>

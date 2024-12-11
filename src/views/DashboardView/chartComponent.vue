@@ -37,16 +37,6 @@
             </OverlayPanel>
           </div>
 
-          <ToggleButton
-            v-if="typeChart === 'vsa'"
-            v-model="showVsaLegend"
-            :disabled="chartData.length === 0"
-            :onLabel="width > smallChartSize ? 'Show Label' : ''"
-            :offLabel="width > smallChartSize ? 'Hide Label' : ''"
-            onIcon="pi pi-eye"
-            offIcon="pi pi-eye-slash"
-            @change="changeConfig"
-          />
           <Button v-if="!gridLock" icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
           <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="reloaData" />
           <Button
@@ -71,13 +61,6 @@
       >
         <appBarchartWidget v-if="typeChart === 'appBar'" :data="chartData" :width="width" />
 
-        <vsaCurveLinechartWidget
-          v-if="typeChart === 'vsa'"
-          :showLegend="showVsaLegend"
-          :width="width"
-          :data="chartData"
-        />
-
         <ssrCaseLinechartWidget v-if="typeChart === 'ssr'" :data="chartData" :width="width" />
 
         <appRadarChartWidget
@@ -101,11 +84,10 @@
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 
 import appBarchartWidget from './appBarchartWidget.vue';
-import vsaCurveLinechartWidget from './vsaCurveLinechartWidget.vue';
 import ssrCaseLinechartWidget from './ssrCaseLinechartWidget.vue';
 import appRadarChartWidget from './appRadarChartWidget.vue';
 import projectRadarChartWidget from './projectRadarChartWidget.vue';
-import { VsaApi, SsrApi, ApplicationApi, CommonApi } from './api';
+import { SsrApi, ApplicationApi } from './api';
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
@@ -140,13 +122,11 @@ const width = defineModel('width');
 const interval = ref(null);
 const intervalTime = 5 * 1000;
 onMounted(() => {
+  setInitTitle();
   if (nodeSelected.value) {
     nodeSelectedInChart.value = nodeSelected.value.data;
     if (!props.muiltiSelect) {
       chartTitle.value = nodeSelected.value.title;
-    } else {
-      setInitTitle();
-      showVsaLegend.value = nodeSelected.value.showLegend;
     }
 
     getChartData();
@@ -190,9 +170,6 @@ const typeChartCanDrop = computed(() => {
     return ['Application'];
   }
 
-  if (props.typeChart === 'vsa') {
-    return ['VsaCurve', 'VsaCurveType'];
-  }
   if (props.typeChart === 'ssr') {
     return ['SsrCase', 'SSR'];
   }
@@ -212,9 +189,7 @@ const setInitTitle = () => {
   if (props.typeChart === 'projectRadar') {
     chartTitle.value = 'Project';
   }
-  if (props.typeChart === 'vsa') {
-    chartTitle.value = 'Vsa';
-  }
+
   if (props.typeChart === 'ssr') {
     chartTitle.value = 'SSR';
   }
@@ -239,28 +214,7 @@ const onDropComponent = async () => {
   if (typeChartCanDrop.value.includes(props.nodeDrag.type) && nodeSelectedInChart.value !== props.nodeDrag._id) {
     if (props.muiltiSelect) {
       nodeKeySelected.value.push(props.nodeDrag.key);
-      if (props.typeChart === 'vsa') {
-        if (props.nodeDrag.type === 'VsaCurve') {
-          nodeSelectedInChart.value.push({
-            curveInfoId: props.nodeDrag._id,
-            curveType: props.nodeDrag.curveType,
-            caseInfoId: props.nodeDrag.caseInfoId,
-            moduleInfoId: props.nodeDrag.moduleInfoId,
-          });
-        }
-        if (props.nodeDrag.type === 'VsaCurveType') {
-          const vsaCurveData = JSON.parse(props.nodeDrag.data);
-          nodeKeySelected.value.push(props.nodeDrag.key);
-          vsaCurveData.forEach((curveId) => {
-            nodeSelectedInChart.value.push({
-              curveInfoId: curveId,
-              curveType: props.nodeDrag.curveType,
-              caseInfoId: props.nodeDrag.caseInfoId,
-              moduleInfoId: props.nodeDrag.moduleInfoId,
-            });
-          });
-        }
-      }
+
       if (props.typeChart === 'ssr') {
         if (props.nodeDrag.type === 'SsrCase') {
           nodeSelectedInChart.value.push({
@@ -288,7 +242,6 @@ const onDropComponent = async () => {
     nodeSelected.value = {
       title: props.nodeDrag.label,
       data: nodeSelectedInChart.value,
-      showLegend: showVsaLegend.value,
       dataKey: [],
     };
 
@@ -325,9 +278,6 @@ const getChartData = async () => {
         chartRadarDataKey.value = res.data.Key.slice(0, 8);
       }
     }
-    if (props.typeChart === 'vsa') {
-      res = await VsaApi.getChartData(nodeSelectedInChart.value);
-    }
     if (props.typeChart === 'ssr') {
       res = await SsrApi.getChartData(nodeSelectedInChart.value);
     }
@@ -363,38 +313,6 @@ const resetChart = async () => {
   setInitTitle();
   nodeSelected.value = props.muiltiSelect ? {} : undefined;
   nodeSelectedInChart.value = props.muiltiSelect ? [] : undefined;
-  showVsaLegend.value = true;
-};
-
-const showVsaLegend = ref(true);
-
-const changeConfig = () => {
-  nodeSelected.value.showLegend = showVsaLegend.value;
-};
-
-const getSsrTypeLabel = (typeValue) => {
-  switch (Number(typeValue)) {
-    case 0:
-      return 'N-1';
-    case 1:
-      return 'N-2';
-    case 2:
-      return 'Base';
-    default:
-      return 'N-1';
-  }
-};
-const getVsaCaseTypeValue = (caseType) => {
-  switch (caseType) {
-    case 0:
-      return 'N:1';
-    case 1:
-      return 'N:2';
-    case 2:
-      return 'Base';
-    default:
-      return caseType;
-  }
 };
 </script>
 
