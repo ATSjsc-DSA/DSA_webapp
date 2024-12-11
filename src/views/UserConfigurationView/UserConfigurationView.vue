@@ -334,7 +334,7 @@
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="createTaskDsaDialog" :style="{ width: '52rem' }" header="Create New " :modal="true">
+  <Dialog v-model:visible="createTaskDsaDialog" :style="{ width: '64rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold white-space-nowrap">Create new Task</span>
@@ -828,7 +828,6 @@ const createApplication = async () => {
       active: newAppData.value.active,
       startTimestamp: parseInt(newAppData.value.startTimestamp.getTime() / 1000),
     };
-    setTimeout(() => (isLoadingUserConfig.value = true), 500);
     const res = await ApiApplication.createApp(dataLoad);
     toast.add({ severity: 'success', summary: 'Created successfully', life: 3000 });
     createApplicationVisibleDialog.value = false;
@@ -838,15 +837,12 @@ const createApplication = async () => {
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingUserConfig.value = false;
 };
 const confirmUpdateApplication = async (event) => {
   await confirmUpdate(event, updateApplication, 'Update Application');
 };
 const updateApplication = async () => {
   try {
-    setTimeout(() => (isLoadingUserConfig.value = true), 500);
-
     const res = await ApiApplication.updateAppData(appData.value._id, {
       name: appData.value.name,
       active: appData.value.active,
@@ -862,7 +858,6 @@ const updateApplication = async () => {
     console.log('updateApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingUserConfig.value = false;
 };
 
 const appNodeRightClick = ref();
@@ -885,6 +880,7 @@ const appContextMenu = ref([
 
 const deleteApplication = async () => {
   isLoadingContainer.value = true;
+
   try {
     await ApiApplication.delAppData(appNodeRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1125,22 +1121,23 @@ const dsaContextMenu = computed(() => [
         monitor: {
           monitorSubSystemId: null,
           busConfig: {
-            voltage: 0,
-            freq: 0,
-            angle: 0,
+            voltage: true,
+            freq: true,
+            angle: true,
             active: true,
           },
           branchConfig: {
-            activePower: 0,
-            reActivePower: 0,
+            activePower: true,
+            reActivePower: true,
             active: true,
           },
           genConfig: {
-            rotorAngle: 0,
-            electP: 0,
-            electQ: 0,
-            mechP: 0,
-            efd: 0,
+            internalRotorAngle: true,
+            externalRotorAngle: true,
+            electP: true,
+            electQ: true,
+            mechP: true,
+            efd: true,
             active: true,
           },
           active: true,
@@ -1342,22 +1339,23 @@ const newTsaData = ref({
   monitor: {
     monitorSubSystemId: null,
     busConfig: {
-      voltage: 0,
-      freq: 0,
-      angle: 0,
+      voltage: true,
+      freq: true,
+      angle: true,
       active: true,
     },
     branchConfig: {
-      activePower: 0,
-      reActivePower: 0,
+      activePower: true,
+      reActivePower: true,
       active: true,
     },
     genConfig: {
-      rotorAngle: 0,
-      electP: 0,
-      electQ: 0,
-      mechP: 0,
-      efd: 0,
+      internalRotorAngle: true,
+      externalRotorAngle: true,
+      electP: true,
+      electQ: true,
+      mechP: true,
+      efd: true,
       active: true,
     },
     active: true,

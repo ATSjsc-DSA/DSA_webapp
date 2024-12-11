@@ -218,15 +218,15 @@ const deleteDisturbances = async (data) => {
   }
 };
 const rowStyle = (data) => {
-  if (data._id === Object.keys(caseExpandedRows.value)[0]) {
-    return { backgroundColor: 'var(--primary-300)' };
-  }
+  // if (data._id === Object.keys(caseExpandedRows.value)[0]) {
+  //   return { backgroundColor: 'var(--highlight-bg)' };
+  // }
 };
 </script>
 
 <style>
 .p-datatable-row-expansion {
-  background-color: var(--primary-100);
+  background-color: var(--highlight-bg);
 }
 #disturbanceCaseTable .p-column-title {
   font-size: 1.1rem;

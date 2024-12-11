@@ -350,7 +350,6 @@ onMounted(async () => {
         }
         if (widget.type === 'log') {
           showLog.value = widget.show;
-          localStorage.setItem('logConfig', JSON.stringify(widget));
         }
         if (widget.type === 'tree') {
           showTree.value = widget.show;

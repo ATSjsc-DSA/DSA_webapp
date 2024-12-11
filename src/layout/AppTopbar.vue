@@ -6,11 +6,8 @@ import { usePrimeVue } from 'primevue/config';
 
 import NavMenu from './NavMenu.vue';
 
-import DSA_api from '@/api/dsa_api';
-import chartComposable from '@/combosables/chartData';
 import { useCommonStore } from '@/store';
 const { layoutConfig, isDarkTheme } = useLayout();
-const { convertDateTimeToString } = chartComposable();
 const commonStore = useCommonStore();
 
 const outsideClickListener = ref(null);
@@ -22,7 +19,6 @@ const logs = ref();
 const countLogs = ref('0');
 let logView = [];
 const interval = ref(null);
-const op = ref();
 const { measInfo_automatic } = storeToRefs(commonStore);
 onMounted(async () => {
   await commonStore.getMeasInfoActive();
@@ -81,29 +77,14 @@ watch(logs, async (newValue, oldValue) => {
   }
 });
 
-const toggle = async (event) => {
-  op.value.toggle(event);
-  try {
-    const ids = logView.map((log) => log._id);
-    const res = await DSA_api.putLogsViewed({ ids: ids });
-    if (res.data.message === 'successfully') {
-      countLogs.value = '0';
-    }
-  } catch (error) {}
-};
-
 const onTopBarUserView = () => {
   router.push('/DSA/user');
 };
 const onProjectView = () => {
   localStorage.removeItem('projectData');
   localStorage.removeItem('slotData');
-  localStorage.removeItem('token');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('gridStackComponentArr');
+  localStorage.removeItem('profileData');
 
-  localStorage.setItem('user', user.data.username);
-  localStorage.setItem('role', user.data.role);
   router.push('/Project');
 };
 

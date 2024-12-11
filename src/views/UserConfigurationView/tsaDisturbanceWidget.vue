@@ -76,7 +76,7 @@
       <Column field="startTimestamp" header="Start Time" sortable style="width: 18%"> </Column>
       <Column field="disturbanceEvenType" header="Event Type">
         <template #body="{ data }">
-          <Chip :label="getDisturbanceEventType(data.disturbanceEvenType)" />
+          {{ getDisturbanceEventType(data.disturbanceEvenType) }}
         </template>
       </Column>
 
@@ -104,7 +104,11 @@
       <Column field="action" header="Action">
         <template #body="{ data }">
           <div class="flex align-items-center justify-content-center w-full">
-            <Chip v-if="data.disturbanceEvenType > 10" :label="getEventValue(data.action)" />
+            <Tag
+              v-if="data.disturbanceEvenType > 10"
+              :value="getEventValue(data.action)"
+              :severity="data.action === 0 ? 'primary' : 'secondary'"
+            />
           </div>
         </template>
       </Column>

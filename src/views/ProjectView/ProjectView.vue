@@ -174,6 +174,9 @@ const { projectData, slotData } = storeToRefs(commonStore);
 const onLogout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('refreshToken');
+  localStorage.removeItem('gridStackComponentArr');
+  localStorage.removeItem('user');
+  localStorage.removeItem('role');
   router.push('/login');
 };
 onMounted(() => {

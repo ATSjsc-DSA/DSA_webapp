@@ -97,14 +97,14 @@
     </div>
   </div>
 
-  <div class="grid p-4">
+  <div class="grid p-4 gap-3">
     <div class="col-4">
       <Chip label="Bus" class="mb-3"></Chip>
       <div class="grid">
-        <label for="monitor_signalP" class="col-6"> Voltage</label>
+        <label for="monitor_signalP" class="col-10"> Voltage</label>
         <Checkbox
           v-model="data.monitor.busConfig.voltage"
-          class="col-6"
+          class="col"
           inputId="monitor_signalP"
           name="monitor_signalP"
           :binary="true"
@@ -112,10 +112,10 @@
       </div>
 
       <div class="grid">
-        <label for="monitor_signalQ" class="col-6"> Freq </label>
+        <label for="monitor_signalQ" class="col-10"> Freq </label>
         <Checkbox
           v-model="data.monitor.busConfig.freq"
-          class="col-6"
+          class="col"
           inputId="monitor_signalQ"
           name="monitor_signalQ"
           :binary="true"
@@ -123,10 +123,10 @@
       </div>
 
       <div class="grid">
-        <label for="monitor_signalV" class="col-6"> Angle </label>
+        <label for="monitor_signalV" class="col-10"> Angle </label>
         <Checkbox
           v-model="data.monitor.busConfig.angle"
-          class="col-6"
+          class="col"
           inputId="monitor_signalV"
           name="monitor_signalV"
           :binary="true"
@@ -137,10 +137,10 @@
     <div class="col-4">
       <Chip label="Branch" class="mb-3"></Chip>
       <div class="grid">
-        <label for="activePower" class="col-6"> Active Power</label>
+        <label for="activePower" class="col-10"> Active Power</label>
         <Checkbox
           v-model="data.monitor.branchConfig.activePower"
-          class="col-6"
+          class="col"
           inputId="activePower"
           name="activePower"
           :binary="true"
@@ -148,10 +148,10 @@
       </div>
 
       <div class="grid">
-        <label for="reActivePower" class="col-6"> ReActive Power </label>
+        <label for="reActivePower" class="col-10"> ReActive Power </label>
         <Checkbox
           v-model="data.monitor.branchConfig.reActivePower"
-          class="col-6"
+          class="col"
           inputId="reActivePower"
           name="reActivePower"
           :binary="true"
@@ -160,32 +160,22 @@
     </div>
     <div class="col">
       <Chip label="Gen" class="mb-3"></Chip>
-      <div class="grid">
-        <label for="monitor_rotorAngle" class="col-6"> Rotor Angle</label>
-        <Checkbox
-          v-model="data.monitor.genConfig.rotorAngle"
-          class="col-6"
-          inputId="monitor_rotorAngle"
-          name="monitor_rotorAngle"
-          :binary="true"
-        />
-      </div>
 
       <div class="grid">
-        <label class="col-6" for="monitor_efd"> Efd</label>
+        <label class="col-10" for="monitor_efd"> Efd</label>
         <Checkbox
           v-model="data.monitor.genConfig.efd"
-          class="col-6"
+          class="col"
           inputId="monitor_efd"
           name="monitor_efd"
           :binary="true"
         />
       </div>
       <div class="grid">
-        <label class="col-6" for="monitor_electP"> Elect P</label>
+        <label class="col-10" for="monitor_electP"> Elect P</label>
         <Checkbox
           v-model="data.monitor.genConfig.electP"
-          class="col-6"
+          class="col"
           inputId="monitor_electP"
           name="monitor_electP"
           :binary="true"
@@ -193,22 +183,42 @@
       </div>
 
       <div class="grid">
-        <label class="col-6" for="monitor_electQ"> Elect Q</label>
+        <label class="col-10" for="monitor_electQ"> Elect Q</label>
         <Checkbox
           v-model="data.monitor.genConfig.electQ"
-          class="col-6"
+          class="col"
           inputId="monitor_electQ"
           name="monitor_electQ"
           :binary="true"
         />
       </div>
       <div class="grid">
-        <label class="col-6" for="monitor_mechP"> Mech P</label>
+        <label class="col-10" for="monitor_mechP"> Mech P</label>
         <Checkbox
           v-model="data.monitor.genConfig.mechP"
-          class="col-6"
+          class="col"
           inputId="monitor_mechP"
           name="monitor_mechP"
+          :binary="true"
+        />
+      </div>
+      <div class="grid">
+        <label for="monitor_internalRotorAngle" class="col-10">Internal Rotor Angle</label>
+        <Checkbox
+          v-model="data.monitor.genConfig.internalRotorAngle"
+          class="col"
+          inputId="monitor_internalRotorAngle"
+          name="monitor_internalRotorAngle"
+          :binary="true"
+        />
+      </div>
+      <div class="grid">
+        <label for="monitor_externalRotorAngle" class="col-10">External Rotor Angle</label>
+        <Checkbox
+          v-model="data.monitor.genConfig.externalRotorAngle"
+          class="col"
+          inputId="monitor_externalRotorAngle"
+          name="monitor_externalRotorAngle"
           :binary="true"
         />
       </div>
