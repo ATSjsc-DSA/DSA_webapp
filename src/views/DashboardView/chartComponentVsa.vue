@@ -33,6 +33,7 @@
           </div>
 
           <Button
+            v-if="nodeSelectedInChart.length <= limitLabelShow"
             v-model="showLegend"
             v-tooltip.bottom="showLegend ? 'Hide Legend' : 'Show Legend'"
             :disabled="chartData.length === 0"
@@ -133,7 +134,7 @@
 import { computed, onUnmounted, onMounted, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
 import { VsaApi } from './api';
-import { smallChartSize } from './chartConfig';
+import { limitLabelShow } from './chartConfig';
 
 import chartComposable from '@/combosables/chartData';
 const { convertDateTimeToString } = chartComposable();
@@ -248,6 +249,9 @@ const onDropComponent = async () => {
           caseName: props.nodeDrag.caseName,
         });
       });
+    }
+    if (nodeSelectedInChart.value.length > limitLabelShow) {
+      showLegend.value = false;
     }
 
     nodeSelected.value = {

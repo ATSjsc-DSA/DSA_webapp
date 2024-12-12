@@ -24,3 +24,4 @@ export const colorArray = [
 ];
 
 export const smallChartSize = 5;
+export const limitLabelShow = 5;

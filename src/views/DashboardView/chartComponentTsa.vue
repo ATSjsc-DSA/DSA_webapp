@@ -41,6 +41,7 @@
             @click="changeConfigAnnotation"
           />
           <Button
+            v-if="nodeSelectedInChart.length <= limitLabelShow"
             v-model="showLegend"
             v-tooltip.bottom="showLegend ? 'Hide Legend' : 'Show Legend'"
             :disabled="chartData.length === 0"
@@ -144,16 +145,13 @@
 
 <script setup>
 import { computed, onUnmounted, onMounted, watch } from 'vue';
-import ToggleButton from 'primevue/togglebutton';
 import tsaCurveLinechartWidget from './tsaCurveLinechartWidget.vue';
 import { TsaApi } from './api';
-import { smallChartSize } from './chartConfig';
+import { limitLabelShow } from './chartConfig';
 
 import chartComposable from '@/combosables/chartData';
-const { convertDateTimeToString } = chartComposable();
 import { useCommonStore } from '@/store';
 import Dialog from 'primevue/dialog';
-import ScrollPanel from 'primevue/scrollpanel';
 import Tree from 'primevue/tree';
 const commonStore = useCommonStore();
 const { measInfo_automatic, measInfoActive } = storeToRefs(commonStore);
@@ -265,6 +263,9 @@ const onDropComponent = async () => {
       });
     }
 
+    if (nodeSelectedInChart.value.length > limitLabelShow) {
+      showLegend.value = false;
+    }
     nodeSelected.value = {
       data: nodeSelectedInChart.value,
       showAnnotations: showAnnotations.value,
