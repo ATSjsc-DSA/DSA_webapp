@@ -6,7 +6,7 @@
 
 <script setup>
 import Chart from 'primevue/chart';
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import { draw, generate } from 'patternomaly';
 import chartComposable from '@/combosables/chartData';
 const { zoomOptions, nodataAnnotationOption } = chartComposable();
@@ -26,6 +26,30 @@ const props = defineProps({
 onMounted(async () => {
   chartData.value = await setChartData();
   chartOptions.value = setChartOptions();
+});
+
+const color = computed(() => {
+  return {
+    current: {
+      rate1: '#a7c957',
+      rate2: '#ffb627',
+      rate3: '#d00000',
+      borderRate1: '#606c38',
+      borderRate2: '#bc6c25',
+    },
+    online: {
+      rate1: '#6a994e',
+      rate2: '#ff9505',
+      borderRate1: '#606c38',
+      borderRate2: '#bc6c25',
+    },
+    offline: {
+      rate1: '#5c8001',
+      rate2: '#e2711d',
+      borderRate1: '#606c38',
+      borderRate2: '#bc6c25',
+    },
+  };
 });
 watch(
   () => props.data,
@@ -92,11 +116,15 @@ const setChartData = async () => {
     onlineRate1Data.push(moduleData.online['rateCritical1']);
     onlineRate2Data.push(moduleData.online['rateCritical2'] - moduleData.online['rateCritical1']);
 
-    offlineRate1Data.push(moduleData.offline['rateCritical1']);
-    offlineRate2Data.push(moduleData.offline['rateCritical2'] - moduleData.offline['rateCritical1']);
+    offlineRate1Data.push(moduleData.online['rateCritical1']);
+    offlineRate2Data.push(moduleData.online['rateCritical2'] - 3000 - moduleData.offline['rateCritical1']);
+
+    if (moduleIndex === 0) {
+      moduleData.current = moduleData.online['rateCritical2'] + 100;
+    }
     currentData.push(moduleData.current);
-    const currentBgColor = getCurrentColor(moduleData.current, moduleData.online);
-    currentColor.push(draw('dash', currentBgColor, currentPatternomalyColor, isSmallChart ? 40 : 25, 300));
+
+    currentColor.push(getCurrentColor(moduleData.current, moduleData.online));
   }
 
   const datasets = [
@@ -105,32 +133,33 @@ const setChartData = async () => {
       type: 'bar',
       datalabels: 'Current',
       label: 'Current',
-      barThickness: isSmallChart ? 20 : 30,
       data: currentData,
+      borderColor: color.value.current.borderRate1,
+      borderWidth: 1.5,
       backgroundColor: currentColor,
       borderColor: currentPatternomalyColor,
-      borderWidth: 0.1,
       stack: 'Stack Current',
     },
+
     // online
     {
       datalabels: 'Online',
-      barThickness: isSmallChart ? 20 : 30,
       type: 'bar',
       label: 'Rate Critical 1',
       data: onlineRate1Data,
-      backgroundColor: 'rgba(40,167,69,1)',
-
+      backgroundColor: color.value.online.rate1,
+      borderColor: color.value.online.borderRate1,
+      borderWidth: 1.5,
       stack: 'Stack Online',
     },
     {
       type: 'bar',
       datalabels: 'Online',
-      barThickness: isSmallChart ? 20 : 30,
       label: 'Rate Critical 2',
       data: onlineRate2Data,
-      backgroundColor: 'rgba(255,165,0,1)',
-
+      backgroundColor: color.value.online.rate2,
+      borderColor: color.value.online.borderRate2,
+      borderWidth: 1.5,
       stack: 'Stack Online',
     },
 
@@ -138,21 +167,21 @@ const setChartData = async () => {
     {
       type: 'bar',
       datalabels: 'Offline',
-      barThickness: isSmallChart ? 20 : 30,
       label: 'Rate Critical 1',
       data: offlineRate1Data,
-      backgroundColor: isDarkTheme.value ? 'rgba(0,128,0,1)' : 'rgba(0,128,30,1)',
-
+      backgroundColor: color.value.offline.rate1,
+      borderColor: color.value.offline.borderRate1,
+      borderWidth: 1.5,
       stack: 'Stack Offline',
     },
     {
       type: 'bar',
       datalabels: 'Offline',
-      barThickness: isSmallChart ? 20 : 30,
       label: 'Rate Critical 2',
       data: offlineRate2Data,
-      backgroundColor: isDarkTheme.value ? 'rgba(255, 141, 0, 1)' : 'rgba(255, 141, 0, 1)',
-
+      backgroundColor: color.value.offline.rate2,
+      borderColor: color.value.offline.borderRate2,
+      borderWidth: 1.5,
       stack: 'Stack Offline',
     },
   ];
@@ -161,11 +190,11 @@ const setChartData = async () => {
 
 const getCurrentColor = (current, rateArr) => {
   if (current <= rateArr['rateCritical1']) {
-    return 'rgba(40,167,69,1)';
+    return color.value.current.rate1;
   } else if (current <= rateArr['rateCritical2']) {
-    return 'rgba(255,165,0,1)';
+    return color.value.current.rate2;
   } else {
-    return 'rgba(255,0,0,1)';
+    return color.value.current.rate3;
   }
 };
 
@@ -176,11 +205,10 @@ const setChartOptions = () => {
   const isSmallChart = props.width < smallChartSize;
   return {
     animation: false,
-    barThickness: 20,
     stacked: true,
-    barThickness: 20,
     maintainAspectRatio: false,
     aspectRatio: 0.6,
+    responsive: true,
     plugins: {
       zoom: zoomOptions(),
       tooltip: {
@@ -208,9 +236,12 @@ const setChartOptions = () => {
       },
       annotation: props.data.length === 0 ? nodataAnnotationOption(textColorSecondary) : {},
     },
+
     scales: {
       x: {
         stacked: true,
+        barPercentage: 0.1, // Adjust this value to increase/decrease the width of the bars
+        categoryPercentage: 1.0, // Adjust this value to increase/decrease the space between groups
         ticks: {
           color: textColorSecondary,
           autoSkip: true, // Cho phép Chart.js tự động bỏ qua nhãn để giảm độ phân giải
