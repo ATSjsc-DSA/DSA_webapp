@@ -24,40 +24,51 @@
           <div>
             <Button
               v-if="nodeSelectedInChart.length > 1 && !gridLock"
+              v-tooltip.bottom="'Open Curve Tree'"
               type="button"
               severity="secondary"
               icon="pi pi-sitemap"
-              :label="width > smallChartSize ? 'Curve Tree' : ''"
               @click="openTreeSelectedCurve"
             />
           </div>
 
-          <ToggleButton
+          <Button
             v-if="chartData.length === 1"
             v-model="showAnnotations"
-            :onLabel="width > smallChartSize ? 'Standard' : ''"
-            :offLabel="width > smallChartSize ? 'Curve Only' : ''"
-            onIcon="pi pi-chart-bar"
-            offIcon="pi pi-chart-line"
-            @change="changeConfig"
+            v-tooltip.bottom="showAnnotations ? 'Curve Only' : 'Show Standard'"
+            severity="secondary"
+            :icon="showAnnotations ? 'pi pi-chart-line' : 'pi pi-chart-bar'"
+            @click="changeConfigAnnotation"
           />
-          <ToggleButton
+          <Button
             v-model="showLegend"
+            v-tooltip.bottom="showLegend ? 'Hide Legend' : 'Show Legend'"
             :disabled="chartData.length === 0"
-            :onLabel="width > smallChartSize ? 'Show Label' : ''"
-            :offLabel="width > smallChartSize ? 'Hide Label' : ''"
-            onIcon="pi pi-eye"
-            offIcon="pi pi-eye-slash"
-            @change="changeConfig"
+            :icon="showLegend ? 'pi pi-eye-slash' : 'pi pi-eye'"
+            severity="secondary"
+            @click="changeConfigLegend"
           />
-          <Button v-if="!gridLock" icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
-          <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="reloaData" />
           <Button
             v-if="!gridLock"
+            v-tooltip.bottom="'Reset Data'"
+            icon="pi pi-trash "
+            severity="danger"
+            text
+            @click="resetChart"
+          />
+          <Button
+            v-tooltip.bottom="'Refresh chart'"
+            icon="pi pi-refresh "
+            severity="secondary"
+            text
+            @click="reloaData"
+          />
+          <Button
+            v-if="!gridLock"
+            v-tooltip.bottom="'Remove Widget'"
             icon="pi pi-times"
             text
             severity="secondary"
-            title="Remove chart"
             @click="onRemoveWidget"
           />
         </div>
@@ -328,8 +339,13 @@ const resetChart = async () => {
 const showAnnotations = ref(false);
 const showLegend = ref(true);
 
-const changeConfig = () => {
+const changeConfigAnnotation = () => {
+  showAnnotations.value = !showAnnotations.value;
   nodeSelected.value.showAnnotations = showAnnotations.value;
+};
+
+const changeConfigLegend = () => {
+  showLegend.value = !showLegend.value;
   nodeSelected.value.showLegend = showLegend.value;
 };
 const curveTree = ref([]);

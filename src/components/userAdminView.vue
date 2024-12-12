@@ -93,6 +93,7 @@
           <Column :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
               <Button icon="pi pi-pencil" outlined rounded class="mr-3" @click="editUser(slotProps.data)" />
+
               <Button
                 icon="pi pi-trash"
                 outlined
@@ -234,7 +235,7 @@ const updateInfo = async () => {
     toast.add({ severity: 'warn', summary: 'Warn Message', detail: 'Password incorrect', life: 3000 });
   } else {
     try {
-      const res = await user_api.updateUser(userForm.value.id, userForm.value.password);
+      const res = await user_api.updateUser(userForm.value.id, { password: userForm.value.password });
       visible.value = false;
       toast.add({ severity: 'success', summary: 'Success Message', detail: res.detail, life: 3000 });
     } catch (error) {

@@ -44,14 +44,27 @@
               </div>
             </OverlayPanel>
           </div>
-          <Button v-if="!gridLock" icon="pi pi-trash " title="Reset Data" severity="danger" text @click="resetChart" />
-          <Button icon="pi pi-refresh " title="Refresh chart" severity="secondary" text @click="reloaData" />
+          <Button
+            v-if="!gridLock"
+            icon="pi pi-trash "
+            v-tooltip.bottom="'Reset Data'"
+            severity="danger"
+            text
+            @click="resetChart"
+          />
+          <Button
+            icon="pi pi-refresh "
+            v-tooltip.bottom="'Refresh chart'"
+            severity="secondary"
+            text
+            @click="reloaData"
+          />
           <Button
             v-if="!gridLock"
             icon="pi pi-times"
             text
             severity="secondary"
-            title="Remove chart"
+            v-tooltip.bottom="'Remove Widget'"
             @click="onRemoveWidget"
           />
         </div>
