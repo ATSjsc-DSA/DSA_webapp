@@ -1,7 +1,5 @@
 <template>
   <div class="card layout-content min-h-full">
-    <AppProgressSpinner :showSpinner="isLoadingUserConfig"></AppProgressSpinner>
-
     <Splitter style="height: 56rem">
       <!-- Tree  -->
       <SplitterPanel :size="25" :minSize="10" style="overflow-y: auto">
@@ -154,7 +152,16 @@
         <Card style="height: 100%">
           <template #title>
             <div class="flex flex-wrap justify-content-between align-items-center gap-2">
-              <div>Configuration {{ nodeSelected._id ? ' - ' + nodeSelected.type : '' }}</div>
+              <div>
+                Configuration
+
+                <span v-if="nodeSelected._id">
+                  {{ ' - ' + nodeSelected.type }}
+                </span>
+                <span v-if="isLoading">
+                  <i class="pi pi-spin pi-spinner px-3" style="font-size: 1.2rem"></i>
+                </span>
+              </div>
             </div>
           </template>
           <template #content>
@@ -403,7 +410,6 @@ import monitorFormWidget from './formWidget/monitorFormWidget.vue';
 
 import monitorWidget from './monitorWidget.vue';
 import dsaFormWidget from './formWidget/dsaFormWidget.vue';
-
 import { ApiApplication, ApiMonitor, ApiDsa } from '@/views/UserConfigurationView/api';
 import DsaVsaFormWidget from './formWidget/dsaVsaFormWidget.vue';
 import DsaTsaFormWidget from './formWidget/dsaTsaFormWidget.vue';
@@ -414,8 +420,6 @@ import dsaOslFormWidget from './formWidget/dsaOslFormWidget.vue';
 import tsaDisturbanceCasesWidget from './tsaDisturbanceCasesWidget.vue';
 const toast = useToast();
 const confirm = useConfirm();
-const isLoadingUserConfig = ref(false);
-
 const commonStore = useCommonStore();
 const { profileData } = storeToRefs(commonStore);
 
@@ -434,7 +438,7 @@ const treeData = ref([
     active: true,
   },
 ]);
-const isLoadingContainer = ref(false);
+const isLoading = ref(false);
 
 // tree map
 /*
@@ -453,7 +457,7 @@ const isLoadingContainer = ref(false);
 
 */
 const getTreeData = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   const appList = await getAppList();
   const tree = [
     {
@@ -471,7 +475,7 @@ const getTreeData = async () => {
     tree[0].children.push(await getAppLeaf(app, appIndex));
   }
   treeData.value = tree;
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 const getAppLeaf = async (app, key = '', newAppLeaf = false) => {
@@ -717,7 +721,7 @@ const onNodeSelect = async (node) => {
   }
   nodeSelected.value = node;
 
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   const keyCanSelected = ['Application', 'Monitor', 'DSA', 'VSA', 'TSA', 'SSR', 'OSL'];
   if (node.type === 'Application') {
     await getAppData(node._id);
@@ -747,7 +751,7 @@ const onNodeSelect = async (node) => {
 
   expandedKeys.value[node.key] = true;
   await onNodeExpand(node);
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 const onNodeExpand = async (node) => {
@@ -787,6 +791,7 @@ const projectContextMenu = ref([
         name: '',
         active: true,
         startTimestamp: new Date(),
+        engineId: undefined,
       };
     },
   },
@@ -846,6 +851,7 @@ const updateApplication = async () => {
     const res = await ApiApplication.updateAppData(appData.value._id, {
       name: appData.value.name,
       active: appData.value.active,
+      engineId: appData.value.engineId,
       startTimestamp: parseInt(appData.value.startTimestamp.getTime() / 1000),
     });
     toast.add({ severity: 'success', summary: 'Updated successfully', life: 3000 });
@@ -879,7 +885,7 @@ const appContextMenu = ref([
 ]);
 
 const deleteApplication = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
 
   try {
     await ApiApplication.delAppData(appNodeRightClick.value._id);
@@ -890,7 +896,7 @@ const deleteApplication = async () => {
     console.log('deleteApplication: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 // ------- Monitor Group Menu -> create monitor
@@ -977,7 +983,7 @@ const monitorContextMenu = computed(() => [
 ]);
 
 const delMonitor = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   try {
     await ApiMonitor.delMonitor(monitorRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -988,7 +994,7 @@ const delMonitor = async () => {
     console.log('delMonitor: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 // ------- DSA group Menu - create DSA
@@ -1170,7 +1176,7 @@ const dsaContextMenu = computed(() => [
   },
 ]);
 const delDsa = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
 
   try {
     await ApiDsa.delDsa(dsaModuleRightClick.value._id);
@@ -1183,7 +1189,7 @@ const delDsa = async () => {
     console.log('delDsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 // ---- Task
@@ -1313,7 +1319,7 @@ const vsaContextMenu = ref([
 ]);
 
 const delVsa = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   try {
     await ApiDsa.delVsa(vsaNodeRightclick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1324,7 +1330,7 @@ const delVsa = async () => {
     console.log('delVsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 // ---DSA - Tsa
@@ -1437,7 +1443,7 @@ const tsaContextMenu = ref([
 ]);
 
 const delTsa = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   try {
     await ApiDsa.delTsa(tsaNodeRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1448,7 +1454,7 @@ const delTsa = async () => {
     console.log('delTsa: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 // ---DSA - Ssr
@@ -1534,7 +1540,7 @@ const ssrContextMenu = ref([
 ]);
 
 const delSsr = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   try {
     await ApiDsa.delSsr(ssrNodeRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1545,7 +1551,7 @@ const delSsr = async () => {
     console.log('delSsr: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 // ---DSA - Osl
@@ -1627,7 +1633,7 @@ const oslContextMenu = ref([
   },
 ]);
 const delOsl = async () => {
-  isLoadingContainer.value = true;
+  isLoading.value = true;
   try {
     await ApiDsa.delOsl(oslNodeRightClick.value._id);
     toast.add({ severity: 'success', summary: 'Deleted successfully', life: 3000 });
@@ -1638,7 +1644,7 @@ const delOsl = async () => {
     console.log('delOsl: error ', error);
     toast.add({ severity: 'error', summary: 'Error Message', detail: error.data.detail, life: 3000 });
   }
-  isLoadingContainer.value = false;
+  isLoading.value = false;
 };
 
 const confirmUpdate = async (event, updateFunc, header = '') => {

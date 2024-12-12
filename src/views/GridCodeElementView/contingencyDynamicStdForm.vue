@@ -25,7 +25,8 @@
         <InputNumber
           v-model="formData.stableRangeLower"
           :suffix="getUnitLabel(formData.unitTypeStable)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -35,7 +36,8 @@
         <InputNumber
           v-model="formData.stableRangeUpper"
           :suffix="getUnitLabel(formData.unitTypeStable)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -62,7 +64,8 @@
         <InputNumber
           v-model="formData.lowerError"
           :suffix="getUnitLabel(formData.unitTypeError)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
@@ -72,7 +75,8 @@
         <InputNumber
           v-model="formData.upperError"
           :suffix="getUnitLabel(formData.unitTypeError)"
-          :maxFractionDigits="10" :minFractionDigits="1"
+          :maxFractionDigits="10"
+          :minFractionDigits="1"
         />
       </div>
     </div>
