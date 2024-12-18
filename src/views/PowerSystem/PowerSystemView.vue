@@ -1,42 +1,47 @@
 <template>
   <div class="card layout-content min-h-full">
     <Toast />
+    <ConfirmDialog />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
+    <!-- this is for test  -->
+    <div class="p-3 flex gap-2 justify-content-end align-items-center">
+      <Button label="Open compare upload" @click="saveUploadVisibleDialog = true" />
+    </div>
+    <!-- end test  -->
     <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
           icon="pi pi-table"
           label="Power System"
           text
-          :severity="tabMenuOnTopActive === 0 ? 'primary' : 'secondary'"
-          @click="tabMenuOnTopActive = 0"
+          :severity="tabMenuOnTopActive === tabMenuOnTopList.indexOf('Power System') ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = tabMenuOnTopList.indexOf('Power System')"
         />
-        <Button
-          icon="pi pi-list"
-          label="Version"
-          text
-          :severity="tabMenuOnTopActive === 1 ? 'primary' : 'secondary'"
-          @click="tabMenuOnTopActive = 1"
-        />
+
         <Button
           v-if="slotData.name !== 'Online'"
           icon="pi pi-history"
-          label="Compare"
+          label="History"
           text
-          :severity="tabMenuOnTopActive === 2 ? 'primary' : 'secondary'"
-          @click="tabMenuOnTopActive = 2"
+          :severity="tabMenuOnTopActive === tabMenuOnTopList.indexOf('History') ? 'primary' : 'secondary'"
+          @click="tabCompareClick"
+        />
+        <Button
+          v-if="slotData.name !== 'Online'"
+          icon="pi pi-list"
+          label="Snapshot"
+          text
+          :severity="tabMenuOnTopActive === tabMenuOnTopList.indexOf('Snapshot') ? 'primary' : 'secondary'"
+          @click="tabMenuOnTopActive = tabMenuOnTopList.indexOf('Snapshot')"
         />
       </div>
-      <div v-if="slotData.name !== 'Online'" class="flex gap-2 justify-content-between align-items-center">
+      <div class="flex gap-2 justify-content-between align-items-center">
         <router-link to="/powersystem/slot" rel="Slot">
-          <Button title="Back to Slot Table" icon="pi pi-list" severity="secondary" text />
+          <Button title="Back to Workspace Table" icon="pi pi-list" severity="secondary" text />
         </router-link>
-        <Tag :value="slotData.name" severity="secondary" class="px-6" />
-      </div>
-
-      <div v-else class="flex gap-2 justify-content-between align-items-center">
-        <Tag value="Online" severity="primary" class="px-6" />
+        <Tag v-if="slotData.name !== 'Online'" :value="slotData.name" severity="secondary" class="px-6" />
+        <Tag v-else value="Online" severity="primary" class="px-6" />
       </div>
     </div>
     <Divider />
@@ -390,15 +395,21 @@
         </Splitter>
       </TabPanel>
 
-      <!-- tab version  -->
-      <TabPanel>
-        <versionTabWidget :canChange="slotData.name !== 'Online'" />
-      </TabPanel>
-
       <!-- tab compare -->
 
       <TabPanel>
-        <compareTabWidget :disabled="slotData.name === 'Online'" />
+        <div v-if="isLoadingContainer" class="relative" style="padding-top: 10rem">
+          <div>
+            <LoadingContainer />
+          </div>
+        </div>
+
+        <compareTabWidget v-else :disabled="slotData.name === 'Online'" :data="compareData" />
+      </TabPanel>
+
+      <!-- tab version  -->
+      <TabPanel>
+        <versionTabWidget :canChange="slotData.name !== 'Online'" />
       </TabPanel>
     </TabView>
   </div>
@@ -465,6 +476,30 @@
     </template>
   </Dialog>
 
+  <!-- compare dialog -->
+
+  <Dialog v-model:visible="saveUploadVisibleDialog" style="width: 80vw" maximizable modal>
+    <template #header>
+      <div class="inline-flex align-items-center justify-content-center gap-2">
+        <span class="font-bold text-lg white-space-nowrap"> File Uploaded </span>
+      </div>
+    </template>
+
+    <compareTabWidget :data="compareData" />
+
+    <template #footer>
+      <div class="p-3 w-full flex align-items-center justify-content-between gap-3">
+        <div>
+          <countDownWidget @timeout="showTimeOutAndlearEmsFile" />
+        </div>
+        <div class="flex align-items-center justify-content-end gap-3">
+          <Button type="button" label="Cancel" severity="secondary" @click="confirmCloseCompareUpload"></Button>
+          <Button type="button" label="Save" severity="primary" @click="saveUploadEmsFile"></Button>
+        </div>
+      </div>
+    </template>
+  </Dialog>
+  <!-- import dialog  -->
   <Dialog
     v-model:visible="importVisibleDialog"
     :style="{ width: '50rem' }"
@@ -481,6 +516,7 @@
     </TabView>
   </Dialog>
 
+  <!-- export dialog  -->
   <Dialog
     v-model:visible="exportVisibleDialog"
     :style="{ width: '50rem' }"
@@ -508,11 +544,10 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 
 import SplitButton from 'primevue/splitbutton';
-
+import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import uploadFileConfig from '../../components/uploadFileConfig.vue';
 import uploadEmsFile from './uploadEmsFile.vue';
 import uploadDynamicFile from '../dynamicModelDefault/uploadDynamicFile.vue';
 import compareTabWidget from './compareTableWidget.vue';
@@ -529,16 +564,18 @@ import dynamicDefinitionTabWidget from './dynamicDefinitionTabWidget.vue';
 
 import createPsDialog from './createPsDialog.vue';
 import createEmsDialog from './createEmsDialog.vue';
-
+import countDownWidget from './countDownWidget.vue';
 import LoadingContainer from '@/components/LoadingContainer.vue';
 import AppProgressSpinner from '@/components/AppProgressSpinner .vue';
 import router from '@/router';
 
-import { DynamicModelApi } from './api';
+import { DynamicModelApi, ApiCompare } from './api';
 // graphic
 import stationGraphic from '@/components/station_graphics/stationGraphic.vue';
 
 import { useCommonStore } from '@/store';
+import { useConfirm } from 'primevue/useconfirm';
+const confirm = useConfirm();
 
 const commonStore = useCommonStore();
 const { slotData } = storeToRefs(commonStore);
@@ -555,13 +592,13 @@ onUnmounted(() => {});
 
 // tab menu
 const tabMenuOnTopActive = ref(0);
+const tabMenuOnTopList = ref(['Power System', 'History', 'Snapshot']);
 const tabMenuPSActive = ref(0);
 const tabMenuPSList = ref(['Parameter', 'EMS', 'PSSE', 'Scada', 'Dynamic', 'Graphics']);
 const showDefinitionFlatList = ref(false);
 
 const loadAllData = async () => {
   await getDefinitionList();
-  // await getVersionData();
   // await getComparePSD();
   tabMenuPSActive.value = 0;
   await getEmsfilterList();
@@ -1057,12 +1094,23 @@ const toggleMenuConfig = (event) => {
 };
 
 const emsImportFormdata = ref();
+const compareData = ref();
+const saveUploadVisibleDialog = ref(false);
 const loadEmsFile = async (formData, callback) => {
   try {
     isLoadingProgress.value = true;
     emsImportFormdata.value = formData;
-    await api.PowerSystemParameterApi.importPowerSystemData(formData);
-    await delayImportExport();
+    const res = await ApiCompare.uploadAndGetCompare(formData);
+    compareData.value = res.data;
+    // // this is for test
+    // compareData.value = {
+    //   message: 'Data is too large to return via API. It has been stored in Redis.',
+    //   psd_diff_key: 'psd_diff:673aae04e9e2f92fe6e376f5:672f888274165faaf2e4244c',
+    //   ems_diff_key: 'ems_diff:673aae04e9e2f92fe6e376f5:672f888274165faaf2e4244c',
+    // };
+    // // end test
+    importVisibleDialog.value = false;
+    saveUploadVisibleDialog.value = true;
     toast.add({ severity: 'success', summary: 'EMS', detail: 'Import Successfully', life: 3000 });
     isLoadingProgress.value = false;
     callback();
@@ -1094,22 +1142,6 @@ const loadDynamicFile = async (formData, callback) => {
 function delayImportExport(ms = 3000) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
-const importEmsFile = async () => {
-  isLoadingProgress.value = true;
-  await delayImportExport();
-  toast.add({ severity: 'success', summary: 'EMS', detail: 'Import Successfully', life: 3000 });
-  importVisibleDialog.value = false;
-  isLoadingProgress.value = false;
-};
-
-const importDynamicFile = async () => {
-  isLoadingProgress.value = true;
-  await delayImportExport();
-  toast.add({ severity: 'success', summary: 'Dynamic Model', detail: 'Import Successfully', life: 3000 });
-  importVisibleDialog.value = false;
-  isLoadingProgress.value = false;
-};
 
 const exportEmsFile = async () => {
   isLoadingProgress.value = true;
@@ -1202,15 +1234,76 @@ const deletePsEms = async (pseId) => {
   }
 };
 
-function capitalizeFirstLetter(string) {
-  if (!string) {
-    return '';
+// compare
+
+const tabCompareClick = async () => {
+  tabMenuOnTopActive.value = tabMenuOnTopList.value.indexOf('History');
+  await getComparePSD();
+};
+
+const getComparePSD = async () => {
+  isLoadingContainer.value = true;
+  try {
+    const res = await ApiCompare.getLastestCompare();
+    compareData.value = res.data;
+  } catch (error) {
+    compareData.value = {};
   }
-  return string
-    .split(/(?=[A-Z])/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
+  isLoadingContainer.value = false;
+};
+
+const confirmCloseCompareUpload = () => {
+  confirm.require({
+    header: 'Confirmation',
+    message: 'Save your Upload File before closing?',
+    icon: 'pi pi-save',
+    rejectProps: {
+      label: "Don't Save",
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Save',
+      severity: 'primary',
+    },
+
+    rejectClass: 'p-button-secondary p-button-outlined',
+    rejectLabel: "Don't Save",
+    acceptLabel: 'Save',
+    accept: async () => {
+      await saveUploadEmsFile();
+    },
+    reject: () => {
+      clearEmsFile();
+    },
+  });
+};
+
+const showTimeOutAndlearEmsFile = () => {
+  toast.add({ severity: 'warn', summary: ' Time Out', detail: 'PowerSystem Data is removed!', life: 3000 });
+  clearEmsFile();
+};
+const clearEmsFile = () => {
+  saveUploadVisibleDialog.value = false;
+  compareData.value = {};
+};
+
+const saveUploadEmsFile = async () => {
+  isLoadingProgress.value = true;
+
+  try {
+    await ApiCompare.saveUploadFile();
+    clearEmsFile();
+    toast.add({
+      severity: 'success',
+      summary: ' Upload File Saved Successfully',
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({ severity: 'error', summary: ' Upload File Save Failed', detail: error.data.detail, life: 3000 });
+  }
+  isLoadingProgress.value = false;
+};
 </script>
 
 <style>

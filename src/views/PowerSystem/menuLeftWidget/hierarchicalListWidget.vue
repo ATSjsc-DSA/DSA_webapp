@@ -32,17 +32,20 @@
   <div v-if="isLoadingTree" class="block relative w-full mt-3 h-12rem" style="z-index: 1">
     <LoadingContainer v-show="isLoadingTree" />
   </div>
-  <Tree
-    v-else
-    v-model:selectionKeys="nodeSelected"
-    :value="treeData"
-    loadingMode="icon"
-    class="w-full md:w-[30rem]"
-    style="height: 28rem; overflow: auto"
-    selectionMode="single"
-    @node-expand="onNodeExpand"
-    @node-select="onNodeSelect"
-  />
+
+  <template v-else>
+    <div class="p-3">No Data</div>
+    <Tree
+      v-if="treeData.length > 0"
+      v-model:selectionKeys="nodeSelected"
+      :value="treeData"
+      loadingMode="icon"
+      class="w-full md:w-[30rem]"
+      style="height: 28rem; overflow: auto"
+      selectionMode="single"
+      @node-expand="onNodeExpand"
+      @node-select="onNodeSelect"
+  /></template>
 </template>
 
 <script setup>
@@ -131,8 +134,8 @@ const getTree = async () => {
       drawLeaf();
     }, 500);
   } catch (error) {
-    console.log('getFirstChildOnPSTree: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    console.log('getTree: error ', error);
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
   setTimeout(() => {
     isLoadingTree.value = false;
@@ -216,8 +219,8 @@ const getLeaf = async (node = {}) => {
     }
     return data;
   } catch (error) {
-    console.log('getFirstChildOnPSTree: error ', error);
-    toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
+    console.log('getLeaf: error ', error);
+    // toast.add({ severity: 'error', summary: 'Definition List', detail: error.data.detail, life: 3000 });
   }
 };
 const onNodeSelect = (node) => {

@@ -14,7 +14,7 @@
     >
       <template #header>
         <div class="flex align-items-center justify-content-between">
-          <div class="font-semibold text-xl py-3">Version</div>
+          <div class="font-semibold text-xl py-3">Snapshot</div>
           <div v-if="canChange" class="flex align-items-center justify-content-end">
             <Button type="button" label="Save" icon="pi pi-save" text @click="handleCreateVersion" />
           </div>
@@ -38,7 +38,7 @@
           <Tag :value="getStateValue(data.state)" :severity="getStateSeverity(data.state)" />
         </template>
       </Column>
-      <Column field="createdUser" header="Created by" style="text-wrap: nowrap" />
+      <Column field="createdUser" header="Created by" class="capitalize" style="text-wrap: nowrap" />
 
       <Column header="Created Time">
         <template #body="{ data }">
@@ -48,8 +48,8 @@
       <Column v-if="canChange" class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
         <template #body="{ data }">
           <Button
-            v-tooltip.left="'Rollback to this Version'"
-            icon="pi pi-pencil"
+            v-tooltip.bottom="'Rollback'"
+            icon="pi pi-backward"
             text
             rounded
             class="flex m-auto"
@@ -75,15 +75,15 @@
   </div>
 
   <confirmUpdateDialog
-    message="This action will clear all previous changes and change to This Version."
+    message="This action will clear all previous changes and change to This Snapshot."
     action="Continue"
   />
 
-  <!-- create new version dialog  -->
+  <!-- create new Snapshot dialog  -->
   <Dialog v-model:visible="createVisibleDialog" :style="{ width: '32rem' }" header="Create New " :modal="true">
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
-        <span class="font-bold white-space-nowrap"> Save Version</span>
+        <span class="font-bold white-space-nowrap"> Save Snapshot</span>
       </div>
     </template>
 
@@ -220,7 +220,7 @@ const createVersion = async () => {
     });
     toast.add({
       severity: 'success',
-      summary: 'Save Version',
+      summary: 'Save Snapshot',
       detail: 'Saveed Successfully',
       life: 3000,
     });
@@ -236,7 +236,7 @@ const confirmRollbackVersion = (event, data) => {
   confirm.require({
     group: 'updateDialog',
     target: event.currentTarget,
-    header: 'Rollback Version - ' + data.name,
+    header: 'Rollback Snapshot - ' + data.name,
     message: 'Are you sure you want to proceed?',
     icon: 'pi pi-exclamation-triangle',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
@@ -255,7 +255,7 @@ const rollbackVersion = async (data) => {
     await ApiVersion.rollbackVersion(data._id);
     toast.add({
       severity: 'success',
-      summary: 'Rollback Version',
+      summary: 'Rollback Snapshot',
       detail: 'Rollbacked Successfully. Reloading data!',
       life: 3000,
     });
@@ -275,10 +275,12 @@ const rollbackVersion = async (data) => {
 .p-datatable-table {
   height: 100%;
 }
-#versionList .p-datatable-wrapper {
-  height: 86%;
-}
-tr.p-datatable-emptymessage {
+
+#versionList tr.p-datatable-emptymessage {
   vertical-align: top;
+}
+
+#versionList tr {
+  height: 4rem;
 }
 </style>

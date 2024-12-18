@@ -32,8 +32,16 @@ export class ApiVersion {
 }
 
 export class ApiCompare {
-  static async getComparePSD() {
-    return get(`/powersystem/${projectData.value._id}/${slotData.value._id}/compare_powersystem`);
+  static async getLastestCompare() {
+    return get(`/powersystem/${projectData.value._id}/${slotData.value._id}/compare_lastest`);
+  }
+
+  static async uploadAndGetCompare(data) {
+    return put(`/powersystem/${projectData.value._id}/${slotData.value._id}/compare`, data);
+  }
+
+  static async saveUploadFile() {
+    return put(`/powersystem/${projectData.value._id}/${slotData.value._id}/upload`);
   }
 }
 

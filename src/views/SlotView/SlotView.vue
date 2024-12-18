@@ -11,10 +11,11 @@
         rowHover
         showGridlines
         :loading="isLoadingData"
+        :rowClass="rowClass"
       >
         <template #header>
           <div class="flex align-items-center justify-content-between">
-            <div class="font-semibold text-xl py-3">Power System Slot</div>
+            <div class="font-semibold text-xl py-3">Power System Workspace</div>
             <router-link to="/Project">
               <Button v-tooltip.bottom="'Project'" severity="secondary" icon="pi pi-sign-out" text />
             </router-link>
@@ -32,9 +33,19 @@
         <Column class="" alignFrozen="right" style="width: 1%; min-width: 5rem" bodyClass="p-1">
           <template #body="{ data }">
             <Button
-              v-tooltip="'Setting Power System'"
+              v-if="data.name === 'Online'"
+              v-tooltip.bottom="'Open Power System'"
               icon="pi pi-caret-right"
-              text
+              :text="data.name !== slotData.name"
+              rounded
+              class="flex m-auto"
+              @click="saveSlotDataAndRedirect(data)"
+            />
+            <Button
+              v-else
+              v-tooltip.bottom="data.name === slotData.name ? 'Open Power System' : 'Setting Power System'"
+              icon="pi pi-caret-right"
+              :text="data.name !== slotData.name"
               rounded
               class="flex m-auto"
               @click="confirmRunSlot($event, data)"
@@ -69,6 +80,9 @@ import { useCommonStore } from '@/store';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 import { Api } from './api';
+// import from '@/views/ProjectView/api.js';
+import ApiOnline from '../ProjectView/api';
+
 const commonStore = useCommonStore();
 const { slotData } = storeToRefs(commonStore);
 const confirm = useConfirm();
@@ -78,11 +92,15 @@ onMounted(async () => {
 
 const slotList = ref([]);
 const isLoadingData = ref(false);
-
+const onlineMode = ref({});
 const getList = async () => {
   isLoadingData.value = true;
   try {
     const res = await Api.getList();
+    await getOnlineModeId();
+    if (onlineMode.value) {
+      res.data.push(onlineMode.value);
+    }
     slotList.value = res.data;
   } catch (error) {
     slotList.value = [];
@@ -90,11 +108,21 @@ const getList = async () => {
   }
   isLoadingData.value = false;
 };
-
+const getOnlineModeId = async () => {
+  try {
+    const res = await ApiOnline.getOnlineModeId();
+    if (res.data.description === '') {
+      res.data.description = 'Read Only';
+    }
+    onlineMode.value = res.data;
+  } catch (error) {
+    return;
+  }
+};
 const confirmRunSlot = (event, data) => {
   confirm.require({
     target: event.currentTarget,
-    header: 'Config Slot - ' + data.name,
+    header: 'Config Workspace - ' + data.name,
     message: 'Are you sure you want to proceed?',
     icon: 'pi pi-cog',
     group: 'runDialog',
@@ -108,7 +136,9 @@ const confirmRunSlot = (event, data) => {
     reject: () => {},
   });
 };
-
+const rowClass = (data) => {
+  return [{ 'bg-primary text-white': data.name === slotData.value.name }];
+};
 const saveSlotDataAndRedirect = (newSlot) => {
   slotData.value = newSlot;
   localStorage.setItem('slotData', JSON.stringify(newSlot));
