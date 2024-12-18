@@ -21,7 +21,7 @@ const showSpinner = computed(() => props.showSpinner);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Đảm bảo overlay nằm trên cùng */
+  z-index: 99999; /* Đảm bảo overlay nằm trên cùng */
 }
 .overlay-hidden {
   display: none;

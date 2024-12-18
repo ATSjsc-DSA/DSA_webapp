@@ -13,16 +13,12 @@
     <ColumnGroup type="header">
       <Row>
         <Column header="Unique Id" style="width: 15%" :rowspan="2" />
-        <Column header="General" :colspan="2" />
-        <Column header="Scada" :colspan="2" />
+        <Column header="General" :colspan="3" />
         <Column header="engineInfo" :colspan="2" />
       </Row>
       <Row>
         <Column header="Name" />
-        <Column header="Operation Name" />
-
-        <Column header="Skey" />
-        <Column header="Scada Name" />
+        <Column header="Power System Id" />
 
         <Column header="Definition" />
         <Column header="Value" />
@@ -51,55 +47,27 @@
         </div>
       </template>
     </Column>
-    <Column header="Operation Name">
+    <Column header="Power System Id">
       <template #body="{ data }">
-        <div v-if="data.new.generalInfo.operationName !== data.old.generalInfo.operationName">
+        <div v-if="data.new.generalInfo.powersystemId.$oid !== data.old.generalInfo.powersystemId.$oid">
           <div class="text-orange-500">
-            {{ data.new.generalInfo.operationName }}
+            {{ data.new.generalInfo.powersystemId.$oid }}
           </div>
-          <div>({{ data.old.generalInfo.operationName }})</div>
+          <div>({{ data.old.generalInfo.powersystemId.$oid }})</div>
         </div>
 
         <div v-else>
-          {{ data.new.generalInfo.operationName }}
+          {{ data.new.generalInfo.powersystemId.$oid }}
         </div>
       </template>
     </Column>
 
-    <Column header="Skey">
-      <template #body="{ data }">
-        <div v-if="data.new.scadaInfo.skey !== data.old.scadaInfo.skey">
-          <div class="text-orange-500">
-            {{ data.new.scadaInfo.skey }}
-          </div>
-          <div>({{ data.old.scadaInfo.skey }})</div>
-        </div>
-
-        <div v-else>
-          {{ data.new.scadaInfo.skey }}
-        </div>
-      </template>
-    </Column>
-    <Column header="Scada Name">
-      <template #body="{ data }">
-        <div v-if="data.new.scadaInfo.scadaName !== data.old.scadaInfo.scadaName">
-          <div class="text-orange-500">
-            {{ data.new.scadaInfo.scadaName }}
-          </div>
-          <div>({{ data.old.scadaInfo.scadaName }})</div>
-        </div>
-
-        <div v-else>
-          {{ data.new.scadaInfo.scadaName }}
-        </div>
-      </template>
-    </Column>
     <Column header="Definition">
       <template #body="{ data }">
         <div
           v-if="data.new.engineInfo.powerSystemDefinitionId.$oid !== data.old.engineInfo.powerSystemDefinitionId.$oid"
-          class="text-orange-500"
           v-tooltip.bottom="data.old.engineInfo.powerSystemDefinitionId.$oid"
+          class="text-orange-500"
         >
           {{ data.new.engineInfo.powerSystemDefinitionId.$oid }}
         </div>

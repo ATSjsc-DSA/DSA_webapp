@@ -4,11 +4,6 @@
     <ConfirmDialog />
     <AppProgressSpinner :showSpinner="isLoadingProgress"></AppProgressSpinner>
 
-    <!-- this is for test  -->
-    <div class="p-3 flex gap-2 justify-content-end align-items-center">
-      <Button label="Open compare upload" @click="saveUploadVisibleDialog = true" />
-    </div>
-    <!-- end test  -->
     <div class="flex gap-2 justify-content-between align-items-center">
       <div class="flex gap-2 justify-content-start">
         <Button
@@ -478,7 +473,7 @@
 
   <!-- compare dialog -->
 
-  <Dialog v-model:visible="saveUploadVisibleDialog" style="width: 80vw" maximizable modal>
+  <Dialog v-model:visible="saveUploadVisibleDialog" :style="{ width: '80vw' }" maximizable modal>
     <template #header>
       <div class="inline-flex align-items-center justify-content-center gap-2">
         <span class="font-bold text-lg white-space-nowrap"> File Uploaded </span>
@@ -488,7 +483,10 @@
     <compareTabWidget :data="compareData" />
 
     <template #footer>
-      <div class="p-3 w-full flex align-items-center justify-content-between gap-3">
+      <div
+        v-if="Object.keys(compareData.psd_diff).length > 0 || Object.keys(compareData.ems_diff).length > 0"
+        class="p-3 w-full flex align-items-center justify-content-between gap-3"
+      >
         <div>
           <countDownWidget @timeout="showTimeOutAndlearEmsFile" />
         </div>
@@ -1102,6 +1100,7 @@ const loadEmsFile = async (formData, callback) => {
     emsImportFormdata.value = formData;
     const res = await ApiCompare.uploadAndGetCompare(formData);
     compareData.value = res.data;
+
     // // this is for test
     // compareData.value = {
     //   message: 'Data is too large to return via API. It has been stored in Redis.',
