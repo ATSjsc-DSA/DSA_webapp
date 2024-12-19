@@ -1,10 +1,10 @@
 import { get, post, put, _delete } from '@/utils/request';
 import { useCommonStore } from '@/store';
 const commonStore = useCommonStore();
-const { projectData, additionVersionId, slotData } = storeToRefs(commonStore);
+const { projectData, slotData } = storeToRefs(commonStore);
 console.log('slotData', slotData.value._id);
 export const VALUE_DATA_NAME = ['EMS', 'PSSE'];
-
+export const TIME_COUNT_DOWN_STORAGE_FILE = 2 * 60;
 export class ApiVersion {
   // version
   static async getList(page) {
@@ -19,7 +19,7 @@ export class ApiVersion {
   }
 
   static async saveVersion(data) {
-    return post(`/powersystem/${projectData.value._id}/${slotData.value._id}/newversion_powersystem`, data);
+    return post(`/powersystem/${projectData.value._id}/${slotData.value._id}/create_version`, data);
   }
 
   static async createNewVersion(nameVersion, scheduledOperationTime) {

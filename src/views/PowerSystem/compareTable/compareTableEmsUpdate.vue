@@ -82,14 +82,14 @@
         <div v-for="(newVal, index) in data.new.engineInfo.values" :key="index">
           <div
             v-if="newVal !== data.old.engineInfo.values[index]"
-            v-tooltip.bottom="data.old.engineInfo.values[index] ? data.old.engineInfo.values[index] : 'Null'"
+            v-tooltip.bottom="`${data.old.engineInfo.values[index] ? data.old.engineInfo.values[index] : 'null'}`"
             class="text-orange-500"
           >
-            {{ newVal }}
+            {{ newVal ? newVal : 'null' }}
           </div>
 
           <div v-else>
-            {{ newVal }}
+            {{ newVal ? newVal : 'null' }}
           </div>
         </div>
       </template>

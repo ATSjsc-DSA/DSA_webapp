@@ -1298,6 +1298,7 @@ const saveUploadEmsFile = async () => {
       summary: ' Upload File Saved Successfully',
       life: 3000,
     });
+     loadAllData()
   } catch (error) {
     toast.add({ severity: 'error', summary: ' Upload File Save Failed', detail: error.data.detail, life: 3000 });
   }

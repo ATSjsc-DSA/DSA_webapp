@@ -15,9 +15,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import ProgressBar from 'primevue/progressbar';
-
+import { TIME_COUNT_DOWN_STORAGE_FILE } from './api';
 const emit = defineEmits(['timeout']);
-const countDownVal = ref(200 * 60);
+const countDownVal = ref(TIME_COUNT_DOWN_STORAGE_FILE);
 const showAlarmAt = ref(10);
 let interval;
 
@@ -31,7 +31,7 @@ const countdown = () => {
 };
 
 onMounted(() => {
-  countDownVal.value = 200 * 60;
+  countDownVal.value = TIME_COUNT_DOWN_STORAGE_FILE;
   interval = setInterval(countdown, 1000);
 });
 

@@ -34,9 +34,9 @@
   </div>
 
   <template v-else>
-    <div class="p-3">No Data</div>
+    <div v-if="treeData.length === 0" class="p-3">No Data</div>
     <Tree
-      v-if="treeData.length > 0"
+      v-else
       v-model:selectionKeys="nodeSelected"
       :value="treeData"
       loadingMode="icon"

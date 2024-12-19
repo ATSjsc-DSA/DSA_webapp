@@ -8,77 +8,65 @@
   <template v-else>
     <TabView>
       <TabPanel header="Power System">
-        <div v-for="(dataChange, definition) in psTableData" :key="definition">
-          <div class="font-semibold my-3">
-            {{ definition }}
-          </div>
+        <div v-if="Object.keys(psTableData).length === 0" style="min-height: 30rem">No Change</div>
+        <template v-else>
+          <Accordion style="min-height: 50rem" multiple :activeIndex="[0]">
+            <template v-for="(dataChange, definition) in psTableData" :key="definition">
+              <AccordionTab :header="definition">
+                <div class="px-3">
+                  <TabView>
+                    <TabPanel :disabled="dataChange.added.length === 0" :header="`New (${dataChange.added.length})`">
+                      <compareTableAdd :data="dataChange.added" />
+                    </TabPanel>
+                    <TabPanel
+                      :disabled="dataChange.modified.length === 0"
+                      :header="`Modified (${dataChange.modified.length})`"
+                    >
+                      <compareTableUpdate :data="dataChange.modified" />
+                    </TabPanel>
 
-          <div class="px-3">
-            <Panel v-if="dataChange.added.length > 0" toggleable>
-              <template #header>
-                <div class="text-green-500">New Power System ({{ dataChange.added.length }})</div>
-              </template>
-              <div class="py-2">
-                <compareTableAdd :data="dataChange.added" />
-              </div>
-            </Panel>
-            <!-- Update  -->
-            <Panel v-if="dataChange.modified.length > 0" toggleable class="mt-3">
-              <template #header>
-                <div class="text-yellow-500">Update Power System ({{ dataChange.modified.length }})</div>
-              </template>
-              <div class="py-2">
-                <compareTableUpdate :data="dataChange.modified" />
-              </div>
-            </Panel>
-            <!-- Delete  -->
-            <Panel v-if="dataChange.removed.length > 0" toggleable class="mt-3">
-              <template #header>
-                <div class="text-red-500">Delete Power System ({{ dataChange.removed.length }})</div>
-              </template>
-              <div class="py-2">
-                <compareTableDelete :data="dataChange.removed" />
-              </div>
-            </Panel>
-          </div>
-        </div>
+                    <TabPanel
+                      :disabled="dataChange.removed.length === 0"
+                      :header="`Removed (${dataChange.removed.length})`"
+                    >
+                      <compareTableDelete :data="dataChange.removed" />
+                    </TabPanel>
+                  </TabView>
+                </div>
+              </AccordionTab>
+            </template>
+          </Accordion>
+        </template>
       </TabPanel>
       <TabPanel header="EMS">
-        <div v-if="Object.keys(emsTableData).length === 0" style="min-height: 30rem;" >No Change</div>
+        <div v-if="Object.keys(emsTableData).length === 0" style="min-height: 30rem">No Change</div>
         <div v-else>
-          <div v-for="(dataChange, definition) in emsTableData" :key="definition">
-            <div class="font-semibold my-3">
-              {{ definition }}
-            </div>
-            <div class="px-3">
-              <Panel v-if="dataChange.added.length > 0" toggleable>
-                <template #header>
-                  <div class="text-green-500">New Power System ({{ dataChange.added.length }})</div>
-                </template>
-                <div class="py-2">
-                  <compareTableAdd :data="dataChange.added" />
+          <Accordion style="min-height: 50rem" multiple :activeIndex="[0]">
+            <template v-for="(dataChange, definition) in emsTableData" :key="definition">
+              <AccordionTab :header="definition">
+                <div class="px-3">
+                  <TabView>
+                    <TabPanel :disabled="dataChange.added.length === 0" :header="`New (${dataChange.added.length})`">
+                      <compareTableAdd :data="dataChange.added" />
+                    </TabPanel>
+                    <TabPanel
+                      :disabled="dataChange.modified.length === 0"
+                      :header="`Modified (${dataChange.modified.length})`"
+                    >
+                      <compareTableEmsUpdate :data="dataChange.modified" />
+                    </TabPanel>
+
+                    <TabPanel
+                      :disabled="dataChange.removed.length === 0"
+                      :header="`Removed (${dataChange.removed.length})`"
+                    >
+                      <compareTableDelete :data="dataChange.removed" />
+                    </TabPanel>
+                  </TabView>
                 </div>
-              </Panel>
-              <!-- Update  -->
-              <Panel v-if="dataChange.modified.length > 0" toggleable class="mt-3">
-                <template #header>
-                  <div class="text-yellow-500">Update Power System ({{ dataChange.modified.length }})</div>
-                </template>
-                <div class="py-2">
-                  <compareTableEmsUpdate :data="dataChange.modified" />
-                </div>
-              </Panel>
-              <!-- Delete  -->
-              <Panel v-if="dataChange.removed.length > 0" toggleable class="mt-3">
-                <template #header>
-                  <div class="text-red-500">Delete Power System ({{ dataChange.removed.length }})</div>
-                </template>
-                <div class="py-2">
-                  <compareTableDelete :data="dataChange.removed" />
-                </div>
-              </Panel>
-            </div>
-          </div>
+              </AccordionTab>
+            </template>
+          </Accordion>
         </div>
       </TabPanel>
     </TabView>
